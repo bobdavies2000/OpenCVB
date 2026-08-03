@@ -12,7 +12,7 @@ Namespace VBClasses
             desc = "Plot data provided in src Mat"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            hist.plotColors(0) = Scalar.White
+            hist.plotColors(0) = Scalar.white
             hist.Run(src)
             dst2 = hist.dst2
 
@@ -130,7 +130,7 @@ Namespace VBClasses
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                     output.Add(pt)
                 Else
-                    output.Add(newPoint)
+                    output.Add(new cv.Point)
                 End If
             Next
 

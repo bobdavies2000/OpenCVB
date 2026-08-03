@@ -1,79 +1,81 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Resize_Basics : Inherits TaskParent
-    Public newSize As Size
-    Public options As New Options_Resize
-    Public Sub New()
-        If standalone Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
-        desc = "Resize with different options and compare them"
-        labels(2) = "Rectangle highlight above resized"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Resize_Basics : Inherits TaskParent
+        Public newSize As Size
+        Public options As New Options_Resize
+        Public Sub New()
+            If standalone Then task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+            desc = "Resize with different options and compare them"
+            labels(2) = "Rectangle highlight above resized"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If task.drawRect.Width <> 0 Then
-            src = src(task.drawRect)
-            newSize = task.drawRect.Size
-        End If
+            If task.drawRect.Width <> 0 Then
+                src = src(task.drawRect)
+                newSize = task.drawRect.Size
+            End If
 
-        Resize(src, dst2, newSize, 0, 0, options.warpFlag)
-    End Sub
-End Class
-
-
-
+            Resize(src, dst2, newSize, 0, 0, options.warpFlag)
+        End Sub
+    End Class
 
 
 
 
-Public Class Resize_Smaller : Inherits TaskParent
-    Public options As New Options_Resize
-    Public newSize As Size
-    Dim optGrid As New Options_GridFromResize
-    Public Sub New()
-        desc = "Resize by a percentage of the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        optGrid.Run()
 
-        newSize = New Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
+
+
+    Public Class Resize_Smaller : Inherits TaskParent
+        Public options As New Options_Resize
+        Public newSize As Size
+        Dim optGrid As New Options_GridFromResize
+        Public Sub New()
+            desc = "Resize by a percentage of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            optGrid.Run()
+
+            newSize = New Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
                                    Math.Ceiling(src.Height * optGrid.lowResPercent))
 
-        Resize(src, dst2, newSize, 0, 0, options.warpFlag)
-        labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)
-    End Sub
-End Class
+            Resize(src, dst2, newSize, 0, 0, options.warpFlag)
+            labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Resize_Proportional : Inherits TaskParent
-    Dim options As New Options_Spectrum
-    Dim redC As New RedC_Basics
-    Public Sub New()
-        desc = "Resize the input but keep the results proportional to the original."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then
-            options.Run()
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            SetTrueText(redC.strOut, 3)
-            If task.rcD IsNot Nothing Then src = src(task.rcD.rect)
-        End If
+    Public Class Resize_Proportional : Inherits TaskParent
+        Dim options As New Options_Spectrum
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Resize the input but keep the results proportional to the original."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then
+                options.Run()
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                SetTrueText(redC.strOut, 3)
+                If task.rcD IsNot Nothing Then src = src(task.rcD.rect)
+            End If
 
-        Dim newSize As Size
-        If dst0.Width / dst0.Height < src.Width / src.Height Then
-            newSize = New Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width)
-        Else
-            newSize = New Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height)
-        End If
-        Resize(src, src, newSize, 0, 0, InterpolationFlags.Nearest)
-        Dim newRect = New cv.Rect(0, 0, newSize.Width, newSize.Height)
-        dst3.SetTo(0)
-        src.CopyTo(dst3(newRect))
-    End Sub
-End Class
+            Dim newSize As Size
+            If dst0.Width / dst0.Height < src.Width / src.Height Then
+                newSize = New Size(dst2.Width, dst2.Height * dst0.Height / dst0.Width)
+            Else
+                newSize = New Size(dst2.Width * dst0.Height / dst0.Width, dst2.Height)
+            End If
+            Resize(src, src, newSize, 0, 0, InterpolationFlags.Nearest)
+            Dim newRect = New cv.Rect(0, 0, newSize.Width, newSize.Height)
+            dst3.SetTo(0)
+            src.CopyTo(dst3(newRect))
+        End Sub
+    End Class
+End Namespace

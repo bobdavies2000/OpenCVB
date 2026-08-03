@@ -106,10 +106,6 @@ Namespace VBClasses
             If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
             task.accRadians.Z += PI / 2
 
-            Dim y1 = task.accRadians.Y - PI
-            If task.accRadians.X < 0 Then y1 *= -1
-            task.verticalizeAngle = y1 * RadToDeg
-
             ' Unit gravity vector in body frame (points down)
             GravityVector = AnglesToGravityVector(task.accRadians)
 
@@ -309,7 +305,7 @@ Namespace VBClasses
             Dim currP2 = WarpPoint(lpCurr.p2, M)
             Dim gravP1 = WarpPoint(lpGravity.p1, M)
             Dim gravP2 = WarpPoint(lpGravity.p2, M)
-            Line(dst3, currP1, currP2, Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst3, currP1, currP2, Scalar.red, task.lineWidth + 1, task.lineType)
             Line(dst3, gravP1, gravP2, Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
             labels(2) = "Stabilized accumulation of last " + CStr(frameHistory.Count) + " frames."

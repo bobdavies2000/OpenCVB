@@ -533,7 +533,7 @@ Namespace VBClasses
                 cc.RenderBlobs(labelView)
 
                 'For Each b In cc.Blobs.Skip(1)
-                '    dst2.Rectangle(b.Rect, Scalar.Red, task.lineWidth + 1, task.lineType)
+                '    dst2.Rectangle(b.Rect, Scalar.red, task.lineWidth + 1, task.lineType)
                 'Next
 
                 Dim maxBlob = cc.GetLargestBlob()

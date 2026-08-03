@@ -8,7 +8,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
+            labels = {"Original Blue plane", "Original Green plane", "Original red plane", "ECC Aligned image"}
             desc = "Align the BGR inputs raw images from the Prokudin examples."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -143,7 +143,7 @@ Namespace VBClasses
         Dim options As New Options_WarpModel
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
+            labels = {"Original Blue plane", "Original Green plane", "Original red plane", "Naively Aligned image"}
             desc = "Import the misaligned input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

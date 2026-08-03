@@ -1,59 +1,61 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 'https://github.com/DinoZ1729/Double-Pendulum/blob/main/pendulum_with_trace.cpp
-Public Class Pendulum_Basics : Inherits TaskParent
-    Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
-    Dim o1 As Single = CSng(2 * PI / 2), o2 As Single = CSng(2 * PI / 3)
-    Dim w1 As Single, w2 As Single
-    Dim g As Single = 9.81F
-    Dim dw As Single = 2, dh As Single = 4
-    Dim center = New Point2f(dst2.Width / 2, 0)
-    Dim fps As Single = 300
-    Dim options = New Options_Pendulum()
-    Public Sub New()
-        labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
-        desc = "Build a double pendulum"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Namespace VBClasses
+    Public Class Pendulum_Basics : Inherits TaskParent
+        Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
+        Dim o1 As Single = CSng(2 * PI / 2), o2 As Single = CSng(2 * PI / 3)
+        Dim w1 As Single, w2 As Single
+        Dim g As Single = 9.81F
+        Dim dw As Single = 2, dh As Single = 4
+        Dim center = New Point2f(dst2.Width / 2, 0)
+        Dim fps As Single = 300
+        Dim options = New Options_Pendulum()
+        Public Sub New()
+            labels = {"", "", "A double pendulum representation", "Trace of the pendulum end points (p1 and p2)"}
+            desc = "Build a double pendulum"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        Dim accumulator As Single
+            Dim accumulator As Single
 
-        If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
-            dst2.SetTo(0)
-            dst3.SetTo(0)
-        End If
+            If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
+                dst2.SetTo(0)
+                dst3.SetTo(0)
+            End If
 
-        If options.initialize Then
-            l1 = msRNG.Next(50, 300)
-            l2 = msRNG.Next(50, 300)
-            dw = msRNG.Next(2, 4)
-            dh = 2 * dw
-        End If
+            If options.initialize Then
+                l1 = msRNG.Next(50, 300)
+                l2 = msRNG.Next(50, 300)
+                dw = msRNG.Next(2, 4)
+                dh = 2 * dw
+            End If
 
-        fps = options.fps
-        Dim dt As Single = CSng(1 / fps)
+            fps = options.fps
+            Dim dt As Single = CSng(1 / fps)
 
-        Dim alfa1 = (-g * (2 * m1 + m2) * Math.Sin(o1) - g * m2 * Math.Sin(o1 - 2 * o2) - 2 * m2 * Math.Sin(o1 - o2) * (w2 * w2 * l2 + w1 * w1 * l1 * Math.Cos(o1 - o2))) / (l1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2)))
-        Dim alfa2 = (2 * Math.Sin(o1 - o2)) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.Cos(o1) + w2 * w2 * l2 * m2 * Math.Cos(o1 - o2)) / l2 / (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2))
+            Dim alfa1 = (-g * (2 * m1 + m2) * Math.Sin(o1) - g * m2 * Math.Sin(o1 - 2 * o2) - 2 * m2 * Math.Sin(o1 - o2) * (w2 * w2 * l2 + w1 * w1 * l1 * Math.Cos(o1 - o2))) / (l1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2)))
+            Dim alfa2 = (2 * Math.Sin(o1 - o2)) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.Cos(o1) + w2 * w2 * l2 * m2 * Math.Cos(o1 - o2)) / l2 / (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2))
 
-        w1 += 10 * dt * alfa1
-        w2 += 10 * dt * alfa2
-        o1 += 10 * dt * w1
-        o2 += 10 * dt * w2
+            w1 += 10 * dt * alfa1
+            w2 += 10 * dt * alfa2
+            o1 += 10 * dt * w1
+            o2 += 10 * dt * w2
 
-        accumulator += dt
+            accumulator += dt
 
-        Dim p1 = New cv.Point((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5F) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5F) / dh + dst2.Height / dh / 2)
-        ' adjust to fit in the image better
-        p1 = New cv.Point(CInt(p1.X * 2), CInt(p1.Y * 0.5F))
-        Dim p2 = New cv.Point(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
+            Dim p1 = New cv.Point((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5F) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5F) / dh + dst2.Height / dh / 2)
+            ' adjust to fit in the image better
+            p1 = New cv.Point(CInt(p1.X * 2), CInt(p1.Y * 0.5F))
+            Dim p2 = New cv.Point(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
 
 
-        Dim lineCenter = New cv.Point(CInt(center.x), CInt(center.y))
-        Line(dst2, lineCenter, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
-        Line(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
+            Dim lineCenter = New cv.Point(CInt(center.x), CInt(center.y))
+            Line(dst2, lineCenter, p1, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
+            Line(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255), task.lineWidth, task.lineType)
 
-        Circle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
-        Circle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
-    End Sub
-End Class
+            Circle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
+            Circle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255), -1, task.lineType)
+        End Sub
+    End Class
+End Namespace

@@ -154,7 +154,7 @@ Namespace VBClasses
     Public Class XR_Color8U_RedHue : Inherits TaskParent
         Dim options As New Options_CamShift
         Public Sub New()
-            labels = {"", "", "Pixels with Red Hue", ""}
+            labels = {"", "", "Pixels with red Hue", ""}
             desc = "Find all the reddish pixels in the image - indicate some life form."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -288,7 +288,7 @@ Namespace VBClasses
     ' https://github.com/AjinkyaChavan9/RGB-Color-Classifier-with-Deep-Learning-using-Keras-and-Tensorflow
     Public Class XR_Color8U_Common : Inherits TaskParent
         Dim common As New List(Of Vec3b)
-        Dim commonScalar As List(Of Scalar) = {Scalar.Blue, Scalar.Green, Scalar.Red, Scalar.Yellow, Scalar.Pink, Scalar.Purple, Scalar.Brown,
+        Dim commonScalar As List(Of Scalar) = {Scalar.Blue, Scalar.Green, Scalar.red, Scalar.Yellow, Scalar.Pink, Scalar.Purple, Scalar.Brown,
                                                   Scalar.Gray, Scalar.Black, white}.ToList
         Public Sub New()
             For Each c In commonScalar

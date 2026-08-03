@@ -62,8 +62,8 @@ Namespace VBClasses
                 Dim cellCount = CountNonZero(dst0(lane))
                 If cellCount Then
                     activeState(i) = True
-                    Rectangle(dst0, lane, Scalar.Red, -1)
-                    Rectangle(dst3, lane, Scalar.Red, -1)
+                    Rectangle(dst0, lane, Scalar.red, -1)
+                    Rectangle(dst3, lane, Scalar.red, -1)
                 End If
                 If cellCount = 0 And activeState(i) = True Then
                     activeState(i) = False
@@ -104,7 +104,7 @@ Namespace VBClasses
                 If standaloneTest() Then
                     For i = 0 To contours.Length - 1
                         Dim minRect = MinAreaRect(contours(i))
-                        Rectangle_Basics.DrawRotatedRect(minRect, dst2, Scalar.Red)
+                        Rectangle_Basics.DrawRotatedRect(minRect, dst2, Scalar.red)
                     Next
                 End If
                 dst3 = video.dst2

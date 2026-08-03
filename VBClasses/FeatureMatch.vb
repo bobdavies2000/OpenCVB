@@ -27,7 +27,7 @@ Namespace VBClasses
                 features.Add(p1)
                 Line(dst, p0, p1, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst, p0, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                Circle(dst, p1, task.DotSize + 1, Scalar.red, -1, task.lineType)
             Next
         End Sub
         Public Shared Sub captureState(ByRef lastframe As cv.Mat, ByRef lastdesc As cv.Mat, ByRef descMat As cv.Mat,
@@ -515,7 +515,7 @@ Namespace VBClasses
                 dstPts.Add(New Point2f(p0.X, p0.Y)) ' heartbeat / track origin
                 Line(dst2, p0, p1, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst2, p0, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst2, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                Circle(dst2, p1, task.DotSize + 1, Scalar.red, -1, task.lineType)
             Next
 
             If srcPts.Count < 3 Then

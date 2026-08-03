@@ -1,41 +1,43 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Texture_Basics : Inherits TaskParent
-    Dim ellipse As New Draw_Ellipses
-    Public texture As New Mat
-    Public tRect as cv.Rect
-    Dim texturePop As Integer
-    Public tChange As Boolean ' if the texture hasn't changed this will be false.
-    Public Sub New()
-        task.gOptions.GridSlider.Value = Math.Min(dst2.Width \ 8, task.gOptions.GridSlider.Maximum)
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Texture_Basics : Inherits TaskParent
+        Dim ellipse As New Draw_Ellipses
+        Public texture As New Mat
+        Public tRect As cv.Rect
+        Dim texturePop As Integer
+        Public tChange As Boolean ' if the texture hasn't changed this will be false.
+        Public Sub New()
+            task.gOptions.GridSlider.Value = Math.Min(dst2.Width \ 8, task.gOptions.GridSlider.Maximum)
 
-        desc = "find the best sample 256x256 texture of a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or src.Channels() <> 1 Then
-            ellipse.Run(src)
-            CvtColor(ellipse.dst2, dst2, ColorConversionCodes.BGR2GRAY)
-            ConvertScaleAbs(dst2, dst2)
-            dst3 = ellipse.dst2.Clone
-            dst3.SetTo(Scalar.Yellow, task.gridMask)
-        Else
-            dst2 = src
-        End If
+            desc = "find the best sample 256x256 texture of a mask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Or src.Channels() <> 1 Then
+                ellipse.Run(src)
+                CvtColor(ellipse.dst2, dst2, ColorConversionCodes.BGR2GRAY)
+                ConvertScaleAbs(dst2, dst2)
+                dst3 = ellipse.dst2.Clone
+                dst3.SetTo(Scalar.Yellow, task.gridMask)
+            Else
+                dst2 = src
+            End If
 
-        tChange = True
-        If texturePop > 0 Then
-            Dim nextCount = CountNonZero(dst2(tRect))
-            If nextCount >= texturePop * 0.95 Then tChange = False
-        End If
-        If tChange Then
-            Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-            For Each roi In task.gridRects
-                sortcounts.Add(CountNonZero(dst2(roi)), roi)
-            Next
-            If standaloneTest() Then Rectangle(dst3, sortcounts.ElementAt(0).Value, white, 2)
-            tRect = sortcounts.ElementAt(0).Value
-            texture = task.color(tRect)
-            texturePop = CountNonZero(dst2(tRect))
-        End If
-        If standaloneTest() Then Rectangle(dst3, tRect, white, 2)
-    End Sub
-End Class
+            tChange = True
+            If texturePop > 0 Then
+                Dim nextCount = CountNonZero(dst2(tRect))
+                If nextCount >= texturePop * 0.95 Then tChange = False
+            End If
+            If tChange Then
+                Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+                For Each roi In task.gridRects
+                    sortcounts.Add(CountNonZero(dst2(roi)), roi)
+                Next
+                If standaloneTest() Then Rectangle(dst3, sortcounts.ElementAt(0).Value, white, 2)
+                tRect = sortcounts.ElementAt(0).Value
+                texture = task.color(tRect)
+                texturePop = CountNonZero(dst2(tRect))
+            End If
+            If standaloneTest() Then Rectangle(dst3, tRect, white, 2)
+        End Sub
+    End Class
+End Namespace

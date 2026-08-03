@@ -224,7 +224,7 @@ Namespace VBClasses
                     For i = 0 To triangles(j).Rows - 1
                         Dim p1 = triangles(j).Get(Of Point2f)(i) + New Point2f(j * src.Width, 0)
                         Dim p2 = triangles(j).Get(Of Point2f)((i + 1) Mod 3) + New Point2f(j * src.Width, 0)
-                        Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow)
+                        Dim color = Choose(i + 1, Scalar.red, Scalar.white, Scalar.Yellow)
                         Line(wideMat, p1, p2, color, task.lineWidth + 3, task.lineType)
                         If j = 0 Then
                             Dim p3 = triangles(j + 1).Get(Of Point2f)(i) + New Point2f(src.Width, 0)
@@ -244,9 +244,9 @@ Namespace VBClasses
                 Dim pt As cv.Point
                 For i = 0 To srcPoints1.Count - 1
                     pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                    Circle(dst2, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
+                    Circle(dst2, pt, task.DotSize + 2, Scalar.white, -1, task.lineType)
                     pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                    Circle(dst3, pt, task.DotSize + 2, Scalar.White, -1, task.lineType)
+                    Circle(dst3, pt, task.DotSize + 2, Scalar.white, -1, task.lineType)
                 Next
             End If
             SetTrueText("M defined as: " + vbCrLf +
@@ -299,7 +299,7 @@ Namespace VBClasses
                             Dim p3 = rectangles(1).Points(i)
                             Line(dst2, p1, p3, white, task.lineWidth, task.lineType)
                         End If
-                        Dim color = Choose(i + 1, Scalar.Red, Scalar.White, Scalar.Yellow, Scalar.Green)
+                        Dim color = Choose(i + 1, Scalar.red, Scalar.white, Scalar.Yellow, Scalar.Green)
                         Line(dst2, p1, p2, color, task.lineWidth + 3, task.lineType)
                     Next
                 Next

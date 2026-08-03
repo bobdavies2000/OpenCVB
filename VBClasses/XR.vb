@@ -605,7 +605,7 @@ Namespace VBClasses
                     layoutColor.Add(vec(1))
                     If options.displayRect Then
                         Circle(dst2, centroid, task.DotSize + 3, Scalar.Yellow, -1, task.lineType)
-                        Circle(dst2, centroid, task.DotSize, Scalar.Red, -1, task.lineType)
+                        Circle(dst2, centroid, task.DotSize, Scalar.red, -1, task.lineType)
                         Rectangle(dst2, rect, Scalar.Yellow, 2)
                     End If
                 End If

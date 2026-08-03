@@ -7,23 +7,18 @@ Public Class OptionsSliders
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
-        If task.allOptions.Text <> "" Then Me.MdiParent = task.allOptions
+        If vbc.task.allOptions.Text <> "" Then Me.MdiParent = vbc.task.allOptions
         Me.Text = traceName + " Sliders"
-        task.allOptions.addTitle(Me)
+        vbc.task.allOptions.addTitle(Me)
 
         FlowLayoutPanel1.Width = Me.Width - 40
         FlowLayoutPanel1.Height = Me.Height - 60
         Return True
     End Function
     Public Sub setupTrackBar(labelStr As String, min As Integer, max As Integer, value As Integer)
-        Dim grp = New FlowLayoutPanel
-        grp.AutoSize = False
-        grp.BorderStyle = BorderStyle.None
-        grp.FlowDirection = FlowDirection.LeftToRight
-        grp.WrapContents = False
-        grp.Width = Me.Width + 10
-        grp.Height = 50
-
+        Dim grp As New FlowLayoutPanel With {.AutoSize = False, .BorderStyle = BorderStyle.None,
+                                             .FlowDirection = FlowDirection.LeftToRight, .WrapContents = False,
+                                             .Width = Me.Width + 10, .Height = 50}
         Dim index = myLabels.Count
         myLabels.Add(New Label)
         myLabels(index).AutoSize = False
@@ -44,7 +39,7 @@ Public Class OptionsSliders
 
         myLabels(index).Text = labelStr + " = " + CStr(mytrackbars(index).Value)
         myLabels(index).Visible = True
-        FlowLayoutPanel1.AutoScroll = If(index > 3, True, False)
+        FlowLayoutPanel1.AutoScroll = index > 3
         FlowLayoutPanel1.Controls.Add(grp)
         groups.Add(grp)
     End Sub
@@ -52,7 +47,7 @@ Public Class OptionsSliders
         Dim outStr = myLabels(sender.tag).Text
         Dim splitStr = outStr.Split("=")
         myLabels(sender.tag).Text = splitStr(0) + "= " + CStr(mytrackbars(sender.tag).Value)
-        task.optionsChanged = True
+        vbc.task.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth

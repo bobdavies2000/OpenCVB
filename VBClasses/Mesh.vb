@@ -78,7 +78,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For i = 0 To knn.queries.Count - 1
-                Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2, knn.queries(i), task.DotSize, Scalar.red, -1, task.lineType)
                 Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = "Triangles built each input cv.Point and its " + CStr(options.nabeCount) + " nearest neighbors."

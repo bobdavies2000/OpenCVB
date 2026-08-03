@@ -1,36 +1,38 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://github.com/epiception/SGM-Census
-Public Class XR_SemiGlobalMatching_CPP : Inherits TaskParent
-    Implements IDisposable
-    Dim leftData(0) As Byte
-    Dim rightData(0) As Byte
-    Public Sub New()
-        desc = "Find depth using the semi-global matching algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.frameCount < 10 Then Exit Sub
+Namespace VBClasses
+    Public Class XR_SemiGlobalMatching_CPP : Inherits TaskParent
+        Implements IDisposable
+        Dim leftData(0) As Byte
+        Dim rightData(0) As Byte
+        Public Sub New()
+            desc = "Find depth using the semi-global matching algorithm."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.frameCount < 10 Then Exit Sub
 
-        'If leftData.Length <> src.Total Then
-        '    ReDim leftData(src.Total - 1)
-        '    ReDim rightData(src.Total - 1)
-        '    cPtr = SemiGlobalMatching_Open(src.Rows, src.Cols, 3)
-        'End If
+            'If leftData.Length <> src.Total Then
+            '    ReDim leftData(src.Total - 1)
+            '    ReDim rightData(src.Total - 1)
+            '    cPtr = SemiGlobalMatching_Open(src.Rows, src.Cols, 3)
+            'End If
 
-        'Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
-        'Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
+            'Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
+            'Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
 
-        'Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
-        'Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
-        'Dim imagePtr = SemiGlobalMatching_Run(cPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
-        '                                      task.leftView.Rows, task.leftView.Cols)
-        'handleLeft.Free()
-        'handleRight.Free()
+            'Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
+            'Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
+            'Dim imagePtr = SemiGlobalMatching_Run(cPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
+            '                                      task.leftView.Rows, task.leftView.Cols)
+            'handleLeft.Free()
+            'handleRight.Free()
 
-        'Dim dst2 = New Mat(task.leftView.Rows, task.leftView.Cols, MatType.CV_8U, imagePtr)
-        SetTrueText("This algorithm runs but always returns zero - I don't see my mistake?" + vbCrLf +
-                            "Needs work but investing further is not needed - we have disparity from the device.", 3)
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = SemiGlobalMatching_Close(cPtr)
-    End Sub
-End Class
+            'Dim dst2 = New Mat(task.leftView.Rows, task.leftView.Cols, MatType.CV_8U, imagePtr)
+            SetTrueText("This algorithm runs but always returns zero - I don't see my mistake?" + vbCrLf +
+                                "Needs work but investing further is not needed - we have disparity from the device.", 3)
+        End Sub
+        Protected Overrides Sub Finalize()
+            If cPtr <> 0 Then cPtr = SemiGlobalMatching_Close(cPtr)
+        End Sub
+    End Class
+End Namespace

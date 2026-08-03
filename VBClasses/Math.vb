@@ -106,7 +106,7 @@ Namespace VBClasses
         Dim options As New Options_Features
         Public Sub New()
             flow.parentData = Me
-            desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
+            desc = "Compute the correlation coefficient of red-Green and red-Blue and Green-Blue"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -118,11 +118,11 @@ Namespace VBClasses
 
             match.template = splitMats(1)
             match.Run(splitMats(1))
-            Dim redGreenCorrelation = "Red-Green " + match.labels(2)
+            Dim redGreenCorrelation = "red-Green " + match.labels(2)
 
             match.template = splitMats(2)
             match.Run(splitMats(0))
-            Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
+            Dim redBlueCorrelation = "red-Blue " + match.labels(2)
 
             flow.nextMsg = blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation
             flow.Run(src)

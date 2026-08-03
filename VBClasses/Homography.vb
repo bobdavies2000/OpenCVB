@@ -1,28 +1,30 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class Homography_Basics : Inherits TaskParent
-    Public corners1 As New List(Of Point2d)
-    Public corners2 As New List(Of Point2d)
-    Dim random As New Random_Point2d
-    Dim options As New Options_Homography
-    Public Sub New()
-        desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class Homography_Basics : Inherits TaskParent
+        Public corners1 As New List(Of Point2d)
+        Public corners2 As New List(Of Point2d)
+        Dim random As New Random_Point2d
+        Dim options As New Options_Homography
+        Public Sub New()
+            desc = "Build the homography matrix from 2 lists of corners and use it in a WarpPerspective call."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If standaloneTest() And task.heartBeat And options.hMethod = HomographyMethods.None Then
-            random.Run(src)
-            corners1 = New List(Of Point2d)(random.PointList)
-            random.Run(src)
-            corners2 = New List(Of Point2d)(random.PointList)
-        End If
-
-        ' cannot find a homography when less than 4...
-        If corners1.Count >= 4 Or corners2.Count >= 4 Then
-            Dim H = FindHomography(corners1, corners2, options.hMethod)
-            If H.Width > 0 Then
-                WarpPerspective(src, dst2, H, src.Size)
+            If standaloneTest() And task.heartBeat And options.hMethod = HomographyMethods.None Then
+                random.Run(src)
+                corners1 = New List(Of Point2d)(random.PointList)
+                random.Run(src)
+                corners2 = New List(Of Point2d)(random.PointList)
             End If
-        End If
-    End Sub
-End Class
+
+            ' cannot find a homography when less than 4...
+            If corners1.Count >= 4 Or corners2.Count >= 4 Then
+                Dim H = FindHomography(corners1, corners2, options.hMethod)
+                If H.Width > 0 Then
+                    WarpPerspective(src, dst2, H, src.Size)
+                End If
+            End If
+        End Sub
+    End Class
+End Namespace

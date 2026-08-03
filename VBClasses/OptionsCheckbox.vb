@@ -2,9 +2,9 @@ Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = vbc.task.allOptions
         Me.Text = traceName + " CheckBoxes"
-        task.allOptions.addTitle(Me)
+        vbc.task.allOptions.addTitle(Me)
         Me.Show()
         Return True
     End Function
@@ -17,7 +17,7 @@ Public Class OptionsCheckbox
         FlowLayoutPanel1.Controls.Add(Box(index))
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        vbc.task.optionsChanged = True
     End Sub
 
     Protected Overrides Sub Dispose(disposing As Boolean)
@@ -31,9 +31,7 @@ Public Class OptionsCheckbox
 
             ' Dispose all dynamically created controls
             For Each checkbox In Box
-                If checkbox IsNot Nothing Then
-                    checkbox.Dispose()
-                End If
+                If checkbox IsNot Nothing Then checkbox.Dispose()
             Next
 
             ' Clear the list

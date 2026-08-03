@@ -23,7 +23,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In inputPoints
-                    Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+                    Circle(dst2, pt, task.DotSize + 2, Scalar.red, -1, task.lineType)
                 Next
                 Draw_Arc.DrawRotatedOutline(minRect, dst2, Scalar.Yellow)
             End If

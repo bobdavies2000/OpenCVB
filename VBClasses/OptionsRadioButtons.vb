@@ -2,9 +2,9 @@ Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = vbc.task.allOptions
         Me.Text = traceName + " Radio Buttons"
-        task.allOptions.addTitle(Me)
+        vbc.task.allOptions.addTitle(Me)
         Return True
     End Function
     Public Sub addRadio(labelStr As String)
@@ -16,7 +16,7 @@ Public Class OptionsRadioButtons
         FlowLayoutPanel1.Controls.Add(check(index))
     End Sub
     Private Sub radio_CheckChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        vbc.task.optionsChanged = True
     End Sub
 
     Protected Overrides Sub Dispose(disposing As Boolean)
@@ -30,9 +30,7 @@ Public Class OptionsRadioButtons
 
             ' Dispose all dynamically created controls
             For Each radioButton In check
-                If radioButton IsNot Nothing Then
-                    radioButton.Dispose()
-                End If
+                If radioButton IsNot Nothing Then radioButton.Dispose()
             Next
 
             ' Clear the list

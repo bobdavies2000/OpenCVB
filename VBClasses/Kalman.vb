@@ -118,7 +118,7 @@ Namespace VBClasses
             Line(dst2, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
         End Sub
         Public Sub New()
-            labels(2) = "Estimate Yellow < Real Red (if working)"
+            labels(2) = "Estimate Yellow < Real red (if working)"
 
             Randn(kState, New Scalar(0), Scalar.All(0.1))
             kf.TransitionMatrix = Mat.FromPixelData(2, 2, MatType.CV_32F, New Single() {1, 1, 0, 1})
@@ -173,7 +173,7 @@ Namespace VBClasses
             ReDim kalman.kInput(2 - 1)
             ReDim kalman.kOutput(2 - 1)
 
-            labels(2) = "Red is real mouse, white is prediction"
+            labels(2) = "red is real mouse, white is prediction"
             desc = "Use kalman filter to predict the next mouse location."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -184,7 +184,7 @@ Namespace VBClasses
             kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
             kalman.Run(emptyMat)
             Line(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
-            Line(dst2, task.mouseMovePoint, lastRealMouse, Scalar.Red)
+            Line(dst2, task.mouseMovePoint, lastRealMouse, Scalar.red)
             lastRealMouse = task.mouseMovePoint
         End Sub
     End Class
@@ -250,7 +250,7 @@ Namespace VBClasses
                     Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
                     input = Mat.FromPixelData(4, 1, MatType.CV_32F, array)
                 End If
-                Rectangle(dst2, rect, Scalar.Red, 2)
+                Rectangle(dst2, rect, Scalar.red, 2)
                 lastRect = rect
             End If
         End Sub

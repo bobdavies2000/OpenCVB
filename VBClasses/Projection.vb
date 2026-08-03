@@ -313,8 +313,8 @@ Namespace VBClasses
             Dim side As New Mat
             CvtColor(heatDeriv.dst3, side, ColorConversionCodes.BGR2GRAY)
             Threshold(side, side, 0, 255, ThresholdTypes.Binary)
-            dst2.SetTo(Scalar.White, top)
-            dst3.SetTo(Scalar.White, side)
+            dst2.SetTo(Scalar.white, top)
+            dst3.SetTo(Scalar.white, side)
         End Sub
     End Class
 

@@ -186,8 +186,8 @@ Namespace VBClasses
                 Case "Green input"
                     labels(2) = "NR_SLR_TrendImages - Green channel"
                     splitIndex = 1
-                Case "Red input"
-                    labels(2) = "NR_SLR_TrendImages - Red channel"
+                Case "red input"
+                    labels(2) = "NR_SLR_TrendImages - red channel"
                     splitIndex = 2
             End Select
             trends.Run(splitMats(splitIndex))

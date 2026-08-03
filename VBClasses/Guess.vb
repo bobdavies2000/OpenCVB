@@ -1,59 +1,61 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class XR_Guess_Depth_CPP : Inherits TaskParent
-    Implements IDisposable
-    Public Sub New()
-        cPtr = Guess_Depth_Open()
-        labels = {"", "", "Updated cv.Point cloud (holes filled)", "Original cv.Point cloud"}
-        desc = "Fill single pixel holes in the cv.Point cloud."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+Namespace VBClasses
+    Public Class XR_Guess_Depth_CPP : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            cPtr = Guess_Depth_Open()
+            labels = {"", "", "Updated cv.Point cloud (holes filled)", "Original cv.Point cloud"}
+            desc = "Fill single pixel holes in the cv.Point cloud."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim cppData(src.Total - 1) As Vec3f
-        src.GetArray(Of Vec3f)(cppData)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
-        handleSrc.Free()
+            Dim cppData(src.Total - 1) As Vec3f
+            src.GetArray(Of Vec3f)(cppData)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = Guess_Depth_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+            handleSrc.Free()
 
-        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone
-        If standaloneTest() Then dst3 = task.pointCloud
-    End Sub
-    Protected Overrides Sub Finalize()
-        Guess_Depth_Close(cPtr)
-    End Sub
-End Class
-
-
-
+            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, imagePtr).Clone
+            If standaloneTest() Then dst3 = task.pointCloud
+        End Sub
+        Protected Overrides Sub Finalize()
+            Guess_Depth_Close(cPtr)
+        End Sub
+    End Class
 
 
 
 
-Public Class XR_Guess_ImageEdges_CPP : Inherits TaskParent
-    Implements IDisposable
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance from edge", 0, 100, 50)
 
-        cPtr = Guess_ImageEdges_Open()
-        labels = {"", "", "Updated cv.Point cloud - nearest depth to each edge is replicated to the image boundary", "Original cv.Point cloud"}
-        desc = "Replicate the nearest depth measurement at all the image edges"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static distSlider = OptionParent.FindSlider("Max Distance from edge")
 
-        If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim cppData(src.Total - 1) As Vec3f
-        src.GetArray(Of Vec3f)(cppData)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distSlider.value)
-        handleSrc.Free()
+    Public Class XR_Guess_ImageEdges_CPP : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance from edge", 0, 100, 50)
 
-        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone
-        If standaloneTest() Then dst3 = task.pointCloud
-    End Sub
-    Protected Overrides Sub Finalize()
-        Guess_ImageEdges_Close(cPtr)
-    End Sub
-End Class
+            cPtr = Guess_ImageEdges_Open()
+            labels = {"", "", "Updated cv.Point cloud - nearest depth to each edge is replicated to the image boundary", "Original cv.Point cloud"}
+            desc = "Replicate the nearest depth measurement at all the image edges"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static distSlider = OptionParent.FindSlider("Max Distance from edge")
+
+            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
+
+            Dim cppData(src.Total - 1) As Vec3f
+            src.GetArray(Of Vec3f)(cppData)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = Guess_ImageEdges_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, distSlider.value)
+            handleSrc.Free()
+
+            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32FC3, cppData).Clone
+            If standaloneTest() Then dst3 = task.pointCloud
+        End Sub
+        Protected Overrides Sub Finalize()
+            Guess_ImageEdges_Close(cPtr)
+        End Sub
+    End Class
+End Namespace

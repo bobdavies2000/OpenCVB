@@ -1,3 +1,4 @@
+Imports VBClasses
 Public Class CPUTime
     ' TreeView and trace Data.
     Public callTrace As List(Of String)
@@ -63,7 +64,7 @@ Public Class CPUTime
         algorithmStack = New Stack()
         algorithmStack.Push(0)
     End Sub
-    Public Function PrepareReport(treeData As List(Of String)) As String
+    Public Shared Function PrepareReport(treeData As List(Of String)) As String
         Static percentTime As String = ""
 
         Dim algorithm_ms = New List(Of Single)(task.cpu.algorithm_ms)
@@ -74,9 +75,6 @@ Public Class CPUTime
         If sumTime = 0 Then Return percentTime
         For i = 0 To algorithm_ms.Count - 1
             task.cpu.algorithm_ms(i) = 0
-        Next
-        For Each percent In algorithm_ms
-            percent /= sumTime
         Next
 
         Dim saveWaitTime As String = ""
@@ -130,10 +128,9 @@ Public Class CPUTime
         Next
 
         percentTime += otherTimes.Sum.ToString("00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
-                                    vbCrLf + vbCrLf + "Click tree at left to see it below:" + vbCrLf + vbCrLf
+                                            vbCrLf + vbCrLf + "Click tree at left to see it below:" + vbCrLf + vbCrLf
 
-        percentTime += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
+        percentTime += If(percentStr = "", "Inactive algorithm selected", percentStr)
         Return percentTime
     End Function
 End Class
-

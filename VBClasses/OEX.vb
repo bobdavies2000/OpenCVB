@@ -29,13 +29,13 @@ Namespace VBClasses
 
             CalcBackProject({hsv}, {0}, dst0, dst2, ranges)
 
-            dst3.SetTo(Scalar.Red)
+            dst3.SetTo(red)
             Dim binW = dst2.Width / task.histogramBins
             Dim bins = dst2.Width / binW
             For i = 0 To bins - 1
                 Dim h = dst2.Height * histArray(i)
                 Dim r = New cv.Rect(i * binW, dst2.Height - h, binW, h)
-                Rectangle(dst3, r, Scalar.Black, -1)
+                Rectangle(dst3, r, black, -1)
             Next
             labels(3) = $"The max value below is {peakValue}"
         End Sub
@@ -58,7 +58,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim count As Integer
-            If task.clickPoint <> newPoint Then
+            If task.clickPoint <> New cv.Point Then
                 Dim connectivity As Integer = 8
                 Dim flags = connectivity Or (255 << 8) Or FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly
                 Dim mask2 As New Mat(src.Rows + 2, src.Cols + 2, MatType.CV_8U, Scalar.All(0))

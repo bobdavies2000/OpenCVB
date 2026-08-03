@@ -15,7 +15,7 @@ Namespace VBClasses
         '    If fpIndex >= 0 Then task.fpD = fcs.fplist(fpIndex)
         'End Sub
         Public Shared Sub fpCellContour(fp As fpData, dst As Mat, Optional colorIndex As Integer = 0)
-            Dim color = Choose(colorIndex + 1, Scalar.White, Scalar.Black)
+            Dim color = Choose(colorIndex + 1, Scalar.white, Scalar.Black)
             For i = 0 To fp.facets.Count - 1
                 Dim p1 = fp.facets(i)
                 Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
@@ -715,7 +715,7 @@ Namespace VBClasses
                 '    linkedCount += 1
                 '    dst3.Line(fp.pt, fp.ptLast, task.highlight, task.lineWidth, task.lineType)
                 'End If
-                'If fp.ptLast <> newPoint Then
+                'If fp.ptLast <> new cv.Point Then
                 '    motionCount += 1
                 '    xDist.Add(fp.ptLast.X - fp.pt.X)
                 '    yDist.Add(fp.ptLast.Y - fp.pt.Y)

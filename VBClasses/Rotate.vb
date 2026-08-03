@@ -1,70 +1,30 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class Rotate_Basics : Inherits TaskParent
-    Public M As Mat
-    Public Mflip As Mat
-    Public options As New Options_Resize
-    Public rotateAngle As Single = 1000
-    Public rotateCenter As cv.Point
-    Public optionsRotate As New Options_Rotate
-    Public Sub New()
-        rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
-        desc = "Rotate a rectangle by a specified angle"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        optionsRotate.Run()
+Namespace VBClasses
+    Public Class Rotate_Basics : Inherits TaskParent
+        Public M As Mat
+        Public Mflip As Mat
+        Public options As New Options_Resize
+        Public rotateAngle As Single = 1000
+        Public rotateCenter As cv.Point
+        Public optionsRotate As New Options_Rotate
+        Public Sub New()
+            rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            desc = "Rotate a rectangle by a specified angle"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            optionsRotate.Run()
 
-        rotateAngle = optionsRotate.rotateAngle
-        M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        WarpAffine(src, dst2, M, src.Size(), options.warpFlag)
-        If options.warpFlag = InterpolationFlags.WarpInverseMap Then
-            Mflip = GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
-        End If
-        labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class XR_Rotate_Box : Inherits TaskParent
-    Dim rotation As New Rotate_Basics
-    Public Sub New()
-        task.drawRect = New cv.Rect(100, 100, 100, 100)
-        labels(2) = "Original Rectangle in the original perspective"
-        labels(3) = "Same Rectangle in the new warped perspective"
-        desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        rotation.Run(src)
-        dst3 = dst2.Clone()
-
-        Dim r = task.drawRect
-        dst2 = src.Clone()
-        Rectangle(dst2, r, white, 1)
-
-        Dim center = New Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
-        Dim drawBox = New RotatedRect(center, New Size2f(r.Width, r.Height), 0)
-        Dim boxPoints = Cv2.BoxPoints(drawBox)
-        Dim srcPoints = Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints)
-        Dim dstpoints As New Mat
-
-        If rotation.options.warpFlag <> InterpolationFlags.WarpInverseMap Then
-            Transform(srcPoints, dstpoints, rotation.M)
-        Else
-            Transform(srcPoints, dstpoints, rotation.Mflip)
-        End If
-        For i = 0 To dstpoints.Width - 1
-            Dim p1 = dstpoints.Get(Of Point2f)(0, i)
-            Dim p2 = dstpoints.Get(Of Point2f)(0, (i + 1) Mod 4)
-            Line(dst3, p1, p2, white, task.lineWidth + 1, task.lineType)
-        Next
-    End Sub
-End Class
+            rotateAngle = optionsRotate.rotateAngle
+            M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+            WarpAffine(src, dst2, M, src.Size(), options.warpFlag)
+            If options.warpFlag = InterpolationFlags.WarpInverseMap Then
+                Mflip = GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
+            End If
+            labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3)
+        End Sub
+    End Class
 
 
 
@@ -72,21 +32,40 @@ End Class
 
 
 
+    Public Class XR_Rotate_Box : Inherits TaskParent
+        Dim rotation As New Rotate_Basics
+        Public Sub New()
+            task.drawRect = New cv.Rect(100, 100, 100, 100)
+            labels(2) = "Original Rectangle in the original perspective"
+            labels(3) = "Same Rectangle in the new warped perspective"
+            desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            rotation.Run(src)
+            dst3 = dst2.Clone()
 
-Public Class XR_Rotate_Example : Inherits TaskParent
-    Dim rotate As New Rotate_Basics
-    Public Sub New()
-        rotate.rotateCenter = New cv.Point(dst2.Height / 2, dst2.Height / 2)
-        rotate.rotateAngle = -90
-        desc = "Reminder on how to rotate an image and keep all the pixels."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim r = New cv.Rect(0, 0, src.Height, src.Height)
-        Resize(src, dst2(r), New Size(src.Height, src.Height))
-        rotate.Run(dst2)
-        dst3(r) = rotate.dst2(New cv.Rect(0, 0, src.Height, src.Height))
-    End Sub
-End Class
+            Dim r = task.drawRect
+            dst2 = src.Clone()
+            Rectangle(dst2, r, white, 1)
+
+            Dim center = New Point2f(r.X + r.Width / 2, r.Y + r.Height / 2)
+            Dim drawBox = New RotatedRect(center, New Size2f(r.Width, r.Height), 0)
+            Dim boxPoints = Cv2.BoxPoints(drawBox)
+            Dim srcPoints = Mat.FromPixelData(1, 4, MatType.CV_32FC2, boxPoints)
+            Dim dstpoints As New Mat
+
+            If rotation.options.warpFlag <> InterpolationFlags.WarpInverseMap Then
+                Transform(srcPoints, dstpoints, rotation.M)
+            Else
+                Transform(srcPoints, dstpoints, rotation.Mflip)
+            End If
+            For i = 0 To dstpoints.Width - 1
+                Dim p1 = dstpoints.Get(Of Point2f)(0, i)
+                Dim p2 = dstpoints.Get(Of Point2f)(0, (i + 1) Mod 4)
+                Line(dst3, p1, p2, white, task.lineWidth + 1, task.lineType)
+            Next
+        End Sub
+    End Class
 
 
 
@@ -95,39 +74,62 @@ End Class
 
 
 
-' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class Rotate_BasicsQT : Inherits TaskParent
-    Public rotateAngle As Double
-    Public rotateCenter As Point2f
-    Public Sub New()
-        rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
-        desc = "Rotate a rectangle by a specified angle"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
-        WarpAffine(src, dst2, M, src.Size(), InterpolationFlags.Nearest)
-    End Sub
-End Class
+    Public Class XR_Rotate_Example : Inherits TaskParent
+        Dim rotate As New Rotate_Basics
+        Public Sub New()
+            rotate.rotateCenter = New cv.Point(dst2.Height / 2, dst2.Height / 2)
+            rotate.rotateAngle = -90
+            desc = "Reminder on how to rotate an image and keep all the pixels."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim r = New cv.Rect(0, 0, src.Height, src.Height)
+            Resize(src, dst2(r), New Size(src.Height, src.Height))
+            rotate.Run(dst2)
+            dst3(r) = rotate.dst2(New cv.Rect(0, 0, src.Height, src.Height))
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_Rotate_Verticalize : Inherits TaskParent
-    Dim rotate As New Rotate_Basics
-    Public angleSlider As New System.Windows.Forms.TrackBar
-    Public Sub New()
-        angleSlider = OptionParent.FindSlider("Rotation Angle in degrees X100")
-        angleSlider.Value = task.verticalizeAngle / 100
-        OptionParent.findRadio("Nearest (preserves pixel values best)").Checked = True
-        desc = "Use gravity vector to rotate the image to be vertical"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If Math.Abs(task.verticalizeAngle) > 90 Then task.verticalizeAngle = task.verticalizeAngle Mod 90
 
-        If standalone Then angleSlider.Value = task.verticalizeAngle * 100
-        rotate.Run(src)
-        dst2 = rotate.dst2
-        SetTrueText("Angle offset from gravity = " + (angleSlider.Value / 100).ToString(fmt2), 3)
-    End Sub
-End Class
+
+
+    ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+    Public Class Rotate_BasicsQT : Inherits TaskParent
+        Public rotateAngle As Double
+        Public rotateCenter As Point2f
+        Public Sub New()
+            rotateCenter = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            desc = "Rotate a rectangle by a specified angle"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+            WarpAffine(src, dst2, M, src.Size(), InterpolationFlags.Nearest)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_Rotate_Verticalize : Inherits TaskParent
+        Dim rotate As New Rotate_Basics
+        Public angleSlider As New System.Windows.Forms.TrackBar
+        Public Sub New()
+            angleSlider = OptionParent.FindSlider("Rotation Angle in degrees X100")
+            angleSlider.Value = task.verticalizeAngle / 100
+            OptionParent.findRadio("Nearest (preserves pixel values best)").Checked = True
+            desc = "Use gravity vector to rotate the image to be vertical"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If Math.Abs(task.verticalizeAngle) > 90 Then task.verticalizeAngle = task.verticalizeAngle Mod 90
+
+            If standalone Then angleSlider.Value = task.verticalizeAngle * 100
+            rotate.Run(src)
+            dst2 = rotate.dst2
+            SetTrueText("Angle offset from gravity = " + (angleSlider.Value / 100).ToString(fmt2), 3)
+        End Sub
+    End Class
+End Namespace

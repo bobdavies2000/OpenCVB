@@ -336,7 +336,7 @@
 '        Public options As New Options_Plane
 '        Public redC As New RedC_Basics
 '        Public Sub New()
-'            labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
+'            labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and red - to the Z-axis"}
 '            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
 '        End Sub
 '        Public Function buildContourPoints(rc As rcData) As List(Of Point3f)

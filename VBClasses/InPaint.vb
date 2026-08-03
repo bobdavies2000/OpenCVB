@@ -1,48 +1,49 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
-Public Class InPaint_Basics : Inherits TaskParent
-    Dim options As New Options_InPaint
-    Public Sub New()
-        desc = "Create a flaw in an image and then use inPaint to mask it."
-        labels(3) = "Repaired Image"
-    End Sub
-    Public Function drawRandomLine(dst As Mat) As Mat
-        Dim p1 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        Dim p2 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        Line(dst2, p1, p2, New Scalar(0, 0, 0), task.lineWidth, task.lineType)
-        Dim mask = New Mat(dst2.Size(), MatType.CV_8UC1)
-        mask.SetTo(0)
-        Line(mask, p1, p2, Scalar.All(255), task.lineWidth, task.lineType)
-        Return mask
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        src.CopyTo(dst2)
-        Dim mask As Mat = drawRandomLine(dst2)
-        Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
-    End Sub
-End Class
+Namespace VBClasses
+    Public Class InPaint_Basics : Inherits TaskParent
+        Dim options As New Options_InPaint
+        Public Sub New()
+            desc = "Create a flaw in an image and then use inPaint to mask it."
+            labels(3) = "Repaired Image"
+        End Sub
+        Public Function drawRandomLine(dst As Mat) As Mat
+            Dim p1 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+            Dim p2 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+            Line(dst2, p1, p2, New Scalar(0, 0, 0), task.lineWidth, task.lineType)
+            Dim mask = New Mat(dst2.Size(), MatType.CV_8UC1)
+            mask.SetTo(0)
+            Line(mask, p1, p2, Scalar.All(255), task.lineWidth, task.lineType)
+            Return mask
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            src.CopyTo(dst2)
+            Dim mask As Mat = drawRandomLine(dst2)
+            Inpaint(dst2, mask, dst3, task.lineWidth, If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_InPaint_Noise : Inherits TaskParent
-    Dim noise As New Draw_Noise
-    Dim options As New Options_InPaint
-    Public Sub New()
-        desc = "Create noise in an image and then use inPaint to remove it."
-        labels(3) = "Repaired Image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        noise.Run(src) ' create some noise in the result1 image.
-        dst2 = noise.dst2
-        Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea,
+    Public Class XR_InPaint_Noise : Inherits TaskParent
+        Dim noise As New Draw_Noise
+        Dim options As New Options_InPaint
+        Public Sub New()
+            desc = "Create noise in an image and then use inPaint to remove it."
+            labels(3) = "Repaired Image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            noise.Run(src) ' create some noise in the result1 image.
+            dst2 = noise.dst2
+            Inpaint(dst2, noise.noiseMask, dst3, noise.options.noiseWidth, If(options.telea,
                                InpaintTypes.Telea, InpaintTypes.NS))
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
@@ -50,20 +51,20 @@ End Class
 
 
 
-Public Class XR_InPaint_Depth : Inherits TaskParent
-    Dim options As New Options_InPaint
-    Public Sub New()
-        labels(2) = "32-bit representation of original depth"
-        labels(3) = "32-bit depth repaired with inpainting"
-        desc = "Use Navier-Stokes to fill in the holes in the depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
-        dst2 = src.Clone
-        Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
-    End Sub
-End Class
+    Public Class XR_InPaint_Depth : Inherits TaskParent
+        Dim options As New Options_InPaint
+        Public Sub New()
+            labels(2) = "32-bit representation of original depth"
+            labels(3) = "32-bit depth repaired with inpainting"
+            desc = "Use Navier-Stokes to fill in the holes in the depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
+            dst2 = src.Clone
+            Inpaint(src, task.noDepthMask, dst3, 20, If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
+        End Sub
+    End Class
 
 
 
@@ -71,41 +72,41 @@ End Class
 
 
 
-Public Class XR_InPaint_PointCloud : Inherits TaskParent
-    Dim options As New Options_InPaint
-    Public Sub New()
-        labels(2) = "Pointcloud before inpaint"
-        labels(3) = "Pointcloud after inpaint"
-        desc = "Use Navier-Stokes to fill in the holes in the depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst2 = task.pointCloud.Clone
+    Public Class XR_InPaint_PointCloud : Inherits TaskParent
+        Dim options As New Options_InPaint
+        Public Sub New()
+            labels(2) = "Pointcloud before inpaint"
+            labels(3) = "Pointcloud after inpaint"
+            desc = "Use Navier-Stokes to fill in the holes in the depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst2 = task.pointCloud.Clone
 
-        Dim splitMats(2) As Mat
-        For i = 0 To task.pcSplit.Length - 1
-            splitMats(i) = New Mat
-            Inpaint(task.pcSplit(i), task.noDepthMask, splitMats(i), 20,
+            Dim splitMats(2) As Mat
+            For i = 0 To task.pcSplit.Length - 1
+                splitMats(i) = New Mat
+                Inpaint(task.pcSplit(i), task.noDepthMask, splitMats(i), 20,
                                 If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
-        Next
-        Merge(splitMats, dst3)
-    End Sub
-End Class
+            Next
+            Merge(splitMats, dst3)
+        End Sub
+    End Class
 
 
 
 
-Public Class XR_InPaint_MissingDepth : Inherits TaskParent
-    Dim options As New Options_InPaint
-    Public Sub New()
-        desc = "Fill in depth with smoothed depth values."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XR_InPaint_MissingDepth : Inherits TaskParent
+        Dim options As New Options_InPaint
+        Public Sub New()
+            desc = "Fill in depth with smoothed depth values."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        ' Apply inpainting to fill missing pixels
-        Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
+            ' Apply inpainting to fill missing pixels
+            Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
                                If(options.telea, InpaintTypes.Telea, InpaintTypes.NS))
-    End Sub
-End Class
-
+        End Sub
+    End Class
+End Namespace

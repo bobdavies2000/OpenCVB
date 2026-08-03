@@ -1,215 +1,119 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class Grid_Basics_TA : Inherits TaskParent
-    Public Sub New()
-        task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
-        task.gridMask = New Mat(dst2.Size(), MatType.CV_8U)
-        desc = "Create a grid of squares covering the entire image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.mouseClickFlag And Not task.firstPass Then
-            task.gridROIclicked = task.gridMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-        End If
+Namespace VBClasses
+    Public Class Grid_Basics_TA : Inherits TaskParent
+        Public Sub New()
+            task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
+            task.gridMask = New Mat(dst2.Size(), MatType.CV_8U)
+            desc = "Create a grid of squares covering the entire image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.mouseClickFlag And Not task.firstPass Then
+                task.gridROIclicked = task.gridMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            End If
 
-        If task.optionsChanged Then
-            Dim bricksPerCol As Integer, bricksPerRow As Integer
-            task.gridNabeRects.Clear()
-            task.gridNabes.Clear()
+            If task.optionsChanged Then
+                Dim bricksPerCol As Integer, bricksPerRow As Integer
+                task.gridNabeRects.Clear()
+                task.gridNabes.Clear()
 
-            task.gridRects.Clear()
-            For y = 0 To dst2.Height - 1 Step task.gridWH
-                For x = 0 To dst2.Width - 1 Step task.gridWH
-                    Dim roi = ValidateRect(New cv.Rect(x, y, task.gridWH, task.gridWH))
+                task.gridRects.Clear()
+                For y = 0 To dst2.Height - 1 Step task.gridWH
+                    For x = 0 To dst2.Width - 1 Step task.gridWH
+                        Dim roi = ValidateRect(New cv.Rect(x, y, task.gridWH, task.gridWH))
 
-                    If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
-                    If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
+                        If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
+                        If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
 
-                    If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then bricksPerCol += 1
-                        If y = 0 Then bricksPerRow += 1
-                        task.gridRects.Add(roi)
-                    End If
+                        If roi.Width > 0 And roi.Height > 0 Then
+                            If x = 0 Then bricksPerCol += 1
+                            If y = 0 Then bricksPerRow += 1
+                            task.gridRects.Add(roi)
+                        End If
+                    Next
                 Next
-            Next
 
-            task.gridMask.SetTo(0)
-            For x = task.gridWH To dst2.Width - 1 Step task.gridWH
-                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                Line(task.gridMask, p1, p2, 255, 1)
-            Next
-            For y = task.gridWH To dst2.Height - 1 Step task.gridWH
-                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                Line(task.gridMask, p1, p2, 255, 1)
-            Next
-
-            For i = 0 To task.gridRects.Count - 1
-                Rectangle(task.gridMap, task.gridRects(i), Scalar.All(i), -1)
-            Next
-
-            ' This determines which grid rects are replaced when motion is detected.
-            ' linkType = 1 means that only the grid rect is copied (the first entry)
-            ' linkType = 4 means link4 gridRects and the original rect are copied (first 5 entries)
-            ' linkType = 8 means link8 gridRects and the original rect are copied (all entries)
-            ' After some testing, it appears that link4 is adequate.  More testing needed.
-            task.motionLinkType = 4
-            For i = 0 To task.gridRects.Count - 1
-                Dim rect = task.gridRects(i)
-                Dim p1 = rect.TopLeft
-                Dim p2 = rect.BottomRight
-                Dim nextList As New List(Of Integer)({i}) ' each neighbor list contains the rect.
-
-                If task.motionLinkType = 4 Or task.motionLinkType = 8 Then
-                    If p1.X > 0 Then nextList.Add(i - 1)
-                    If p2.X < dst2.Width And p2.Y <= dst2.Height Then nextList.Add(i + 1)
-                    If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
-                    If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
-                End If
-
-                If task.motionLinkType = 8 Then
-                    If p1.X > 0 And p1.Y > 0 Then nextList.Add(i - bricksPerRow - 1)
-                    If p1.Y > 0 And p2.X < dst2.Width Then nextList.Add(i - bricksPerRow + 1)
-                    If p1.X > 0 And p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow - 1)
-                    If p2.X < dst2.Width And p2.Y < dst2.Height Then
-                        If i + bricksPerRow + 1 < task.gridRects.Count Then nextList.Add(i + bricksPerRow + 1)
-                    End If
-                End If
-                task.gridNabes.Add(nextList)
-            Next
-
-            For Each nabeList In task.gridNabes
-                Dim xList As New List(Of Integer), yList As New List(Of Integer)
-                For Each index In nabeList
-                    Dim rect = task.gridRects(index)
-                    xList.Add(rect.X)
-                    yList.Add(rect.Y)
-                    xList.Add(rect.BottomRight.X)
-                    yList.Add(rect.BottomRight.Y)
+                task.gridMask.SetTo(0)
+                For x = task.gridWH To dst2.Width - 1 Step task.gridWH
+                    Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
+                    Line(task.gridMask, p1, p2, 255, 1)
                 Next
-                Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
-                If r.Width < task.gridWH * 3 Then
-                    If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.gridWH * 3
-                    r.Width = task.gridWH * 3
-                End If
-                If r.Height < task.gridWH * 3 Then
-                    If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.gridWH * 3
-                    r.Height = task.gridWH * 3
-                End If
-                If r.Width <> task.gridWH * 3 Then r.Width = task.gridWH * 3
-                If r.Height <> task.gridWH * 3 Then r.Height = task.gridWH * 3
-                task.gridNabeRects.Add(r)
-            Next
+                For y = task.gridWH To dst2.Height - 1 Step task.gridWH
+                    Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
+                    Line(task.gridMask, p1, p2, 255, 1)
+                Next
 
-            task.gridWH = task.gridWH
-            task.bricksPerCol = bricksPerCol
-            task.bricksPerRow = bricksPerRow
-            task.gridWH = task.gridRects(0).Width
-        End If
-        If standaloneTest() Then
-            dst2 = New Mat(dst2.Size(), MatType.CV_8U)
-            task.color.CopyTo(dst2)
-            dst2.SetTo(white, task.gridMask)
-            labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
-                                                 CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
-        End If
-    End Sub
-End Class
+                For i = 0 To task.gridRects.Count - 1
+                    Rectangle(task.gridMap, task.gridRects(i), Scalar.All(i), -1)
+                Next
 
+                ' This determines which grid rects are replaced when motion is detected.
+                ' linkType = 1 means that only the grid rect is copied (the first entry)
+                ' linkType = 4 means link4 gridRects and the original rect are copied (first 5 entries)
+                ' linkType = 8 means link8 gridRects and the original rect are copied (all entries)
+                ' After some testing, it appears that link4 is adequate.  More testing needed.
+                task.motionLinkType = 4
+                For i = 0 To task.gridRects.Count - 1
+                    Dim rect = task.gridRects(i)
+                    Dim p1 = rect.TopLeft
+                    Dim p2 = rect.BottomRight
+                    Dim nextList As New List(Of Integer)({i}) ' each neighbor list contains the rect.
 
+                    If task.motionLinkType = 4 Or task.motionLinkType = 8 Then
+                        If p1.X > 0 Then nextList.Add(i - 1)
+                        If p2.X < dst2.Width And p2.Y <= dst2.Height Then nextList.Add(i + 1)
+                        If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
+                        If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
+                    End If
 
+                    If task.motionLinkType = 8 Then
+                        If p1.X > 0 And p1.Y > 0 Then nextList.Add(i - bricksPerRow - 1)
+                        If p1.Y > 0 And p2.X < dst2.Width Then nextList.Add(i - bricksPerRow + 1)
+                        If p1.X > 0 And p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow - 1)
+                        If p2.X < dst2.Width And p2.Y < dst2.Height Then
+                            If i + bricksPerRow + 1 < task.gridRects.Count Then nextList.Add(i + bricksPerRow + 1)
+                        End If
+                    End If
+                    task.gridNabes.Add(nextList)
+                Next
 
+                For Each nabeList In task.gridNabes
+                    Dim xList As New List(Of Integer), yList As New List(Of Integer)
+                    For Each index In nabeList
+                        Dim rect = task.gridRects(index)
+                        xList.Add(rect.X)
+                        yList.Add(rect.Y)
+                        xList.Add(rect.BottomRight.X)
+                        yList.Add(rect.BottomRight.Y)
+                    Next
+                    Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
+                    If r.Width < task.gridWH * 3 Then
+                        If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.gridWH * 3
+                        r.Width = task.gridWH * 3
+                    End If
+                    If r.Height < task.gridWH * 3 Then
+                        If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.gridWH * 3
+                        r.Height = task.gridWH * 3
+                    End If
+                    If r.Width <> task.gridWH * 3 Then r.Width = task.gridWH * 3
+                    If r.Height <> task.gridWH * 3 Then r.Height = task.gridWH * 3
+                    task.gridNabeRects.Add(r)
+                Next
 
-
-
-Public Class XR_Grid_Basics_TATest : Inherits TaskParent
-    Public Sub New()
-        If standalone Then task.gOptions.GridSlider.Value = 16
-        labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each r.  Bottom might be a shortened r."}
-        If standalone Then desc = "Validation test for Grid_Basics_TA algorithm"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim meanVal = Mean(src)
-
-        dst2.SetTo(0)
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            Subtract(meanVal, src(r), dst2(r))
-            SetTrueText(CStr(i), New cv.Point(r.X, r.Y))
-        Next
-        dst2.SetTo(white, task.gridMask)
-
-        dst3.SetTo(0)
-        For i = 0 To task.gridRects.Count - 1
-            Dim r = task.gridRects(i)
-            Subtract(meanVal, src(r), dst3(r))
-            Line(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class XR_Grid_List : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Adjust grid width/height to increase thread count."
-        If standalone Then desc = "List the active threads"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        For Each roi In task.gridRects
-            dst3(roi).SetTo(0)
-        Next
-        Dim CurrentProcess As Process = Process.GetCurrentProcess()
-        Dim myThreads As ProcessThreadCollection = CurrentProcess.Threads
-        Dim str = ""
-        Dim threadCount As Integer
-        Dim notIdle As Integer
-        For Each thread In myThreads
-            str += CStr(thread.id) + " state = " + CStr(thread.threadstate) + ", "
-            threadCount += 1
-            If threadCount Mod 5 = 0 Then str += vbCrLf
-            If thread.threadstate <> 5 Then notIdle += 1
-        Next thread
-        SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Grid_FPS : Inherits TaskParent
-    Public desiredFPS As Integer = 2
-    Public heartBeat As Boolean
-    Dim skipCount As Integer
-    Dim saveSkip As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, desiredFPS)
-        desc = "Provide a service that lets any algorithm control its frame rate"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static fpsSlider = OptionParent.FindSlider("Desired FPS rate")
-        desiredFPS = fpsSlider.value
-
-        Dim fps = task.fpsAlgorithm \ desiredFPS
-        If fps = 0 Then fps = 1
-        heartBeat = (task.frameCount Mod fps) = 0
-        If heartBeat Then
-            saveSkip = skipCount
-            skipCount = 0
-            If standaloneTest() Then dst2 = src
-        Else
-            skipCount += 1
-        End If
-        strOut = "Grid heartbeat fps " + CStr(desiredFPS) + " per sec.  " + CStr(saveSkip) + " frames skipped"
-    End Sub
-End Class
+                task.gridWH = task.gridWH
+                task.bricksPerCol = bricksPerCol
+                task.bricksPerRow = bricksPerRow
+                task.gridWH = task.gridRects(0).Width
+            End If
+            If standaloneTest() Then
+                dst2 = New Mat(dst2.Size(), MatType.CV_8U)
+                task.color.CopyTo(dst2)
+                dst2.SetTo(white, task.gridMask)
+                labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
+                                                     CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
+            End If
+        End Sub
+    End Class
 
 
 
@@ -217,70 +121,31 @@ End Class
 
 
 
-Public Class XR_Grid_ValidateLocation : Inherits TaskParent
-    Public Sub New()
-        dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-        task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        desc = "Click any grid element to see its neighbors"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        labels(2) = "Clickpoint is at (X, Y): " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y)
+    Public Class XR_Grid_Basics_TATest : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.GridSlider.Value = 16
+            labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each r.  Bottom might be a shortened r."}
+            If standalone Then desc = "Validation test for Grid_Basics_TA algorithm"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim meanVal = Mean(src)
 
-        SetTrueText("Click any grid entry to see its neighbors", 3)
-        dst2.SetTo(white, task.gridMask)
-
-        Dim grIndex As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-        If task.gridRects(grIndex).Contains(task.clickPoint) Then
-            labels(3) = "Grid index = " + CStr(grIndex) + " contains the mouse clickpoint" + vbCrLf
-        Else
-            labels(3) = "Grid index = " + CStr(grIndex) + " does NOT match the grid location." + vbCrLf
-        End If
-        dst3.SetTo(0)
-        For Each index In task.gridNabes(grIndex)
-            Dim r = task.gridRects(index)
-            Rectangle(dst2, r, white, task.lineWidth)
-            Rectangle(dst3, r, Scalar.All(index), task.lineWidth)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
-    Public minMaxLocs(0) As lpData
-    Public minMaxVals(0) As Vec2f
-    Public Sub New()
-        task.gOptions.GridSlider.Value = 8
-        desc = "Find the min and max depth within each grid r."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If minMaxLocs.Length <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
-        If minMaxVals.Length <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
-        Dim mm As mmData
-        For i = 0 To minMaxLocs.Length - 1
-            Dim r = task.gridRects(i)
-            MinMaxLoc(task.pcSplit(2)(r), mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
-            minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
-            minMaxVals(i) = New Vec2f(mm.minVal, mm.maxVal)
-        Next
-
-        If standaloneTest() Then
             dst2.SetTo(0)
-            For i = 0 To minMaxLocs.Length - 1
-                Dim lp = minMaxLocs(i)
-                Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.Red, -1, task.lineType)
-                Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                Subtract(meanVal, src(r), dst2(r))
+                SetTrueText(CStr(i), New cv.Point(r.X, r.Y))
             Next
             dst2.SetTo(white, task.gridMask)
-        End If
-    End Sub
-End Class
+
+            dst3.SetTo(0)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                Subtract(meanVal, src(r), dst3(r))
+                Line(dst3(r), New cv.Point(0, 0), New cv.Point(r.Width, r.Height), white, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
 
 
 
@@ -288,40 +153,98 @@ End Class
 
 
 
-Public Class XR_Grid_TrackCenter : Inherits TaskParent
-    Public center As cv.Point
-    Dim match As New Match_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.ShowGrid.Checked = True
-        desc = "Track a cell near the center of the grid"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            Dim index As Integer = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
-            Dim r = task.gridRects(index)
-            match.template = src(r).Clone
-            center = New cv.Point(r.X + r.Width / 2, r.Y + r.Height / 2)
-        End If
 
-        Dim pad = task.gridWH / 2
-        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.gridWH, task.gridWH))
-        match.Run(src(searchRect))
-        center = match.newCenter
 
-        If standaloneTest() Then
+
+    Public Class XR_Grid_List : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Adjust grid width/height to increase thread count."
+            If standalone Then desc = "List the active threads"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            For Each roi In task.gridRects
+                dst3(roi).SetTo(0)
+            Next
+            Dim CurrentProcess As Process = Process.GetCurrentProcess()
+            Dim myThreads As ProcessThreadCollection = CurrentProcess.Threads
+            Dim str = ""
+            Dim threadCount As Integer
+            Dim notIdle As Integer
+            For Each thread In myThreads
+                str += CStr(thread.id) + " state = " + CStr(thread.threadstate) + ", "
+                threadCount += 1
+                If threadCount Mod 5 = 0 Then str += vbCrLf
+                If thread.threadstate <> 5 Then notIdle += 1
+            Next thread
+            SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Grid_FPS : Inherits TaskParent
+        Public desiredFPS As Integer = 2
+        Public heartBeat As Boolean
+        Dim skipCount As Integer
+        Dim saveSkip As Integer
+        Public Sub New()
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired FPS rate", 1, 10, desiredFPS)
+            desc = "Provide a service that lets any algorithm control its frame rate"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static fpsSlider = OptionParent.FindSlider("Desired FPS rate")
+            desiredFPS = fpsSlider.value
+
+            Dim fps = task.fpsAlgorithm \ desiredFPS
+            If fps = 0 Then fps = 1
+            heartBeat = (task.frameCount Mod fps) = 0
+            If heartBeat Then
+                saveSkip = skipCount
+                skipCount = 0
+                If standaloneTest() Then dst2 = src
+            Else
+                skipCount += 1
+            End If
+            strOut = "Grid heartbeat fps " + CStr(desiredFPS) + " per sec.  " + CStr(saveSkip) + " frames skipped"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_Grid_ValidateLocation : Inherits TaskParent
+        Public Sub New()
+            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+            task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            desc = "Click any grid element to see its neighbors"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            Rectangle(dst2, match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
-            Circle(dst2, center, task.DotSize, white, -1, task.lineType)
+            labels(2) = "Clickpoint is at (X, Y): " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y)
 
-            If task.heartBeat Then dst3.SetTo(0)
-            Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
-            SetTrueText(match.correlation.ToString(fmt3), center, 3)
+            SetTrueText("Click any grid entry to see its neighbors", 3)
+            dst2.SetTo(white, task.gridMask)
 
-            labels(3) = "Match correlation = " + match.correlation.ToString(fmt3)
-        End If
-    End Sub
-End Class
+            Dim grIndex As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            If task.gridRects(grIndex).Contains(task.clickPoint) Then
+                labels(3) = "Grid index = " + CStr(grIndex) + " contains the mouse clickpoint" + vbCrLf
+            Else
+                labels(3) = "Grid index = " + CStr(grIndex) + " does NOT match the grid location." + vbCrLf
+            End If
+            dst3.SetTo(0)
+            For Each index In task.gridNabes(grIndex)
+                Dim r = task.gridRects(index)
+                Rectangle(dst2, r, white, task.lineWidth)
+                Rectangle(dst3, r, Scalar.All(index), task.lineWidth)
+            Next
+        End Sub
+    End Class
 
 
 
@@ -329,111 +252,190 @@ End Class
 
 
 
-Public Class Grid_Rectangles : Inherits TaskParent
-    Public gridWidth As Integer = 10
-    Public gridHeight As Integer = 10
-    Public gridRects As New List(Of cv.Rect)
-    Public gridMap As New Mat
-    Public bricksPerCol As Integer
-    Public bricksPerRow As Integer
-    Public gridMask As Mat
-    Public gridNabes As New List(Of List(Of Integer))
-    Public Sub New()
-        gridMask = New Mat(dst2.Size(), MatType.CV_8U)
-        gridMap = New Mat(dst2.Size(), MatType.CV_8U)
-        desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
-                    "  Specify the Y size."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
-            gridRects.Clear()
-            bricksPerCol = 0
-            bricksPerRow = 0
-            For y = 0 To dst2.Height - 1 Step gridHeight
-                For x = 0 To dst2.Width - 1 Step gridWidth
-                    Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
-                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
-                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
-                    If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then bricksPerCol += 1
-                        If y = 0 Then bricksPerRow += 1
-                        gridRects.Add(roi)
-                    End If
+
+    Public Class XR_Grid_MinMaxDepth : Inherits TaskParent
+        Public minMaxLocs(0) As lpData
+        Public minMaxVals(0) As Vec2f
+        Public Sub New()
+            task.gOptions.GridSlider.Value = 8
+            desc = "Find the min and max depth within each grid r."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If minMaxLocs.Length <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
+            If minMaxVals.Length <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
+            Dim mm As mmData
+            For i = 0 To minMaxLocs.Length - 1
+                Dim r = task.gridRects(i)
+                MinMaxLoc(task.pcSplit(2)(r), mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(r))
+                minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
+                minMaxVals(i) = New Vec2f(mm.minVal, mm.maxVal)
+            Next
+
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                For i = 0 To minMaxLocs.Length - 1
+                    Dim lp = minMaxLocs(i)
+                    Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.red, -1, task.lineType)
+                    Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)
                 Next
-            Next
+                dst2.SetTo(white, task.gridMask)
+            End If
+        End Sub
+    End Class
 
-            gridMask.SetTo(0)
-            For x = gridWidth To dst2.Width - 1 Step gridWidth
-                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                Line(gridMask, p1, p2, 255, task.lineWidth)
-            Next
-            For y = gridHeight To dst2.Height - 1 Step gridHeight
-                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                Line(gridMask, p1, p2, 255, task.lineWidth)
-            Next
 
-            For Each roi In gridRects
-                Rectangle(gridMap, roi, Scalar.All(gridRects.IndexOf(roi)), -1)
-            Next
 
-            gridNabes.Clear()
-            For Each roi In gridRects
-                gridNabes.Add(New List(Of Integer))
-                For i = 0 To 8
-                    Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
+
+
+
+
+    Public Class XR_Grid_TrackCenter : Inherits TaskParent
+        Public center As cv.Point
+        Dim match As New Match_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.ShowGrid.Checked = True
+            desc = "Track a cell near the center of the grid"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
+                task.gOptions.DebugCheckBox.Checked = False
+                Dim index As Integer = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
+                Dim r = task.gridRects(index)
+                match.template = src(r).Clone
+                center = New cv.Point(r.X + r.Width / 2, r.Y + r.Height / 2)
+            End If
+
+            Dim pad = task.gridWH / 2
+            Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.gridWH, task.gridWH))
+            match.Run(src(searchRect))
+            center = match.newCenter
+
+            If standaloneTest() Then
+                dst2 = src
+                Rectangle(dst2, match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
+                Circle(dst2, center, task.DotSize, white, -1, task.lineType)
+
+                If task.heartBeat Then dst3.SetTo(0)
+                Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
+                SetTrueText(match.correlation.ToString(fmt3), center, 3)
+
+                labels(3) = "Match correlation = " + match.correlation.ToString(fmt3)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Grid_Rectangles : Inherits TaskParent
+        Public gridWidth As Integer = 10
+        Public gridHeight As Integer = 10
+        Public gridRects As New List(Of cv.Rect)
+        Public gridMap As New Mat
+        Public bricksPerCol As Integer
+        Public bricksPerRow As Integer
+        Public gridMask As Mat
+        Public gridNabes As New List(Of List(Of Integer))
+        Public Sub New()
+            gridMask = New Mat(dst2.Size(), MatType.CV_8U)
+            gridMap = New Mat(dst2.Size(), MatType.CV_8U)
+            desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
+                    "  Specify the Y size."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then
+                gridRects.Clear()
+                bricksPerCol = 0
+                bricksPerRow = 0
+                For y = 0 To dst2.Height - 1 Step gridHeight
+                    For x = 0 To dst2.Width - 1 Step gridWidth
+                        Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
+                        If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
+                        If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
+                        If roi.Width > 0 And roi.Height > 0 Then
+                            If x = 0 Then bricksPerCol += 1
+                            If y = 0 Then bricksPerRow += 1
+                            gridRects.Add(roi)
+                        End If
+                    Next
+                Next
+
+                gridMask.SetTo(0)
+                For x = gridWidth To dst2.Width - 1 Step gridWidth
+                    Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
+                    Line(gridMask, p1, p2, 255, task.lineWidth)
+                Next
+                For y = gridHeight To dst2.Height - 1 Step gridHeight
+                    Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
+                    Line(gridMask, p1, p2, 255, task.lineWidth)
+                Next
+
+                For Each roi In gridRects
+                    Rectangle(gridMap, roi, Scalar.All(gridRects.IndexOf(roi)), -1)
+                Next
+
+                gridNabes.Clear()
+                For Each roi In gridRects
+                    gridNabes.Add(New List(Of Integer))
+                    For i = 0 To 8
+                        Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                               roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                               roi.X - 1, roi.X, roi.X + roi.Width + 1)
-                    Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
+                        Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
-                    If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNabes(gridNabes.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
-                    End If
+                        If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
+                            gridNabes(gridNabes.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
+                        End If
+                    Next
+                Next
+            End If
+
+            If standaloneTest() Then
+                task.color.CopyTo(dst2)
+                dst2.SetTo(white, gridMask)
+                labels(2) = "Grid_Basics_TA " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
+                              CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Grid_SquaresOnly : Inherits TaskParent
+        Public gridRects As New List(Of cv.Rect)
+        Public Sub New()
+            desc = "Create the brickList for a smallRes resolution."
+        End Sub
+        Public Shared Function smallValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
+            If r.X < 0 Then r.X = 0
+            If r.Y < 0 Then r.Y = 0
+            If r.X + r.Width >= task.smallRes.Width * ratio Then r.Width = task.smallRes.Width * ratio - r.X - 1
+            If r.Y + r.Height >= task.smallRes.Height * ratio Then r.Height = task.smallRes.Height * ratio - r.Y - 1
+            If r.X >= task.smallRes.Width * ratio Then r.X = task.smallRes.Width - 1
+            If r.Y >= task.smallRes.Height * ratio Then r.Y = task.smallRes.Height - 1
+            If r.Width <= 0 Then r.Width = 1
+            If r.Height <= 0 Then r.Height = 1
+            Return r
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            gridRects.Clear()
+            Dim input As New Mat(task.smallRes, MatType.CV_8U, 0)
+            For y = 0 To input.Height - 1 Step task.smallBrick
+                For x = 0 To input.Width - 1 Step task.smallBrick
+                    Dim roi = smallValidateRect(New cv.Rect(x, y, task.smallBrick, task.smallBrick))
+
+                    'If roi.Bottom = input.Height - 1 Then roi.Height += 1
+                    'If roi.BottomRight.X = input.Width - 1 Then roi.Width += 1
+
+                    If roi.Width > 0 And roi.Height > 0 Then gridRects.Add(roi)
                 Next
             Next
-        End If
-
-        If standaloneTest() Then
-            task.color.CopyTo(dst2)
-            dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics_TA " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
-                              CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-Public Class Grid_SquaresOnly : Inherits TaskParent
-    Public gridRects As New List(Of cv.Rect)
-    Public Sub New()
-        desc = "Create the brickList for a smallRes resolution."
-    End Sub
-    Public Function smallValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
-        If r.X < 0 Then r.X = 0
-        If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.smallRes.Width * ratio Then r.Width = task.smallRes.Width * ratio - r.X - 1
-        If r.Y + r.Height >= task.smallRes.Height * ratio Then r.Height = task.smallRes.Height * ratio - r.Y - 1
-        If r.X >= task.smallRes.Width * ratio Then r.X = task.smallRes.Width - 1
-        If r.Y >= task.smallRes.Height * ratio Then r.Y = task.smallRes.Height - 1
-        If r.Width <= 0 Then r.Width = 1
-        If r.Height <= 0 Then r.Height = 1
-        Return r
-    End Function
-
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        gridRects.Clear()
-        Dim input As New Mat(task.smallRes, MatType.CV_8U, 0)
-        For y = 0 To input.Height - 1 Step task.smallBrick
-            For x = 0 To input.Width - 1 Step task.smallBrick
-                Dim roi = smallValidateRect(New cv.Rect(x, y, task.smallBrick, task.smallBrick))
-
-                'If roi.Bottom = input.Height - 1 Then roi.Height += 1
-                'If roi.BottomRight.X = input.Width - 1 Then roi.Width += 1
-
-                If roi.Width > 0 And roi.Height > 0 Then gridRects.Add(roi)
-            Next
-        Next
-    End Sub
-End Class
+        End Sub
+    End Class
+End Namespace

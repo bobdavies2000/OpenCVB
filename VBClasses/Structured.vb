@@ -6,7 +6,7 @@ Namespace VBClasses
         Public lines As New Line_Basics
         Dim struct As New Structured_Core
         Public Sub New()
-            task.gOptions.highlight.SelectedItem = "Red"
+            task.gOptions.highlight.SelectedItem = "red"
             task.gOptions.LineWidth.Value += 1
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the lines in the X-direction of the Structured_Core output"
@@ -140,7 +140,7 @@ Namespace VBClasses
             dst0 = makeXSlice(index)
             dst2 = task.color.Clone
             dst2.SetTo(white, dst0)
-            Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), Scalar.Red, slice.options.sliceSize)
+            Line(dst1, New cv.Point(index, 0), New cv.Point(index, dst1.Height), Scalar.red, slice.options.sliceSize)
 
             Dim hist As Mat = Mat.FromPixelData(dst0.Width, 1, MatType.CV_32F, counts.ToArray)
             plot.Run(hist)
@@ -396,7 +396,7 @@ Namespace VBClasses
             options.Run()
 
             Dim sliceMask As New Mat
-            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            If task.mouseMovePoint = New cv.Point Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
             Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
             Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
@@ -466,7 +466,7 @@ Namespace VBClasses
 
             Dim max = counts.Max
             maxCountIndex = counts.IndexOf(max)
-            Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), Scalar.Red, slice.options.sliceSize)
+            Line(dst2, New cv.Point(0, maxCountIndex), New cv.Point(dst2.Width, maxCountIndex), Scalar.red, slice.options.sliceSize)
 
             Dim hist As Mat = Mat.FromPixelData(dst0.Height, 1, MatType.CV_32F, counts.ToArray)
             plot.dst2 = New Mat(dst2.Height, dst2.Height, MatType.CV_8UC3, Scalar.All(0))
@@ -506,7 +506,7 @@ Namespace VBClasses
                 yValues.Add(planeY * ratio)
             Next
 
-            Threshold(dst2, dst2, 0, Scalar.White, ThresholdTypes.Binary)
+            Threshold(dst2, dst2, 0, Scalar.white, ThresholdTypes.Binary)
 
             Dim max = counts.Max
             If max = 0 Then Exit Sub
@@ -528,7 +528,7 @@ Namespace VBClasses
             End If
             SetTrueText(strOut, 2)
 
-            dst3.SetTo(Scalar.Red)
+            dst3.SetTo(Scalar.red)
             Dim barHeight = dst2.Height / counts.Count
             For i = 0 To counts.Count - 1
                 Dim w = dst2.Width * counts(i) / max
@@ -554,8 +554,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            Dim newPoint As New cv.Point
 
-            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            If task.mouseMovePoint = New cv.Point Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
             Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
             heat.Run(src)

@@ -166,7 +166,7 @@ Namespace VBClasses
             Static cvtScaleSlider = OptionParent.FindSlider("Convert And Scale")
             If task.optionsChanged Then
                 gColor.color1 = Scalar.Yellow
-                gColor.color2 = Scalar.Red
+                gColor.color2 = Scalar.red
                 Dim gradMat As New Mat
 
                 gColor.gradientWidth = dst1.Width
@@ -213,7 +213,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
                 gColor.color1 = Scalar.Yellow
-                gColor.color2 = Scalar.Red
+                gColor.color2 = Scalar.red
                 Dim gradMat As New Mat
 
                 gColor.gradientWidth = dst1.Width

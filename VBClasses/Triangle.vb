@@ -150,7 +150,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+            labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. red dot is maxDist."}
             desc = "Given a RedCloud cell, resize it and show the points with depth."
         End Sub
 
@@ -193,7 +193,7 @@ Namespace VBClasses
 
             Dim newMaxDist = New Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                           yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-            Circle(dst3, newMaxDist, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+            Circle(dst3, newMaxDist, task.DotSize + 2, Scalar.red, -1, task.lineType)
         End Sub
     End Class
 
@@ -237,7 +237,7 @@ Namespace VBClasses
             Next
 
             For Each pt In srcPoints
-                Circle(dst2, pt, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize + 1, Scalar.red, -1, task.lineType)
             Next
         End Sub
     End Class

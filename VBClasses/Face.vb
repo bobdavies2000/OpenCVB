@@ -1,42 +1,44 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
-Public Class XR_Face_Haar_LBP : Inherits TaskParent
-    Dim haarCascade As CascadeClassifier
-    Dim lbpCascade As CascadeClassifier
-    Public Sub New()
-        haarCascade = New CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_default.xml")
-        lbpCascade = New CascadeClassifier(task.homeDir + "Data/lbpcascade_frontalface.xml")
-        desc = "Detect faces in the video stream."
-        labels(2) = "Faces detected with Haar"
-        labels(3) = "Faces detected with LBP"
-    End Sub
-    Public Shared Sub DetectFace(ByRef src As Mat, cascade As CascadeClassifier)
-        Dim faces() = cascade.DetectMultiScale(task.gray, 1.08, 3, HaarDetectionTypes.ScaleImage, New Size(30, 30))
-        For Each fface In faces
-        Rectangle(src, fface, Scalar.Red)
-        Next
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone()
-        DetectFace(dst2, haarCascade)
-        dst3 = src.Clone()
-        DetectFace(dst3, lbpCascade)
-    End Sub
-End Class
+Namespace VBClasses
+    Public Class XR_Face_Haar_LBP : Inherits TaskParent
+        Dim haarCascade As CascadeClassifier
+        Dim lbpCascade As CascadeClassifier
+        Public Sub New()
+            haarCascade = New CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_default.xml")
+            lbpCascade = New CascadeClassifier(task.homeDir + "Data/lbpcascade_frontalface.xml")
+            desc = "Detect faces in the video stream."
+            labels(2) = "Faces detected with Haar"
+            labels(3) = "Faces detected with LBP"
+        End Sub
+        Public Shared Sub DetectFace(ByRef src As Mat, cascade As CascadeClassifier)
+            Dim faces() = cascade.DetectMultiScale(task.gray, 1.08, 3, HaarDetectionTypes.ScaleImage, New Size(30, 30))
+            For Each fface In faces
+                Rectangle(src, fface, Scalar.red)
+            Next
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src.Clone()
+            DetectFace(dst2, haarCascade)
+            dst3 = src.Clone()
+            DetectFace(dst3, lbpCascade)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_Face_Haar_Alt : Inherits TaskParent
-    Dim haarCascade As CascadeClassifier
-    Public Sub New()
-        haarCascade = New CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_alt.xml")
-        desc = "Detect faces Haar_alt database."
-        labels(2) = "Faces detected with Haar_Alt"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone()
-        XR_Face_Haar_LBP.DetectFace(dst2, haarCascade)
-    End Sub
-End Class
+    Public Class XR_Face_Haar_Alt : Inherits TaskParent
+        Dim haarCascade As CascadeClassifier
+        Public Sub New()
+            haarCascade = New CascadeClassifier(task.homeDir + "Data/haarcascade_frontalface_alt.xml")
+            desc = "Detect faces Haar_alt database."
+            labels(2) = "Faces detected with Haar_Alt"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src.Clone()
+            XR_Face_Haar_LBP.DetectFace(dst2, haarCascade)
+        End Sub
+    End Class
+End Namespace

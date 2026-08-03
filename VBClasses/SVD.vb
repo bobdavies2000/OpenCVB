@@ -1,38 +1,39 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://answers.opencvb.org/question/200080/parameters-of-cvsvdecomp/
-Public Class XR_SVD_Example : Inherits TaskParent
-    Public Sub New()
-        desc = "SVD example"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim inputData() As Single = {
-                    1, 2, 3, 4, 5,
-                    1, 2, 3, 4, 5,
-                    1, 2, 3, 4, 5,
-                    1, 2, 3, 4, 5,
-                    1, 2, 3, 4, 5
-                }
+Namespace VBClasses
+    Public Class XR_SVD_Example : Inherits TaskParent
+        Public Sub New()
+            desc = "SVD example"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim inputData() As Single = {
+                        1, 2, 3, 4, 5,
+                        1, 2, 3, 4, 5,
+                        1, 2, 3, 4, 5,
+                        1, 2, 3, 4, 5,
+                        1, 2, 3, 4, 5
+                    }
 
-        src = Mat.FromPixelData(5, 5, MatType.CV_32F, inputData)
-        Dim W As New Mat, U As New Mat, VT As New Mat
+            src = Mat.FromPixelData(5, 5, MatType.CV_32F, inputData)
+            Dim W As New Mat, U As New Mat, VT As New Mat
 
-        SVDecomp(src, W, U, VT, SVD.Flags.FullUV)
+            SVDecomp(src, W, U, VT, SVD.Flags.FullUV)
 
-        Dim WD As New Mat(5, 5, MatType.CV_32F, Scalar.All(0))
-        W.CopyTo(WD.Diag)
+            Dim WD As New Mat(5, 5, MatType.CV_32F, Scalar.All(0))
+            W.CopyTo(WD.Diag)
 
-        Dim rec As Mat = VT.T * WD * U.T
-        strOut = ""
-        For i = 0 To rec.Rows - 1
-            For j = 0 To rec.Cols - 1
-                strOut += rec.Get(Of Single)(i, j).ToString(fmt3) + ", "
+            Dim rec As Mat = VT.T * WD * U.T
+            strOut = ""
+            For i = 0 To rec.Rows - 1
+                For j = 0 To rec.Cols - 1
+                    strOut += rec.Get(Of Single)(i, j).ToString(fmt3) + ", "
+                Next
+                strOut += vbCrLf
             Next
-            strOut += vbCrLf
-        Next
 
-        SetTrueText(strOut)
-    End Sub
-End Class
+            SetTrueText(strOut)
+        End Sub
+    End Class
 
 
 
@@ -40,116 +41,117 @@ End Class
 
 
 
-' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
-' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
-Public Class XR_SVD_Example2 : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Compute the mean and tangent of a RedCloud Cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+    ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
+    ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
+    Public Class XR_SVD_Example2 : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Compute the mean and tangent of a RedCloud Cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-        Dim rc = task.rcD
-        If rc Is Nothing Then Exit Sub
-        If redC.rcList.Count = 0 Then Exit Sub
-        SetTrueText(redC.strOut, 1)
+            Dim rc = task.rcD
+            If rc Is Nothing Then Exit Sub
+            If redC.rcList.Count = 0 Then Exit Sub
+            SetTrueText(redC.strOut, 1)
 
-        If task.heartBeat Then
-            Dim m = Cv2.Moments(rc.mask, True)
-            Dim center = New Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
-            Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
+            If task.heartBeat Then
+                Dim m = Cv2.Moments(rc.mask, True)
+                Dim center = New Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
+                Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)
 
-            Dim mArea = Mat.FromPixelData(4, 1, MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
-            Dim U As New Mat
-            SVDecomp(mArea, New Mat, U, New Mat, SVD.Flags.FullUV)
+                Dim mArea = Mat.FromPixelData(4, 1, MatType.CV_32F, {m.M20 / rc.pixels, m.Mu11 / rc.pixels, m.Mu11 / rc.pixels, m.Mu02 / rc.pixels})
+                Dim U As New Mat
+                SVDecomp(mArea, New Mat, U, New Mat, SVD.Flags.FullUV)
 
 
-            strOut = "The U Mat: " + vbCrLf
-            For j = 0 To U.Rows - 1
+                strOut = "The U Mat: " + vbCrLf
+                For j = 0 To U.Rows - 1
+                    For i = 0 To U.Cols - 1
+                        strOut += U.Get(Of Single)(j, i).ToString(fmt3) + ", "
+                    Next
+                    strOut += vbCrLf
+                Next
+                strOut += vbCrLf
+
+                strOut += "The tangent: " + vbCrLf
                 For i = 0 To U.Cols - 1
-                    strOut += U.Get(Of Single)(j, i).ToString(fmt3) + ", "
+                    strOut += U.Get(Of Single)(0, i).ToString(fmt3) + ", "
+                Next
+                strOut += vbCrLf
+
+                Dim angle = Math.Atan2(U.Get(Of Single)(0, 1), U.Get(Of Single)(0, 0))
+                strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
+
+                strOut += "Center.X = " + center.X.ToString(fmt2) + " Center.Y = " + center.Y.ToString(fmt2) + vbCrLf
+
+                strOut += "Rect is at (" + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ") with width/height = " + CStr(rc.rect.Width) + "/" + CStr(rc.rect.Height) + vbCrLf
+            End If
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
+    Public Class XR_SVD_Gaussian : Inherits TaskParent
+        Dim covar As New Covariance_Images
+        Public Sub New()
+            desc = "Compute the SVD for the covariance of 2 images - only close to working..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            covar.Run(src)
+            dst2 = src
+
+            Dim U As New Mat, W As New Mat, VT As New Mat
+            SVDecomp(covar.covariance, W, U, VT, SVD.Flags.FullUV)
+
+            strOut = "The Covariance Mat: " + vbCrLf
+            For j = 0 To covar.covariance.Rows - 1
+                For i = 0 To covar.covariance.Cols - 1
+                    strOut += covar.covariance.Get(Of Double)(j, i).ToString(fmt3) + ", "
                 Next
                 strOut += vbCrLf
             Next
             strOut += vbCrLf
 
-            strOut += "The tangent: " + vbCrLf
-            For i = 0 To U.Cols - 1
-                strOut += U.Get(Of Single)(0, i).ToString(fmt3) + ", "
+            strOut += "The W Mat: " + vbCrLf
+            For j = 0 To W.Rows - 1
+                For i = 0 To W.Cols - 1
+                    strOut += W.Get(Of Double)(j, i).ToString(fmt3) + ", "
+                Next
+                strOut += vbCrLf
             Next
             strOut += vbCrLf
 
-            Dim angle = Math.Atan2(U.Get(Of Single)(0, 1), U.Get(Of Single)(0, 0))
+            strOut += "The U Mat: " + vbCrLf
+            For j = 0 To U.Rows - 1
+                For i = 0 To U.Cols - 1
+                    strOut += U.Get(Of Double)(j, i).ToString(fmt3) + ", "
+                Next
+                strOut += vbCrLf
+            Next
+            strOut += vbCrLf
+
+            Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / PI)
             strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
 
-            strOut += "Center.X = " + center.X.ToString(fmt2) + " Center.Y = " + center.Y.ToString(fmt2) + vbCrLf
+            Sqrt(W, W)
+            W *= 3
+            Dim size = New Size2f(10, 100) ' New Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
+            Dim pt = New Point2f(covar.meanVal.Get(Of Double)(0, 0), covar.meanVal.Get(Of Double)(0, 1))
+            Dim rrect = New RotatedRect(pt, size, angle)
+            Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
 
-            strOut += "Rect is at (" + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ") with width/height = " + CStr(rc.rect.Width) + "/" + CStr(rc.rect.Height) + vbCrLf
-        End If
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
-Public Class XR_SVD_Gaussian : Inherits TaskParent
-    Dim covar As New Covariance_Images
-    Public Sub New()
-        desc = "Compute the SVD for the covariance of 2 images - only close to working..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        covar.Run(src)
-        dst2 = src
-
-        Dim U As New Mat, W As New Mat, VT As New Mat
-        SVDecomp(covar.covariance, W, U, VT, SVD.Flags.FullUV)
-
-        strOut = "The Covariance Mat: " + vbCrLf
-        For j = 0 To covar.covariance.Rows - 1
-            For i = 0 To covar.covariance.Cols - 1
-                strOut += covar.covariance.Get(Of Double)(j, i).ToString(fmt3) + ", "
-            Next
-            strOut += vbCrLf
-        Next
-        strOut += vbCrLf
-
-        strOut += "The W Mat: " + vbCrLf
-        For j = 0 To W.Rows - 1
-            For i = 0 To W.Cols - 1
-                strOut += W.Get(Of Double)(j, i).ToString(fmt3) + ", "
-            Next
-            strOut += vbCrLf
-        Next
-        strOut += vbCrLf
-
-        strOut += "The U Mat: " + vbCrLf
-        For j = 0 To U.Rows - 1
-            For i = 0 To U.Cols - 1
-                strOut += U.Get(Of Double)(j, i).ToString(fmt3) + ", "
-            Next
-            strOut += vbCrLf
-        Next
-        strOut += vbCrLf
-
-        Dim angle = -Math.Atan2(U.Get(Of Double)(0, 1), U.Get(Of Double)(0, 0)) * (180 / PI)
-        strOut += "Angle = " + angle.ToString(fmt3) + " radians" + vbCrLf
-
-        Sqrt(W, W)
-        W *= 3
-        Dim size = New Size2f(10, 100) ' New Size2f(W.Get(Of Double)(0, 0), W.Get(Of Double)(1, 0))
-        Dim pt = New Point2f(covar.meanVal.Get(Of Double)(0, 0), covar.meanVal.Get(Of Double)(0, 1))
-        Dim rrect = New RotatedRect(pt, size, angle)
-        Ellipse(dst2, rrect, task.highlight, task.lineWidth, task.lineType)
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+End Namespace

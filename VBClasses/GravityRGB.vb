@@ -221,13 +221,14 @@ Namespace VBClasses
 
     Public Class GravityRGB_Vertical : Inherits TaskParent
         Public lpList As New List(Of lpData)
+        Public avgAngleToVertical As Single
         Public Sub New()
             desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lpList.Clear()
-            dst2 = task.color.Clone
-            dst3 = task.color.Clone
+            dst2 = task.gray.Clone
+            dst3 = task.gray.Clone
 
             If task.lpGravity Is Nothing Then
                 SetTrueText("task.lpGravity is not available.", 2)
@@ -236,14 +237,21 @@ Namespace VBClasses
             End If
 
             Dim gAngle = task.lpGravity.angle
-            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, task.highlight, task.lineWidth + 1, task.lineType)
+            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
 
             For Each lp In task.lines.lpList
                 If Math.Abs(gAngle - lp.angle) < AngleThreshold Then
-                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                     lpList.Add(lp)
                 End If
             Next
+
+            Dim angleList As New List(Of Single)
+            For Each lp In lpList
+                angleList.Add(If(lp.angle >= 0, 90 - lp.angle, -90 - lp.angle))
+            Next
+            avgAngleToVertical = If(angleList.Count = 0, task.verticalizeAngle, angleList.Average())
+            If Math.Abs(avgAngleToVertical) > 90 Then avgAngleToVertical = avgAngleToVertical Mod 90
 
             If lpList.Count = 0 Then
                 labels(2) = "No lines parallel to gravity (of " + CStr(task.lines.lpList.Count) + ")"
@@ -261,56 +269,27 @@ Namespace VBClasses
 
     Public Class GravityRGB_Rotate : Inherits TaskParent
         Dim vert As New GravityRGB_Vertical
-        Dim lastRotateAngle As Double
-        Dim angleReady As Boolean
-        Public avgAngle As Double
-        Public rotateAngle As Double
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Cursor.ai: Average GravityRGB_Vertical angles-to-vertical and rotate task.color."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then angleReady = False
+            Static lastRotateAngle As Double
+            Dim avgAngle As Double
+            If task.optionsChanged Or vert.lpList.Count = 0 Then
+                avgAngle = task.verticalizeAngle
+                If Math.Abs(avgAngle) > 90 Then avgAngle = avgAngle Mod 90
+                lastRotateAngle = avgAngle
+            End If
 
             vert.Run(src)
-            dst2 = task.color
+            dst2 = vert.dst2
 
-            Dim angleDiff As Double
-            If vert.lpList.Count = 0 Then
-                angleDiff = task.verticalizeAngle
-                If Math.Abs(angleDiff) > 90 Then angleDiff = angleDiff Mod 90
-                avgAngle = If(task.lpGravity Is Nothing, 90.0, CDbl(task.lpGravity.angle))
-            Else
-                Dim sumAngle As Double = 0
-                Dim sumToVertical As Double = 0
-                For Each lp In vert.lpList
-                    sumAngle += lp.angle
-                    ' Signed angle from image vertical (90 deg), same sign as verticalizeAngle / Vertical_Gravity.
-                    If lp.angle >= 0 Then
-                        sumToVertical += 90 - lp.angle
-                    Else
-                        sumToVertical += -90 - lp.angle
-                    End If
-                Next
-                avgAngle = sumAngle / vert.lpList.Count
-                angleDiff = sumToVertical / vert.lpList.Count
-                If Math.Abs(angleDiff) > 90 Then angleDiff = angleDiff Mod 90
-            End If
-
-            ' Local previous angle — IMU overwrites task.verticalizeAngle every frame.
-            If Not angleReady Then
-                lastRotateAngle = angleDiff
-                angleReady = True
-            End If
+            If avgAngle = 0 Then avgAngle = vert.avgAngleToVertical
 
             ' Hold only for tiny jitter; otherwise take the new estimate so dst3 stays true to vertical.
-            If Math.Abs(angleDiff - lastRotateAngle) < 0.1 Then
-                rotateAngle = lastRotateAngle
-            Else
-                rotateAngle = angleDiff
-            End If
+            Dim rotateAngle = If(Math.Abs(avgAngle - lastRotateAngle) < 1, lastRotateAngle, avgAngle)
             lastRotateAngle = rotateAngle
-            task.verticalizeAngle = rotateAngle
 
             dst3 = GravityRGB_Basics.rotateRGB(task.color, rotateAngle)
 
@@ -323,17 +302,34 @@ Namespace VBClasses
                 Return
             End If
 
-            strOut = "Vertical lines = " + CStr(vert.lpList.Count) + vbCrLf +
-                     "Average line angle = " + avgAngle.ToString(fmt2) + " deg" + vbCrLf +
-                     "Average angle to vertical = " + rotateAngle.ToString(fmt2) + " deg" + vbCrLf +
-                     "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg"
-            SetTrueText(strOut, 1)
-            labels(3) = "Rotated by " + rotateAngle.ToString(fmt2) + " deg (avg of " +
-                        CStr(vert.lpList.Count) + " vertical lines)"
             If task.heartBeat Then
+                strOut = "Vertical lines identified = " + CStr(vert.lpList.Count) + vbCrLf +
+                             "Average line angle to vertical = " + avgAngle.ToString(fmt2) + " deg" + vbCrLf +
+                             "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg"
+                labels(3) = "Rotated by " + rotateAngle.ToString(fmt2) + " deg (avg of " +
+                            CStr(vert.lpList.Count) + " vertical lines)"
                 labels(2) = "Avg angle " + avgAngle.ToString(fmt2) + " deg, vertical = " +
-                            angleDiff.ToString(fmt2) + " deg"
+                            avgAngle.ToString(fmt2) + " deg"
             End If
+            SetTrueText(strOut, 1)
+
+            lastRotateAngle = If(Math.Abs(avgAngle - lastRotateAngle) < 10, lastRotateAngle, avgAngle)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class GravityRGB_Compare : Inherits TaskParent
+        Dim rotate As New GravityRGB_Rotate
+        Public Sub New()
+            desc = "Compare the results of using the vertical lines to just using the IMU"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            rotate.Run(emptyMat)
+            dst2 = rotate.dst3
+            dst3 = GravityRGB_Basics.rotateRGB(task.color, task.verticalizeAngle)
         End Sub
     End Class
 

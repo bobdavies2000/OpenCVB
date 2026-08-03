@@ -74,7 +74,7 @@ Namespace VBClasses
         Dim factor = 8
         Dim age As Integer
         Public population As Integer
-        Public nodeColor = Scalar.White
+        Public nodeColor = Scalar.white
         Public backColor = Scalar.Black
         Dim savePointCount As Integer
         Dim lastPopulation As Integer
@@ -185,7 +185,7 @@ Namespace VBClasses
             Threshold(deaths, deaths, 0, 255, ThresholdTypes.Binary)
             dst2 = game.dst2.Clone()
             dst2.SetTo(Scalar.Blue, births)
-            dst2.SetTo(Scalar.Red, deaths)
+            dst2.SetTo(Scalar.red, deaths)
         End Sub
     End Class
 

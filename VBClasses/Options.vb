@@ -2641,7 +2641,7 @@ Namespace VBClasses
             If radio.Setup(traceName) Then
                 radio.addRadio("Second DuoTone Blue")
                 radio.addRadio("Second DuoTone Green")
-                radio.addRadio("Second DuoTone Red")
+                radio.addRadio("Second DuoTone red")
                 radio.addRadio("Second DuoTone None")
                 radio.check(switchColor).Checked = True
             End If
@@ -2805,12 +2805,12 @@ Namespace VBClasses
             End If
 
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Threshold for Red channel", 0, 255, redThreshold)
+                sliders.setupTrackBar("Threshold for red channel", 0, 255, redThreshold)
             End If
         End Sub
         Public Sub Run()
             Static topCheck = FindCheckBox("Top View (Unchecked Side View)")
-            Static redSlider = OptionParent.FindSlider("Threshold for Red channel")
+            Static redSlider = OptionParent.FindSlider("Threshold for red channel")
 
             redThreshold = redSlider.value
 
@@ -3436,13 +3436,13 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.Setup(traceName)
-                sliders.setupTrackBar("Red", 0, 255, redS)
+                sliders.setupTrackBar("red", 0, 255, redS)
                 sliders.setupTrackBar("Green", 0, 255, greenS)
                 sliders.setupTrackBar("Blue", 0, 255, blueS)
             End If
         End Sub
         Public Sub Run()
-            Static redSlider = OptionParent.FindSlider("Red")
+            Static redSlider = OptionParent.FindSlider("red")
             Static greenSlider = OptionParent.FindSlider("Green")
             Static blueSlider = OptionParent.FindSlider("Blue")
             redS = redSlider.Value
@@ -4472,7 +4472,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("High Threshold", 0, 100, highThreshold)
                 sliders.setupTrackBar("Color Change - Blue", 5, 25, blueChange * 10)
                 sliders.setupTrackBar("Color Change - Green", 5, 25, greenChange * 10)
-                sliders.setupTrackBar("Color Change - Red", 5, 25, redChange * 10)
+                sliders.setupTrackBar("Color Change - red", 5, 25, redChange * 10)
             End If
 
             If (radio.Setup(traceName)) Then
@@ -4487,7 +4487,7 @@ Namespace VBClasses
             Static betaSlider = OptionParent.FindSlider("Beta")
             Static lowSlider = OptionParent.FindSlider("Low Threshold")
             Static highSlider = OptionParent.FindSlider("High Threshold")
-            Static redSlider = OptionParent.FindSlider("Color Change - Red")
+            Static redSlider = OptionParent.FindSlider("Color Change - red")
             Static greenSlider = OptionParent.FindSlider("Color Change - Green")
             Static blueSlider = OptionParent.FindSlider("Color Change - Blue")
             alpha = alphaSlider.value / 10
@@ -5453,7 +5453,7 @@ Namespace VBClasses
                 check.Setup(traceName)
                 check.addCheckBox("Blue Variable")
                 check.addCheckBox("Green Variable")
-                check.addCheckBox("Red Variable")
+                check.addCheckBox("red Variable")
                 check.Box(0).Checked = True
                 check.Box(1).Checked = True
                 check.Box(2).Checked = True
@@ -5462,7 +5462,7 @@ Namespace VBClasses
         Public Sub Run()
             Static blueCheck = FindCheckBox("Blue Variable")
             Static greenCheck = FindCheckBox("Green Variable")
-            Static redCheck = FindCheckBox("Red Variable")
+            Static redCheck = FindCheckBox("red Variable")
             setBlue = blueCheck.checked
             setGreen = greenCheck.checked
             setRed = redCheck.checked
@@ -6121,7 +6121,7 @@ Namespace VBClasses
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Random_NormalDist Blue Mean", 0, 255, blueVal)
                 sliders.setupTrackBar("Random_NormalDist Green Mean", 0, 255, greenVal)
-                sliders.setupTrackBar("Random_NormalDist Red Mean", 0, 255, redVal)
+                sliders.setupTrackBar("Random_NormalDist red Mean", 0, 255, redVal)
                 sliders.setupTrackBar("Random_NormalDist Stdev", 0, 255, stdev)
             End If
 
@@ -6130,7 +6130,7 @@ Namespace VBClasses
         Public Sub Run()
             Static blueSlider = OptionParent.FindSlider("Random_NormalDist Blue Mean")
             Static greenSlider = OptionParent.FindSlider("Random_NormalDist Green Mean")
-            Static redSlider = OptionParent.FindSlider("Random_NormalDist Red Mean")
+            Static redSlider = OptionParent.FindSlider("Random_NormalDist red Mean")
             Static stdevSlider = OptionParent.FindSlider("Random_NormalDist Stdev")
             redVal = redSlider.value
             greenVal = greenSlider.value
@@ -6394,7 +6394,7 @@ Namespace VBClasses
                 radio.addRadio("Grayscale input")
                 radio.addRadio("Blue input")
                 radio.addRadio("Green input")
-                radio.addRadio("Red input")
+                radio.addRadio("red input")
                 radio.check(1).Checked = True
             End If
         End Sub

@@ -337,7 +337,7 @@ Namespace VBClasses
 
             Dim clipped = ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
             Line(dst3, p1, p2, If(clipped, white, Scalar.Black), task.lineWidth + 1, task.lineType)
-            Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.Red), task.lineWidth + 1, task.lineType)
+            Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.red), task.lineWidth + 1, task.lineType)
 
             flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")
             linenum += 1
@@ -364,16 +364,16 @@ Namespace VBClasses
             desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If p1 <> newPoint And p2 <> New cv.Point And task.clickPoint <> newPoint Then
-                p1 = newPoint
-                p2 = newPoint
+            If p1 <> new cv.Point And p2 <> New cv.Point And task.clickPoint <> new cv.Point Then
+                p1 = new cv.Point
+                p2 = new cv.Point
             End If
             dst2 = src
             If task.clickPoint <> New cv.Point Or externalUse Then
                 If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
             End If
-            If p1 <> newPoint And p2 = newPoint Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
-            If p1 <> newPoint And p2 <> newPoint Then
+            If p1 <> new cv.Point And p2 = new cv.Point Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+            If p1 <> new cv.Point And p2 <> new cv.Point Then
                 Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
             End If
             SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +

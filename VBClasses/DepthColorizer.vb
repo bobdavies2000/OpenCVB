@@ -42,7 +42,7 @@ Namespace VBClasses
 
             task.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, task.vecColors.ToArray)
 
-            Dim color3 = Scalar.Black, color4 = Scalar.Red
+            Dim color3 = Scalar.Black, color4 = Scalar.red
             Dim corrColors = New List(Of Vec3b)
             f = 1.0
             For i = 0 To gradientWidth - 1

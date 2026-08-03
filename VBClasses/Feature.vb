@@ -469,7 +469,7 @@ Namespace VBClasses
                 shiTomasi.Run(task.leftView)
                 Dim _cvtInline As New Mat
                 CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-                dst2.SetTo(Scalar.White, _cvtInline)
+                dst2.SetTo(Scalar.white, _cvtInline)
 
                 shiTomasi.Run(task.rightView)
                 CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
@@ -566,7 +566,7 @@ Namespace VBClasses
                     Dim pt = newFeatures(i)
                     features.Add(pt)
                     If gens(i) < task.fOptions.FrameHistoryCount.Value Then
-                        Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+                        Circle(dst2, pt, task.DotSize + 2, Scalar.red, -1, task.lineType)
                     Else
                         whiteCount += 1
                         Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -577,7 +577,7 @@ Namespace VBClasses
             If featureHistory.Count > task.fOptions.FrameHistoryCount.Value Then featureHistory.RemoveAt(0)
             If task.heartBeat Then
                 labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
-                            " Red is a recent addition, yellow is present on previous " +
+                            " red is a recent addition, yellow is present on previous " +
                             CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
             End If
         End Sub

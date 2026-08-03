@@ -1,60 +1,59 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
-Public Class Salience_Basics_CPP : Inherits TaskParent
-    Implements IDisposable
-    Dim grayData(0) As Byte
-    Public options As New Options_Salience
-    Public Sub New()
-        cPtr = Salience_Open()
-        desc = "Show results of Salience algorithm when using C++"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Namespace VBClasses
+    Public Class Salience_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
+        Dim grayData(0) As Byte
+        Public options As New Options_Salience
+        Public Sub New()
+            cPtr = Salience_Open()
+            desc = "Show results of Salience algorithm when using C++"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If src.Channels() <> 1 Then src = task.gray
-        If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
-        Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
-        src.GetArray(Of Byte)(grayData)
-        Dim imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
-        grayHandle.Free()
-
-        dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
-    End Sub
-    Protected Overrides Sub Finalize()
-        If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
-    End Sub
-End Class
-
-
-
-Public Class XR_Salience_Basics_MT : Inherits TaskParent
-    Dim salience As New Salience_Basics_CPP
-    Public Sub New()
-        OptionParent.FindSlider("Salience numScales").Value = 2
-        desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = task.gray
-        Dim threads = 32
-        Dim h = src.Height \ threads
-        dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-        For i = 0 To threads - 1
-            Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
-            If roi.Height <= 0 Then Continue For
-
-            Dim cPtr = Salience_Open()
-            Dim input = src(roi).Clone()
-            Dim grayData(input.Total - 1) As Byte
+            If src.Channels() <> 1 Then src = task.gray
+            If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
             Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
-            input.GetArray(Of Byte)(grayData)
-            Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
+            src.GetArray(Of Byte)(grayData)
+            Dim imagePtr = Salience_Run(cPtr, options.numScales, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
             grayHandle.Free()
 
-            dst2(roi) = Mat.FromPixelData(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone
+            dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8U, imagePtr).Clone
+        End Sub
+        Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
-        Next
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
+    Public Class XR_Salience_Basics_MT : Inherits TaskParent
+        Dim salience As New Salience_Basics_CPP
+        Public Sub New()
+            OptionParent.FindSlider("Salience numScales").Value = 2
+            desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 1 Then src = task.gray
+            Dim threads = 32
+            Dim h = src.Height \ threads
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            For i = 0 To threads - 1
+                Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
+                If roi.Height <= 0 Then Continue For
+
+                Dim cPtr = Salience_Open()
+                Dim input = src(roi).Clone()
+                Dim grayData(input.Total - 1) As Byte
+                Dim grayHandle = GCHandle.Alloc(grayData, GCHandleType.Pinned)
+                input.GetArray(Of Byte)(grayData)
+                Dim imagePtr = Salience_Run(cPtr, salience.options.numScales, grayHandle.AddrOfPinnedObject, roi.Height, roi.Width)
+                grayHandle.Free()
+
+                dst2(roi) = Mat.FromPixelData(roi.Height, roi.Width, MatType.CV_8U, imagePtr).Clone
+                If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
+            Next
+        End Sub
+    End Class
+End Namespace

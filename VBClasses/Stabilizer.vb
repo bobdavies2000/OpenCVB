@@ -30,7 +30,7 @@ Namespace VBClasses
             WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant)
             CvtColor(dst2, dst3, ColorConversionCodes.GRAY2BGR)
             Line(dst3, refLine.ptE1, refLine.ptE2, Scalar.Yellow, task.lineWidth + 1, task.lineType)
-            Line(dst3, lpCurr.ptE1, lpCurr.ptE2, Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst3, lpCurr.ptE1, lpCurr.ptE2, Scalar.red, task.lineWidth + 1, task.lineType)
 
             labels(3) = "Delta Angle=" + angleDelta.ToString(fmt2) + " deg, tx=" + tx.ToString(fmt2) + ", ty=" + ty.ToString(fmt2)
         End Sub
@@ -147,7 +147,7 @@ Namespace VBClasses
                 rollImageDeg = task.lpGravity.angle
             End If
 
-            Line(dst2, lpCurr.ptE1, lpCurr.ptE2, Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst2, lpCurr.ptE1, lpCurr.ptE2, Scalar.red, task.lineWidth + 1, task.lineType)
             If task.lpGravity IsNot Nothing And task.lpGravity.length > 0 Then
                 Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, Scalar.Yellow, task.lineWidth, task.lineType)
             End If
@@ -159,7 +159,7 @@ Namespace VBClasses
 
             strOut = "Pitch/roll use task.accRadians (X,Z) from gravity/IMU pipeline (radians converted to degrees)." + vbCrLf +
                  "Yaw uses integrated IMU_AngularVelocity.Y (rad/s); reset on options change — it drifts without magnetometer." + vbCrLf +
-                 "Red = longest tracked line (lpCurr); yellow = gravity line (lpGravity)." + vbCrLf +
+                 "red = longest tracked line (lpCurr); yellow = gravity line (lpGravity)." + vbCrLf +
                  "To reduce jitter: raise IMU alpha filter, mount the camera rigidly, and move smoothly."
             SetTrueText(strOut, 3)
         End Sub
@@ -178,7 +178,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Cursor.ai: Pitch, roll, yaw from task.longestLine and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
             labels(2) = "PRY (deg) from longest line + gravity"
-            labels(3) = "Red = longestLine, yellow = lpGravity"
+            labels(3) = "red = longestLine, yellow = lpGravity"
         End Sub
         Private Shared Function Unit2D(p1 As Point2f, p2 As Point2f) As Point2f
             Dim dx = p2.X - p1.X
@@ -221,7 +221,7 @@ Namespace VBClasses
             End If
             Dim yawDeg = WrapDeg(Math.Atan2(l.X * hy - l.Y * hx, l.X * hx + l.Y * hy) * RadToDeg)
 
-            Line(dst2, task.longestLine.ptE1, task.longestLine.ptE2, Scalar.Red, task.lineWidth + 1, task.lineType)
+            Line(dst2, task.longestLine.ptE1, task.longestLine.ptE2, Scalar.red, task.lineWidth + 1, task.lineType)
             Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
             labels(2) = "Pitch=" + task.pitchDeg.ToString(fmt2) + "  Roll=" + rollDeg.ToString(fmt2) + "  Yaw=" + yawDeg.ToString(fmt2)

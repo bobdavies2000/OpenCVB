@@ -1,63 +1,65 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class HeartBeat_Basics_TA : Inherits TaskParent
-    Const ms1000 = 1000
-    Public Sub New()
-        desc = "Update the heart beat variables"
-    End Sub
-    Public Shared Sub setHeartBeat()
-        If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class HeartBeat_Basics_TA : Inherits TaskParent
+        Const ms1000 = 1000
+        Public Sub New()
+            desc = "Update the heart beat variables"
+        End Sub
+        Public Shared Sub setHeartBeat()
+            If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
-        ' update the time measures
-        Dim msWatch = task.myStopWatch.ElapsedMilliseconds
+            ' update the time measures
+            Dim msWatch = task.myStopWatch.ElapsedMilliseconds
 
-        task.quarterBeat = False
-        task.midHeartBeat = False
-        task.heartBeat = False
+            task.quarterBeat = False
+            task.midHeartBeat = False
+            task.heartBeat = False
 
-        Static msLast As Integer
-        Dim ms = (msWatch - msLast) / ms1000
-        If msLast > msWatch Then
-            msLast = msWatch
-            ms = ms1000
-        End If
-
-        For i = 0 To task.quarter.Length - 1
-            If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
-                task.quarterBeat = True
-                If i = 1 Then task.midHeartBeat = True
-                If i = 3 Then task.heartBeat = True
-                task.quarter(i) = True
+            Static msLast As Integer
+            Dim ms = (msWatch - msLast) / ms1000
+            If msLast > msWatch Then
+                msLast = msWatch
+                ms = ms1000
             End If
-        Next
-        If task.heartBeat Then ReDim task.quarter(4)
-        If task.heartBeat Then task.heartbeatFrame = task.frameCount
 
-        If task.frameCount = 1 Then task.heartBeat = True
+            For i = 0 To task.quarter.Length - 1
+                If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                    task.quarterBeat = True
+                    If i = 1 Then task.midHeartBeat = True
+                    If i = 3 Then task.heartBeat = True
+                    task.quarter(i) = True
+                End If
+            Next
+            If task.heartBeat Then ReDim task.quarter(4)
+            If task.heartBeat Then task.heartbeatFrame = task.frameCount
 
-        If task.heartBeat Then
-            task.heartBeatCount += 1
-            If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
-        End If
+            If task.frameCount = 1 Then task.heartBeat = True
 
-        Dim frameDuration = ms1000 / task.fpsAlgorithm
-        task.almostHeartBeat = If(msWatch - msLast + frameDuration * 1.5 > ms1000, True, False)
+            If task.heartBeat Then
+                task.heartBeatCount += 1
+                If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
+            End If
 
-        If (msWatch - msLast) > ms1000 Then msLast = msWatch
-        If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
+            Dim frameDuration = ms1000 / task.fpsAlgorithm
+            task.almostHeartBeat = msWatch - msLast + frameDuration * 1.5 > ms1000
 
-        Static lastHeartBeatLT As Boolean = False
-        Static lastHeartBeat As Boolean = False
+            If (msWatch - msLast) > ms1000 Then msLast = msWatch
+            If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
-        task.afterHeartBeat = If(lastHeartBeat, True, False)
-        task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
+            Static lastHeartBeatLT As Boolean = False
+            Static lastHeartBeat As Boolean = False
 
-        lastHeartBeat = task.heartBeat
-        lastHeartBeatLT = task.heartBeatLT
+            task.afterHeartBeat = lastHeartBeat
+            task.afterHeartBeatLT = lastHeartBeatLT
 
-        task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
+            lastHeartBeat = task.heartBeat
+            lastHeartBeatLT = task.heartBeatLT
 
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        setHeartBeat()
-    End Sub
-End Class
+            task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
+
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            setHeartBeat()
+        End Sub
+    End Class
+End Namespace

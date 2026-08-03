@@ -1,4 +1,4 @@
-Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp : Imports VBClasses
 Imports cvext = OpenCvSharp.GdipExtensions
 Namespace MainApp
     Partial Public Class MainUI

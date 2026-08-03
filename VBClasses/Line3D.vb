@@ -79,7 +79,7 @@ Namespace VBClasses
             Dim depthMax = If(brickMax.depth > 0, brickMax.depth, mm.maxVal)
 
             Dim depthMean = Mean(task.pcSplit(2), dst0)(0)
-            Circle(dst2, lp.p1, task.DotSize + 4, Scalar.Red, -1, task.lineType)
+            Circle(dst2, lp.p1, task.DotSize + 4, Scalar.red, -1, task.lineType)
             Circle(dst2, lp.p2, task.DotSize + 4, Scalar.Blue, -1, task.lineType)
 
             If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then

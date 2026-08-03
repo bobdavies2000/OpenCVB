@@ -85,7 +85,7 @@ Namespace VBClasses
                         lastFeatures.Add(pt2)
                         Line(dst2, pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
                         Circle(dst3, pt1, task.DotSize + 3, white, -1, task.lineType)
-                        Circle(dst3, pt2, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                        Circle(dst3, pt2, task.DotSize + 1, Scalar.red, -1, task.lineType)
                     End If
                 End If
             Next

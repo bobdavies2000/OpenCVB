@@ -234,7 +234,7 @@ Namespace VBClasses
                 Dim p1 = knn.queries(i)
                 Dim p2 = knn.trainInput(knn.result(i, 0))
                 Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, p2, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst3, p2, task.DotSize, Scalar.red, -1, task.lineType)
                 Line(dst3, p1, p2, white, task.lineWidth, task.lineType)
             Next
             knn.trainInput = New List(Of Point2f)(knn.queries)

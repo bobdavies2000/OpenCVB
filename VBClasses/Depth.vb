@@ -162,12 +162,12 @@ Namespace VBClasses
                 maxPoint(i) = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
 
                 Circle(dst2(r), mm.minLoc, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst2(r), mm.maxLoc, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2(r), mm.maxLoc, task.DotSize, Scalar.red, -1, task.lineType)
 
                 Dim p1 = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
                 Dim p2 = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
                 Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, p2, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst3, p2, task.DotSize, Scalar.red, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -427,7 +427,7 @@ Namespace VBClasses
                 kalman.Run(emptyMat)
                 Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
                 Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
-                Rectangle(dst2, kRect, Scalar.Red, 2)
+                Rectangle(dst2, kRect, Scalar.red, 2)
                 Rectangle(dst2, nextRect, Scalar.Blue, 2)
                 If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
                     trustedRect = ValidateRect(kRect)
@@ -1150,7 +1150,7 @@ Namespace VBClasses
         Dim kalman As New Kalman_Basics
         Public Sub New()
             ReDim kalman.kInput(task.gridRects.Count * 4 - 1)
-            labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min cv.Point (only) for each cell."}
+            labels = {"", "", "red is min distance, blue is max distance", "Voronoi representation of min cv.Point (only) for each cell."}
             desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1162,7 +1162,7 @@ Namespace VBClasses
             For Each brick In bricks.brickList
                 Dim pt = brick.mm.minLoc
                 subdiv.Insert(New cv.Point(pt.X + brick.rect.X, pt.Y + brick.rect.Y))
-                Circle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, Scalar.red, -1, task.lineType)
                 Circle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, Scalar.Blue, -1, task.lineType)
             Next
 

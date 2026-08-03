@@ -34,9 +34,9 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 Static lastCenter As Point2f = center
-                Circle(dst3, center, 5, Scalar.Red, -1, task.lineType)
+                Circle(dst3, center, 5, Scalar.red, -1, task.lineType)
                 Circle(dst3, lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
-                Line(dst3, center, lastCenter, Scalar.Red, task.lineWidth + 1, task.lineType)
+                Line(dst3, center, lastCenter, Scalar.red, task.lineWidth + 1, task.lineType)
                 lastCenter = center
                 strOut += "Yellow is last center, red is the current center"
             End If

@@ -192,7 +192,7 @@ Namespace VBClasses
         Public Sub New()
             match.showOutput = True
             labels(2) = "Probabilities that the template matches image"
-            labels(3) = "Red is the best template to match (highest entropy)"
+            labels(3) = "red is the best template to match (highest entropy)"
             desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -319,7 +319,7 @@ Namespace VBClasses
             inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
             dst3 = New Mat(dst3.Size(), MatType.CV_32F, Scalar.All(0))
             If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
-            labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
+            labels(2) = "red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
             desc = "Find the requested template in task.drawrect in an image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -345,7 +345,7 @@ Namespace VBClasses
             SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
             If standaloneTest() Then
-                Circle(dst2, match.newCenter, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2, match.newCenter, task.DotSize, Scalar.red, -1, task.lineType)
                 SetTrueText(match.correlation.ToString(fmt3), match.newCenter, 2)
             End If
             lastImage = src
@@ -596,7 +596,7 @@ Namespace VBClasses
                 Dim index = knn.result(i, 0)
                 If index >= 0 And index < lastPt.Count Then
                     Dim lastMP = lastPt(index)
-                    Line(dst2, lp.p1, lastMP.p2, Scalar.Red, task.lineWidth, task.lineType)
+                    Line(dst2, lp.p1, lastMP.p2, Scalar.red, task.lineWidth, task.lineType)
                 End If
             Next
 

@@ -3,11 +3,11 @@ Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = task.mainFormLocation.X
-        Me.Top = task.mainFormLocation.Y - 40
+        Me.Left = vbc.task.mainFormLocation.X
+        Me.Top = vbc.task.mainFormLocation.Y - 40
 
-        Me.Width = task.mainFormLocation.Width
-        Me.Height = task.mainFormLocation.Height
+        Me.Width = vbc.task.mainFormLocation.Width
+        Me.Height = vbc.task.mainFormLocation.Height
         PixelViewerForm_ResizeEnd(sender, e)
         Timer1.Enabled = True
     End Sub
@@ -32,7 +32,7 @@ Public Class PixelViewerForm
     End Sub
     Private Sub PixelViewerForm_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         Timer1.Enabled = False
-        task.pixelViewerOn = False
+        vbc.task.pixelViewerOn = False
     End Sub
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         mousePoint.X -= 1

@@ -105,7 +105,7 @@ Namespace VBClasses
             desc = "Automate getting the right white balance"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static thresholdSlider = OptionParent.FindSlider("White balance threshold X100")
+            Static thresholdSlider = OptionParent.FindSlider("white balance threshold X100")
             Dim thresholdVal = thresholdSlider.Value / 100
 
             Dim rgb32f As New Mat
@@ -152,13 +152,13 @@ Namespace VBClasses
     Public Class PhotoShop_ChangeMask : Inherits TaskParent
         Dim whiteBal As New PhotoShop_WhiteBalance
         Public Sub New()
-            OptionParent.FindSlider("White balance threshold X100").Value = 3
+            OptionParent.FindSlider("white balance threshold X100").Value = 3
             desc = "Create a mask for the changed pixels after white balance"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             whiteBal.Run(src)
             dst2 = whiteBal.dst2
-            labels(2) = "White balanced image"
+            labels(2) = "white balanced image"
             labels(3) = "Mask of changed pixels"
             Dim diff = dst2 - src
             Dim _cvt1 As New Mat
@@ -350,7 +350,7 @@ Namespace VBClasses
             If radio.Setup(traceName) Then
                 radio.addRadio("First DuoTone Blue")
                 radio.addRadio("First DuoTone Green")
-                radio.addRadio("First DuoTone Red")
+                radio.addRadio("First DuoTone red")
                 radio.check(1).Checked = True
             End If
 
@@ -563,13 +563,13 @@ Namespace VBClasses
     Public Class PhotoShop_WhiteBalance : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("White balance threshold X100", 1, 100, 50)
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("white balance threshold X100", 1, 100, 50)
             cPtr = WhiteBalance_Open()
-            labels = {"", "", "Image with white balance applied", "White pixels were altered from the original"}
+            labels = {"", "", "Image with white balance applied", "white pixels were altered from the original"}
             desc = "Automate getting the right white balance"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static thresholdSlider = OptionParent.FindSlider("White balance threshold X100")
+            Static thresholdSlider = OptionParent.FindSlider("white balance threshold X100")
             Dim thresholdVal As Single = thresholdSlider.Value / 100
 
             If src.Channels <> 3 Then src = task.color.Clone

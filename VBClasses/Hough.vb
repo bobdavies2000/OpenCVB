@@ -20,7 +20,7 @@ Namespace VBClasses
 
                 Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
                 Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-                Line(dst, pt1, pt2, Scalar.Red, task.lineWidth + 1, task.lineType, 0)
+                Line(dst, pt1, pt2, Scalar.red, task.lineWidth + 1, task.lineType, 0)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -36,7 +36,7 @@ Namespace VBClasses
                 Dim probSegments = HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
                 For i = 0 To Math.Min(probSegments.Length, options.lineCount) - 1
                     Dim lineX As LineSegmentPoint = probSegments(i)
-                    Line(dst3, lineX.P1, lineX.P2, Scalar.Red, task.lineWidth + 2, task.lineType)
+                    Line(dst3, lineX.P1, lineX.P2, Scalar.red, task.lineWidth + 2, task.lineType)
                 Next
                 labels(3) = "Probablistic lines = " + CStr(probSegments.Length)
             End If
@@ -351,7 +351,7 @@ Namespace VBClasses
             segments = HoughLinesP(task.edges.dst2, options.rho, options.theta, options.threshold)
             For i = 0 To Math.Min(segments.Length, options.lineCount) - 1
                 Dim lineX As LineSegmentPoint = segments(i)
-                Line(dst3, lineX.P1, lineX.P2, Scalar.Red, task.lineWidth + 2, task.lineType)
+                Line(dst3, lineX.P1, lineX.P2, Scalar.red, task.lineWidth + 2, task.lineType)
             Next
             labels(3) = "Probablistic lines = " + CStr(segments.Length)
         End Sub

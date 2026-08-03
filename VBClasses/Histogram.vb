@@ -50,7 +50,7 @@ Namespace VBClasses
             dst2 = plotHist.dst2
 
             If standalone Then
-                labels(2) = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " +
+                labels(2) = Choose(splitIndex + 1, "Blue", "Green", "red") + " histogram, bins = " +
                                            CStr(task.histogramBins)
             Else
                 labels(2) = "Range = " + ranges(0).Start.ToString(fmt3) + " To " + ranges(0).End.ToString(fmt3)
@@ -420,7 +420,7 @@ Namespace VBClasses
             peaks(0) = New Histogram_PeakFinder
             peaks(1) = New Histogram_PeakFinder
             peaks(2) = New Histogram_PeakFinder
-            labels(2) = "Upper left is Blue, upper right is Green, bottom left is Red"
+            labels(2) = "Upper left is Blue, upper right is Green, bottom left is red"
             desc = "Find the peaks and valleys for each of the BGR channels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -497,7 +497,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
-                colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
+                colorName = Choose(splitIndex + 1, "Blue", "Green", "red")
                 Dim splitMats() As Mat = Split(src)
                 src = splitMats(splitIndex)
             End If
@@ -573,7 +573,7 @@ Namespace VBClasses
 
                 mats.Run(emptyMat)
                 dst3 = mats.dst2
-                labels(3) = "Before (top) and After Red Histogram"
+                labels(3) = "Before (top) and After red Histogram"
             End If
 
             Merge(rgbEq, dst2)

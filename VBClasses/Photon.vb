@@ -72,7 +72,7 @@ Namespace VBClasses
                 For j = 0 To counts.Length - 1
                     Dim h = (dst2.Height - 1) * (counts(j)(i) \ dst2.Total) ' extra parens to avoid overflow at high res.
                     Dim r = ValidateRect(New cv.Rect(colWidth * i, colTop, colWidth, h))
-                    If h > 0 Then dst3(r).SetTo(Choose(j + 1, Scalar.Red, Scalar.LightGreen, Scalar.Blue, Scalar.Yellow))
+                    If h > 0 Then dst3(r).SetTo(Choose(j + 1, Scalar.red, Scalar.LightGreen, Scalar.Blue, Scalar.Yellow))
                     colTop += h
                 Next
             Next

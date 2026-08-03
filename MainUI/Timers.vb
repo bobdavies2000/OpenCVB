@@ -1,3 +1,4 @@
+Imports VBClasses
 Namespace MainApp
     Partial Public Class MainUI
         Dim fpsWriteCount As Integer
@@ -14,7 +15,7 @@ Namespace MainApp
             If isPlaying Then
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
-                Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+                Dim spanCopy As New TimeSpan(elapsedTime)
                 Dim taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
                 If taskTimerInterval = 0 Then Exit Sub
                 lastTime = timeNow

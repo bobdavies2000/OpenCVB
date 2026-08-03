@@ -476,7 +476,7 @@ Namespace VBClasses
         Public input As lpData
         Public output As lpData
         Public Sub New()
-            labels = {"", "", "White Is the line selected For display And yellow Is perpendicular line", ""}
+            labels = {"", "", "white Is the line selected For display And yellow Is perpendicular line", ""}
             desc = "Find the line perpendicular To the line created by the points provided."
         End Sub
         Public Shared Function computePerp(lp As lpData) As lpData
@@ -507,7 +507,7 @@ Namespace VBClasses
             Line(dst2, input.p1, input.p2, white, task.lineWidth, task.lineType)
 
             output = computePerp(input)
-            Circle(dst2, input.ptCenter, task.DotSize + 2, Scalar.Red, -1, task.lineType)
+            Circle(dst2, input.ptCenter, task.DotSize + 2, Scalar.red, -1, task.lineType)
             Line(dst2, output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
             If standaloneTest() Then SetTrueText("The line displayed at left Is the gravity vector.", 3)
@@ -2208,7 +2208,7 @@ Namespace VBClasses
                     If Math.Abs(lpX.angle - lp.angle) > 2 Then Continue For
                     If lp.index > 0 AndAlso lpX.index = lp.index Then Continue For
                     Dim pt = Line_Intersection.IntersectTest(lpX, lp)
-                    If pt = newPoint Then Continue For
+                    If pt = New cv.Point Then Continue For
                     If Math.Abs(pt.X) > dst2.Width * 2 And Math.Abs(pt.Y) > dst2.Height * 2 Then
                         intersections.Add(lpList.IndexOf(lpX))
                     End If
@@ -2259,7 +2259,7 @@ Namespace VBClasses
                     If Math.Abs(lpX.angle - lp.angle) > 2 Then Continue For
                     If lpX.index = lp.index Then Continue For
                     Dim pt = Line_Intersection.IntersectTest(lpX, lp)
-                    If pt = newPoint Then Continue For
+                    If pt = New cv.Point Then Continue For
                     If Math.Abs(pt.X) > dst2.Width * 2 And Math.Abs(pt.Y) > dst2.Height * 2 Then
                         intersections.Add(lpList.IndexOf(lpX))
                     End If
@@ -2278,7 +2278,7 @@ Namespace VBClasses
             Next
 
             labels(2) = CStr(lpList.Count) + " lines found and as many as " +
-                        CStr(interList.Values(0).Count) + " are parallel.  White is right image, left yellow."
+                        CStr(interList.Values(0).Count) + " are parallel.  white is right image, left yellow."
         End Sub
     End Class
 
@@ -2353,7 +2353,7 @@ Namespace VBClasses
             If lastGray Is Nothing OrElse lastGray.Size <> gray.Size OrElse task.optionsChanged Then
                 lastGray = gray.Clone
                 SeedFromLongest(seedSize)
-            ElseIf task.heartBeatlt OrElse lpTracked Is Nothing Then
+            ElseIf task.heartBeatLT OrElse lpTracked Is Nothing Then
                 SeedFromLongest(seedSize)
             ElseIf task.lines.lpList.Count = 0 Then
                 ' Keep last track when Line_Basics misses this frame.
@@ -2397,7 +2397,7 @@ Namespace VBClasses
                             "  p1 corr=" + p1Correlation.ToString(fmt3) +
                             "  p2 corr=" + p2Correlation.ToString(fmt3) +
                             "  len=" + lpTracked.length.ToString(fmt1)
-                labels(3) = "White = endpoint templates (seedSize), yellow = search (searchSize) at lpList(0) p1/p2"
+                labels(3) = "white = endpoint templates (seedSize), yellow = search (searchSize) at lpList(0) p1/p2"
             Else
                 labels(2) = "Waiting for a longest line seed from Line_Basics"
                 labels(3) = ""

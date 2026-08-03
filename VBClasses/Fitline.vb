@@ -52,7 +52,7 @@ Namespace VBClasses
             lp = New lpData(New cv.Point(0, leftY), New cv.Point(src.Cols - 1, rightY))
             If standaloneTest() Then
                 dst2.SetTo(0)
-                Line(dst2, lp.p1, lp.p2, Scalar.Red, task.lineWidth, task.lineType)
+                Line(dst2, lp.p1, lp.p2, Scalar.red, task.lineWidth, task.lineType)
             End If
         End Sub
     End Class
@@ -102,7 +102,7 @@ Namespace VBClasses
                     lines.Add(p1)
                     lines.Add(p2)
                 End If
-                Line(dst2, p1, p2, Scalar.Red, task.lineWidth, task.lineType)
+                Line(dst2, p1, p2, Scalar.red, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class

@@ -714,7 +714,7 @@ Namespace VBClasses
 
             labels(2) = "Subject index=" + CStr(subject.mapID) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
-            labels(3) = "White = kept region. Select another cell with RedColor UI to retarget."
+            labels(3) = "white = kept region. Select another cell with RedColor UI to retarget."
             strOut = "Uses RedCloud color flood cells (RedColor_Basics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
                  "For iPhone-like quality you would need a learned segmenter; this is a fast geometric proxy."
             SetTrueText(strOut, 3)

@@ -286,7 +286,7 @@ Namespace VBClasses
         Public ySlices As New List(Of List(Of Byte))
         Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
         Public Sub New()
-            labels(2) = "White lines are slices used to find previous line locations."
+            labels(2) = "white lines are slices used to find previous line locations."
             desc = "Build slices in X and Y from the previous image near the each line's center."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

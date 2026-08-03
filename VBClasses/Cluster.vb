@@ -68,7 +68,7 @@ Namespace VBClasses
             Next
             dst3 = src
             For i = 0 To knn.queries.Count - 1
-                Circle(dst2, knn.queries(i), task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2, knn.queries(i), task.DotSize, Scalar.red, -1, task.lineType)
                 Circle(dst3, knn.queries(i), task.DotSize, task.highlight, -1, task.lineType)
             Next
             labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input cv.Point and its nearest neighbor."

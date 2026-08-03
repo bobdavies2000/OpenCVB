@@ -1,36 +1,38 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
-'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class FREAK_Basics : Inherits TaskParent
-    Implements IDisposable
-    Dim orb As New ORB_Basics
-    Dim freak As FREAK
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Find keypoints using FREAK algorithm"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        orb.Run(src)
-        dst1 = orb.dst2
+Namespace VBClasses
+    'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
+    Public Class FREAK_Basics : Inherits TaskParent
+        Implements IDisposable
+        Dim orb As New ORB_Basics
+        Dim freak As FREAK
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Find keypoints using FREAK algorithm"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            orb.Run(src)
+            dst1 = orb.dst2
 
-        If freak Is Nothing Then freak = XFeatures2D.FREAK.Create()
-        Dim fdesc = New Mat
-        Dim keypoints = orb.keypoints.ToList
-        freak.Compute(task.gray, orb.keypoints, fdesc)
+            If freak Is Nothing Then freak = XFeatures2D.FREAK.Create()
+            Dim fdesc = New Mat
+            Dim keypoints = orb.keypoints.ToList
+            freak.Compute(task.gray, orb.keypoints, fdesc)
 
-        dst2 = src.Clone()
+            dst2 = src.Clone()
 
-        For Each kpt In keypoints
-            Dim r = kpt.Size / 2
-            Circle(dst2, kpt.Pt, r, Scalar.Green, -1, task.lineType)
-            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), Scalar.Green, task.lineWidth, task.lineType)
-            Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), Scalar.Green, task.lineWidth, task.lineType)
-        Next
-        labels(2) = CStr(orb.keypoints.Length) + " key points were identified"
-        labels(3) = CStr(orb.keypoints.Length) + " FREAK Descriptors (resized) One row = keypoint"
-        If fdesc.Width > 0 And fdesc.Height > 0 Then Resize(fdesc, dst3, dst3.Size())
-    End Sub
-    Protected Overrides Sub Finalize()
-        If freak IsNot Nothing Then freak.Dispose()
-    End Sub
-End Class
+            For Each kpt In keypoints
+                Dim r = kpt.Size / 2
+                Circle(dst2, kpt.Pt, r, Scalar.Green, -1, task.lineType)
+                Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), Scalar.Green, task.lineWidth, task.lineType)
+                Line(dst2, New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), Scalar.Green, task.lineWidth, task.lineType)
+            Next
+            labels(2) = CStr(orb.keypoints.Length) + " key points were identified"
+            labels(3) = CStr(orb.keypoints.Length) + " FREAK Descriptors (resized) One row = keypoint"
+            If fdesc.Width > 0 And fdesc.Height > 0 Then Resize(fdesc, dst3, dst3.Size())
+        End Sub
+        Protected Overrides Sub Finalize()
+            If freak IsNot Nothing Then freak.Dispose()
+        End Sub
+    End Class
+End Namespace

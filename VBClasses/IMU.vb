@@ -158,7 +158,9 @@ Namespace VBClasses
             Dim y1 = accY - PI
             If accX < 0 Then y1 *= -1
             angleFromVertical = CSng(y1 * RadToDeg)
+            If Math.Abs(angleFromVertical) > 90 Then angleFromVertical = angleFromVertical Mod 90
             task.verticalizeAngle = angleFromVertical
+
             task.accRadians = New Point3f(accX, accY, CSng(Math.Atan2(g.Y, g.Z)))
 
             Dim endpoints = IMU_GravityComplementary.GravityVectorToLineEndpoints(gravityVector, task.workRes.Width, task.workRes.Height)
@@ -296,7 +298,7 @@ Namespace VBClasses
 
             Dim y1 = task.accRadians.Y - PI
             If task.accRadians.X < 0 Then y1 *= -1
-            task.verticalizeAngle = y1 * RadToDeg
+            If task.imuBasics.noCameraMotion = False Then task.verticalizeAngle = y1 * RadToDeg
 
             ' Unit gravity vector in body frame (points down)
             GravityVector = AnglesToGravityVector(task.accRadians)
@@ -608,8 +610,8 @@ Namespace VBClasses
                             "IMUtoCapture (ms, sampled, in red) " + IMUtoCaptureEstimate.ToString("00") + vbCrLf + vbCrLf +
                             "IMU Frame Time = Blue" + vbCrLf +
                             "Host Frame Time = Green" + vbCrLf +
-                            "IMU Total Delay = Red" + vbCrLf +
-                            "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
+                            "IMU Total Delay = red" + vbCrLf +
+                            "IMU Anchor Frame Time = white (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
                 plot.plotData = New Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
                 plot.Run(src)
@@ -673,11 +675,11 @@ Namespace VBClasses
             Dim output = "Estimated host delay (ms, sampled) " + sampledCPUDelay.ToString("00") + vbCrLf +
                          "Estimated IMU delay (ms, sampled) " + sampledIMUDelay.ToString("00") + vbCrLf +
                          "Estimated Total delay (ms, sampled) " + sampledTotalDelay.ToString("00") + vbCrLf +
-                         "Estimated Total delay Smoothed (ms, sampled, in White) " + sampledSmooth.ToString("00") + vbCrLf + vbCrLf +
+                         "Estimated Total delay Smoothed (ms, sampled, in white) " + sampledSmooth.ToString("00") + vbCrLf + vbCrLf +
                          "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                          "Green" + vbTab + "Host Frame Time" + vbCrLf +
-                         "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
-                         "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
+                         "red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
+                         "white" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
             plot.Run(src)
@@ -836,7 +838,7 @@ Namespace VBClasses
             dst2 = plot(2).dst2
 
             SetTrueText("Blue (usually hidden) is the raw signal" + vbCrLf + "Green (usually hidden) is the Velocity-filtered results" + vbCrLf +
-                        "Red is the Kalman IMU data" + vbCrLf + "White is the IMU Averaging output (note delay from Kalman output)" + vbCrLf + vbCrLf +
+                        "red is the Kalman IMU data" + vbCrLf + "white is the IMU Averaging output (note delay from Kalman output)" + vbCrLf + vbCrLf +
                         "Move the camera around to see the impact on the IMU data." + vbCrLf +
                         "Adjust the global option 'Frame History' to see the impact." + vbCrLf + vbCrLf +
                         "Remember that IMU Data filtering only impacts the X and Z values." + vbCrLf +
@@ -1017,8 +1019,8 @@ Namespace VBClasses
                              "Host Interrupt Delay (ms, sampled, in red) " + HostInterruptDelayEstimate.ToString("00") + vbCrLf + vbCrLf +
                              "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                              "Green" + vbTab + "Host Frame Time" + vbCrLf +
-                             "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
-                             "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
+                             "red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
+                             "white" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
                 plot.plotData = New Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
                 plot.Run(src)
@@ -1081,8 +1083,8 @@ Namespace VBClasses
                          "Host Interrupt Delay (ms, sampled, in red) " + HostInterruptDelayEstimate.ToString("00") + vbCrLf + vbCrLf +
                          "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                          "Green" + vbTab + "Host Frame Time" + vbCrLf +
-                         "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
-                         "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
+                         "red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
+                         "white" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
                 plot.plotData = New Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
                 plot.Run(src)

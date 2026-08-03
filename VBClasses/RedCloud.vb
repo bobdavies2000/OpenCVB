@@ -154,7 +154,7 @@ Namespace VBClasses
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)
                 Dim x = incr * i
-                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
+                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.white, task.lineWidth, task.lineType)
             Next
             dst3 = plot.dst2
         End Sub

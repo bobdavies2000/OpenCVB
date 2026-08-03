@@ -4,7 +4,7 @@
 '        Public ptLeft As Point3f, ptRight As Point3f, ptTop As Point3f, ptBot As Point3f, ptFront As Point3f, ptBack As Point3f
 '        Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
 '                                                           "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
-'        Public cornerColors As New List(Of Scalar)({white, Scalar.LightBlue, Scalar.Red, Scalar.Green,
+'        Public cornerColors As New List(Of Scalar)({white, Scalar.LightBlue, Scalar.red, Scalar.Green,
 '                                                               white, Scalar.Yellow, Scalar.Blue})
 '        Public corners3D As New List(Of Point3f)
 '        Public corners As New List(Of cv.Point)
@@ -190,7 +190,7 @@
 '                Next
 '            End If
 
-'            strOut = "Points are presented clockwise starting at White dot (leftmost top cv.Point)" + vbCrLf +
+'            strOut = "Points are presented clockwise starting at white dot (leftmost top cv.Point)" + vbCrLf +
 '                             "yellow = closer, blue = farther, " + vbCrLf + vbCrLf + sides.strOut
 
 '            dst1 = sides.dst3.Clone

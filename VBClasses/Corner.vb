@@ -202,7 +202,7 @@ Namespace VBClasses
                 kalman.kInput(0) = m.M10 / m.M00
                 kalman.kInput(1) = m.M01 / m.M00
                 kalman.Run(emptyMat)
-                Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, Scalar.Red, -1, task.lineType)
+                Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, Scalar.red, -1, task.lineType)
             End If
         End Sub
     End Class

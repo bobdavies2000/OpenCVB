@@ -102,7 +102,7 @@ Namespace VBClasses
                         nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                         cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                     Case gifTypes.gifdst2
-                        If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(Scalar.White, task.gridMask)
+                        If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(Scalar.white, task.gridMask)
                         If task.dstList(2).Channels() = 1 Then
                             Dim _cvtInline As New Mat
                             CvtColor(task.dstList(2), _cvtInline, ColorConversionCodes.GRAY2BGR)

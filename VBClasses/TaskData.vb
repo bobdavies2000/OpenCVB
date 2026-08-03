@@ -259,5 +259,6 @@ Namespace VBClasses
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
         Public maxTrueTextLines As Integer = 18
+        Public newMat As New cv.Mat
     End Class
 End Namespace

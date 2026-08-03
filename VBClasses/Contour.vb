@@ -24,7 +24,7 @@ Namespace VBClasses
                 End If
             Next
             If idFound = False Then tour = tourList(0)
-            task.color(tour.rect).SetTo(Scalar.White, tour.mask)
+            task.color(tour.rect).SetTo(Scalar.white, tour.mask)
 
             Dim cDesc = tour.displayData()
             Return cDesc
@@ -39,7 +39,7 @@ Namespace VBClasses
             For Each tour In tourList
                 If tour.ID = id Then Exit For
             Next
-            task.color(tour.rect).SetTo(Scalar.White, tour.mask)
+            task.color(tour.rect).SetTo(Scalar.white, tour.mask)
             Return task.contourD
         End Function
         Public Shared Function buildContours(input As Mat) As cv.Point()()

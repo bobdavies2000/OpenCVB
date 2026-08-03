@@ -611,7 +611,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             For i = 0 To currSet.Count - 1
                 Circle(dst2, currSet(i), task.DotSize + 2, Scalar.Yellow, -1, task.lineType)
-                Circle(dst2, targetSet(i), task.DotSize + 2, Scalar.Red, -1, task.lineType)
+                Circle(dst2, targetSet(i), task.DotSize + 2, Scalar.red, -1, task.lineType)
             Next
 
             Dim noChanges As Boolean = True
@@ -638,7 +638,7 @@ Namespace VBClasses
         Public Sub New()
             task.scalarColors(0) = Scalar.Yellow
             task.scalarColors(1) = Scalar.Blue
-            task.scalarColors(2) = Scalar.Red
+            task.scalarColors(2) = Scalar.red
             labels = {"", "", "Colorized sets", ""}
             desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
         End Sub

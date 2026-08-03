@@ -77,7 +77,7 @@ Namespace VBClasses
     Public Class LaneFinder_HLSColor : Inherits TaskParent
         Public input As New LaneFinder_Videos
         Public Sub New()
-            labels = {"HLS color conversion", "InRange White", "InRange Yellow", "Combined InRange White and InRange Yellow results"}
+            labels = {"HLS color conversion", "InRange white", "InRange Yellow", "Combined InRange white and InRange Yellow results"}
             desc = "Isolate the colors for the white and yellow"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -125,9 +125,9 @@ Namespace VBClasses
             dst0 = hls.input.video.dst2
             dst2 = hls.dst0
             dst3 = hls.dst3
-            cv.Cv2.Polylines(dst0, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
-            cv.Cv2.Polylines(dst2, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
-            cv.Cv2.Polylines(dst3, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
+            cv.Cv2.Polylines(dst0, pListList, True, cv.Scalar.white, task.lineWidth, task.lineType, 0)
+            cv.Cv2.Polylines(dst2, pListList, True, cv.Scalar.white, task.lineWidth, task.lineType, 0)
+            cv.Cv2.Polylines(dst3, pListList, True, cv.Scalar.white, task.lineWidth, task.lineType, 0)
         End Sub
     End Class
 

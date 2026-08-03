@@ -11,12 +11,12 @@ Public Class ORB_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 1 Then src = task.gray
+        If src.Channels() <> 1 Then src = vbc.task.gray
         orb = ORB.Create(options.desiredCount)
         keypoints = orb.Detect(src)
         dst2 = src.Clone()
         For Each kpt In keypoints
-        Circle(dst2, kpt.Pt, task.DotSize + 1, Scalar.Yellow, -1, task.lineType)
+            Circle(dst2, kpt.Pt, vbc.task.DotSize + 1, Scalar.Yellow, -1, vbc.task.lineType)
         Next
         labels(2) = CStr(keypoints.Length) + " key points were identified"
     End Sub

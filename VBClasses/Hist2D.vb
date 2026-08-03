@@ -168,7 +168,7 @@ Namespace VBClasses
             CalcHist({src}, {0, 1}, task.depthmask, histogram01, 2, histRowsCols, task.rangesBGR)
             Threshold(histogram01, dst3, 0, 255, ThresholdTypes.Binary)
 
-            labels(2) = "Blue is on the X-Axis and Red is on the Y-Axis"
+            labels(2) = "Blue is on the X-Axis and red is on the Y-Axis"
             labels(3) = "Blue is on the X-Axis and Green is on the Y-Axis"
         End Sub
     End Class

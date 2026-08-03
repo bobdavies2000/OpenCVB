@@ -383,7 +383,7 @@ Namespace VBClasses
 
             If gather.rects.Count = 0 Then Exit Sub
             If task.mouseClickFlag Then setClickPoint(task.clickPoint, task.mousePicTag)
-            If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
+            If ClickPoint = new cv.Point Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
             Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
             Dim r = task.gridRects(gridIndex)
             Rectangle(dst2, r, white, task.lineWidth)

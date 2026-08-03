@@ -431,9 +431,9 @@ Namespace VBClasses
                 labels(2) = "Matched grid segments in dst3 with disparity"
                 For Each i In highlights
                     Dim r = task.gridRects(i)
-                    Rectangle(dst3, r, Scalar.Red, 2)
+                    Rectangle(dst3, r, Scalar.red, 2)
                     r.X += maxLocs(i)
-                    Rectangle(dst2, r, Scalar.Red, 2)
+                    Rectangle(dst2, r, Scalar.red, 2)
                     SetTrueText(CStr(maxLocs(i)), New cv.Point(r.X, r.Y), 2)
                 Next
             Else
@@ -447,9 +447,9 @@ Namespace VBClasses
                     If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                     For Each i In redRects
                         Dim r = task.gridRects(i)
-                        Rectangle(dst3, r, Scalar.Red, 2)
+                        Rectangle(dst3, r, Scalar.red, 2)
                         r.X += maxLocs(i)
-                        Rectangle(dst2, r, Scalar.Red, 2)
+                        Rectangle(dst2, r, Scalar.red, 2)
                         SetTrueText(CStr(maxLocs(i)), New cv.Point(r.X, r.Y), 2)
                     Next
                 End If
@@ -839,7 +839,7 @@ Namespace VBClasses
             Dim r2 = New cv.Rect(0, 0, dst2.Width - offset - 1, dst2.Height - offset - 1)
             dst3.SetTo(white)
             dst3(r1).SetTo(Scalar.Blue, edges.dst2(r2))
-            dst3.SetTo(Scalar.Red, dst1)
+            dst3.SetTo(Scalar.red, dst1)
             labels(2) = valley.labels(3)
         End Sub
     End Class

@@ -1287,7 +1287,7 @@ Namespace VBClasses
 
             lpList.Clear()
             For y = task.gridWH To dst1.Height - 1 Step task.gridWH
-                Dim p1 = newPoint, p2 = newPoint
+                Dim p1 = New cv.Point, p2 = New cv.Point
                 Dim val1 As Integer, val2 As Integer
                 For x = 0 To dst1.Width - 1 Step task.gridWH
                     val1 = dst1.Get(Of Byte)(y, x)
@@ -1296,12 +1296,12 @@ Namespace VBClasses
                         If val1 = 0 Then p1 = New cv.Point(x + task.gridWH, y)
                         If val1 <> 0 And (x = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x + task.gridWH - 1, y)
-                        If p1 <> newPoint And p2 <> newPoint Then
+                        If p1 <> New cv.Point And p2 <> New cv.Point Then
                             Dim lp As New lpData(p1, p2) With {.fLessID = If(val1 = 0, val2, val1)}
                             lpList.Add(lp)
                             Line(dst2, p1, p2, white, task.lineWidth)
-                            p1 = newPoint
-                            p2 = newPoint
+                            p1 = New cv.Point
+                            p2 = New cv.Point
                         End If
                     End If
                 Next
@@ -1328,7 +1328,7 @@ Namespace VBClasses
 
             lpList.Clear()
             For x = task.gridWH To dst1.Width - 1 Step task.gridWH
-                Dim p1 = newPoint, p2 = newPoint
+                Dim p1 = New cv.Point, p2 = New cv.Point
                 Dim val1 As Integer, val2 As Integer
                 For y = 0 To dst1.Height - 1 Step task.gridWH
                     val1 = dst1.Get(Of Byte)(y, x)
@@ -1337,12 +1337,12 @@ Namespace VBClasses
                         If val1 = 0 Then p1 = New cv.Point(x, y + task.gridWH)
                         If val1 <> 0 And (y = 0 And val1 <> 0) Then p1 = New cv.Point(CInt(x), CInt(y))
                         If val2 = 0 Then p2 = New cv.Point(x, y + task.gridWH - 1)
-                        If p1 <> newPoint And p2 <> newPoint Then
+                        If p1 <> New cv.Point And p2 <> New cv.Point Then
                             Dim lp As New lpData(p1, p2) With {.fLessID = If(val1 = 0, val2, val1)}
                             lpList.Add(lp)
                             Line(dst2, p1, p2, white, task.lineWidth)
-                            p1 = newPoint
-                            p2 = newPoint
+                            p1 = New cv.Point
+                            p2 = New cv.Point
                         End If
                     End If
                 Next

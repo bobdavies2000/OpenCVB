@@ -8,7 +8,7 @@ Namespace VBClasses
         Public Sub New()
             task.fOptions.FrameHistoryCount.Value = 30
             task.gOptions.setHistogramBins(255)
-            labels(2) = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
+            labels(2) = "Histogram of the grayscale image.  white lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
             desc = "Find the histogram valleys for a grayscale image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -509,7 +509,7 @@ Namespace VBClasses
             If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
             Dim nextChan As New Mat
             ExtractChannel(src, nextChan, splitIndex)
-            hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, Scalar.Blue, Scalar.Green, Scalar.Red)
+            hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, Scalar.Blue, Scalar.Green, Scalar.red)
             hist.Run(nextChan)
             dst2 = hist.dst2
 
@@ -673,7 +673,7 @@ Namespace VBClasses
                     state = True
                     Dim p1 = New cv.Point(i * incr, 0)
                     Dim p2 = New cv.Point(i * incr, dst2.Height)
-                    If standaloneFlag And task.heartBeat Then Line(dst2, p1, p2, Scalar.White, task.lineWidth)
+                    If standaloneFlag And task.heartBeat Then Line(dst2, p1, p2, Scalar.white, task.lineWidth)
                 ElseIf state = True And count < threshold Then
                     state = False
                 End If
@@ -681,7 +681,7 @@ Namespace VBClasses
 
             If standaloneFlag And task.heartBeat Then
                 Dim y = dst2.Height * (maxVal - threshold) / maxVal
-                Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.White, task.lineWidth)
+                Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.white, task.lineWidth)
             End If
             If task.heartBeat Then strOut = CStr(classCount) + " depth classes were found - " +
                                             "marked by vertical lines."

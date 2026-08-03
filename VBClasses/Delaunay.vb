@@ -69,7 +69,7 @@ Namespace VBClasses
             Next
 
             For Each pt In random.PointList
-                Circle(dst2, pt, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize + 1, Scalar.red, -1, task.lineType)
             Next
 
             Dim facets = New Point2f()() {Nothing}
@@ -112,7 +112,7 @@ Namespace VBClasses
                 End Function).ToArray()
 
             For Each p In points
-                Circle(dst2, p, task.DotSize + 1, Scalar.Red, -1, task.lineType)
+                Circle(dst2, p, task.DotSize + 1, Scalar.red, -1, task.lineType)
             Next
             dst3 = dst2.Clone()
 

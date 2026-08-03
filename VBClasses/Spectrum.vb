@@ -221,7 +221,7 @@ Namespace VBClasses
         Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "Cell trimming information", "", "White is after trimming, gray is before trim, black is outside the cell mask."}
+            labels = {"", "Cell trimming information", "", "white is after trimming, gray is before trim, black is outside the cell mask."}
             If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             desc = "Zoom in on the selected RedCloud cell before and after Spectrum filtering."
         End Sub

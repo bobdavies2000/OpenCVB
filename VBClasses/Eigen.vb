@@ -74,7 +74,7 @@ Namespace VBClasses
             Dim p1 = New cv.Point(lineX.X1, lineX.Y1)
             Dim p2 = New cv.Point(src.Width, lineX.Vy / lineX.Vx * src.Width + bb)
             Dim lp = findEdgePoints(New lpData(p1, p2))
-            Line(dst2, lp.p1, lp.p2, Scalar.Red, task.lineWidth + 4, task.lineType)
+            Line(dst2, lp.p1, lp.p2, Scalar.red, task.lineWidth + 4, task.lineType)
 
             Dim pointMat = Mat.FromPixelData(pointCount, 1, MatType.CV_32FC2, noisyLine.PointList.ToArray)
             Dim meanVal = Cv2.Mean(pointMat)

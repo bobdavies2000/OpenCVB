@@ -18,7 +18,7 @@ Namespace VBClasses
             If task.drawRect = New cv.Rect Then
                 mask.SetTo(255)
             Else
-                Rectangle(mask, task.drawRect, Scalar.White, -1)
+                Rectangle(mask, task.drawRect, Scalar.white, -1)
             End If
             CvtColor(mask, dst3, ColorConversionCodes.GRAY2BGR)
 
@@ -169,7 +169,7 @@ Namespace VBClasses
                 dst3.SetTo(0)
                 Circle(dst3, center, radius, white, -1, task.lineType)
             Else
-                Rectangle(dst3, task.drawRect, Scalar.White, -1)
+                Rectangle(dst3, task.drawRect, Scalar.white, -1)
             End If
 
             dst2 = src.Clone()

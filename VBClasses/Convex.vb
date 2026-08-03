@@ -94,7 +94,7 @@ Namespace VBClasses
             Resize(dst2, dst2, New Size(task.workRes.Width, task.workRes.Height))
             CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
 
-            labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
+            labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
             desc = "Find the convexityDefects in the image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -107,8 +107,8 @@ Namespace VBClasses
 
             Dim defects = ConvexityDefects(contours.bestContour, hullIndices.ToList)
             For Each v In defects
-                Line(dst3, c(v(0)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
-                Line(dst3, c(v(1)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
+                Line(dst3, c(v(0)), c(v(2)), Scalar.red, task.lineWidth + 1, task.lineType)
+                Line(dst3, c(v(1)), c(v(2)), Scalar.red, task.lineWidth + 1, task.lineType)
                 Circle(dst3, c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
             Next
         End Sub
@@ -186,7 +186,7 @@ Namespace VBClasses
                 SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
             End If
 
-            DrawTour(dst2, rc.contour, Scalar.Red)
+            DrawTour(dst2, rc.contour, Scalar.red)
         End Sub
     End Class
 End Namespace

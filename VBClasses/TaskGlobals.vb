@@ -1,29 +1,38 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Module vbc
-    Public task As AlgorithmTask
+    Private _task As AlgorithmTask
+    ''' <summary>Shared algorithm task state for the current session.</summary>
+    Public Property task As AlgorithmTask
+        Get
+            Return _task
+        End Get
+        Set(value As AlgorithmTask)
+            _task = value
+        End Set
+    End Property
     Public AlgorithmTestAllCount As Integer = 1
-
     Public wcMinVal As Single = -1000
     Public wcMaxVal As Single = 1000
 
     Public Const maxSlope As Integer = 100000
     Public Const PixelsPerRad As Single = 60.0F
     Public Const RadToDeg As Double = 57.295779513082323
-    Public Const AngleThreshold As Integer = 2
+    Public Const AngleThreshold As Single = 2.0F
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
-    Public newPoint As New cv.Point
-    Public newMat As New cv.Mat
+    Public ReadOnly white As New Scalar(255, 255, 255)
+    Public ReadOnly black As New Scalar(0, 0, 0)
+    Public ReadOnly grayColor As New Scalar(127, 127, 127)
+    Public ReadOnly yellow As New Scalar(0, 255, 255)
+    Public ReadOnly purple As New Scalar(255, 0, 255)
+    Public ReadOnly teal As New Scalar(255, 255, 0)
+    Public ReadOnly red As New Scalar(0, 0, 255), green As New Scalar(0, 255, 0)
+    Public ReadOnly blue As New Scalar(255, 0, 0)
+
     Public msRNG As New System.Random
-    Public white As New Scalar(255, 255, 255), black As New Scalar(0, 0, 0)
-    Public grayColor As New Scalar(127, 127, 127)
-    Public yellow As New Scalar(0, 255, 255), purple As New Scalar(255, 0, 255)
-    Public teal As New Scalar(255, 255, 0)
-    Public red As New Scalar(0, 0, 255), green As New Scalar(0, 255, 0)
-    Public blue As New Scalar(255, 0, 0)
 
     Public zero3f As New Point3f
     Public newVec4f As New Vec4f
@@ -45,7 +54,7 @@ Public Module vbc
     Public Function ScalarToVec(c As Scalar) As Vec3b
         Return New Vec3b(c(0), c(1), c(2))
     End Function
-    Public Function findRectFromLine(lp As lpData) as cv.Rect
+    Public Function findRectFromLine(lp As lpData) As cv.Rect
         Dim rect = New cv.Rect(lp.p1.X, lp.p1.Y, Math.Abs(lp.p1.X - lp.p2.X), Math.Abs(lp.p1.Y - lp.p2.Y))
         If lp.p1.Y > lp.p2.Y Then rect = New cv.Rect(lp.p1.X, lp.p2.Y, rect.Width, rect.Height)
         If rect.Width < 2 Then rect.Width = 2
@@ -115,7 +124,7 @@ Public Module vbc
         End If
         Return New List(Of cv.Point)
     End Function
-    Public Function ValidateRect(ByVal r as cv.Rect, Optional ratio As Integer = 1) as cv.Rect
+    Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
         If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
@@ -126,7 +135,7 @@ Public Module vbc
         If r.Height <= 0 Then r.Height = 1
         Return r
     End Function
-    Public Function validateRect(r as cv.Rect, width As Integer, height As Integer) as cv.Rect
+    Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
         If r.Width < 0 Then r.Width = 1
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0

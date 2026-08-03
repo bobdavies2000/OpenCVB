@@ -241,7 +241,7 @@ Namespace VBClasses
             options.Run()
 
             Dim pt = task.mouseMovePoint
-            If standalone And task.mouseMovePoint = newPoint Then
+            If standalone And task.mouseMovePoint = new cv.Point Then
                 pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             End If
 

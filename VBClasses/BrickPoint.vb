@@ -128,7 +128,7 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each brick In bricks.brickList
-                If brick.mm.maxLoc = newPoint Then Continue For
+                If brick.mm.maxLoc = new cv.Point Then Continue For
                 If brick.mm.maxVal <> 255 Then Continue For
                 If brick.mm.maxLoc.Y = brick.rect.Y Then
                     Circle(dst2, brick.mm.maxLoc, task.DotSize, task.highlight, -1, task.lineType)

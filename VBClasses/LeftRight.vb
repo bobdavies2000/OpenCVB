@@ -1,71 +1,69 @@
-Imports jsonShared
-Imports VBClasses
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
-Public Class LeftRight_Basics : Inherits TaskParent
-    Public meanLeft As Double
-    Public meanRight As Double
-    Dim brightness = New Brightness_Basics
-    Public Sub New()
-        labels = {"", "", "Left camera image", "Right camera image"}
-        desc = "Display the left and right views as they came from the camera."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.Settings.cameraName.Contains("StereoLabs") Then
-            dst2 = task.leftView.Clone
-            dst3 = task.rightView.Clone
-        Else
-            brightness.run(task.leftView)
-            Dim tmpLeft As Mat = brightness.dst2 ' input array conflict
-            Normalize(tmpLeft, task.leftView, 100, 150, NormTypes.MinMax)
-            If standaloneTest() Then dst2 = task.leftView
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Namespace VBClasses
+    Public Class LeftRight_Basics : Inherits TaskParent
+        Public meanLeft As Double
+        Public meanRight As Double
+        Dim brightness = New Brightness_Basics
+        Public Sub New()
+            labels = {"", "", "Left camera image", "Right camera image"}
+            desc = "Display the left and right views as they came from the camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.Settings.cameraName.Contains("StereoLabs") Then
+                dst2 = task.leftView.Clone
+                dst3 = task.rightView.Clone
+            Else
+                brightness.run(task.leftView)
+                Dim tmpLeft As Mat = brightness.dst2 ' input array conflict
+                Normalize(tmpLeft, task.leftView, 100, 150, NormTypes.MinMax)
+                If standaloneTest() Then dst2 = task.leftView
 
-            brightness.run(task.rightView)
-            Dim tmpRight As Mat = brightness.dst2 ' inputarray conflict
-            Normalize(tmpRight, task.rightView, 100, 150, NormTypes.MinMax)
-            If standaloneTest() Then dst3 = task.rightView
-        End If
-    End Sub
-End Class
-
+                brightness.run(task.rightView)
+                Dim tmpRight As Mat = brightness.dst2 ' inputarray conflict
+                Normalize(tmpRight, task.rightView, 100, 150, NormTypes.MinMax)
+                If standaloneTest() Then dst3 = task.rightView
+            End If
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_LeftRight_RawLeft : Inherits TaskParent
-    Public Sub New()
-        task.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        desc = "Match the raw left image with the color image with a drawRect"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
-    End Sub
-End Class
+
+    Public Class XR_LeftRight_RawLeft : Inherits TaskParent
+        Public Sub New()
+            task.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            desc = "Match the raw left image with the color image with a drawRect"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class XR_LeftRight_BRISK : Inherits TaskParent
-    Dim brisk As New Feature_BRISK
-    Dim options As New Options_Features
-    Public Sub New()
-        OptionParent.FindSlider("Min Distance").Value = 20
-        labels = {"", "", "Left Image", "Right Image"}
-        desc = "Find BRISK features in the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XR_LeftRight_BRISK : Inherits TaskParent
+        Dim brisk As New Feature_BRISK
+        Dim options As New Options_Features
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = 20
+            labels = {"", "", "Left Image", "Right Image"}
+            desc = "Find BRISK features in the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        brisk.Run(task.leftView)
-        dst2 = brisk.dst2.Clone
+            brisk.Run(task.leftView)
+            dst2 = brisk.dst2.Clone
 
-        brisk.Run(task.rightView)
-        dst3 = brisk.dst2.Clone
-    End Sub
-End Class
-
+            brisk.Run(task.rightView)
+            dst3 = brisk.dst2.Clone
+        End Sub
+    End Class
 
 
 
@@ -73,50 +71,51 @@ End Class
 
 
 
-Public Class XR_LeftRight_RGBAlignLeft : Inherits TaskParent
-    Dim options As New Options_RGBAlign
-    Public Sub New()
-        desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
-            SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
+
+    Public Class XR_LeftRight_RGBAlignLeft : Inherits TaskParent
+        Dim options As New Options_RGBAlign
+        Public Sub New()
+            desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
                             "The parameters are set for only the Intel D435i camera.")
-            Exit Sub
-        End If
+                Exit Sub
+            End If
 
-        options.Run()
+            options.Run()
 
-        Dim w = dst0.Width
-        Dim h = dst0.Height
-        Dim xD = options.xDisp
-        Dim yD = options.yDisp
-        Dim xS = options.xShift
-        Dim yS = options.yShift
-        Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
-        Resize(task.leftView(rect), dst2, dst0.Size)
+            Dim w = dst0.Width
+            Dim h = dst0.Height
+            Dim xD = options.xDisp
+            Dim yD = options.yDisp
+            Dim xS = options.xShift
+            Dim yS = options.yShift
+            Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
+            Resize(task.leftView(rect), dst2, dst0.Size)
 
-        dst3 = ShowAddweighted(dst2, src, labels(3))
-    End Sub
-End Class
+            dst3 = ShowAddweighted(dst2, src, labels(3))
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XR_LeftRight_ContourLeft : Inherits TaskParent
-    Dim color8U As New Color8U_Basics
-    Dim contours As New Contour_Basics
-    Public Sub New()
-        desc = "Segment the left view with contour_basics_List"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        color8U.Run(task.leftView)
-        contours.Run(color8U.dst2)
-        dst2 = contours.dst2
-    End Sub
-End Class
+    Public Class XR_LeftRight_ContourLeft : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Dim contours As New Contour_Basics
+        Public Sub New()
+            desc = "Segment the left view with contour_basics_List"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(task.leftView)
+            contours.Run(color8U.dst2)
+            dst2 = contours.dst2
+        End Sub
+    End Class
 
 
 
@@ -124,21 +123,21 @@ End Class
 
 
 
-Public Class XR_LeftRight_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
-    Public Sub New()
-        desc = "Display the edges in the left and right views"
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
-        dst2 = edges.dst2
+    Public Class XR_LeftRight_Edges : Inherits TaskParent
+        Dim edges As New Edge_Basics_TA
+        Public Sub New()
+            desc = "Display the edges in the left and right views"
+            labels(2) = "Left Image"
+            labels(3) = "Right Image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edges.Run(task.leftView)
+            dst2 = edges.dst2
 
-        edges.Run(task.rightView)
-        dst3 = edges.dst2
-    End Sub
-End Class
+            edges.Run(task.rightView)
+            dst3 = edges.dst2
+        End Sub
+    End Class
 
 
 
@@ -146,141 +145,142 @@ End Class
 
 
 
-Public Class XR_LeftRight_EdgesColor : Inherits TaskParent
-    Dim edges As New Edge_Basics_TA
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        desc = "Display the edges in the left, right, and color views"
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.edges.dst2.Clone
+    Public Class XR_LeftRight_EdgesColor : Inherits TaskParent
+        Dim edges As New Edge_Basics_TA
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            desc = "Display the edges in the left, right, and color views"
+            labels(2) = "Left Image"
+            labels(3) = "Right Image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = task.edges.dst2.Clone
 
-        edges.Run(task.leftView)
-        dst2 = edges.dst2.Clone
+            edges.Run(task.leftView)
+            dst2 = edges.dst2.Clone
 
-        edges.Run(task.rightView)
-        dst3 = edges.dst2
-    End Sub
-End Class
+            edges.Run(task.rightView)
+            dst3 = edges.dst2
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class LeftRight_Brightness_TA : Inherits TaskParent
-    Dim Options As New Options_BrightnessContrast
-    Public Sub New()
-        OptionParent.FindSlider("Alpha (contrast)").Value = 650
-        OptionParent.FindSlider("Beta (brightness)").Value = -85
-        desc = "Implement brightness/contrast for the grayscale left/right views"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Options.Run()
+    Public Class LeftRight_Brightness_TA : Inherits TaskParent
+        Dim Options As New Options_BrightnessContrast
+        Public Sub New()
+            OptionParent.FindSlider("Alpha (contrast)").Value = 650
+            OptionParent.FindSlider("Beta (brightness)").Value = -85
+            desc = "Implement brightness/contrast for the grayscale left/right views"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Options.Run()
 
-        ConvertScaleAbs(task.leftView, dst2, Options.brightness, Options.contrast)
-        Normalize(dst2, dst2, 0, 255, NormTypes.MinMax)
+            ConvertScaleAbs(task.leftView, dst2, Options.brightness, Options.contrast)
+            Normalize(dst2, dst2, 0, 255, NormTypes.MinMax)
 
-        ConvertScaleAbs(task.rightView, dst3, Options.brightness, Options.contrast)
-        Normalize(dst3, dst3, 0, 255, NormTypes.MinMax)
+            ConvertScaleAbs(task.rightView, dst3, Options.brightness, Options.contrast)
+            Normalize(dst3, dst3, 0, 255, NormTypes.MinMax)
 
-        labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
-        labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
-    End Sub
-End Class
+            labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
+            labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class LeftRight_Features : Inherits TaskParent
-    Dim fless As New FeatureLess_Correlation
-    Public Sub New()
-        desc = "Show the featureless areas of the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fless.Run(task.leftView)
+    Public Class LeftRight_Features : Inherits TaskParent
+        Dim fless As New FeatureLess_Correlation
+        Public Sub New()
+            desc = "Show the featureless areas of the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fless.Run(task.leftView)
 
-        dst2 = task.leftView.Clone
-        dst2.SetTo(0, fless.dst2)
-        labels(2) = fless.labels(3)
+            dst2 = task.leftView.Clone
+            dst2.SetTo(0, fless.dst2)
+            labels(2) = fless.labels(3)
 
-        fless.Run(task.rightView)
+            fless.Run(task.rightView)
 
-        dst3 = task.rightView.Clone
-        dst3.SetTo(0, fless.dst2)
-        labels(3) = fless.labels(3)
-    End Sub
-End Class
+            dst3 = task.rightView.Clone
+            dst3.SetTo(0, fless.dst2)
+            labels(3) = fless.labels(3)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class LeftRight_Reduction : Inherits TaskParent
-    Public reduction As New Reduction_Basics
-    Public Sub New()
-        task.fOptions.ReductionColor.Value = 50
-        desc = "Add color to the 8-bit infrared images."
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(task.leftView)
-        dst2 = Palettize(reduction.dst2.Clone)
+    Public Class LeftRight_Reduction : Inherits TaskParent
+        Public reduction As New Reduction_Basics
+        Public Sub New()
+            task.fOptions.ReductionColor.Value = 50
+            desc = "Add color to the 8-bit infrared images."
+            labels(2) = "Left Image"
+            labels(3) = "Right Image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(task.leftView)
+            dst2 = Palettize(reduction.dst2.Clone)
 
-        reduction.Run(task.rightView)
-        dst3 = Palettize(reduction.dst2.Clone)
-    End Sub
-End Class
+            reduction.Run(task.rightView)
+            dst3 = Palettize(reduction.dst2.Clone)
+        End Sub
+    End Class
 
 
 
 
 
-Public Class LeftRight_FeatureLess : Inherits TaskParent
-    Public fLess As New FeatureLess_DepthFull
-    Public Sub New()
-        labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
-        desc = "Reduce both the left and right color images"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.leftView)
-        dst2 = fLess.dst2.Clone
+    Public Class LeftRight_FeatureLess : Inherits TaskParent
+        Public fLess As New FeatureLess_DepthFull
+        Public Sub New()
+            labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
+            desc = "Reduce both the left and right color images"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.leftView)
+            dst2 = fLess.dst2.Clone
 
-        fLess.Run(task.rightView)
-        dst3 = fLess.dst2.Clone
-    End Sub
-End Class
+            fLess.Run(task.rightView)
+            dst3 = fLess.dst2.Clone
+        End Sub
+    End Class
 
 
 
 
 
-Public Class LeftRight_Stable : Inherits TaskParent
-    Dim stableLeft As New StableGray_BasicsMax
-    Dim motionRight As New Motion_Right
-    Public Sub New()
-        dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-        desc = "Create StableGray_Basics output for left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        stableLeft.Run(task.leftView)
-        dst2 = stableLeft.dst2
-        labels(2) = "LeftView accumulated pixels after update for maximums and motion."
+    Public Class LeftRight_Stable : Inherits TaskParent
+        Dim stableLeft As New StableGray_BasicsMax
+        Dim motionRight As New Motion_Right
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Create StableGray_Basics output for left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            stableLeft.Run(task.leftView)
+            dst2 = stableLeft.dst2
+            labels(2) = "LeftView accumulated pixels after update for maximums and motion."
 
-        motionRight.Run(task.rightView)
+            motionRight.Run(task.rightView)
 
-        Static lastRight As Mat = task.rightView.Clone
-        If task.heartBeat Then lastRight = task.rightView.Clone
+            Static lastRight As Mat = task.rightView.Clone
+            If task.heartBeat Then lastRight = task.rightView.Clone
 
-        Max(task.rightView, lastRight, dst3)
-        task.rightView.CopyTo(dst3, motionRight.dst3)
+            Max(task.rightView, lastRight, dst3)
+            task.rightView.CopyTo(dst3, motionRight.dst3)
 
-        lastRight = dst3.Clone
+            lastRight = dst3.Clone
 
-        labels(3) = "RightView accumulated pixels after update for maximums and motion."
-    End Sub
-End Class
+            labels(3) = "RightView accumulated pixels after update for maximums and motion."
+        End Sub
+    End Class
+End Namespace

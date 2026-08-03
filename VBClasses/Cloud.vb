@@ -184,8 +184,8 @@ Namespace VBClasses
                                                    (markerRight.Y - cam.Y) * Math.Cos(task.accRadians.Z) + (markerRight.X - cam.X) * Math.Sin(task.accRadians.Z) + cam.Y)
             End If
             If standaloneTest() = False Then
-                Circle(dst2, markerLeft, task.DotSize, Scalar.Red, -1, task.lineType)
-                Circle(dst2, markerRight, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2, markerLeft, task.DotSize, Scalar.red, -1, task.lineType)
+                Circle(dst2, markerRight, task.DotSize, Scalar.red, -1, task.lineType)
             End If
 
             ' draw the arc enclosing the camera FOV
@@ -198,10 +198,10 @@ Namespace VBClasses
             Line(dst2, cam, fovTop, white, 1, task.lineType)
             Line(dst2, cam, fovBot, white, 1, task.lineType)
 
-            Circle(dst2, markerLeft, task.DotSize + 3, Scalar.Red, -1, task.lineType)
-            Circle(dst2, markerRight, task.DotSize + 3, Scalar.Red, -1, task.lineType)
-            Line(dst2, cam, markerLeft, Scalar.Red, 1, task.lineType)
-            Line(dst2, cam, markerRight, Scalar.Red, 1, task.lineType)
+            Circle(dst2, markerLeft, task.DotSize + 3, Scalar.red, -1, task.lineType)
+            Circle(dst2, markerRight, task.DotSize + 3, Scalar.red, -1, task.lineType)
+            Line(dst2, cam, markerLeft, Scalar.red, 1, task.lineType)
+            Line(dst2, cam, markerRight, Scalar.red, 1, task.lineType)
 
             Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
             SetTrueText("vFOV=" + (180 - startAngle * 2).ToString("0.0") + " deg.", New cv.Point(4, dst2.Height * 3 / 4))
@@ -259,10 +259,10 @@ Namespace VBClasses
 
             Line(dst2, task.topCameraPoint, fovLeft, white, 1, task.lineType)
 
-            Circle(dst2, markerLeft, task.DotSize + 3, Scalar.Red, -1, task.lineType)
-            Circle(dst2, markerRight, task.DotSize + 3, Scalar.Red, -1, task.lineType)
-            Line(dst2, cam, markerLeft, Scalar.Red, 1, task.lineType)
-            Line(dst2, cam, markerRight, Scalar.Red, 1, task.lineType)
+            Circle(dst2, markerLeft, task.DotSize + 3, Scalar.red, -1, task.lineType)
+            Circle(dst2, markerRight, task.DotSize + 3, Scalar.red, -1, task.lineType)
+            Line(dst2, cam, markerLeft, Scalar.red, 1, task.lineType)
+            Line(dst2, cam, markerRight, Scalar.red, 1, task.lineType)
 
             Dim shift = (src.Width - src.Height) / 2
             Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
@@ -635,7 +635,7 @@ Namespace VBClasses
 
             dst3.SetTo(0, task.noDepthMask)
             dst2.SetTo(0, task.noDepthMask)
-            labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of X neighbor"
+            labels(2) = "white pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of X neighbor"
             labels(3) = "Mask showing discontinuities > " + CStr(task.depthDiffMeters) + " meters of X neighbor"
         End Sub
     End Class
@@ -671,7 +671,7 @@ Namespace VBClasses
                 brickPrev = brick
             Next
 
-            labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
+            labels(2) = "white pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
             labels(3) = "Mask showing discontinuities > " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
         End Sub
     End Class
@@ -708,7 +708,7 @@ Namespace VBClasses
                 brickPrev = brick
             Next
 
-            labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X and Y direction"
+            labels(2) = "white pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X and Y direction"
         End Sub
     End Class
 

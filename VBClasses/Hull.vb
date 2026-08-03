@@ -332,7 +332,7 @@ Namespace VBClasses
                 Cv2.Circle(dst3, endPt, task.DotSize, task.highlight, -1)
 
                 ' Far point (deepest defect)
-                Cv2.Circle(dst3, farPt, task.DotSize + 1, Scalar.Red, -1)
+                Cv2.Circle(dst3, farPt, task.DotSize + 1, Scalar.red, -1)
 
                 ' Optional: draw line from start → far → end
                 Cv2.Line(dst3, startPt, farPt, task.highlight, task.lineWidth)
