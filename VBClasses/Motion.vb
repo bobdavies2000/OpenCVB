@@ -546,33 +546,4 @@ Namespace VBClasses
             SetTrueText(edges.strOut, 3)
         End Sub
     End Class
-
-
-
-
-    Public Class Motion_GravityRGB : Inherits TaskParent
-        Public Sub New()
-            labels(3) = "Gravity rotation on every frame - contrast with the dst2 image."
-            desc = "Rotate just the motion grid cells using the gravity warpaffine."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static fullRotateCount As New List(Of Integer)
-
-            dst3 = Cloud_GravityRGB.rotateRGB(task.gray, task.verticalizeAngle)
-            dst1 = Cloud_GravityRGB.rotateRGB(task.motion.motionMask, task.verticalizeAngle)
-            If task.heartBeatLT Or task.imuBasics.imuStabilityMeasure < 0.95 Then
-                dst2 = dst3.Clone
-                fullRotateCount.Add(1)
-            Else
-                dst3.CopyTo(dst2, dst1)
-                fullRotateCount.Add(0)
-            End If
-
-            If fullRotateCount.Count > 100 Then fullRotateCount.RemoveAt(0)
-
-            Dim avgFullRotate = fullRotateCount.Average
-            labels(2) = avgFullRotate.ToString("0.0%") + " of the frames were complete rotations of task.gray"
-        End Sub
-    End Class
-
 End Namespace

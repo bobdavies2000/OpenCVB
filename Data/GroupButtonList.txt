@@ -67,6 +67,7 @@ GL
 GrabCut
 Gradient
 Gravity
+GravityRGB
 Grid
 GridRect
 GuidedBP

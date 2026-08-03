@@ -11,7 +11,7 @@ Namespace VBClasses
             Dim lpLong = task.longestLine
             For i = -5 To 5
                 Dim angle = task.verticalizeAngle + 0.02 * i
-                dst3 = Cloud_GravityRGB.rotateRGB(task.gray(lpLong.rect), angle)
+                dst3 = GravityRGB_Basics.rotateRGB(task.gray(lpLong.rect), angle)
                 lines.Run(dst3)
                 For Each lp In lines.lpList
                     If Math.Abs(lp.p1.X - lp.p2.X) <= 1 Then sortScores.Add(lp.length, i)
@@ -48,7 +48,7 @@ Namespace VBClasses
             Static startAngle As Double
             If task.heartBeat Then startAngle = task.verticalizeAngle
             Dim angle = startAngle + 0.01 * index
-            dst3 = Cloud_GravityRGB.rotateRGB(task.gray, angle)
+            dst3 = GravityRGB_Basics.rotateRGB(task.gray, angle)
             lines.Run(dst3)
 
             dst2.SetTo(0)
@@ -88,7 +88,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
 
-            dst1 = Cloud_GravityRGB.rotateRGB(dst2(lp.rect), task.verticalizeAngle)
+            dst1 = GravityRGB_Basics.rotateRGB(dst2(lp.rect), task.verticalizeAngle)
 
             Dim aspectRect = lp.rect.Width / CSng(lp.rect.Height)
             Dim aspect = dst3.Width / CSng(dst3.Height)
@@ -128,7 +128,7 @@ Namespace VBClasses
 
 
     Public Class Vertical_Gravity : Inherits TaskParent
-        Dim gravity As New Cloud_GravityRGB
+        Dim gravity As New GravityRGB_Basics
         Dim lines As New Line_Core
         Public Sub New()
             desc = "Cursor.ai: Find longest vertical line after rotating using the IMU data."
@@ -186,7 +186,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             vert.Run(task.gray)
-            dst2 = Cloud_GravityRGB.rotateRGB(task.color, task.verticalizeAngle)
+            dst2 = GravityRGB_Basics.rotateRGB(task.color, task.verticalizeAngle)
         End Sub
     End Class
 
