@@ -88,10 +88,9 @@ Namespace VBClasses
 
             ' Tilt angles from accelerometer (low-pass source)
             Dim g = task.IMU_Acceleration
-            task.accRadians = New Point3f(
-                    CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z))),
-                    CSng(Math.Abs(Math.Atan2(g.X, g.Y))),
-                    CSng(Math.Atan2(g.Y, g.Z)))
+            task.accRadians = New Point3f(CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z))),
+                                          CSng(Math.Abs(Math.Atan2(g.X, g.Y))),
+                                          CSng(Math.Atan2(g.Y, g.Z)))
 
             ' Complementary filter: angle = alpha * (gyro-integrated) + (1-alpha) * (accel-derived)
             If task.optionsChanged Then

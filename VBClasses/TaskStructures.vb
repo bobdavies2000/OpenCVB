@@ -467,17 +467,19 @@ Namespace VBClasses
                 Dim p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
                 color = task.scalarColors(p1GridIndex Mod 255)
 
-                pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-                    Dim r = task.gridRects(p1GridIndex)
-                    pVec1 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
-                End If
+                If task.pcSplit IsNot Nothing Then
+                    pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+                    If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
+                        Dim r = task.gridRects(p1GridIndex)
+                        pVec1 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
+                    End If
 
-                pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-                If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-                    Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-                    Dim r = task.gridRects(p2GridIndex)
-                    pVec2 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
+                    pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+                    If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
+                        Dim p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+                        Dim r = task.gridRects(p2GridIndex)
+                        pVec2 = New cv.Vec3f(0, 0, Mean(task.pcSplit(2)(r), task.depthmask(r)).Item(0))
+                    End If
                 End If
 
                 If p1.X <> p2.X Then

@@ -5,10 +5,9 @@ Namespace VBClasses
         Public noCameraMotion As Boolean
         Public imuStabilityMeasure As Single = 0 ' 
         Dim lastTimeStamp As Double
-        Dim imuCheck As New IMU_Vertical
-        Dim plot As New PlotTime_Scalar
+        Dim imuStabilityCheck As New IMU_Vertical
+        Dim findGravity As New IMU_FindVertical
         Public Sub New()
-            plot.plotCount = 1
             desc = "Read and display the IMU data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -49,7 +48,9 @@ Namespace VBClasses
             Dim x2 = -(90 + task.theta.X * RadToDeg)
             Dim y1 = task.accRadians.Y - PI
             If task.accRadians.X < 0 Then y1 *= -1
-            task.verticalizeAngle = y1 * RadToDeg
+
+            findGravity.Run(emptyMat)
+
             strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                          x1.ToString(fmt1) + vbTab + (y1 * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Z * RadToDeg).ToString(fmt1) + vbCrLf +
                          "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
@@ -59,18 +60,19 @@ Namespace VBClasses
                           "cz = " + task.gravityMatrix.cz.ToString(fmt3) + " sz = " + task.gravityMatrix.sz.ToString(fmt3)
 
             strOut += vbCrLf + vbCrLf + "IMU Stability since last heartbeat " + imuStabilityMeasure.ToString("0.0%") + vbCrLf
-            strOut += "Current frame's stability measure = " + CStr(imuCheck.imuIsStable)
+            strOut += "Current frame's stability measure = " + CStr(imuStabilityCheck.imuIsStable)
             task.accRadians = task.theta
             If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
             task.accRadians.Z += PI / 2
 
             SetTrueText(strOut)
 
-            imuCheck.run(emptyMat)
-            imuStabilityMeasure = imuCheck.avgStable
-            noCameraMotion = imuCheck.imuIsStable ' imuStabilityMeasure >= 0.95
+            imuStabilityCheck.Run(emptyMat)
+            imuStabilityMeasure = imuStabilityCheck.avgStable
+            noCameraMotion = imuStabilityCheck.imuIsStable
 
             If standaloneTest() Then
+                Static plot As New PlotTime_Scalar With {.plotCount = 1, .plotData = New Scalar(imuStabilityMeasure, 0, 0)}
                 plot.plotData = New Scalar(imuStabilityMeasure, 0, 0)
                 plot.Run(emptyMat)
                 dst3 = plot.mats.mat(0)
@@ -114,7 +116,7 @@ Namespace VBClasses
             If avgX < 0 Then angle *= -1
             labels(2) = "stabilizer_Vertical Angle = " + angle.ToString(fmt1)
 
-            imuIsStable = Math.Abs(lastAngleX - avgX) < 0.001 And Math.Abs(lastAngleY - avgY) < 0.001
+            imuIsStable = Math.Abs(lastAngleX - avgX) < 1.0F And Math.Abs(lastAngleY - avgY) < 1.0F
             stableCount.Add(If(imuIsStable, 1, 0))
             avgStable = stableCount.Average
             stableStr = "IMU stable = " + avgStable.ToString("0.0%") + " of the time"
@@ -130,6 +132,56 @@ Namespace VBClasses
 
         End Sub
     End Class
+
+
+
+
+
+    Public Class IMU_FindVertical : Inherits TaskParent
+        ''' <summary>Camera angle from vertical in degrees (positive = tilted one way in the image plane).</summary>
+        Public angleFromVertical As Single
+        ''' <summary>Unit gravity vector from the accelerometer (points down in the camera/body frame).</summary>
+        Public gravityVector As Point3f
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Cursor.ai: Find the camera's angle from vertical using the IMU accelerometer."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim g = task.IMU_Acceleration
+            Dim mag = CSng(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z))
+            If mag < 0.001F Then mag = 1.0F
+            gravityVector = New Point3f(g.X / mag, g.Y / mag, g.Z / mag)
+
+            ' Image-plane tilt from vertical: Atan2 of lateral vs vertical accel (same convention as IMU_Basics_TA).
+            Dim accX = CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)))
+            Dim accY = CSng(Math.Abs(Math.Atan2(g.X, g.Y)))
+            Dim y1 = accY - PI
+            If accX < 0 Then y1 *= -1
+            angleFromVertical = CSng(y1 * RadToDeg)
+            task.verticalizeAngle = angleFromVertical
+            task.accRadians = New Point3f(accX, accY, CSng(Math.Atan2(g.Y, g.Z)))
+
+            Dim endpoints = IMU_GravityComplementary.GravityVectorToLineEndpoints(gravityVector, task.workRes.Width, task.workRes.Height)
+            task.lpGravity = New lpData(endpoints.p1, endpoints.p2)
+
+            dst2 = task.color.Clone
+            dst3 = task.color.Clone
+            Line(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            Line(dst3, task.lpGravity.p1, task.lpGravity.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+            strOut = "IMU acceleration (m/s^2)" + vbCrLf +
+                     "X=" + g.X.ToString(fmt3) + "  Y=" + g.Y.ToString(fmt3) + "  Z=" + g.Z.ToString(fmt3) + vbCrLf +
+                     "|g|=" + mag.ToString(fmt3) + " (earth ~9.81)" + vbCrLf + vbCrLf +
+                     "Gravity unit vector: " + gravityVector.X.ToString(fmt3) + ", " +
+                     gravityVector.Y.ToString(fmt3) + ", " + gravityVector.Z.ToString(fmt3) + vbCrLf + vbCrLf +
+                     "Angle from vertical = " + angleFromVertical.ToString(fmt2) + " deg" + vbCrLf +
+                     "(task.verticalizeAngle updated)"
+            SetTrueText(strOut, 1)
+            labels(2) = "Angle from vertical = " + angleFromVertical.ToString(fmt2) + " deg"
+            labels(3) = "Yellow = IMU gravity direction"
+        End Sub
+    End Class
+
 
 
 

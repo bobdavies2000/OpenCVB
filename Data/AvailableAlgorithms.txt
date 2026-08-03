@@ -270,7 +270,8 @@ Gravity_LineTrackStabilize
 GravityRGB_Basics
 GravityRGB_Line
 GravityRGB_Motion
-GravityRGB_RotateRGB
+GravityRGB_Rotate
+GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
 Grid_Rectangles
@@ -349,6 +350,7 @@ Hull_Edges
 Hull_RedC
 IMU_Average
 IMU_Basics_TA
+IMU_FindVertical
 IMU_GMatrix_TA
 IMU_GMatrix_TAWithOptions
 IMU_GravityComplementary
@@ -1218,6 +1220,7 @@ XR_Gravity_Basics_TAOld
 XR_Gravity_BrickRotate
 XR_Gravity_RGB
 XR_GravityRGB_IMUFixup
+XR_GravityRGB_RotateRGB
 XR_Grid_Basics_TATest
 XR_Grid_List
 XR_Grid_MinMaxDepth
