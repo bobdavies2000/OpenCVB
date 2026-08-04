@@ -77,24 +77,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Match_Duplicate : Inherits TaskParent
-        Public match As New Match_Basics
-        Public Sub New()
-            desc = "Test the correlation of 2 identical Mat's."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = src.Clone
-            If task.drawRect.Width = 0 Then task.drawRect = New cv.Rect(10, 10, 50, 50)
-            If task.optionsChanged Then match.template = src(task.drawRect).Clone
-            match.Run(src(task.drawRect))
-            labels(2) = "Correlation coefficient = " + match.correlation.ToString(fmt3)
-        End Sub
-    End Class
-
-
-
-
-
 
     Public Class XR_Match_BasicsTest : Inherits TaskParent
         Public match As New Match_Basics
@@ -302,56 +284,6 @@ Namespace VBClasses
             Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
         End Sub
     End Class
-
-
-
-
-
-
-
-
-
-    Public Class Match_DrawRect : Inherits TaskParent
-        Dim match As New Match_Basics
-        Public inputRect As cv.Rect
-        Public showOutput As Boolean
-        Public Sub New()
-            inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
-            dst3 = New Mat(dst3.Size(), MatType.CV_32F, Scalar.All(0))
-            If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
-            labels(2) = "red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
-            desc = "Find the requested template in task.drawrect in an image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastImage As Mat = src.Clone
-            If task.mouseClickFlag And task.drawRect.Width <> 0 Then
-                inputRect = ValidateRect(task.drawRect)
-                match.template = src(inputRect).Clone()
-            Else
-                If task.firstPass Then match.template = lastImage(inputRect).Clone()
-            End If
-
-            match.Run(src)
-
-            If standaloneTest() Or showOutput Then
-                Normalize(match.dst0, dst0, 0, 255, NormTypes.MinMax)
-                dst3.SetTo(0)
-                Dim r = ValidateRect(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height))
-                dst0.CopyTo(dst3(r))
-                Rectangle(dst3, inputRect, white, task.lineWidth, task.lineType)
-                dst2 = src
-            End If
-
-            SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
-
-            If standaloneTest() Then
-                Circle(dst2, match.newCenter, task.DotSize, Scalar.red, -1, task.lineType)
-                SetTrueText(match.correlation.ToString(fmt3), match.newCenter, 2)
-            End If
-            lastImage = src
-        End Sub
-    End Class
-
 
 
 
@@ -725,6 +657,117 @@ Namespace VBClasses
                 End If
             Next
             SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    Public Class Match_DrawRectOld : Inherits TaskParent
+        Dim match As New Match_Basics
+        Public inputRect As cv.Rect
+        Public showOutput As Boolean
+        Public Sub New()
+            inputRect = New cv.Rect(dst2.Width / 2 - 20, dst2.Height / 2 - 20, 40, 40) ' arbitrary template to match
+            dst3 = New Mat(dst3.Size(), MatType.CV_32F, Scalar.All(0))
+            If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
+            labels(2) = "red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
+            desc = "Find the requested template in task.drawrect in an image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastImage As Mat = src.Clone
+            If task.mouseClickFlag And task.drawRect.Width <> 0 Then
+                inputRect = ValidateRect(task.drawRect)
+                match.template = src(inputRect).Clone()
+            Else
+                If task.firstPass Then match.template = lastImage(inputRect).Clone()
+            End If
+
+            match.Run(src)
+
+            If standaloneTest() Or showOutput Then
+                Normalize(match.dst0, dst0, 0, 255, NormTypes.MinMax)
+                dst3.SetTo(0)
+                Dim r = ValidateRect(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height))
+                dst0.CopyTo(dst3(r))
+                Rectangle(dst3, inputRect, white, task.lineWidth, task.lineType)
+                dst2 = src
+            End If
+
+            SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
+
+            If standaloneTest() Then
+                Circle(dst2, match.newCenter, task.DotSize, Scalar.Red, -1, task.lineType)
+                SetTrueText(match.correlation.ToString(fmt3), match.newCenter, 2)
+            End If
+            lastImage = src
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Match_DrawRect : Inherits TaskParent
+        Public showOutput As Boolean = True
+        Public correlation As Single
+        Public newCenter As cv.Point
+        Public newRect As cv.Rect
+        Dim template As cv.Mat
+        Public Sub New()
+            labels = {"", "", "Best match (drawRect center + predicted location)", "Match probabilities"}
+            desc = "Use task.drawRect as a template, search the full image, show probabilities in dst3 and best match in dst2."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            If task.optionsChanged Or task.mouseClickFlag Then
+                If task.drawRect.Width < 2 Or task.drawRect.Height < 2 Then
+                    task.drawRect = New cv.Rect(dst2.Width \ 2 - 20, dst2.Height \ 2 - 20, 40, 40)
+                End If
+                template = src(task.drawRect).Clone
+            End If
+
+                Dim corr As New cv.Mat
+            MatchTemplate(src, template, corr, TemplateMatchModes.CCoeffNormed)
+            Dim mm = GetMinMax(corr)
+            correlation = mm.maxVal
+            newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
+            newCenter = New cv.Point(CInt(mm.maxLoc.X + template.Width / 2), CInt(mm.maxLoc.Y + template.Height / 2))
+
+            If standaloneTest() Or showOutput Then
+                Dim prob As New cv.Mat
+                Normalize(corr, prob, 0, 255, NormTypes.MinMax)
+                prob.ConvertTo(prob, MatType.CV_8U)
+                dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+                ' Align probability peaks with the matched template center in image coordinates.
+                Dim place = New cv.Rect(template.Width \ 2, template.Height \ 2, corr.Width, corr.Height)
+                place = ValidateRect(place)
+                Dim copyW = Math.Min(prob.Width, place.Width)
+                Dim copyH = Math.Min(prob.Height, place.Height)
+                If copyW > 0 AndAlso copyH > 0 Then
+                    prob(New cv.Rect(0, 0, copyW, copyH)).CopyTo(dst3(New cv.Rect(place.X, place.Y, copyW, copyH)))
+                End If
+
+                dst2 = task.color.Clone()
+                Dim drawCenter = New cv.Point(task.drawRect.X + task.drawRect.Width \ 2,
+                                              task.drawRect.Y + task.drawRect.Height \ 2)
+                Rectangle(dst2, task.drawRect, white, task.lineWidth, task.lineType)
+                Circle(dst2, drawCenter, task.DotSize + 2, white, -1, task.lineType)
+                Rectangle(dst2, newRect, task.highlight, task.lineWidth, task.lineType)
+                Circle(dst2, newCenter, task.DotSize, Scalar.Red, -1, task.lineType)
+                SetTrueText(correlation.ToString(fmt3), newCenter, 2)
+            End If
+
+            labels(2) = "Best match corr=" + correlation.ToString(fmt3) + " at (" +
+                        CStr(newCenter.X) + "," + CStr(newCenter.Y) + ")"
+            labels(3) = "MatchTemplate probabilities (brighter = higher)"
         End Sub
     End Class
 

@@ -160,7 +160,7 @@ Namespace VBClasses
             labels(2) = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right"
             desc = "Determine where a 3D line is close to the real depth data"
         End Sub
-        Private Function findCorrelation(pts1 As Mat, pts2 As Mat) As Single
+        Private Shared Function findCorrelation(pts1 As Mat, pts2 As Mat) As Single
             Dim correlationMat As New Mat
             MatchTemplate(pts1, pts2, correlationMat, TemplateMatchModes.CCoeffNormed)
             Return correlationMat.Get(Of Single)(0, 0)

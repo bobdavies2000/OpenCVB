@@ -117,7 +117,7 @@ Namespace VBClasses
                 MeanStdDev(src(r), meanS, stdev)
                 sortedStd.Add(stdev(0) + stdev(1) + stdev(2), r)
                 Dim colorIndex As Integer = 1
-                Dim mean As Vec3i = New Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
+                Dim mean As New Vec3i(CInt(meanS(0)), CInt(meanS(1)), CInt(meanS(2)))
                 If mean(0) < options.minThreshold And mean(1) < options.minThreshold And mean(2) < options.minThreshold Then
                     colorIndex = 1
                 ElseIf mean(0) > options.maxThreshold And mean(1) > options.maxThreshold And mean(2) > options.maxThreshold Then

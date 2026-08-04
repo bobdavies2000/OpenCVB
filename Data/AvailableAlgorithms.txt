@@ -268,13 +268,6 @@ Gravity_CloudMethod
 Gravity_Jitter
 Gravity_LineTrackStabilize
 GravityRGB_Basics
-GravityRGB_Compare
-GravityRGB_Line
-GravityRGB_LineRotate
-GravityRGB_LineValidate
-GravityRGB_Motion
-GravityRGB_Rotate
-GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
 Grid_Rectangles
@@ -460,6 +453,7 @@ Mat_Convert
 Match_Basics
 Match_Brick
 Match_DrawRect
+Match_DrawRectOld
 Match_LinesKNN
 Match_Point
 Match_VH
@@ -1222,8 +1216,15 @@ XR_Gravity_Basics_Original
 XR_Gravity_Basics_TAOld
 XR_Gravity_BrickRotate
 XR_Gravity_RGB
+XR_GravityRGB_Compare
 XR_GravityRGB_IMUFixup
+XR_GravityRGB_Line
+XR_GravityRGB_LineRotate
+XR_GravityRGB_Motion
+XR_GravityRGB_Rotate
 XR_GravityRGB_RotateRGB
+XR_GravityRGB_UsingVerticalLine
+XR_GravityRGB_Vertical
 XR_Grid_Basics_TATest
 XR_Grid_List
 XR_Grid_MinMaxDepth
@@ -1440,7 +1441,6 @@ XR_Mat_Tricks
 XR_Match_Basics1
 XR_Match_BasicsTest
 XR_Match_BestEntropy
-XR_Match_Duplicate
 XR_Match_GoodFeatureKNN
 XR_Match_LinePairTest
 XR_Match_Motion

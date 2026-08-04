@@ -22,13 +22,19 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = task.gray
             dst2 = src
-            dst3 = rotateRGB(src, task.verticalizeAngle)
 
-            strOut = "Same IMU gravity data used by Cloud_Gravity (gMatrix):" + vbCrLf +
-                 "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt2) + " deg" + vbCrLf +
-                 "accRadians X = " + task.accRadians.X.ToString(fmt3) + vbCrLf +
-                 "accRadians Y = " + task.accRadians.Y.ToString(fmt3) + vbCrLf +
-                 "accRadians Z = " + task.accRadians.Z.ToString(fmt3)
+            Dim rotateAngle = task.verticalizeAngle
+            Static lastRotateAngle = task.verticalizeAngle
+            If task.imuBasics.noCameraMotion Then rotateAngle = lastRotateAngle
+            lastRotateAngle = rotateAngle
+
+            dst3 = rotateRGB(src, rotateAngle)
+
+            strOut = "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt2) + " deg" + vbCrLf +
+                     "noCameraMotion = " + CStr(task.imuBasics.noCameraMotion) + vbCrLf +
+                     "accRadians X = " + task.accRadians.X.ToString(fmt3) + vbCrLf +
+                     "accRadians Y = " + task.accRadians.Y.ToString(fmt3) + vbCrLf +
+                     "accRadians Z = " + task.accRadians.Z.ToString(fmt3)
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -147,7 +153,7 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_Line : Inherits TaskParent
+    Public Class XR_GravityRGB_Line : Inherits TaskParent
         Dim lines As New Line_Core
         Dim para As New Line_Parallel
         Public Sub New()
@@ -197,7 +203,7 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_Motion : Inherits TaskParent
+    Public Class XR_GravityRGB_Motion : Inherits TaskParent
         Public Sub New()
             labels(3) = "Gravity rotation on every frame - contrast with the dst2 image."
             desc = "Rotate just the motion grid cells using the gravity warpaffine."
@@ -225,56 +231,9 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_Vertical : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public avgAngleToVertical As Single
-        Public Sub New()
-            desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            lpList.Clear()
-            dst2 = task.gray.Clone
-            dst3 = task.gray.Clone
 
-            If task.lpGravity Is Nothing Then
-                SetTrueText("task.lpGravity is not available.", 2)
-                labels(2) = "No gravity vector"
-                Return
-            End If
-
-            Dim gAngle = task.lpGravity.angle
-            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
-
-            For Each lp In task.lines.lpList
-                If Math.Abs(gAngle - lp.angle) < AngleThreshold Then
-                    Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-                    lpList.Add(lp)
-                End If
-            Next
-
-            Dim angleList As New List(Of Single)
-            For Each lp In lpList
-                angleList.Add(If(lp.angle >= 0, 90 - lp.angle, -90 - lp.angle))
-            Next
-            avgAngleToVertical = If(angleList.Count = 0, task.verticalizeAngle, angleList.Average())
-            If Math.Abs(avgAngleToVertical) > 90 Then avgAngleToVertical = avgAngleToVertical Mod 90
-
-            If lpList.Count = 0 Then
-                labels(2) = "No lines parallel to gravity (of " + CStr(task.lines.lpList.Count) + ")"
-            Else
-                labels(2) = CStr(lpList.Count) + " of " + CStr(task.lines.lpList.Count) +
-                            " lines nearly parallel to gravity (within " + CStr(AngleThreshold) + " deg)"
-            End If
-            labels(3) = "lpGravity angle = " + gAngle.ToString(fmt2) + " deg"
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class GravityRGB_Rotate : Inherits TaskParent
-        Dim vert As New GravityRGB_Vertical
+    Public Class XR_GravityRGB_Rotate : Inherits TaskParent
+        Dim vert As New XR_GravityRGB_Vertical
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Cursor.ai: Average GravityRGB_Vertical angles-to-vertical and rotate task.color."
@@ -327,8 +286,8 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_Compare : Inherits TaskParent
-        Dim rotate As New GravityRGB_Rotate
+    Public Class XR_GravityRGB_Compare : Inherits TaskParent
+        Dim rotate As New XR_GravityRGB_Rotate
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Compare the results of using the vertical lines to just using the IMU"
@@ -346,7 +305,7 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_LineRotate : Inherits TaskParent
+    Public Class XR_GravityRGB_LineRotate : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
@@ -383,12 +342,58 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_LineValidate : Inherits TaskParent
-        Dim vert As New GravityRGB_Vertical
+    Public Class XR_GravityRGB_Vertical : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public avgAngleToVertical As Single
+        Public Sub New()
+            desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lpList.Clear()
+            dst2 = task.gray.Clone
+            dst3 = task.gray.Clone
+
+            If task.lpGravity Is Nothing Then
+                SetTrueText("task.lpGravity is not available.", 2)
+                labels(2) = "No gravity vector"
+                Return
+            End If
+
+            Dim gAngle = task.lpGravity.angle
+            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
+
+            For Each lp In task.lines.lpList
+                If Math.Abs(gAngle - lp.angle) < AngleThreshold Then
+                    Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                    lpList.Add(lp)
+                End If
+            Next
+
+            Dim angleList As New List(Of Single)
+            For Each lp In lpList
+                angleList.Add(If(lp.angle >= 0, 90 - lp.angle, -90 - lp.angle))
+            Next
+            avgAngleToVertical = If(angleList.Count = 0, task.verticalizeAngle, angleList.Average())
+            If Math.Abs(avgAngleToVertical) > 90 Then avgAngleToVertical = avgAngleToVertical Mod 90
+
+            If lpList.Count = 0 Then
+                labels(2) = "No lines parallel to gravity (of " + CStr(task.lines.lpList.Count) + ")"
+            Else
+                labels(2) = CStr(lpList.Count) + " of " + CStr(task.lines.lpList.Count) +
+                            " lines nearly parallel to gravity (within " + CStr(AngleThreshold) + " deg)"
+            End If
+            labels(3) = "lpGravity angle = " + gAngle.ToString(fmt2) + " deg"
+        End Sub
+    End Class
+
+
+
+
+    Public Class XR_GravityRGB_UsingVerticalLine : Inherits TaskParent
+        Dim vert As New XR_GravityRGB_Vertical
         Public rotateAngle As Double
         Public Sub New()
-            desc = "Cursor.ai: Rotate GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
-            labels = {"", "", "task.gray", "task.gray rotated to validated vertical"}
+            desc = "Cursor.ai: Rotate XR_GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             vert.Run(src)
@@ -399,30 +404,33 @@ Namespace VBClasses
             Dim center = New Point2f(dst2.Width / 2.0F, dst2.Height / 2.0F)
             Dim M = GetRotationMatrix2D(center, -angle, 1)
 
-            Dim deltas As New List(Of Double)
-            For Each lp In vert.lpList
+            rotateAngle = task.verticalizeAngle
+            If vert.lpList.Count > 0 Then
+                Dim lp = task.lines.lpList(0)
+                Line(dst2, lp.p1, lp.p2, white)
                 Dim p1 = GravityRGB_Basics.WarpPoint(lp.p1, M)
                 Dim p2 = GravityRGB_Basics.WarpPoint(lp.p2, M)
                 If p1.X <> p2.X Then
                     Dim dx = p2.X - p1.X
                     Dim dy = p2.Y - p1.Y
                     If dy = 0 Then dy = 1
-                    deltas.Add(Math.Atan2(dx, dy) * RadToDeg)
+                    Dim delta As Single = Math.Atan2(dx, dy) * RadToDeg
+                    Static lastDelta = delta
+                    ' the delta jumps more than 5 degrees, it is bogus.  Just use the last in that case.
+                    If Math.Abs(lastDelta - delta) > 5 Then delta = lastDelta Else lastDelta = delta
+                    rotateAngle += delta
                 End If
-            Next
+            End If
 
-            rotateAngle = angle
-            If deltas.Count > 0 Then rotateAngle += deltas.Average()
-            If Math.Abs(rotateAngle) > 90 Then rotateAngle = rotateAngle Mod 90
-
+            Static lastRotateAngle = rotateAngle
+            If task.imuBasics.noCameraMotion Then rotateAngle = lastRotateAngle
+            lastRotateAngle = rotateAngle
             dst3 = GravityRGB_Basics.rotateRGB(task.gray, rotateAngle)
 
             If task.heartBeat Then
                 labels(2) = CStr(vert.lpList.Count) + " vertical lines, avgAngleToVertical = " +
                             vert.avgAngleToVertical.ToString(fmt2) + " deg"
-                labels(3) = "Rotated gray by " + rotateAngle.ToString(fmt2) + " deg" +
-                            If(deltas.Count = 0, "",
-                               " (avg refine " + deltas.Average().ToString(fmt3) + " from " + CStr(deltas.Count) + " lines)")
+                labels(3) = "Rotated gray by " + rotateAngle.ToString(fmt2) + " deg"
             End If
         End Sub
     End Class
