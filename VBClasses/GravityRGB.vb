@@ -6,6 +6,11 @@ Namespace VBClasses
             labels = {"", "", "Original RGB", "RGB rotated with IMU gravity data"}
             desc = "Cursor.ai: Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
         End Sub
+        Public Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
+            Dim xOut = M.Get(Of Double)(0, 0) * pt.X + M.Get(Of Double)(0, 1) * pt.Y + M.Get(Of Double)(0, 2)
+            Dim yOut = M.Get(Of Double)(1, 0) * pt.X + M.Get(Of Double)(1, 1) * pt.Y + M.Get(Of Double)(1, 2)
+            Return New Point2f(CSng(xOut), CSng(yOut))
+        End Function
         Public Shared Function rotateRGB(src As Mat, angle As Double) As cv.Mat
             If Math.Abs(angle) > 90 Then angle = angle Mod 90
             Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
@@ -191,6 +196,7 @@ Namespace VBClasses
 
 
 
+
     Public Class GravityRGB_Motion : Inherits TaskParent
         Public Sub New()
             labels(3) = "Gravity rotation on every frame - contrast with the dst2 image."
@@ -324,12 +330,100 @@ Namespace VBClasses
     Public Class GravityRGB_Compare : Inherits TaskParent
         Dim rotate As New GravityRGB_Rotate
         Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Compare the results of using the vertical lines to just using the IMU"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             rotate.Run(emptyMat)
-            dst2 = rotate.dst3
+            dst1 = rotate.dst3
             dst3 = GravityRGB_Basics.rotateRGB(task.color, task.verticalizeAngle)
+
+            Absdiff(dst1, dst3, dst2)
+
+        End Sub
+    End Class
+
+
+
+
+    Public Class GravityRGB_LineRotate : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+            desc = "Cursor.ai: Rotate each line in task.lines.lpList with GravityRGB_Basics.rotateRGB and draw on 8UC1 dst2."
+        End Sub
+        Private Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
+            Dim xOut = M.Get(Of Double)(0, 0) * pt.X + M.Get(Of Double)(0, 1) * pt.Y + M.Get(Of Double)(0, 2)
+            Dim yOut = M.Get(Of Double)(1, 0) * pt.X + M.Get(Of Double)(1, 1) * pt.Y + M.Get(Of Double)(1, 2)
+            Return New Point2f(CSng(xOut), CSng(yOut))
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            ' Rebuild lpList from rotated endpoints (same transform as rotateRGB).
+            lpList.Clear()
+            dst2.SetTo(0)
+            Dim angle = task.verticalizeAngle
+            If Math.Abs(angle) > 90 Then angle = angle Mod 90
+            Dim center = New Point2f(dst2.Width / 2.0F, dst2.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1)
+            For Each lp In task.lines.lpList
+                Dim p1 = WarpPoint(lp.p1, M)
+                Dim p2 = WarpPoint(lp.p2, M)
+                If Math.Abs(p1.X - p2.X) < 2 Then
+                    lpList.Add(New lpData(p1, p2))
+                    Line(dst2, p1, p2, white, task.lineWidth, task.lineType)
+                End If
+            Next
+
+            labels(2) = CStr(task.lines.lpList.Count) + " lines rotated by " +
+                        task.verticalizeAngle.ToString(fmt2) + " deg"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class GravityRGB_LineValidate : Inherits TaskParent
+        Dim vert As New GravityRGB_Vertical
+        Public rotateAngle As Double
+        Public Sub New()
+            desc = "Cursor.ai: Rotate GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
+            labels = {"", "", "task.gray", "task.gray rotated to validated vertical"}
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            vert.Run(src)
+            dst2 = task.gray
+
+            Dim angle = CDbl(vert.avgAngleToVertical)
+            If Math.Abs(angle) > 90 Then angle = angle Mod 90
+            Dim center = New Point2f(dst2.Width / 2.0F, dst2.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1)
+
+            Dim deltas As New List(Of Double)
+            For Each lp In vert.lpList
+                Dim p1 = GravityRGB_Basics.WarpPoint(lp.p1, M)
+                Dim p2 = GravityRGB_Basics.WarpPoint(lp.p2, M)
+                If p1.X <> p2.X Then
+                    Dim dx = p2.X - p1.X
+                    Dim dy = p2.Y - p1.Y
+                    If dy = 0 Then dy = 1
+                    deltas.Add(Math.Atan2(dx, dy) * RadToDeg)
+                End If
+            Next
+
+            rotateAngle = angle
+            If deltas.Count > 0 Then rotateAngle += deltas.Average()
+            If Math.Abs(rotateAngle) > 90 Then rotateAngle = rotateAngle Mod 90
+
+            dst3 = GravityRGB_Basics.rotateRGB(task.gray, rotateAngle)
+
+            If task.heartBeat Then
+                labels(2) = CStr(vert.lpList.Count) + " vertical lines, avgAngleToVertical = " +
+                            vert.avgAngleToVertical.ToString(fmt2) + " deg"
+                labels(3) = "Rotated gray by " + rotateAngle.ToString(fmt2) + " deg" +
+                            If(deltas.Count = 0, "",
+                               " (avg refine " + deltas.Average().ToString(fmt3) + " from " + CStr(deltas.Count) + " lines)")
+            End If
         End Sub
     End Class
 

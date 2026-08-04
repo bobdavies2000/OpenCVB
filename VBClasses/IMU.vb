@@ -1,7 +1,64 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
     Public Class IMU_Basics_TA : Inherits TaskParent
+        Public noCameraMotion As Boolean
+        Dim lastTimeStamp As Double
+        Dim lastAcc As Point3f
+        Public Sub New()
+            desc = "Cursor.ai rewrite: Minimal IMU, theta, accRadians, verticalizeAngle, lpGravity, noCameraMotion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim g = task.IMU_Acceleration
+            Dim acc = New Point3f(CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z))),
+                                  CSng(Math.Abs(Math.Atan2(g.X, g.Y))),
+                                  CSng(Math.Atan2(g.Y, g.Z)))
+            If task.optionsChanged Then
+                noCameraMotion = True
+                task.theta = acc
+            Else
+                Dim dt = (task.IMU_TimeStamp - lastTimeStamp) / 1000.0
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt /= 1000.0
+                Dim gyro = task.IMU_AngularVelocity * CSng(dt)
+                task.theta += New Point3f(-gyro.Z, -gyro.Y, gyro.X)
+
+                Dim a = task.IMU_AlphaFilter
+                task.theta.X = a * task.theta.X + (1 - a) * acc.X
+                task.theta.Y = acc.Y
+                task.theta.Z = a * task.theta.Z + (1 - a) * acc.Z
+            End If
+
+            lastTimeStamp = task.IMU_TimeStamp
+            task.accRadians = task.theta
+            If task.accRadians.Y > PI / 2 Then task.accRadians.Y -= PI / 2
+            task.accRadians.Z += PI / 2
+
+            Dim y1 = acc.Y - PI
+            If acc.X < 0 Then y1 *= -1
+            Dim ang = y1 * RadToDeg
+            If Math.Abs(ang) > 90 Then ang = ang Mod 90
+            task.verticalizeAngle = ang
+
+            Dim mag = CSng(Math.Sqrt(g.X * g.X + g.Y * g.Y + g.Z * g.Z))
+            If mag < 0.001F Then mag = 1.0F
+            Dim ep = IMU_GravityComplementary.GravityVectorToLineEndpoints(
+                New Point3f(g.X / mag, g.Y / mag, g.Z / mag), task.workRes.Width, task.workRes.Height)
+            task.lpGravity = New lpData(ep.p1, ep.p2)
+
+            noCameraMotion = Math.Abs(lastAcc.X - task.accRadians.X) < 0.02F And Math.Abs(lastAcc.Y - task.accRadians.Y) < 0.02F
+            lastAcc = task.accRadians
+
+            If task.heartBeat Then
+                labels(2) = "verticalize=" + task.verticalizeAngle.ToString(fmt2) + " deg  stable=" + CStr(noCameraMotion)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
+    Public Class XR_IMU_BasicsOld : Inherits TaskParent
         Public noCameraMotion As Boolean
         Public imuStabilityMeasure As Single = 0 ' 
         Dim lastTimeStamp As Double
@@ -79,7 +136,6 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
 
 
 

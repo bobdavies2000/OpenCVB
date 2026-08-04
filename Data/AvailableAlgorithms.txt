@@ -270,6 +270,8 @@ Gravity_LineTrackStabilize
 GravityRGB_Basics
 GravityRGB_Compare
 GravityRGB_Line
+GravityRGB_LineRotate
+GravityRGB_LineValidate
 GravityRGB_Motion
 GravityRGB_Rotate
 GravityRGB_Vertical
@@ -1321,6 +1323,7 @@ XR_ImageOffset_SliceH
 XR_ImageOffset_SliceV
 XR_IMU_Basics_Kalman
 XR_IMU_Basics_WithOptions
+XR_IMU_BasicsOld
 XR_IMU_IscameraStable
 XR_IMU_PlotAcceleration
 XR_IMU_PlotAngularVelocity

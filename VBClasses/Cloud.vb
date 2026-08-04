@@ -770,7 +770,7 @@ Namespace VBClasses
 
     Public Class Cloud_Gravity : Inherits TaskParent
         Public Sub New()
-            desc = "Rebuild the cv.Point cloud with knowledge of gravity (if the option is requested.)"
+            desc = "Cursor.ai: Rebuild the cv.Point cloud with knowledge of gravity (if the option is requested.)"
         End Sub
         Public Shared Sub preparePointCloud()
             task.pcSplit = Split(task.pointCloud)
