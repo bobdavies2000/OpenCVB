@@ -29,7 +29,7 @@ Namespace VBClasses
 
             Dim c3D = task.pointCloud.Get(Of Point3f)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
             triangles.Clear()
-            Dim color = task.scalarColors(task.rcD.index)
+            Dim color = task.scalarColors(task.rcD.index Mod 255)
             Dim color3D As New Point3f(color(0), color(1), color(2))
             For i = 0 To pt3D.Count - 1
                 triangles.Add(color3D)
