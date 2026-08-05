@@ -763,11 +763,11 @@ Namespace VBClasses
                 Rectangle(dst2, task.drawRect, white, task.lineWidth, task.lineType)
                 Circle(dst2, drawCenter, task.DotSize + 2, white, -1, task.lineType)
                 Rectangle(dst2, newRect, task.highlight, task.lineWidth, task.lineType)
-                Circle(dst2, newCenter, task.DotSize, Scalar.Red, -1, task.lineType)
+                Circle(dst2, newCenter, task.DotSize, task.highlight, -1, task.lineType)
                 SetTrueText(correlation.ToString(fmt3), newCenter, 2)
 
                 ' update the template for the next frame
-                template = src(newRect).Clone
+                'template = src(newRect).Clone
             End If
 
 

@@ -29,7 +29,7 @@ Namespace VBClasses
             Return lpList
         End Function
         Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
-            Static lpFind As New Line_FindClosest With {.lpList = inputList, .LastList = lastList}
+            Static lpFind As New Line_FindClosest With {.lpList = inputList, .LastList = inputList}
             lpFind.lpList = inputList
             lpFind.LastList = lastList
             For Each lp In inputList
@@ -2406,11 +2406,10 @@ Namespace VBClasses
 
             If task.heartBeat Then lpTracked = vert.lpList(0)
 
-
             If task.heartBeat Then
                 lpTracked = vert.lpList(0)
-                Dim index1 = task.gridMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
-                Dim index2 = task.gridMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
+                Dim index1 = task.gridMap.Get(Of Integer)(lpTracked.p1.Y + 2 * task.gridWH, lpTracked.p1.X) ' trying to stay away from the image edge.
+                Dim index2 = task.gridMap.Get(Of Integer)(lpTracked.p2.Y - 2 * task.gridWH, lpTracked.p2.X) ' trying to stay away from the image edge. 
                 Dim r1 = task.gridNabeRects(index1)
                 Dim r2 = task.gridNabeRects(index2)
                 matchP1.template = src(r1)
@@ -2419,11 +2418,11 @@ Namespace VBClasses
 
             matchP1.Run(src)
             Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-            matchP1.template = src(matchP1.newRect)
+            'matchP1.template = src(matchP1.newRect)
 
             matchP2.Run(src)
             Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-            matchP2.template = src(matchP2.newRect)
+            'matchP2.template = src(matchP2.newRect)
 
             If standaloneTest() Then
                 dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal)
@@ -2432,6 +2431,8 @@ Namespace VBClasses
 
             Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+
+            Line(task.color, vert.lpList(0).p1, vert.lpList(0).p2, task.highlight, task.lineWidth)
         End Sub
     End Class
 

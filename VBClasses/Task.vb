@@ -52,6 +52,7 @@ Namespace VBClasses
 
             task.grid = New Grid_Basics_TA
             task.lines = New Line_Basics_TA
+
             task.filterBasics = New Filter_Basics_TA
             task.foreground = New Foreground_Basics_TA
             task.leftRightBrightness = New LeftRight_Brightness_TA
