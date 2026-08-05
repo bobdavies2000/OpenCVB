@@ -233,7 +233,7 @@ Namespace VBClasses
 
 
     Public Class XR_GravityRGB_Rotate : Inherits TaskParent
-        Dim vert As New XR_GravityRGB_Vertical
+        Dim vert As New GravityRGB_Vertical
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Cursor.ai: Average GravityRGB_Vertical angles-to-vertical and rotate task.color."
@@ -342,58 +342,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_GravityRGB_Vertical : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public avgAngleToVertical As Single
-        Public Sub New()
-            desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            lpList.Clear()
-            dst2 = task.gray.Clone
-            dst3 = task.gray.Clone
-
-            If task.lpGravity Is Nothing Then
-                SetTrueText("task.lpGravity is not available.", 2)
-                labels(2) = "No gravity vector"
-                Return
-            End If
-
-            Dim gAngle = task.lpGravity.angle
-            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
-
-            For Each lp In task.lines.lpList
-                If Math.Abs(gAngle - lp.angle) < AngleThreshold Then
-                    Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-                    lpList.Add(lp)
-                End If
-            Next
-
-            Dim angleList As New List(Of Single)
-            For Each lp In lpList
-                angleList.Add(If(lp.angle >= 0, 90 - lp.angle, -90 - lp.angle))
-            Next
-            avgAngleToVertical = If(angleList.Count = 0, task.verticalizeAngle, angleList.Average())
-            If Math.Abs(avgAngleToVertical) > 90 Then avgAngleToVertical = avgAngleToVertical Mod 90
-
-            If lpList.Count = 0 Then
-                labels(2) = "No lines parallel to gravity (of " + CStr(task.lines.lpList.Count) + ")"
-            Else
-                labels(2) = CStr(lpList.Count) + " of " + CStr(task.lines.lpList.Count) +
-                            " lines nearly parallel to gravity (within " + CStr(AngleThreshold) + " deg)"
-            End If
-            labels(3) = "lpGravity angle = " + gAngle.ToString(fmt2) + " deg"
-        End Sub
-    End Class
-
-
-
-
     Public Class XR_GravityRGB_UsingVerticalLine : Inherits TaskParent
-        Dim vert As New XR_GravityRGB_Vertical
+        Dim vert As New GravityRGB_Vertical
         Public rotateAngle As Double
         Public Sub New()
-            desc = "Cursor.ai: Rotate XR_GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
+            desc = "Cursor.ai: Rotate GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             vert.Run(src)
@@ -435,4 +388,53 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class GravityRGB_Vertical : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public avgAngleToVertical As Single
+        Public Sub New()
+            desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.gray.Clone
+            dst3 = task.gray.Clone
+
+            If task.lpGravity Is Nothing Then
+                SetTrueText("task.lpGravity is not available.", 2)
+                labels(2) = "No gravity vector"
+                Return
+            End If
+
+            Dim gAngle = task.lpGravity.angle
+            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
+
+            Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            For Each lp In task.lines.lpList
+                If Math.Abs(gAngle - lp.angle) < AngleThreshold Then
+                    Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                    lpSorted.Add(lp.length, lp)
+                End If
+            Next
+
+            lpList = New List(Of lpData)(lpSorted.Values)
+
+            Dim angleList As New List(Of Single)
+            For Each lp In lpList
+                angleList.Add(If(lp.angle >= 0, 90 - lp.angle, -90 - lp.angle))
+            Next
+            avgAngleToVertical = If(angleList.Count = 0, task.verticalizeAngle, angleList.Average())
+            If Math.Abs(avgAngleToVertical) > 90 Then avgAngleToVertical = avgAngleToVertical Mod 90
+
+            If lpList.Count = 0 Then
+                labels(2) = "No lines parallel to gravity (of " + CStr(task.lines.lpList.Count) + ")"
+            Else
+                labels(2) = CStr(lpList.Count) + " of " + CStr(task.lines.lpList.Count) +
+                            " lines nearly parallel to gravity (within " + CStr(AngleThreshold) + " deg)"
+            End If
+            labels(3) = "lpGravity angle = " + gAngle.ToString(fmt2) + " deg"
+        End Sub
+    End Class
 End Namespace

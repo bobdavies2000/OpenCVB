@@ -7,26 +7,30 @@ Namespace VBClasses
         Public newCenter As cv.Point
         Public newRect As New cv.Rect
         Public mm As mmData
+        Public correlationMat As New cv.Mat
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                    "(allows multiple targets per image.)"
         End Sub
+        Public Shared Function showCorrelationMat(correlationMap As cv.Mat, minVal As Single) As cv.Mat
+            Dim rect = New cv.Rect(0, 0, correlationMap.Width, correlationMap.Height)
+            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            ConvertScaleAbs(correlationMap, dst(rect), 255, -minVal)
+            Return dst
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 SetTrueText("Match is called often so no need for standalone test.")
                 Exit Sub
             End If
 
-            Dim tmp As New cv.Mat
-            MatchTemplate(template, src, tmp, TemplateMatchModes.CCoeffNormed)
-            mm = GetMinMax(tmp)
-
-            Dim rect = New cv.Rect(0, 0, tmp.Width, tmp.Height)
-            dst3.SetTo(0)
-            ConvertScaleAbs(tmp, dst3(rect), 255, -mm.minVal)
-
+            MatchTemplate(template, src, correlationMat, TemplateMatchModes.CCoeffNormed)
+            mm = GetMinMax(correlationMat)
             correlation = mm.maxVal
+
+            If standaloneTest() Then dst3 = showCorrelationMat(correlationMat, mm.minVal)
+
             labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
             Dim w = template.Width, h = template.Height
             newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
@@ -172,7 +176,6 @@ Namespace VBClasses
         Dim entropy As New Entropy_Highest
         Dim match As New Match_DrawRect
         Public Sub New()
-            match.showOutput = True
             labels(2) = "Probabilities that the template matches image"
             labels(3) = "red is the best template to match (highest entropy)"
             desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
@@ -715,14 +718,13 @@ Namespace VBClasses
 
 
     Public Class Match_DrawRect : Inherits TaskParent
-        Public showOutput As Boolean = True
         Public correlation As Single
         Public newCenter As cv.Point
         Public newRect As cv.Rect
         Dim template As cv.Mat
         Public Sub New()
             labels = {"", "", "Best match (drawRect center + predicted location)", "Match probabilities"}
-            desc = "Use task.drawRect as a template, search the full image, show probabilities in dst3 and best match in dst2."
+            desc = "Cursor.ai: task.drawRect template provided, search the full image, show probabilities in dst3 and best match in dst2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
@@ -734,14 +736,14 @@ Namespace VBClasses
                 template = src(task.drawRect).Clone
             End If
 
-                Dim corr As New cv.Mat
+            Dim corr As New cv.Mat
             MatchTemplate(src, template, corr, TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(corr)
             correlation = mm.maxVal
             newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
             newCenter = New cv.Point(CInt(mm.maxLoc.X + template.Width / 2), CInt(mm.maxLoc.Y + template.Height / 2))
 
-            If standaloneTest() Or showOutput Then
+            If standaloneTest() Then
                 Dim prob As New cv.Mat
                 Normalize(corr, prob, 0, 255, NormTypes.MinMax)
                 prob.ConvertTo(prob, MatType.CV_8U)
@@ -763,7 +765,11 @@ Namespace VBClasses
                 Rectangle(dst2, newRect, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst2, newCenter, task.DotSize, Scalar.Red, -1, task.lineType)
                 SetTrueText(correlation.ToString(fmt3), newCenter, 2)
+
+                ' update the template for the next frame
+                template = src(newRect).Clone
             End If
+
 
             labels(2) = "Best match corr=" + correlation.ToString(fmt3) + " at (" +
                         CStr(newCenter.X) + "," + CStr(newCenter.Y) + ")"

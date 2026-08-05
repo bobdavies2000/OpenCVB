@@ -38,6 +38,7 @@ CComp_Both
 CComp_Stats
 Cloud_Basics
 Cloud_Gravity
+Cloud_GravityRGB
 Cloud_ReduceSplit2
 Cloud_SetupSide
 Cloud_SetupTop
@@ -268,6 +269,7 @@ Gravity_CloudMethod
 Gravity_Jitter
 Gravity_LineTrackStabilize
 GravityRGB_Basics
+GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
 Grid_Rectangles
@@ -416,6 +418,7 @@ Line_Intersection
 Line_LeftRight
 Line_LeftRightx
 Line_Match
+Line_MatchFail2
 Line_Parallel
 Line_ParallelLR
 Line_Perpendicular
@@ -1224,7 +1227,6 @@ XR_GravityRGB_Motion
 XR_GravityRGB_Rotate
 XR_GravityRGB_RotateRGB
 XR_GravityRGB_UsingVerticalLine
-XR_GravityRGB_Vertical
 XR_Grid_Basics_TATest
 XR_Grid_List
 XR_Grid_MinMaxDepth

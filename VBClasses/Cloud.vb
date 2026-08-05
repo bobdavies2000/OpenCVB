@@ -828,4 +828,44 @@ Namespace VBClasses
             SetTrueText(traceName + " algorithm contains some shared functions to rotate and prepare the pointcloud.")
         End Sub
     End Class
+
+
+
+
+
+    Public Class Cloud_GravityRGB : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "", "Original RGB", "RGB rotated with the same IMU data as Cloud_Gravity"}
+            desc = "Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
+        End Sub
+        Public Shared Function rotateRGB(src As Mat, Optional angle As Double = Double.NaN) As Mat
+            If Double.IsNaN(angle) Then angle = task.verticalizeAngle
+            If Math.Abs(angle) > 90 Then angle = angle Mod 90
+            Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1)
+            Dim dst As New Mat(src.Size, src.Type)
+            WarpAffine(src, dst, M, src.Size(), InterpolationFlags.Cubic)
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 3 Then src = task.color
+            dst2 = src
+
+            Dim rotateAngle = task.verticalizeAngle
+            Static lastRotateAngle = task.verticalizeAngle
+            If task.imuBasics.noCameraMotion Then rotateAngle = lastRotateAngle
+            lastRotateAngle = rotateAngle
+
+            dst3 = rotateRGB(src, rotateAngle)
+
+            strOut = "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt2) + " deg" + vbCrLf +
+                     "noCameraMotion = " + CStr(task.imuBasics.noCameraMotion) + vbCrLf +
+                     "accRadians X = " + task.accRadians.X.ToString(fmt3) + vbCrLf +
+                     "accRadians Y = " + task.accRadians.Y.ToString(fmt3) + vbCrLf +
+                     "accRadians Z = " + task.accRadians.Z.ToString(fmt3) + vbCrLf + vbCrLf +
+                     IMU_GMatrix_TA.gMatrixToStr(task.gMatrix)
+            SetTrueText(strOut, 1)
+        End Sub
+    End Class
 End Namespace

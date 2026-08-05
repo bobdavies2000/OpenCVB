@@ -2286,122 +2286,153 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Match : Inherits TaskParent
+
+    Public Class Line_MatchFail2 : Inherits TaskParent
         Public lpTracked As lpData
-        Public p1Correlation As Single
-        Public p2Correlation As Single
-        Dim match1 As New Match_Basics
-        Dim match2 As New Match_Basics
-        Dim lastGray As Mat
-        Dim templateRect1 As cv.Rect
-        Dim templateRect2 As cv.Rect
+        Public topCorrelation As Single
+        Public botCorrelation As Single
+        Dim vert As New GravityRGB_Vertical
+        Dim matchTop As New Match_Basics
+        Dim matchBot As New Match_Basics
+        Dim templateTop As cv.Rect
+        Dim templateBot As cv.Rect
+        Dim searchTop As cv.Rect
+        Dim searchBot As cv.Rect
+        Dim searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public Sub New()
-            desc = "Cursor.ai: Track the longest line using MatchTemplate at p1 and p2 (seedSize/searchSize around each endpoint)."
+            desc = "Cursor.ai: Track the longest GravityRGB_Vertical line with Match_Basics at top/bottom (gridWH*10 templates, half-height search)."
         End Sub
         Private Shared Function CenterRect(pt As cv.Point2f, size As Integer) As cv.Rect
             Dim half = size \ 2
-            Dim r = ValidateRect(New cv.Rect(CInt(Math.Round(pt.X)) - half, CInt(Math.Round(pt.Y)) - half, size, size))
-            If r.Width <> size Then
-                r.X -= size - r.Width
-                r.Width = size
-            End If
-
-            If r.Height <> size Then
-                r.Y -= size - r.Height
-                r.Height = size
-            End If
-            Return r
+            Return ValidateRect(New cv.Rect(CInt(Math.Round(pt.X)) - half, CInt(Math.Round(pt.Y)) - half, size, size))
         End Function
-        Private Sub SeedFromLongest(seedSize As Integer)
-            If task.lines.lpList.Count = 0 Then
-                lpTracked = Nothing
-                Return
-            End If
-            lpTracked = task.lines.lpList(0)
-            templateRect1 = CenterRect(lpTracked.p1, seedSize)
-            templateRect2 = CenterRect(lpTracked.p2, seedSize)
-        End Sub
-        Private Function MatchEndpoint(gray As Mat, prevPt As cv.Point2f, searchPt As cv.Point2f,
-                                       seedSize As Integer, searchSize As Integer,
+        Private Shared Function TopBottom(lp As lpData) As (top As cv.Point2f, bot As cv.Point2f)
+            If lp.p1.Y <= lp.p2.Y Then Return (lp.p1, lp.p2)
+            Return (lp.p2, lp.p1)
+        End Function
+        Private Function MatchEndpoint(src As Mat, lastgray As cv.Mat, prevPt As cv.Point2f, seedSize As Integer,
                                        match As Match_Basics, ByRef correlation As Single,
                                        ByRef templateRect As cv.Rect) As cv.Point2f
             templateRect = CenterRect(prevPt, seedSize)
-            Dim searchRect = CenterRect(searchPt, searchSize)
-            If templateRect.Width >= searchRect.Width OrElse templateRect.Height >= searchRect.Height OrElse
-               templateRect.Width < 2 OrElse templateRect.Height < 2 Then
-                correlation = 0
-                Return prevPt
-            End If
 
-            match.template = lastGray(templateRect).Clone
-            match.Run(gray(searchRect))
+            match.template = lastgray(templateRect).Clone
+            match.Run(src(searchRect))
             correlation = match.correlation
             If correlation < task.fCorrThreshold Then Return prevPt
 
             Dim newRect = New cv.Rect(searchRect.X + match.newRect.X, searchRect.Y + match.newRect.Y,
                                       match.newRect.Width, match.newRect.Height)
-            Dim dx = newRect.X - templateRect.X
-            Dim dy = newRect.Y - templateRect.Y
-            Return New cv.Point2f(prevPt.X + dx, prevPt.Y + dy)
+            Return New cv.Point2f(newRect.X + newRect.Width / 2.0F, newRect.Y + newRect.Height / 2.0F)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.lines.lpList.Count = 0 AndAlso lpTracked Is Nothing Then Exit Sub
-            Dim gray = If(src.Channels <> 1, task.gray, src)
-            Dim seedSize = task.gridWH * 3
-            Dim searchSize = task.gridWH * 6
+            If src.Channels <> 1 Then src = task.gray
 
-            If lastGray Is Nothing OrElse lastGray.Size <> gray.Size OrElse task.optionsChanged Then
-                lastGray = gray.Clone
-                SeedFromLongest(seedSize)
-            ElseIf task.heartBeatLT OrElse lpTracked Is Nothing Then
-                SeedFromLongest(seedSize)
-            ElseIf task.lines.lpList.Count = 0 Then
-                ' Keep last track when Line_Basics misses this frame.
+            Dim seedSize = task.gridWH * 10
+            Dim searchSize = src.Height \ 2
+            Static lastGray As cv.Mat = src.Clone
+
+            vert.Run(src)
+            If vert.lpList.Count = 0 Then
+                labels(2) = "No vertical lines from GravityRGB_Vertical"
+                labels(3) = ""
+                Exit Sub
+            End If
+
+            If task.optionsChanged OrElse task.heartBeatLT Then
+                lpTracked = vert.lpList(0)
+                Dim tb = TopBottom(lpTracked)
+                templateTop = CenterRect(tb.top, seedSize)
+                templateBot = CenterRect(tb.bot, seedSize)
             Else
-                Dim newP1 = MatchEndpoint(gray, lpTracked.p1, task.lines.lpList(0).p1, seedSize, searchSize,
-                                          match1, p1Correlation, templateRect1)
-                Dim newP2 = MatchEndpoint(gray, lpTracked.p2, task.lines.lpList(0).p2, seedSize, searchSize,
-                                          match2, p2Correlation, templateRect2)
+                Dim tb = TopBottom(lpTracked)
+                Dim newTop = MatchEndpoint(src, lastGray, tb.top, seedSize, matchTop, topCorrelation, templateTop)
+                Dim newBot = MatchEndpoint(src, lastGray, tb.bot, seedSize, matchBot, botCorrelation, templateBot)
 
-                If p1Correlation >= task.fCorrThreshold AndAlso p2Correlation >= task.fCorrThreshold Then
+                If topCorrelation >= task.fCorrThreshold AndAlso botCorrelation >= task.fCorrThreshold Then
                     Dim age = lpTracked.age + 1
                     If age >= 1000 Then age = 10
-                    lpTracked = New lpData(newP1, newP2) With {.age = age}
-                    templateRect1 = CenterRect(lpTracked.p1, seedSize)
-                    templateRect2 = CenterRect(lpTracked.p2, seedSize)
+                    lpTracked = New lpData(newTop, newBot) With {.age = age}
                 End If
             End If
 
-            lastGray = gray.Clone
+            lastGray = src.Clone
 
             dst2 = task.color.Clone
             dst3 = task.color.Clone
-            If lpTracked IsNot Nothing Then
-                task.longestLine = lpTracked
 
-                Dim s1 = If(task.lines.lpList.Count > 0, task.lines.lpList(0).p1, lpTracked.p1)
-                Dim s2 = If(task.lines.lpList.Count > 0, task.lines.lpList(0).p2, lpTracked.p2)
-                Rectangle(dst3, CenterRect(s1, searchSize), task.highlight, task.lineWidth)
-                Rectangle(dst3, CenterRect(s2, searchSize), task.highlight, task.lineWidth)
-                Rectangle(dst3, templateRect1, white, 1)
-                Rectangle(dst3, templateRect2, white, 1)
-                Line(dst3, lpTracked.p1, lpTracked.p2, task.highlight, task.lineWidth, task.lineType)
+            task.longestLine = lpTracked
+            Dim ends = TopBottom(lpTracked)
+            Rectangle(dst3, searchTop, task.highlight, task.lineWidth)
+            Rectangle(dst3, searchBot, task.highlight, task.lineWidth)
+            Rectangle(dst3, templateTop, white, 1)
+            Rectangle(dst3, templateBot, white, 1)
+            Line(dst3, ends.top, ends.bot, task.highlight, task.lineWidth, task.lineType)
 
-                Line(dst2, lpTracked.p1, lpTracked.p2, task.highlight, task.lineWidth + 1, task.lineType)
-                Line(task.depthRGB, task.longestLine.p1, task.longestLine.p2, task.highlight, task.lineWidth + 1, task.lineType)
-                Circle(dst2, lpTracked.p1, task.DotSize + 2, white, -1, task.lineType)
-                Circle(dst2, lpTracked.p2, task.DotSize + 2, white, -1, task.lineType)
-                SetTrueText(CStr(lpTracked.age), New cv.Point(CInt(lpTracked.ptCenter.X + 2), CInt(lpTracked.ptCenter.Y + 2)), 2)
+            Line(dst2, ends.top, ends.bot, task.highlight, task.lineWidth + 1, task.lineType)
+            Circle(dst2, ends.top, task.DotSize + 2, white, -1, task.lineType)
+            Circle(dst2, ends.bot, task.DotSize + 2, white, -1, task.lineType)
 
-                labels(2) = "Tracked age=" + CStr(lpTracked.age) +
-                            "  p1 corr=" + p1Correlation.ToString(fmt3) +
-                            "  p2 corr=" + p2Correlation.ToString(fmt3) +
-                            "  len=" + lpTracked.length.ToString(fmt1)
-                labels(3) = "white = endpoint templates (seedSize), yellow = search (searchSize) at lpList(0) p1/p2"
-            Else
-                labels(2) = "Waiting for a longest line seed from Line_Basics"
-                labels(3) = ""
-            End If
+            labels(2) = "Vertical track age=" + CStr(lpTracked.age) +
+                        "  top corr=" + topCorrelation.ToString(fmt3) +
+                        "  bot corr=" + botCorrelation.ToString(fmt3) +
+                        "  len=" + lpTracked.length.ToString(fmt1)
+            labels(3) = "GravityRGB_Vertical seed; white=templates (gridWH*10), yellow=search (half image height)"
         End Sub
     End Class
+
+
+
+
+
+    Public Class Line_Match : Inherits TaskParent
+        Dim vert As New GravityRGB_Vertical
+        Dim matchP1 As New Match_Basics
+        Dim matchP2 As New Match_Basics
+        Dim lpTracked As lpData
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            vert.Run(src)
+            dst2 = src.Clone
+            If vert.lpList.Count = 0 Then
+                labels(2) = "No vertical lines from GravityRGB_Vertical"
+                labels(3) = ""
+                Exit Sub
+            End If
+
+            If task.heartBeat Then lpTracked = vert.lpList(0)
+
+
+            If task.heartBeat Then
+                lpTracked = vert.lpList(0)
+                Dim index1 = task.gridMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
+                Dim index2 = task.gridMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
+                Dim r1 = task.gridNabeRects(index1)
+                Dim r2 = task.gridNabeRects(index2)
+                matchP1.template = src(r1)
+                matchP2.template = src(r2)
+            End If
+
+            matchP1.Run(src)
+            Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+            matchP1.template = src(matchP1.newRect)
+
+            matchP2.Run(src)
+            Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+            matchP2.template = src(matchP2.newRect)
+
+            If standaloneTest() Then
+                dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal)
+                dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal)
+            End If
+
+            Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+        End Sub
+    End Class
+
 End Namespace
