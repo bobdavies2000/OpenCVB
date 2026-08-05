@@ -507,7 +507,7 @@ Namespace VBClasses
             Line(dst2, input.p1, input.p2, white, task.lineWidth, task.lineType)
 
             output = computePerp(input)
-            Circle(dst2, input.ptCenter, task.DotSize + 2, Scalar.red, -1, task.lineType)
+            Circle(dst2, input.ptCenter, task.DotSize + 2, Scalar.Red, -1, task.lineType)
             Line(dst2, output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
             If standaloneTest() Then SetTrueText("The line displayed at left Is the gravity vector.", 3)
@@ -1997,7 +1997,7 @@ Namespace VBClasses
             desc = "Find the line in provided lpList closest to the requested line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then inputLine = task.longestLine
+            If standalone And task.longestLine IsNot Nothing Then inputLine = task.longestLine
 
             If standaloneTest() Then
                 dst3 = task.lines.dst3
