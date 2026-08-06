@@ -2,8 +2,10 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Impor
 Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
+        Public lastList As New List(Of lpData)
         Public averageAge As Single
         Public Sub New()
+            labels(3) = "Age is shown for the top 10 longest lines."
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
@@ -30,8 +32,7 @@ Namespace VBClasses
             Return lpList
         End Function
         Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
-            Static lpFind As New Line_FindClosest With {.lpList = inputList, .LastList = inputList}
-            lpFind.lpList = inputList
+            Static lpFind As New Line_FindClosest With {.LastList = inputList}
             lpFind.LastList = lastList
             For Each lp In inputList
                 lpFind.inputLine = lp
@@ -50,24 +51,10 @@ Namespace VBClasses
             Next
 
             Static gravity = task.lpGravity
-            Dim noLineFound As Boolean = True
-            If inputList.Count > 0 Then
-                If task.longestLine = gravity Or task.longestLine Is Nothing Then task.longestLine = inputList(0)
-                lpFind.inputLine = task.longestLine
-                lpFind.Run(emptyMat)
-                Dim lpTmp = lpFind.closestLine
-
-                If lpTmp IsNot Nothing Then
-                    task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2) With {.age = lpTmp.age}
-                    noLineFound = False
-                End If
-            End If
-
-            If noLineFound Then
+            If inputList.Count = 0 Then
                 gravity = task.lpGravity
                 task.longestLine = task.lpGravity
                 inputList.Add(task.longestLine) ' need to always have something in lplist...
-                Return 0
             End If
 
             Return lpAges.Average
@@ -95,8 +82,9 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lp In lpList
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
-                SetTrueText(CStr(lp.age), lp.ptCenter, 2)
+                If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
+            lastList = New List(Of lpData)(lpList)
         End Sub
     End Class
 
@@ -120,8 +108,8 @@ Namespace VBClasses
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
             averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines.  Line age is shown for top 10 longest lines." +
-                        " Avg age = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
+            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines." +
+                        " Average age all lines = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
             dst3 = task.lines.dst3
             For Each lp In task.lines.lpList
@@ -1888,6 +1876,7 @@ Namespace VBClasses
 
 
 
+
     Public Class XR_Line_LeftRight : Inherits TaskParent
         Public leftList As New List(Of lpData)
         Public rightList As New List(Of lpData)
@@ -2002,54 +1991,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_FindClosest : Inherits TaskParent
-        Public inputLine As lpData
-        Public closestLine As lpData
-        Public lpList As New List(Of lpData)
-        Public LastList As New List(Of lpData)
-        Public Sub New()
-            labels(3) = "The lines found in the current image - task.lines.dst3"
-            desc = "Find the line in provided lpList closest to the requested line"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.longestLine IsNot Nothing Then inputLine = task.longestLine
-
-            If standaloneTest() Then
-                dst3 = task.lines.dst3
-                dst2 = task.color.Clone
-                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
-            End If
-
-            Dim candidates As New List(Of lpData)
-            For Each lp In LastList
-                If inputLine.ptCenter.DistanceTo(lp.ptCenter) < lp.length Then
-                    If Math.Abs(lp.angle - inputLine.angle) < 2 Then candidates.Add(lp)
-                End If
-            Next
-
-            labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
-            closestLine = Nothing
-            If candidates.Count = 0 Then Exit Sub ' no lines were found.
-
-            Dim distances As New List(Of Single)
-            For Each lp In candidates
-                Dim distance = inputLine.p1.DistanceTo(lp.p1) + inputLine.p2.DistanceTo(lp.p2)
-                If distance < lp.length Then
-                    distance = inputLine.p1.DistanceTo(lp.p2) + inputLine.p2.DistanceTo(lp.p1)
-                End If
-                distances.Add(distance)
-            Next
-
-            closestLine = candidates(distances.IndexOf(distances.Min))
-            LastList.RemoveAt(LastList.IndexOf(closestLine)) ' can't match it again later. 
-            Line(dst2, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_Line_Matcher : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public lpLastList As New List(Of lpData)
@@ -2075,7 +2016,7 @@ Namespace VBClasses
                 Dim candidates As New List(Of lpData)
                 For Each lpLast In remaining
                     If lp.ptCenter.DistanceTo(lpLast.ptCenter) < lpLast.length Then
-                        If Math.Abs(lpLast.angle - lp.angle) < 2 Then candidates.Add(lpLast)
+                        If Math.Abs(lpLast.angle - lp.angle) < AngleThreshold Then candidates.Add(lpLast)
                     End If
                 Next
                 If candidates.Count = 0 Then Continue For
@@ -2419,9 +2360,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If task.heartBeat Then lpTracked = vert.lpList(0)
-
-            If task.heartBeat Then
+            If task.heartBeat Or lpTracked Is Nothing Then
                 lpTracked = vert.lpList(0)
                 Dim index1 = task.gridMap.Get(Of Integer)(lpTracked.p1.Y + 2 * task.gridWH, lpTracked.p1.X) ' trying to stay away from the image edge.
                 Dim index2 = task.gridMap.Get(Of Integer)(lpTracked.p2.Y - 2 * task.gridWH, lpTracked.p2.X) ' trying to stay away from the image edge. 
@@ -2450,4 +2389,55 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class Line_FindClosest : Inherits TaskParent
+        Public inputLine As lpData
+        Public closestLine As lpData
+        Public closestLine2 As lpData ' second closest line.
+        Public LastList As New List(Of lpData)
+        Public Sub New()
+            labels(3) = "The lines found in the current image - task.lines.dst3"
+            desc = "Find the line closest to the requested line in the task.lines.lastList"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                If task.lines.lpList.Count > 0 Then inputLine = task.lines.lpList(0)
+            End If
+            If inputLine Is Nothing Or LastList.Count = 0 Then Exit Sub
+
+            If standaloneTest() Then
+                CvtColor(task.lines.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
+                dst2 = task.color.Clone
+                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
+            End If
+
+            Dim candidates As New List(Of lpData)
+            For Each lp In LastList
+                If inputLine.ptCenter.DistanceTo(lp.ptCenter) < lp.length Then
+                    If Math.Abs(lp.angle - inputLine.angle) < AngleThreshold Then candidates.Add(lp)
+                End If
+            Next
+
+            labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
+            closestLine = Nothing
+            If candidates.Count = 0 Then Exit Sub ' no candidates for the closest line were found.
+
+            Dim distances As New List(Of Single)
+            For Each lp In candidates
+                Dim distance = inputLine.p1.DistanceTo(lp.p1) + inputLine.p2.DistanceTo(lp.p2)
+                If distance < lp.length Then
+                    distance = inputLine.p1.DistanceTo(lp.p2) + inputLine.p2.DistanceTo(lp.p1)
+                End If
+                distances.Add(distance)
+            Next
+
+            closestLine = candidates(distances.IndexOf(distances.Min))
+            Line(dst3, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
+            cv.Cv2.ImShow("dst3", dst3)
+        End Sub
+    End Class
 End Namespace

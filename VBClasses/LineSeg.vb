@@ -17,8 +17,8 @@ Namespace VBClasses
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
             averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-            labels(2) = "LSD found " + CStr(lpList.Count) + " lines.  Line age is shown for top 10 longest lines." +
-                        " Avg age = " + If(lpList.Count > 0, averageAge.ToString(fmt1), "0")
+            labels(2) = "LSD found " + CStr(lpList.Count) + " lines." +
+                        " Average age all lines = " + If(lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
             dst3 = task.lines.dst2
             For Each lp In lpList
