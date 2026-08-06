@@ -414,6 +414,7 @@ Line_Depth
 Line_DepthSimple
 Line_DepthUpdate
 Line_FindClosest
+Line_FindClosestFail
 Line_Finder
 Line_Intersection
 Line_LeftRight

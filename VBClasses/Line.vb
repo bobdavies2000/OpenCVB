@@ -2340,6 +2340,125 @@ Namespace VBClasses
 
 
 
+
+
+    Public Class Line_FindClosestFail : Inherits TaskParent
+        Public inputLine As lpData
+        Public closestLine As lpData
+        Public closestLine2 As lpData ' second closest line.
+        Public LastList As New List(Of lpData)
+        Public Sub New()
+            labels(3) = "The lines found in the current image - task.lines.dst3"
+            desc = "Find the line closest to the requested line in the task.lines.lastList"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                If task.lines.lpList.Count > 0 Then inputLine = task.lines.lpList(0)
+            End If
+            If inputLine Is Nothing Or LastList.Count = 0 Then Exit Sub
+
+            If standaloneTest() Then
+                CvtColor(task.lines.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
+                dst2 = task.color.Clone
+                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
+            End If
+
+            Dim candidates As New List(Of lpData)
+            For Each lp In LastList
+                If inputLine.ptCenter.DistanceTo(lp.ptCenter) < lp.length Then
+                    If Math.Abs(lp.angle - inputLine.angle) < AngleThreshold Then candidates.Add(lp)
+                End If
+            Next
+
+            labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
+            closestLine = Nothing
+            If candidates.Count = 0 Then Exit Sub ' no candidates for the closest line were found.
+
+            Dim distances As New List(Of Single)
+            For Each lp In candidates
+                Dim distance = inputLine.p1.DistanceTo(lp.p1) + inputLine.p2.DistanceTo(lp.p2)
+                If distance < lp.length Then
+                    distance = inputLine.p1.DistanceTo(lp.p2) + inputLine.p2.DistanceTo(lp.p1)
+                End If
+                distances.Add(distance)
+            Next
+
+            closestLine = candidates(distances.IndexOf(distances.Min))
+            Line(dst3, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Line_FindClosest : Inherits TaskParent
+        Public inputLine As lpData
+        Public closestLine As lpData
+        Public closestLine2 As lpData
+        Public lastList As New List(Of lpData)
+        Public Sub New()
+            labels = {"", "", "Input (white), closest (highlight), 2nd closest (red)", "task.lines.lastList candidates"}
+            desc = "Cursor.ai: Identify the line in task.lines.lastList most likely to match the input line, and show the 2 closest."
+        End Sub
+        Private Shared Function EndpointDistance(a As lpData, b As lpData) As Single
+            Dim dSame = a.p1.DistanceTo(b.p1) + a.p2.DistanceTo(b.p2)
+            Dim dSwap = a.p1.DistanceTo(b.p2) + a.p2.DistanceTo(b.p1)
+            Return Math.Min(dSame, dSwap)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            closestLine = Nothing
+            closestLine2 = Nothing
+
+            If standalone Then
+                lastList.Clear()
+                If task.lines.lpList.Count > 0 And task.lines.lastList.Count > 0 Then
+                    inputLine = task.lines.lpList(0)
+                    lastList = New List(Of lpData)(task.lines.lastList)
+                End If
+            End If
+
+            If inputLine Is Nothing OrElse lastList.Count = 0 Then
+                labels(2) = "No input line or empty lastList"
+                Exit Sub
+            End If
+
+            Dim sorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
+            For Each lp In task.lines.lastList
+                If inputLine.ptCenter.DistanceTo(lp.ptCenter) >= lp.length Then Continue For
+                If Math.Abs(lp.angle - inputLine.angle) >= AngleThreshold Then Continue For
+                sorted.Add(EndpointDistance(inputLine, lp), lp)
+            Next
+
+            If sorted.Count > 0 Then closestLine = sorted.Values(0)
+            If sorted.Count > 1 Then closestLine2 = sorted.Values(1)
+
+            If standaloneTest() Then
+                dst2 = task.color.Clone
+                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 2, task.lineType)
+
+                dst3.SetTo(0)
+                If closestLine IsNot Nothing Then
+                    Line(dst2, closestLine.p1, closestLine.p2, task.highlight, task.lineWidth + 2, task.lineType)
+                    Line(dst3, closestLine.p1, closestLine.p2, task.highlight, task.lineWidth + 2, task.lineType)
+                End If
+                If closestLine2 IsNot Nothing Then
+                    Line(dst2, closestLine2.p1, closestLine2.p2, Scalar.Red, task.lineWidth + 1, task.lineType)
+                    Line(dst3, closestLine2.p1, closestLine2.p2, Scalar.Red, task.lineWidth + 1, task.lineType)
+                End If
+            End If
+
+            labels(2) = CStr(sorted.Count) + " candidates within " + CStr(AngleThreshold) +
+                        " deg. Closest = " + If(closestLine Is Nothing, "none", "highlight") +
+                        ", 2nd = " + If(closestLine2 Is Nothing, "none", "red")
+        End Sub
+    End Class
+
+
+
+
+
     Public Class Line_Match : Inherits TaskParent
         Dim vert As New GravityRGB_Vertical
         Dim matchP1 As New Match_Basics
@@ -2386,58 +2505,6 @@ Namespace VBClasses
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
 
             ' Line(task.color, vert.lpList(0).p1, vert.lpList(0).p2, task.highlight, task.lineWidth)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Line_FindClosest : Inherits TaskParent
-        Public inputLine As lpData
-        Public closestLine As lpData
-        Public closestLine2 As lpData ' second closest line.
-        Public LastList As New List(Of lpData)
-        Public Sub New()
-            labels(3) = "The lines found in the current image - task.lines.dst3"
-            desc = "Find the line closest to the requested line in the task.lines.lastList"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                If task.lines.lpList.Count > 0 Then inputLine = task.lines.lpList(0)
-            End If
-            If inputLine Is Nothing Or LastList.Count = 0 Then Exit Sub
-
-            If standaloneTest() Then
-                CvtColor(task.lines.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
-                dst2 = task.color.Clone
-                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
-            End If
-
-            Dim candidates As New List(Of lpData)
-            For Each lp In LastList
-                If inputLine.ptCenter.DistanceTo(lp.ptCenter) < lp.length Then
-                    If Math.Abs(lp.angle - inputLine.angle) < AngleThreshold Then candidates.Add(lp)
-                End If
-            Next
-
-            labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
-            closestLine = Nothing
-            If candidates.Count = 0 Then Exit Sub ' no candidates for the closest line were found.
-
-            Dim distances As New List(Of Single)
-            For Each lp In candidates
-                Dim distance = inputLine.p1.DistanceTo(lp.p1) + inputLine.p2.DistanceTo(lp.p2)
-                If distance < lp.length Then
-                    distance = inputLine.p1.DistanceTo(lp.p2) + inputLine.p2.DistanceTo(lp.p1)
-                End If
-                distances.Add(distance)
-            Next
-
-            closestLine = candidates(distances.IndexOf(distances.Min))
-            Line(dst3, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
-            cv.Cv2.ImShow("dst3", dst3)
         End Sub
     End Class
 End Namespace
