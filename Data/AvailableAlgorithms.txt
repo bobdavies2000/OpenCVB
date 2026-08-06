@@ -57,6 +57,7 @@ Contour_Basics
 Contour_Smoothing
 Contour_Sort
 Convex_Basics
+Convex_Defects
 Convex_RedCDefects
 Corner_Basics
 Corner_Core
@@ -952,7 +953,6 @@ XR_ContourPlane_RectX
 XR_ContourPlane_X
 XR_Contrast_Basics
 XR_Contrast_POW
-XR_Convex_Defects
 XR_Convex_RedC
 XR_Corner_BasicsCentroid
 XR_Corner_BasicsCentroids

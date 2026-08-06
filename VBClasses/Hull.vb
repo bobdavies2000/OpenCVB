@@ -253,8 +253,10 @@ Namespace VBClasses
                 contour = hContour.contours1.sortContours.allContours(0)
             End If
 
-            Dim hullIndices = ConvexHullIndices(contour, False)
-            Dim defects = ConvexityDefects(contour, hullIndices.ToList)
+            Dim contourList = contour.ToList()
+            Dim defects As Vec4i() = Nothing
+            contourList = Convex_RedCDefects.checkDefects(contourList, defects)
+            contour = contourList.ToArray()
 
             Dim lastV As Integer = -1
             Dim newC As New List(Of cv.Point)
@@ -301,10 +303,9 @@ Namespace VBClasses
             DrawTour(tmp, rc.hull, task.highlight, task.lineWidth)
             Resize(tmp, dst1, dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
-            Dim hullIndices = ConvexHullIndices(rc.contour, False)
-            If Hull_Defect.indicesMayFail(rc.contour) Then Exit Sub
-
-            Dim defects = ConvexityDefects(rc.contour, hullIndices.ToList)
+            Dim defects As Vec4i() = Nothing
+            rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
+            If defects.Length = 0 Then Exit Sub
 
             Dim lastV As Integer = -1
             Dim tour As New List(Of cv.Point)
@@ -332,7 +333,7 @@ Namespace VBClasses
                 Cv2.Circle(dst3, endPt, task.DotSize, task.highlight, -1)
 
                 ' Far point (deepest defect)
-                Cv2.Circle(dst3, farPt, task.DotSize + 1, Scalar.red, -1)
+                Cv2.Circle(dst3, farPt, task.DotSize + 1, Scalar.Red, -1)
 
                 ' Optional: draw line from start → far → end
                 Cv2.Line(dst3, startPt, farPt, task.highlight, task.lineWidth)
@@ -371,27 +372,23 @@ Namespace VBClasses
                     dst3(rc.rect).SetTo(color, rc.mask)
                     DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
 
-                    If Hull_Defect.indicesMayFail(rc.contour) Then
+                    Dim defects As Vec4i() = Nothing
+                    rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
+                    If defects.Length = 0 Then
                         defectCount += 1
                     Else
-                        Try
-                            Dim hullIndices = ConvexHullIndices(rc.contour, False)
-                            Dim defects = ConvexityDefects(rc.contour, hullIndices.ToList)
-                            ' Fill each defect triangle (start / far / end) into mask, map, and display.
-                            For Each d In defects
-                                Dim tri = New cv.Point() {
-                                    rc.contour(d.Item0),
-                                    rc.contour(d.Item2),
-                                    rc.contour(d.Item1)
-                                }
-                                FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
-                                filledDefects += 1
-                            Next
-                            rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
-                            rc.pixels = CountNonZero(rc.mask)
-                        Catch ex As Exception
-                            defectCount += 1
-                        End Try
+                        ' Fill each defect triangle (start / far / end) into mask, map, and display.
+                        For Each d In defects
+                            Dim tri = New cv.Point() {
+                                rc.contour(d.Item0),
+                                rc.contour(d.Item2),
+                                rc.contour(d.Item1)
+                            }
+                            FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
+                            filledDefects += 1
+                        Next
+                        rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
+                        rc.pixels = CountNonZero(rc.mask)
                     End If
                 End If
 

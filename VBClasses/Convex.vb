@@ -85,40 +85,6 @@ Namespace VBClasses
 
 
 
-
-    ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
-    Public Class XR_Convex_Defects : Inherits TaskParent
-        Dim contours As New XR_Contour_Largest
-        Public Sub New()
-            Threshold(ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, ThresholdTypes.Binary)
-            Resize(dst2, dst2, New Size(task.workRes.Width, task.workRes.Height))
-            CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
-
-            labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
-            desc = "Find the convexityDefects in the image"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(dst2.Clone)
-            Dim c = contours.bestContour.ToArray
-            CvtColor(dst2, dst3, ColorConversionCodes.GRAY2BGR)
-            Dim hull = ConvexHull(c, False)
-            Dim hullIndices = ConvexHullIndices(c, False)
-            DrawTour(dst3, hull.ToList, task.highlight)
-
-            Dim defects = ConvexityDefects(contours.bestContour, hullIndices.ToList)
-            For Each v In defects
-                Line(dst3, c(v(0)), c(v(2)), Scalar.red, task.lineWidth + 1, task.lineType)
-                Line(dst3, c(v(1)), c(v(2)), Scalar.red, task.lineWidth + 1, task.lineType)
-                Circle(dst3, c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class Convex_RedCDefects : Inherits TaskParent
         Dim contours As New XR_Contour_Largest
         Dim redC As New RedC_Basics
@@ -152,6 +118,33 @@ Namespace VBClasses
             End If
             Return newC
         End Function
+        ''' <summary>
+        ''' Update contour by removing duplicate points, then run ConvexityDefects when safe.
+        ''' Returns the cleaned contour. defects is empty when ConvexityDefects cannot be used.
+        ''' </summary>
+        Public Shared Function checkDefects(c As List(Of cv.Point), ByRef defects As Vec4i()) As List(Of cv.Point)
+            defects = New Vec4i() {}
+            If c Is Nothing OrElse c.Count < 3 Then Return If(c, New List(Of cv.Point))
+
+            ' Update contour first: duplicate vertices make hull indices non-monotonous.
+            Dim cleaned As New List(Of cv.Point)(c.Count)
+            Dim seen As New HashSet(Of cv.Point)
+            For Each pt In c
+                If seen.Add(pt) Then cleaned.Add(pt)
+            Next
+
+            If cleaned.Count < 3 OrElse Hull_Defect.indicesMayFail(cleaned) Then Return cleaned
+
+            If Hull_Defect.indicesMayFail(cleaned) Then
+                Try
+                    Dim hullIndices = ConvexHullIndices(cleaned.ToArray(), False)
+                    defects = ConvexityDefects(cleaned, hullIndices.ToList())
+                Catch
+                    defects = New Vec4i() {}
+                End Try
+            End If
+            Return cleaned
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst1 = redC.dst2
@@ -174,19 +167,53 @@ Namespace VBClasses
             Dim c = contours.bestContour
 
             Dim hull = ConvexHull(c, False)
-            Dim hullIndices = ConvexHullIndices(c, False)
             dst2.SetTo(0)
             DrawTour(dst2, hull.ToList, task.highlight, -1)
 
-            ' check if self-intersecting...
-            If Hull_Defect.indicesMayFail(rc.contour) Then
-                Dim defects = ConvexityDefects(c, hullIndices.ToList)
+            Dim defects As Vec4i() = Nothing
+            c = checkDefects(c, defects)
+            If defects.Length > 0 Then
                 rc.contour = betterContour(c, defects)
             Else
-                SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
+                rc.contour = c
+                SetTrueText("Convexity defects skipped - contour was self-intersecting.", 3)
             End If
 
             DrawTour(dst2, rc.contour, Scalar.red)
+        End Sub
+    End Class
+
+
+
+
+
+
+    ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
+    Public Class Convex_Defects : Inherits TaskParent
+        Dim contours As New XR_Contour_Largest
+        Public Sub New()
+            Threshold(ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, ThresholdTypes.Binary)
+            Resize(dst2, dst2, New Size(task.workRes.Width, task.workRes.Height))
+            CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
+
+            labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
+            desc = "Find the convexityDefects in the image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(dst2.Clone)
+            CvtColor(dst2, dst3, ColorConversionCodes.GRAY2BGR)
+
+            Dim defects As Vec4i() = Nothing
+            contours.bestContour = Convex_RedCDefects.checkDefects(contours.bestContour, defects)
+            Dim c = contours.bestContour
+            Dim hull = ConvexHull(c.ToArray(), False)
+            DrawTour(dst3, hull.ToList, task.highlight)
+
+            For Each v In defects
+                Line(dst3, c(v(0)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
+                Line(dst3, c(v(1)), c(v(2)), Scalar.Red, task.lineWidth + 1, task.lineType)
+                Circle(dst3, c(v(2)), task.DotSize + 2, task.highlight, -1, task.lineType)
+            Next
         End Sub
     End Class
 End Namespace

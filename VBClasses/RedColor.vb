@@ -312,7 +312,7 @@ Namespace VBClasses
     Public Class XR_RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
             desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -328,13 +328,13 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 If rc.contour IsNot Nothing AndAlso rc.contour.Count >= 3 Then
                     rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
-                    Dim hullIndices = ConvexHullIndices(rc.hull.ToArray, False)
-                    Try
-                        Dim defects = ConvexityDefects(rc.contour, hullIndices)
+                    Dim defects As Vec4i() = Nothing
+                    rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
+                    If defects.Length > 0 Then
                         rc.contour = Convex_RedCDefects.betterContour(rc.contour, defects)
-                    Catch ex As Exception
+                    Else
                         defectCount += 1
-                    End Try
+                    End If
                     DrawTour(rcMap(rc.rect), rc.hull, rc.mapID, -1)
                     rclist.Add(rc)
                 End If
