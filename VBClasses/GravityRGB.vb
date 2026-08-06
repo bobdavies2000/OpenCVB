@@ -1,4 +1,6 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class GravityRGB_Basics : Inherits TaskParent
         Public Sub New()
@@ -400,15 +402,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.gray.Clone
-            dst3 = task.gray.Clone
 
             If task.lpGravity Is Nothing Then
                 SetTrueText("task.lpGravity is not available.", 2)
                 labels(2) = "No gravity vector"
                 Return
             End If
-
-            Line(dst3, task.lpGravity.ptE1, task.lpGravity.ptE2, white, task.lineWidth + 1, task.lineType)
 
             Dim tmpList As New List(Of lpData)
             Dim lpNext = task.lines.lpList(0)
@@ -427,7 +426,7 @@ Namespace VBClasses
             Next
 
             Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-            For Each lp In task.lines.lpList
+            For Each lp In tmpList
                 If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then
                     Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                     lpSorted.Add(lp.length, lp)

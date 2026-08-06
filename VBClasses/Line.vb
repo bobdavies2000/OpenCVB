@@ -2,6 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Impor
 Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
+        Public averageAge As Single
         Public Sub New()
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) with sobel input."
@@ -78,24 +79,22 @@ Namespace VBClasses
                 Static basicsFLD As New Line_Basics
                 basicsFLD.Run(src)
                 dst2 = basicsFLD.dst2
+                lpList = basicsFLD.lpList
+                averageAge = basicsFLD.averageAge
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
                 basicsLSD.Run(src)
                 dst2 = basicsLSD.dst2
+                lpList = basicsLSD.lpList
+                averageAge = basicsLSD.averageAge
                 labels = basicsLSD.labels
             End If
 
             dst3.SetTo(0)
-            For Each lp In lpList
-                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth)
-            Next
-
-            ' Line(dst3, task.longestLine.p1, task.longestLine.p2, 255, task.lineWidth + 1)
-            labels(3) = CStr(task.lines.lpList.Count) + " lines.  Highlighted line is the current longest line."
-
-            For Each lp In lpList
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            For i = 0 To Math.Min(10, lpList.Count) - 1
+                Dim lp = lpList(i)
+                SetTrueText(CStr(lp.age), lp.ptCenter, 2)
             Next
         End Sub
     End Class
@@ -107,18 +106,20 @@ Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public core As New Line_Core
+        Public averageAge As Single
         Public Sub New()
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
+            Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
+            lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
-            Dim lastList = New List(Of lpData)(lpList)
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-            Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
+            averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
             labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines.  Line age is shown." +
                         " Avg age = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
@@ -2419,20 +2420,19 @@ Namespace VBClasses
             matchP1.Run(src)
             Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
             'matchP1.template = src(matchP1.newRect)
+            If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
+            SetTrueText(matchP1.correlation.ToString(fmt3))
 
             matchP2.Run(src)
             Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
             'matchP2.template = src(matchP2.newRect)
-
-            If standaloneTest() Then
-                dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal)
-                dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal)
-            End If
+            If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
+            SetTrueText(matchP2.correlation.ToString(fmt3))
 
             Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
 
-            Line(task.color, vert.lpList(0).p1, vert.lpList(0).p2, task.highlight, task.lineWidth)
+            ' Line(task.color, vert.lpList(0).p1, vert.lpList(0).p2, task.highlight, task.lineWidth)
         End Sub
     End Class
 

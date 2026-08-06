@@ -1,5 +1,8 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports System.Security.Cryptography
 Imports System.Threading
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Match_Basics : Inherits TaskParent
         Public template As New Mat ' caller provides this!
@@ -13,10 +16,12 @@ Namespace VBClasses
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                    "(allows multiple targets per image.)"
         End Sub
-        Public Shared Function showCorrelationMat(correlationMap As cv.Mat, minVal As Single) As cv.Mat
-            Dim rect = New cv.Rect(0, 0, correlationMap.Width, correlationMap.Height)
+        Public Shared Function showCorrelationMat(correlationMat As cv.Mat, minVal As Single) As cv.Mat
             Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-            ConvertScaleAbs(correlationMap, dst(rect), 255, -minVal)
+            Dim x = (dst.Width - correlationMat.Width) / 2
+            Dim y = (dst.Height - correlationMat.Height) / 2
+            Dim rect = New cv.Rect(x, y, correlationMat.Width, correlationMat.Height)
+            ConvertScaleAbs(correlationMat, dst(rect), 255, -minVal)
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -531,7 +536,7 @@ Namespace VBClasses
                 Dim index = knn.result(i, 0)
                 If index >= 0 And index < lastPt.Count Then
                     Dim lastMP = lastPt(index)
-                    Line(dst2, lp.p1, lastMP.p2, Scalar.red, task.lineWidth, task.lineType)
+                    Line(dst2, lp.p1, lastMP.p2, Scalar.Red, task.lineWidth, task.lineType)
                 End If
             Next
 

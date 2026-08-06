@@ -3,27 +3,28 @@ Namespace VBClasses
     Public Class LineSeg_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public core As New LineSeg_Core
+        Public averageAge As Single
         Public Sub New()
             desc = "Run LSD (Line Segment Detector) with sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
+            Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
+            lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
-            Dim lastList = New List(Of lpData)(lpList)
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-            Dim averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
+            averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
             labels(2) = "LSD found " + CStr(lpList.Count) + " lines.  Line age is shown." +
                         " Avg age = " + If(lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
             dst3 = task.lines.dst2
-            For Each lp In task.lines.lpList
+            For Each lp In lpList
                 SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 5, lp.ptCenter.Y + 5), 3)
             Next
-            task.lines.lpList = New List(Of lpData)(lpList)
         End Sub
     End Class
 
