@@ -75,16 +75,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
+            Dim rect As New cv.Rect(task.gridWH * 2, task.gridWH * 2, dst2.Width - task.gridWH * 4, dst2.Height - task.gridWH * 4)
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
-                basicsFLD.Run(src)
+                basicsFLD.Run(src(rect))
                 dst2 = basicsFLD.dst2
                 lpList = basicsFLD.lpList
                 averageAge = basicsFLD.averageAge
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
-                basicsLSD.Run(src)
+                basicsLSD.Run(src(rect))
                 dst2 = basicsLSD.dst2
                 lpList = basicsLSD.lpList
                 averageAge = basicsLSD.averageAge
@@ -92,8 +93,8 @@ Namespace VBClasses
             End If
 
             dst3.SetTo(0)
-            For i = 0 To Math.Min(10, lpList.Count) - 1
-                Dim lp = lpList(i)
+            For Each lp In lpList
+                Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 SetTrueText(CStr(lp.age), lp.ptCenter, 2)
             Next
         End Sub
@@ -111,8 +112,6 @@ Namespace VBClasses
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
-
             Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
             lpList = New List(Of lpData)(core.lpList)
@@ -121,7 +120,7 @@ Namespace VBClasses
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
             averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines.  Line age is shown." +
+            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines.  Line age is shown for top 10 longest lines." +
                         " Avg age = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
             dst3 = task.lines.dst3
@@ -146,7 +145,6 @@ Namespace VBClasses
         Public Sub New()
             ld = FastLineDetector.Create
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Use FastLineDetector (OpenCV Contrib) To find all the lines inside drawRect"
         End Sub
         Public Shared Function getRawSortedLines(lines As Vec4f()) As List(Of lpData)
@@ -171,16 +169,32 @@ Namespace VBClasses
             Return lpList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = task.gray
             If src.Type <> MatType.CV_8U Then src.ConvertTo(src, MatType.CV_8U)
 
             lpList = getRawSortedLines(ld.Detect(src))
 
-            dst2.SetTo(0)
-            For Each lp In lpList
-                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            dst1.SetTo(0)
+            dst2 = task.color.Clone
+            Dim x = (dst2.Width - src.Width) \ 2
+            Dim y = (dst2.Height - src.Height) \ 2
+            For i = 0 To lpList.Count - 1
+                Dim lp = lpList(i)
+                lp.p1.X += x
+                lp.p2.X += x
+                lp.ptCenter.X += x
+
+                lp.p1.Y += y
+                lp.p2.Y += y
+                lp.ptCenter.Y += y
+
+                lp.index = (i + 1) Mod 255
+                lpList(i) = lp
+
+                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.AntiAlias)
+                Line(dst2, lp.p1, lp.p2, white, task.lineWidth, LineTypes.AntiAlias)
             Next
 
+            Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
             labels(2) = CStr(lpList.Count) + " lines were detected."
         End Sub
         Protected Overrides Sub Finalize()

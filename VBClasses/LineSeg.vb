@@ -4,12 +4,11 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public core As New LineSeg_Core
         Public averageAge As Single
+        Public rect As cv.Rect
         Public Sub New()
             desc = "Run LSD (Line Segment Detector) with sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
-
             Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
             lpList = New List(Of lpData)(core.lpList)
@@ -18,7 +17,7 @@ Namespace VBClasses
             lpList = Line_Basics_TA.removeDuplicates(core.lpList)
             averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
 
-            labels(2) = "LSD found " + CStr(lpList.Count) + " lines.  Line age is shown." +
+            labels(2) = "LSD found " + CStr(lpList.Count) + " lines.  Line age is shown for top 10 longest lines." +
                         " Avg age = " + If(lpList.Count > 0, averageAge.ToString(fmt1), "0")
 
             dst3 = task.lines.dst2
@@ -38,13 +37,10 @@ Namespace VBClasses
         Dim lsd As LineSegmentDetector
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Cursor.ai: Use Line Segment Detector (LSD) to find lines in the image."
             lsd = LineSegmentDetector.Create()
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray.Clone
-
             Dim vecMat As New Mat
             lsd.Detect(src, vecMat)
             Dim vecArray() As Vec4f = Nothing
@@ -52,13 +48,24 @@ Namespace VBClasses
             lpList = Line_Core.getRawSortedLines(vecArray)
 
             dst1.SetTo(0)
-            dst3.SetTo(0)
             dst2 = task.color.Clone
+            Dim x = (dst2.Width - src.Width) \ 2
+            Dim y = (dst2.Height - src.Height) \ 2
             For i = 0 To lpList.Count - 1
                 Dim lp = lpList(i)
-                lp.index = i
-                Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth, LineTypes.Link4)
-                Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+
+                lp.p1.X += x
+                lp.p2.X += x
+                lp.ptCenter.X += x
+
+                lp.p1.Y += y
+                lp.p2.Y += y
+                lp.ptCenter.Y += y
+
+                lp.index = (i + 1) Mod 255
+                lpList(i) = lp
+                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.AntiAlias)
+                Line(dst2, lp.p1, lp.p2, white, task.lineWidth, LineTypes.AntiAlias)
             Next
             Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
             labels(2) = CStr(lpList.Count) + " LSD line segments were detected."
