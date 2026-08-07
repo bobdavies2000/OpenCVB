@@ -53,8 +53,8 @@ Module Program
                                 xrClasses.Add(currClassname, currClassname)
 
                                 ' comment both of these lines to remove XR_ algorithms.
-                                displayClasses.Add(currClassname, currClassname)
-                                toggleTotal = True
+                                'displayClasses.Add(currClassname, currClassname)
+                                'toggleTotal = True
                             ElseIf currClassname.StartsWith("XO_") Then
                                 ' skipping it now...
                             Else

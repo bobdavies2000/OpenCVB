@@ -408,7 +408,7 @@ Partial Class OptionsFeatures
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
         Name = "OptionsFeatures"
-        Text = "Important Options for Color, Features, Edges, Lines, and Masks"
+        Text = "Feature Options"
         CType(FrameHistoryCount, ComponentModel.ISupportInitialize).EndInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).EndInit()

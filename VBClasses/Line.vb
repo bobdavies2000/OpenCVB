@@ -2250,156 +2250,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Line_MatchFail2 : Inherits TaskParent
-        Public lpTracked As lpData
-        Public topCorrelation As Single
-        Public botCorrelation As Single
-        Dim vert As New GravityRGB_Vertical
-        Dim matchTop As New Match_Basics
-        Dim matchBot As New Match_Basics
-        Dim templateTop As cv.Rect
-        Dim templateBot As cv.Rect
-        Dim searchTop As cv.Rect
-        Dim searchBot As cv.Rect
-        Dim searchRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Public Sub New()
-            desc = "Cursor.ai: Track the longest GravityRGB_Vertical line with Match_Basics at top/bottom (gridWH*10 templates, half-height search)."
-        End Sub
-        Private Shared Function CenterRect(pt As cv.Point2f, size As Integer) As cv.Rect
-            Dim half = size \ 2
-            Return ValidateRect(New cv.Rect(CInt(Math.Round(pt.X)) - half, CInt(Math.Round(pt.Y)) - half, size, size))
-        End Function
-        Private Shared Function TopBottom(lp As lpData) As (top As cv.Point2f, bot As cv.Point2f)
-            If lp.p1.Y <= lp.p2.Y Then Return (lp.p1, lp.p2)
-            Return (lp.p2, lp.p1)
-        End Function
-        Private Function MatchEndpoint(src As Mat, lastgray As cv.Mat, prevPt As cv.Point2f, seedSize As Integer,
-                                       match As Match_Basics, ByRef correlation As Single,
-                                       ByRef templateRect As cv.Rect) As cv.Point2f
-            templateRect = CenterRect(prevPt, seedSize)
-
-            match.template = lastgray(templateRect).Clone
-            match.Run(src(searchRect))
-            correlation = match.correlation
-            If correlation < task.fCorrThreshold Then Return prevPt
-
-            Dim newRect = New cv.Rect(searchRect.X + match.newRect.X, searchRect.Y + match.newRect.Y,
-                                      match.newRect.Width, match.newRect.Height)
-            Return New cv.Point2f(newRect.X + newRect.Width / 2.0F, newRect.Y + newRect.Height / 2.0F)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
-            Dim seedSize = task.gridWH * 10
-            Dim searchSize = src.Height \ 2
-            Static lastGray As cv.Mat = src.Clone
-
-            vert.Run(src)
-            If vert.lpList.Count = 0 Then
-                labels(2) = "No vertical lines from GravityRGB_Vertical"
-                labels(3) = ""
-                Exit Sub
-            End If
-
-            If task.optionsChanged OrElse task.heartBeatLT Then
-                lpTracked = vert.lpList(0)
-                Dim tb = TopBottom(lpTracked)
-                templateTop = CenterRect(tb.top, seedSize)
-                templateBot = CenterRect(tb.bot, seedSize)
-            Else
-                Dim tb = TopBottom(lpTracked)
-                Dim newTop = MatchEndpoint(src, lastGray, tb.top, seedSize, matchTop, topCorrelation, templateTop)
-                Dim newBot = MatchEndpoint(src, lastGray, tb.bot, seedSize, matchBot, botCorrelation, templateBot)
-
-                If topCorrelation >= task.fCorrThreshold AndAlso botCorrelation >= task.fCorrThreshold Then
-                    Dim age = lpTracked.age + 1
-                    If age >= 1000 Then age = 10
-                    lpTracked = New lpData(newTop, newBot) With {.age = age}
-                End If
-            End If
-
-            lastGray = src.Clone
-
-            dst2 = task.color.Clone
-            dst3 = task.color.Clone
-
-            Dim ends = TopBottom(lpTracked)
-            Rectangle(dst3, searchTop, task.highlight, task.lineWidth)
-            Rectangle(dst3, searchBot, task.highlight, task.lineWidth)
-            Rectangle(dst3, templateTop, white, 1)
-            Rectangle(dst3, templateBot, white, 1)
-            Line(dst3, ends.top, ends.bot, task.highlight, task.lineWidth, task.lineType)
-
-            Line(dst2, ends.top, ends.bot, task.highlight, task.lineWidth + 1, task.lineType)
-            Circle(dst2, ends.top, task.DotSize + 2, white, -1, task.lineType)
-            Circle(dst2, ends.bot, task.DotSize + 2, white, -1, task.lineType)
-
-            labels(2) = "Vertical track age=" + CStr(lpTracked.age) +
-                        "  top corr=" + topCorrelation.ToString(fmt3) +
-                        "  bot corr=" + botCorrelation.ToString(fmt3) +
-                        "  len=" + lpTracked.length.ToString(fmt1)
-            labels(3) = "GravityRGB_Vertical seed; white=templates (gridWH*10), yellow=search (half image height)"
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class Line_FindClosestFail : Inherits TaskParent
-        Public inputLine As lpData
-        Public closestLine As lpData
-        Public closestLine2 As lpData ' second closest line.
-        Public LastList As New List(Of lpData)
-        Public Sub New()
-            labels(3) = "The lines found in the current image - task.lines.dst3"
-            desc = "Find the line closest to the requested line in the task.lines.lastList"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                If task.lines.lpList.Count > 0 Then inputLine = task.lines.lpList(0)
-            End If
-            If inputLine Is Nothing Or LastList.Count = 0 Then Exit Sub
-
-            If standaloneTest() Then
-                CvtColor(task.lines.dst3, dst3, cv.ColorConversionCodes.GRAY2BGR)
-                dst2 = task.color.Clone
-                Line(dst2, inputLine.p1, inputLine.p2, white, task.lineWidth + 1)
-            End If
-
-            Dim candidates As New List(Of lpData)
-            For Each lp In LastList
-                If inputLine.ptCenter.DistanceTo(lp.ptCenter) < lp.length Then
-                    If Math.Abs(lp.angle - inputLine.angle) < AngleThreshold Then candidates.Add(lp)
-                End If
-            Next
-
-            labels(2) = "There were " + CStr(candidates.Count) + " with an angle within 2 degrees of the input line."
-            closestLine = Nothing
-            If candidates.Count = 0 Then Exit Sub ' no candidates for the closest line were found.
-
-            Dim distances As New List(Of Single)
-            For Each lp In candidates
-                Dim distance = inputLine.p1.DistanceTo(lp.p1) + inputLine.p2.DistanceTo(lp.p2)
-                If distance < lp.length Then
-                    distance = inputLine.p1.DistanceTo(lp.p2) + inputLine.p2.DistanceTo(lp.p1)
-                End If
-                distances.Add(distance)
-            Next
-
-            closestLine = candidates(distances.IndexOf(distances.Min))
-            Line(dst3, closestLine.ptE1, closestLine.ptE2, task.highlight, task.lineWidth + 2)
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class Line_FindClosest : Inherits TaskParent
         Public inputLine As lpData
         Public closestLine As lpData
@@ -2610,42 +2460,46 @@ Namespace VBClasses
         Public lp As lpData
         Dim matchP1 As New Match_Basics
         Dim matchP2 As New Match_Basics
+        Dim lowCorrelation As Boolean
         Public Sub New()
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+            desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
-            If task.lines.lpList.Count = 0 Then Exit Sub
+            If task.lines.lpList.Count = 0 Then
+                SetTrueText("No lines found in task.lines.lpList", 3)
+                Exit Sub
+            End If
 
             dst2 = task.color.Clone
 
             If lp IsNot Nothing AndAlso lp.length < dst2.Height / 5 Then lp = Nothing
-            If task.heartBeat Or lp Is Nothing Then
-                lp = task.lines.lpList(0)
-                Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-                Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-                Dim r1 = task.gridNabeRects(index1)
-                Dim r2 = task.gridNabeRects(index2)
-                Dim offset1 = New cv.Point(lp.p1.X - (r1.X + r1.Width \ 2), lp.p1.Y - (r1.Y + r1.Height \ 2))
-                Dim offset2 = New cv.Point(lp.p2.X - (r2.X + r2.Width \ 2), lp.p2.Y - (r2.Y + r2.Height \ 2))
-                r1.X += offset1.X
-                r1.Y += offset1.Y
-                r2.X += offset2.X
-                r2.Y += offset2.Y
+            If task.heartBeat Or lp Is Nothing Or lowCorrelation Then
+                lowCorrelation = False
+                If standalone Then lp = task.lines.lpList(0)
+                Dim sideSize = task.grid.nabeRectSide
+                Dim r1 = New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize)
+                Dim r2 = New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize)
                 matchP1.template = src(r1)
                 matchP2.template = src(r2)
             Else
                 matchP1.Run(src)
-                Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-                SetTrueText(matchP1.correlation.ToString(fmt3), lp.p1)
+                SetTrueText(matchP1.correlation.ToString(fmt3), matchP1.newRect.BottomRight)
 
                 matchP2.Run(src)
-                Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-                SetTrueText(matchP2.correlation.ToString(fmt3), lp.p2)
+                SetTrueText(matchP2.correlation.ToString(fmt3), matchP2.newRect.BottomRight)
 
-                If Math.Abs(lp.p1.X - lp.p2.X) > 50 Then Dim k = 0
-                lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+                lowCorrelation = matchP1.correlation < 0.98 Or matchP2.correlation < 0.98
+                If lowCorrelation = False Then
+                    Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+                    Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+                    lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+                    labels(2) = "Correlation P1/P2 templates = " + matchP1.correlation.ToString("0.000") + "/" +
+                                                                   matchP2.correlation.ToString("0.000")
+                Else
+                    labels(2) = "Low correlation.  Selecting line again..."
+                End If
             End If
 
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)

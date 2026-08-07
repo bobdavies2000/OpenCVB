@@ -2,6 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Threading
 Namespace VBClasses
     Public Class Grid_Basics_TA : Inherits TaskParent
+        Public nabeRectSide As Integer
         Public Sub New()
             task.gridMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
             task.gridNabeMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
@@ -14,6 +15,7 @@ Namespace VBClasses
             End If
 
             If task.optionsChanged Then
+                nabeRectSide = task.gridWH * 3
                 Dim bricksPerCol As Integer, bricksPerRow As Integer
                 task.gridNabeRects.Clear()
                 task.gridNabes.Clear()
@@ -88,24 +90,22 @@ Namespace VBClasses
                         yList.Add(rect.BottomRight.Y)
                     Next
                     Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
-                    If r.Width < task.gridWH * 3 Then
-                        If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.gridWH * 3
-                        r.Width = task.gridWH * 3
+                    If r.Width < nabeRectSide Then
+                        If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - nabeRectSide
+                        r.Width = nabeRectSide
                     End If
-                    If r.Height < task.gridWH * 3 Then
-                        If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.gridWH * 3
-                        r.Height = task.gridWH * 3
+                    If r.Height < nabeRectSide Then
+                        If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - nabeRectSide
+                        r.Height = nabeRectSide
                     End If
-                    If r.Width <> task.gridWH * 3 Then r.Width = task.gridWH * 3
-                    If r.Height <> task.gridWH * 3 Then r.Height = task.gridWH * 3
+                    If r.Width <> nabeRectSide Then r.Width = nabeRectSide
+                    If r.Height <> nabeRectSide Then r.Height = nabeRectSide
                     task.gridNabeMap(task.gridRects(nabeList(0))).SetTo(task.gridNabeRects.Count)
                     task.gridNabeRects.Add(r)
                 Next
 
-                task.gridWH = task.gridWH
                 task.bricksPerCol = bricksPerCol
                 task.bricksPerRow = bricksPerRow
-                task.gridWH = task.gridRects(0).Width
             End If
             If standaloneTest() Then
                 dst2 = New Mat(dst2.Size(), MatType.CV_8U)

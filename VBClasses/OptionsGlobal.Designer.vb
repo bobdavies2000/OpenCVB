@@ -367,7 +367,7 @@ Partial Class OptionsGlobal
         gravityPointCloud.Location = New Point(15, 190)
         gravityPointCloud.Margin = New Padding(3, 4, 3, 4)
         gravityPointCloud.Name = "gravityPointCloud"
-        gravityPointCloud.Size = New Size(408, 34)
+        gravityPointCloud.Size = New Size(406, 34)
         gravityPointCloud.TabIndex = 8
         gravityPointCloud.Text = "Apply gravity transform to Point cloud"
         gravityPointCloud.UseVisualStyleBackColor = True
@@ -551,7 +551,7 @@ Partial Class OptionsGlobal
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(3, 4, 3, 4)
         Name = "OptionsGlobal"
-        Text = "OptionsGlobal"
+        Text = "Global Options"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
         CType(PaintFreqSlider, ComponentModel.ISupportInitialize).EndInit()
