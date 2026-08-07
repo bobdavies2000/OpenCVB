@@ -11,6 +11,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
+            If core.lpList.Count = 0 Then Exit Sub
             lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 

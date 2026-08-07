@@ -54,7 +54,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
-            Dim rect As New cv.Rect(task.gridWH * 2, task.gridWH * 2, dst2.Width - task.gridWH * 4, dst2.Height - task.gridWH * 4)
+            Dim rect As New cv.Rect(task.gridWH * 5, task.gridWH * 5, dst2.Width - task.gridWH * 10, dst2.Height - task.gridWH * 10)
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
                 basicsFLD.Run(src(rect))
@@ -2503,66 +2503,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Match : Inherits TaskParent
-        Dim vert As New GravityRGB_Vertical
-        Dim matchP1 As New Match_Basics
-        Dim matchP2 As New Match_Basics
-        Dim lpTracked As lpData
-        Dim lpFind As New Line_FindClosest
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            vert.Run(src)
-            dst2 = task.color.Clone
-            If vert.lpList.Count = 0 Then
-                labels(2) = "No vertical lines from GravityRGB_Vertical"
-                labels(3) = ""
-                Exit Sub
-            End If
-
-            If task.heartBeat Or lpTracked Is Nothing Then
-                lpTracked = vert.lpList(0)
-                Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X) ' trying to stay away from the image edge.
-                Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X) ' trying to stay away from the image edge. 
-                Dim r1 = task.gridNabeRects(index1)
-                Dim r2 = task.gridNabeRects(index2)
-                matchP1.template = src(r1)
-                matchP2.template = src(r2)
-            End If
-
-            lpFind.inputLine = lpTracked
-            lpFind.Run(task.gray)
-
-            If lpFind.closestLine Is Nothing Then
-                matchP1.Run(src)
-                Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-                matchP1.template = src(matchP1.newRect)
-                If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
-                SetTrueText(matchP1.correlation.ToString(fmt3))
-
-                matchP2.Run(src)
-                Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-                matchP2.template = src(matchP2.newRect)
-                If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
-                SetTrueText(matchP2.correlation.ToString(fmt3))
-
-                Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
-                Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
-            Else
-                Dim lp = lpFind.closestLine
-                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.AntiAlias)
-            End If
-            lpFind.lastList = task.lines.lpList
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Line_MatchEdge : Inherits TaskParent
         Dim vert As New GravityRGB_Vertical
@@ -2603,6 +2543,112 @@ Namespace VBClasses
             Rectangle(dst1, r2, white, task.lineWidth)
             Circle(dst1, lpTracked.p1, task.DotSize, white, -1)
             Circle(dst1, lpTracked.p2, task.DotSize, white, -1)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_MatchTest : Inherits TaskParent
+        Dim vert As New GravityRGB_Vertical
+        Dim matchP1 As New Match_Basics
+        Dim matchP2 As New Match_Basics
+        Dim lpTracked As lpData
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            vert.Run(src)
+            dst2 = task.color.Clone
+            If vert.lpList.Count = 0 Then
+                labels(2) = "No vertical lines from GravityRGB_Vertical"
+                labels(3) = ""
+                Exit Sub
+            End If
+
+            If lpTracked IsNot Nothing AndAlso lpTracked.length < dst2.Height / 5 Then lpTracked = Nothing
+            If task.heartBeat Or lpTracked Is Nothing Then
+                lpTracked = vert.lpList(0)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
+                Dim r1 = task.gridNabeRects(index1)
+                Dim r2 = task.gridNabeRects(index2)
+                Dim offset1 = New cv.Point(lpTracked.p1.X - (r1.X + r1.Width \ 2), lpTracked.p1.Y - (r1.Y + r1.Height \ 2))
+                Dim offset2 = New cv.Point(lpTracked.p2.X - (r2.X + r2.Width \ 2), lpTracked.p2.Y - (r2.Y + r2.Height \ 2))
+                r1.X += offset1.X
+                r1.Y += offset1.Y
+                r2.X += offset2.X
+                r2.Y += offset2.Y
+                matchP1.template = src(r1)
+                matchP2.template = src(r2)
+            Else
+                matchP1.Run(src)
+                Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+                If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
+                SetTrueText(matchP1.correlation.ToString(fmt3), lpTracked.p1)
+
+                matchP2.Run(src)
+                Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+                If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
+                SetTrueText(matchP2.correlation.ToString(fmt3), lpTracked.p2)
+                lpTracked = New lpData(matchP1.newCenter, matchP2.newCenter)
+            End If
+
+            Line(dst2, lpTracked.p1, lpTracked.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Match : Inherits TaskParent
+        Public lp As lpData
+        Dim matchP1 As New Match_Basics
+        Dim matchP2 As New Match_Basics
+        Public Sub New()
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            dst2 = task.color.Clone
+
+            If lp IsNot Nothing AndAlso lp.length < dst2.Height / 5 Then lp = Nothing
+            If task.heartBeat Or lp Is Nothing Then
+                lp = task.lines.lpList(0)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+                Dim r1 = task.gridNabeRects(index1)
+                Dim r2 = task.gridNabeRects(index2)
+                Dim offset1 = New cv.Point(lp.p1.X - (r1.X + r1.Width \ 2), lp.p1.Y - (r1.Y + r1.Height \ 2))
+                Dim offset2 = New cv.Point(lp.p2.X - (r2.X + r2.Width \ 2), lp.p2.Y - (r2.Y + r2.Height \ 2))
+                r1.X += offset1.X
+                r1.Y += offset1.Y
+                r2.X += offset2.X
+                r2.Y += offset2.Y
+                matchP1.template = src(r1)
+                matchP2.template = src(r2)
+            Else
+                matchP1.Run(src)
+                Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+                SetTrueText(matchP1.correlation.ToString(fmt3), lp.p1)
+
+                matchP2.Run(src)
+                Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+                SetTrueText(matchP2.correlation.ToString(fmt3), lp.p2)
+
+                If Math.Abs(lp.p1.X - lp.p2.X) > 50 Then Dim k = 0
+                lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+            End If
+
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
         End Sub
     End Class
 End Namespace
