@@ -409,24 +409,8 @@ Namespace VBClasses
                 Return
             End If
 
-            Dim tmpList As New List(Of lpData)
-            Dim lpNext = task.lines.lpList(0)
-            For i = 1 To task.lines.lpList.Count - 1
-                Dim lp = task.lines.lpList(i - 1)
-                Dim skipit = False
-                For j = i To task.lines.lpList.Count - 1
-                    lpNext = task.lines.lpList(j)
-                    If (lp.ptE1.DistanceTo(lpNext.ptE1) < task.gridWH And lp.ptE2.DistanceTo(lpNext.ptE2) < task.gridWH) Or
-                       (lp.ptE2.DistanceTo(lpNext.ptE1) < task.gridWH And lp.ptE1.DistanceTo(lpNext.ptE2) < task.gridWH) Then
-                        skipit = True
-                        Exit For
-                    End If
-                Next
-                If skipit = False Then tmpList.Add(If(lp.age > lpNext.age, lp, lpNext))
-            Next
-
             Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-            For Each lp In tmpList
+            For Each lp In task.lines.lpList
                 If Math.Abs(task.lpGravity.angle - lp.angle) < AngleThreshold Then
                     Line(dst2, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
                     lpSorted.Add(lp.length, lp)

@@ -2,7 +2,6 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Impor
 Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public lastList As New List(Of lpData)
         Public averageAge As Single
         Public Sub New()
             labels(3) = "Age is shown for the top 10 longest lines."
@@ -84,7 +83,23 @@ Namespace VBClasses
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
-            lastList = New List(Of lpData)(lpList)
+
+            If standalone Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                If task.lines.lpList.Count > index Then
+                    Dim lp = task.lines.lpList(index)
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth + 1)
+                    Rectangle(dst3, lp.rect, white, task.lineWidth)
+                    Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                    Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+                    Dim r1 = task.gridNabeRects(index1)
+                    Dim r2 = task.gridNabeRects(index2)
+                    Rectangle(dst3, r1, white, task.lineWidth)
+                    Rectangle(dst3, r2, white, task.lineWidth)
+
+                    Dim testlp = New lpData(lp.p1, lp.p2)
+                End If
+            End If
         End Sub
     End Class
 
@@ -156,6 +171,15 @@ Namespace VBClasses
             Dim lpList As New List(Of lpData)(lpSorted.Values)
             Return lpList
         End Function
+        Public Shared Function lpFixup(lp As lpData, x As Integer, y As Integer) As lpData
+            lp.p1.X += x
+            lp.p2.X += x
+
+            lp.p1.Y += y
+            lp.p2.Y += y
+
+            Return New lpData(lp.p1, lp.p2)
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> MatType.CV_8U Then src.ConvertTo(src, MatType.CV_8U)
 
@@ -166,20 +190,11 @@ Namespace VBClasses
             Dim x = (dst2.Width - src.Width) \ 2
             Dim y = (dst2.Height - src.Height) \ 2
             For i = 0 To lpList.Count - 1
-                Dim lp = lpList(i)
-                lp.p1.X += x
-                lp.p2.X += x
-                lp.ptCenter.X += x
+                lpList(i).index = (i + 1) Mod 255
+                lpList(i) = lpFixup(lpList(i), x, y)
 
-                lp.p1.Y += y
-                lp.p2.Y += y
-                lp.ptCenter.Y += y
-
-                lp.index = (i + 1) Mod 255
-                lpList(i) = lp
-
-                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.AntiAlias)
-                Line(dst2, lp.p1, lp.p2, white, task.lineWidth, LineTypes.AntiAlias)
+                Line(dst1, lpList(i).p1, lpList(i).p2, lpList(i).index, task.lineWidth, LineTypes.AntiAlias)
+                Line(dst2, lpList(i).p1, lpList(i).p2, white, task.lineWidth, LineTypes.AntiAlias)
             Next
 
             Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
@@ -2413,9 +2428,9 @@ Namespace VBClasses
 
             If standalone Then
                 lastList.Clear()
-                If task.lines.lpList.Count > 0 And task.lines.lastList.Count > 0 Then
+                If task.lines.lpList.Count > 0 Then
                     inputLine = task.lines.lpList(0)
-                    lastList = New List(Of lpData)(task.lines.lastList)
+                    lastList = New List(Of lpData)(task.lines.lpList)
                 End If
             End If
 
@@ -2425,7 +2440,7 @@ Namespace VBClasses
             End If
 
             Dim sorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingle)
-            For Each lp In task.lines.lastList
+            For Each lp In lastList
                 If inputLine.ptCenter.DistanceTo(lp.ptCenter) >= lp.length Then Continue For
                 If Math.Abs(lp.angle - inputLine.angle) >= AngleThreshold Then Continue For
                 sorted.Add(EndpointDistance(inputLine, lp), lp)
@@ -2459,10 +2474,106 @@ Namespace VBClasses
 
 
 
+
+    Public Class Line_FindVertical : Inherits TaskParent
+        Dim vert As New GravityRGB_Vertical
+        Dim lpTracked As lpData
+        Dim lpFind As New Line_FindClosest
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            vert.Run(src)
+            dst2 = task.color.Clone
+            If vert.lpList.Count = 0 Then
+                labels(2) = "No vertical lines from GravityRGB_Vertical"
+                labels(3) = ""
+                Exit Sub
+            End If
+
+            If task.heartBeat Or lpTracked Is Nothing Then lpTracked = vert.lpList(0)
+
+            lpFind.inputLine = lpTracked
+            lpFind.Run(task.gray)
+
+            If lpFind.closestLine IsNot Nothing Then
+                Line(dst2, lpFind.closestLine.p1, lpFind.closestLine.p2, task.highlight, task.lineWidth, LineTypes.AntiAlias)
+            End If
+            lpFind.lastList = task.lines.lpList
+            lpTracked = lpFind.closestLine
+        End Sub
+    End Class
+
+
+
+
+
     Public Class Line_Match : Inherits TaskParent
         Dim vert As New GravityRGB_Vertical
         Dim matchP1 As New Match_Basics
         Dim matchP2 As New Match_Basics
+        Dim lpTracked As lpData
+        Dim lpFind As New Line_FindClosest
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the longest vertical line on the heartbeat and track it using correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            vert.Run(src)
+            dst2 = task.color.Clone
+            If vert.lpList.Count = 0 Then
+                labels(2) = "No vertical lines from GravityRGB_Vertical"
+                labels(3) = ""
+                Exit Sub
+            End If
+
+            If task.heartBeat Or lpTracked Is Nothing Then
+                lpTracked = vert.lpList(0)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X) ' trying to stay away from the image edge.
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X) ' trying to stay away from the image edge. 
+                Dim r1 = task.gridNabeRects(index1)
+                Dim r2 = task.gridNabeRects(index2)
+                matchP1.template = src(r1)
+                matchP2.template = src(r2)
+            End If
+
+            lpFind.inputLine = lpTracked
+            lpFind.Run(task.gray)
+
+            If lpFind.closestLine Is Nothing Then
+                matchP1.Run(src)
+                Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+                matchP1.template = src(matchP1.newRect)
+                If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
+                SetTrueText(matchP1.correlation.ToString(fmt3))
+
+                matchP2.Run(src)
+                Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+                matchP2.template = src(matchP2.newRect)
+                If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
+                SetTrueText(matchP2.correlation.ToString(fmt3))
+
+                Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+                Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
+            Else
+                Dim lp = lpFind.closestLine
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, LineTypes.AntiAlias)
+            End If
+            lpFind.lastList = task.lines.lpList
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_MatchEdge : Inherits TaskParent
+        Dim vert As New GravityRGB_Vertical
         Dim lpTracked As lpData
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -2472,39 +2583,34 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
             vert.Run(src)
-            dst2 = src.Clone
+            dst2 = task.edges.dst2
             If vert.lpList.Count = 0 Then
                 labels(2) = "No vertical lines from GravityRGB_Vertical"
                 labels(3) = ""
                 Exit Sub
             End If
 
+            Static r1 As cv.Rect, r2 As cv.Rect
             If task.heartBeat Or lpTracked Is Nothing Then
                 lpTracked = vert.lpList(0)
-                Dim index1 = task.gridMap.Get(Of Integer)(lpTracked.p1.Y + 2 * task.gridWH, lpTracked.p1.X) ' trying to stay away from the image edge.
-                Dim index2 = task.gridMap.Get(Of Integer)(lpTracked.p2.Y - 2 * task.gridWH, lpTracked.p2.X) ' trying to stay away from the image edge. 
-                Dim r1 = task.gridNabeRects(index1)
-                Dim r2 = task.gridNabeRects(index2)
-                matchP1.template = src(r1)
-                matchP2.template = src(r2)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
+                r1 = task.gridNabeRects(index1)
+                r2 = task.gridNabeRects(index2)
             End If
 
-            matchP1.Run(src)
-            Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-            'matchP1.template = src(matchP1.newRect)
-            If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
-            SetTrueText(matchP1.correlation.ToString(fmt3))
+            dst3.SetTo(0)
+            Line(dst3, lpTracked.p1, lpTracked.p2, 255, task.lineWidth + 5)
+            Dim rect = r1.Union(r2)
+            Rectangle(dst3, rect, white, task.lineWidth)
+            Rectangle(dst3, r1, white, task.lineWidth)
+            Rectangle(dst3, r2, white, task.lineWidth)
 
-            matchP2.Run(src)
-            Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-            'matchP2.template = src(matchP2.newRect)
-            If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
-            SetTrueText(matchP2.correlation.ToString(fmt3))
-
-            Dim lp = New lpData(matchP1.newCenter, matchP2.newCenter)
-            Line(dst2, lp.p1, lp.p2, white, task.lineWidth)
-
-            ' Line(task.color, vert.lpList(0).p1, vert.lpList(0).p2, task.highlight, task.lineWidth)
+            dst1.SetTo(0)
+            Rectangle(dst1, r1, white, task.lineWidth)
+            Rectangle(dst1, r2, white, task.lineWidth)
+            Circle(dst1, lpTracked.p1, task.DotSize, white, -1)
+            Circle(dst1, lpTracked.p2, task.DotSize, white, -1)
         End Sub
     End Class
 End Namespace

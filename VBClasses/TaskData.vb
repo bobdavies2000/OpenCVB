@@ -116,6 +116,7 @@ Namespace VBClasses
 
         Public gridRects As List(Of cv.Rect)
         Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
+        Public gridNabeMap As New cv.Mat ' map of nabe rects
         Public gridNabes As New List(Of List(Of Integer))
         Public gridMap As New Mat
         Public gridMask As New Mat

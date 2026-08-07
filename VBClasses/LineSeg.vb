@@ -52,20 +52,9 @@ Namespace VBClasses
             Dim x = (dst2.Width - src.Width) \ 2
             Dim y = (dst2.Height - src.Height) \ 2
             For i = 0 To lpList.Count - 1
-                Dim lp = lpList(i)
-
-                lp.p1.X += x
-                lp.p2.X += x
-                lp.ptCenter.X += x
-
-                lp.p1.Y += y
-                lp.p2.Y += y
-                lp.ptCenter.Y += y
-
-                lp.index = (i + 1) Mod 255
-                lpList(i) = lp
-                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth, LineTypes.AntiAlias)
-                Line(dst2, lp.p1, lp.p2, white, task.lineWidth, LineTypes.AntiAlias)
+                lpList(i) = Line_Core.lpFixup(lpList(i), x, y)
+                Line(dst1, lpList(i).p1, lpList(i).p2, lpList(i).index, task.lineWidth, LineTypes.AntiAlias)
+                Line(dst2, lpList(i).p1, lpList(i).p2, white, task.lineWidth, LineTypes.AntiAlias)
             Next
             Threshold(dst1, dst3, 0, 255, ThresholdTypes.Binary)
             labels(2) = CStr(lpList.Count) + " LSD line segments were detected."

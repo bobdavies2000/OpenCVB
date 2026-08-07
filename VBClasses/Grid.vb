@@ -3,7 +3,8 @@ Imports System.Threading
 Namespace VBClasses
     Public Class Grid_Basics_TA : Inherits TaskParent
         Public Sub New()
-            task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
+            task.gridMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
+            task.gridNabeMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
             task.gridMask = New Mat(dst2.Size(), MatType.CV_8U)
             desc = "Create a grid of squares covering the entire image."
         End Sub
@@ -97,6 +98,7 @@ Namespace VBClasses
                     End If
                     If r.Width <> task.gridWH * 3 Then r.Width = task.gridWH * 3
                     If r.Height <> task.gridWH * 3 Then r.Height = task.gridWH * 3
+                    task.gridNabeMap(task.gridRects(nabeList(0))).SetTo(task.gridNabeRects.Count)
                     task.gridNabeRects.Add(r)
                 Next
 
@@ -218,31 +220,25 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Grid_ValidateLocation : Inherits TaskParent
+    Public Class Grid_ValidateNabeMap : Inherits TaskParent
         Public Sub New()
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
             desc = "Click any grid element to see its neighbors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            labels(2) = "Clickpoint is at (X, Y): " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y)
-
-            SetTrueText("Click any grid entry to see its neighbors", 3)
+            labels(2) = "Clickpoint is at (X, Y): " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + "  Click any grid entry to see its neighbors"
             dst2.SetTo(white, task.gridMask)
 
-            Dim grIndex As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim grIndex As Integer = task.gridNabeMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             If task.gridRects(grIndex).Contains(task.clickPoint) Then
                 labels(3) = "Grid index = " + CStr(grIndex) + " contains the mouse clickpoint" + vbCrLf
             Else
                 labels(3) = "Grid index = " + CStr(grIndex) + " does NOT match the grid location." + vbCrLf
             End If
             dst3.SetTo(0)
-            For Each index In task.gridNabes(grIndex)
-                Dim r = task.gridRects(index)
-                Rectangle(dst2, r, white, task.lineWidth)
-                Rectangle(dst3, r, Scalar.All(index), task.lineWidth)
-            Next
+            Rectangle(dst2, task.gridNabeRects(grIndex), task.highlight, task.lineWidth + 1)
+            Rectangle(dst3, task.gridNabeRects(grIndex), task.highlight, task.lineWidth)
         End Sub
     End Class
 

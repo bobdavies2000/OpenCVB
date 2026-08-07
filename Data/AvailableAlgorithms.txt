@@ -275,6 +275,7 @@ Grid_Basics_TA
 Grid_FPS
 Grid_Rectangles
 Grid_SquaresOnly
+Grid_ValidateNabeMap
 GridRect_Basics
 GridRect_Canny
 GridRect_LowStdev
@@ -416,10 +417,12 @@ Line_DepthUpdate
 Line_FindClosest
 Line_FindClosestFail
 Line_Finder
+Line_FindVertical
 Line_Intersection
 Line_LeftRight
 Line_LeftRightx
 Line_Match
+Line_MatchEdge
 Line_MatchFail2
 Line_Parallel
 Line_ParallelLR
@@ -1232,7 +1235,6 @@ XR_Grid_Basics_TATest
 XR_Grid_List
 XR_Grid_MinMaxDepth
 XR_Grid_TrackCenter
-XR_Grid_ValidateLocation
 XR_GridRect_Color
 XR_GridRect_ColorSplit
 XR_GridRect_CorrelationMotion

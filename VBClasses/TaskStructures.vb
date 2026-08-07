@@ -522,17 +522,11 @@ Namespace VBClasses
 
                 angle = computeAngle(p1, p2)
 
-                Dim pad As Integer = 5
-                Dim w = Math.Abs(p1.X - p2.X) + pad * 2
-                Dim h = Math.Abs(p1.Y - p2.Y) + pad
-                ' p1 is always leftmost cv.Point.
-                If Math.Abs(angle) > 45 Then
-                    rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y), Math.Max(pad * 2, w), Math.Max(pad * 2, h))
-                Else
-                    rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad, Math.Max(pad * 2, w), Math.Max(pad * 2, h))
-                End If
-
-                rect = ValidateRect(rect)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(p1.Y, p1.X)
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(p2.Y, p2.X)
+                Dim r1 = task.gridNabeRects(index1)
+                Dim r2 = task.gridNabeRects(index2)
+                rect = r1.Union(r2)
             End Sub
             Sub New()
                 p1 = New cv.Point2f()
