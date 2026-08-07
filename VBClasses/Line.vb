@@ -49,13 +49,6 @@ Namespace VBClasses
                 lpAges.Add(lp.age)
             Next
 
-            Static gravity = task.lpGravity
-            If inputList.Count = 0 Then
-                gravity = task.lpGravity
-                task.longestLine = task.lpGravity
-                inputList.Add(task.longestLine) ' need to always have something in lplist...
-            End If
-
             Return lpAges.Average
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2331,7 +2324,6 @@ Namespace VBClasses
             dst2 = task.color.Clone
             dst3 = task.color.Clone
 
-            task.longestLine = lpTracked
             Dim ends = TopBottom(lpTracked)
             Rectangle(dst3, searchTop, task.highlight, task.lineWidth)
             Rectangle(dst3, searchBot, task.highlight, task.lineWidth)

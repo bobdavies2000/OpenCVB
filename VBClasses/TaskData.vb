@@ -164,7 +164,6 @@ Namespace VBClasses
 
         Public lpGravity As lpData
         Public lpHorizon As lpData
-        Public longestLine As lpData
 
         Public IMU_Acceleration As Point3f
         Public IMU_AverageAcceleration As Point3f

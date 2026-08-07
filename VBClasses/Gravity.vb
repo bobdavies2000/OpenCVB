@@ -239,7 +239,7 @@ Namespace VBClasses
             If graySrc.Empty Then Exit Sub
             If task.optionsChanged Or task.firstPass Then ResetState()
 
-            Dim lpCurr = task.longestLine
+            Dim lpCurr = task.lines.lpList(0)
             Dim lpGravity = task.lpGravity
 
             If Not refReady Then

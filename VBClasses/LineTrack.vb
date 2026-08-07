@@ -1,36 +1,5 @@
 ﻿Imports System.Runtime.InteropServices : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class LineTrack_Basics : Inherits TaskParent
-        Public lpCurr As New lpData
-        Public lpInput As New lpData
-        Dim lpFind As New Line_FindClosest
-        Public Sub New()
-            desc = "Track the longest line even if it is no longer the longest and flag when it is lost."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            lpFind.inputLine = task.longestLine
-            lpFind.Run(emptyMat)
-            Dim lpTmp = lpFind.closestLine
-
-            If lpTmp IsNot Nothing Then
-                task.longestLine = New lpData(lpTmp.ptE1, lpTmp.ptE2) With {.age = lpTmp.age}
-                dst2 = task.color.Clone
-                With task.longestLine
-                    Line(dst2, .p1, .p2, task.highlight, task.lineWidth + 1)
-                    SetTrueText(CStr(.age), New Point2f(.ptCenter.X + 2, .ptCenter.Y + 2), 2)
-                End With
-            End If
-            labels(2) = "The longest line has been present for " + CStr(task.longestLine.age) + " frames."
-
-            SetTrueText("The longest line is the default line.  It has been present for " + CStr(task.longestLine.age) + " frames.", 3)
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class XR_LineTrack_Basics : Inherits TaskParent
         Public lp As lpData
         Public lpNew As lpData
@@ -833,7 +802,7 @@ Namespace VBClasses
     '        lineTrack.Run(emptyMat)
     '        labels(2) = lineTrack.labels(2)
 
-    '        lpCurr = task.longestLine
+    '        lpCurr = task.lines.lplist(0)
 
     '        If standaloneTest() Then
     '            dst2 = lineTrack.dst2.Clone
@@ -860,7 +829,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            Dim lp = task.longestLine
+            Dim lp = task.lines.lpList(0)
             Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
 
             Dim lpPerp = Line_Perpendicular.computePerp(lp)

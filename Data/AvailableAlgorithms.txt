@@ -444,7 +444,6 @@ LineSeg_FLD
 LineSeg_LBD
 LineSeg_Match
 LineSeg_Top3
-LineTrack_Basics
 LineTrack_Match
 LineTrack_MatchLines
 LineTrack_PitchRoll

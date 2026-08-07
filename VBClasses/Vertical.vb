@@ -8,7 +8,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sortScores As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            Dim lpLong = task.longestLine
+            Dim lpLong = task.lines.lpList(0)
             For i = -5 To 5
                 Dim angle = task.verticalizeAngle + 0.02 * i
                 dst3 = GravityRGB_Basics.rotateRGB(task.gray(lpLong.rect), angle)
@@ -83,7 +83,7 @@ Namespace VBClasses
             desc = "Rotate the longest line's lp.rect to gravity with verticalizeAngle and run Line_Basics_TA on it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If longestLine Is Nothing Then longestLine = task.longestLine
+            If longestLine Is Nothing Then longestLine = task.lines.lpList(0)
             Dim lp As lpData = longestLine
             dst2.SetTo(0)
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)

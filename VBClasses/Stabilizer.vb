@@ -9,12 +9,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.grayOriginal
 
-            If task.longestLine.age <= 1 Then
+            If task.lines.lpList(0).age <= 1 Then
                 dst2 = src.Clone
                 Exit Sub
             End If
 
-            Dim lpCurr = task.longestLine
+            Dim lpCurr = task.lines.lpList(0)
             If task.heartBeatLT Or task.optionsChanged Or refLine Is Nothing Then
                 refLine = New lpData(lpCurr.p1, lpCurr.p2)
             End If
@@ -120,7 +120,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.color.Clone
 
-            Dim lpCurr = task.longestLine
+            Dim lpCurr = task.lines.lpList(0)
             If lpCurr.length <= 0 Then
                 labels(2) = "Longest line not ready (lpCurr invalid)."
                 labels(3) = ""
@@ -155,7 +155,7 @@ Namespace VBClasses
             labels(2) = "Pitch=" + pitchDeg.ToString(fmt2) + " deg  Roll(IMU Z)=" + rollDeg.ToString(fmt2) +
                     " deg  Yaw(gyro int)=" + yawDeg.ToString(fmt2) + " deg"
             labels(3) = "lpCurr angle=" + lpCurr.angle.ToString(fmt2) + " deg, roll(image lpGravity)=" + rollImageDeg.ToString(fmt2) +
-                    " deg, line present " + CStr(task.longestLine.age) + " frames"
+                    " deg, line present " + CStr(task.lines.lpList(0).age) + " frames"
 
             strOut = "Pitch/roll use task.accRadians (X,Z) from gravity/IMU pipeline (radians converted to degrees)." + vbCrLf +
                  "Yaw uses integrated IMU_AngularVelocity.Y (rad/s); reset on options change — it drifts without magnetometer." + vbCrLf +
@@ -169,16 +169,16 @@ Namespace VBClasses
 
 
     ''' <summary>
-    ''' Estimate pitch, roll, and yaw from task.longestLine and task.lpGravity in the image plane.
+    ''' Estimate pitch, roll, and yaw from task.lines.lplist(0) and task.lpGravity in the image plane.
     ''' Roll: tilt of projected gravity vs image-down (atan2 of gravity unit vector).
     ''' Pitch: acute angle (deg) between the longest line and the gravity line in the image (0 when parallel in the plane).
     ''' Yaw: signed angle of the longest line vs in-image "horizontal" (perpendicular to projected gravity); useful when the tracked line is horizontal in the world.
     ''' </summary>
     Public Class Stabilizer_PRY : Inherits TaskParent
         Public Sub New()
-            desc = "Cursor.ai: Pitch, roll, yaw from task.longestLine and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
+            desc = "Cursor.ai: Pitch, roll, yaw from task.lines.lplist(0) and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
             labels(2) = "PRY (deg) from longest line + gravity"
-            labels(3) = "red = longestLine, yellow = lpGravity"
+            labels(3) = "red = lines.lplist(0), yellow = lpGravity"
         End Sub
         Private Shared Function Unit2D(p1 As Point2f, p2 As Point2f) As Point2f
             Dim dx = p2.X - p1.X
@@ -200,7 +200,7 @@ Namespace VBClasses
             dst2 = src.Clone
 
             Dim g = Unit2D(task.lpGravity.ptE1, task.lpGravity.ptE2)
-            Dim l = Unit2D(task.longestLine.ptE1, task.longestLine.ptE2)
+            Dim l = Unit2D(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)
 
             Dim rollDeg = WrapDeg(Math.Atan2(g.X, g.Y) * RadToDeg)
 
@@ -221,15 +221,15 @@ Namespace VBClasses
             End If
             Dim yawDeg = WrapDeg(Math.Atan2(l.X * hy - l.Y * hx, l.X * hx + l.Y * hy) * RadToDeg)
 
-            Line(dst2, task.longestLine.ptE1, task.longestLine.ptE2, Scalar.red, task.lineWidth + 1, task.lineType)
+            Line(dst2, task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2, Scalar.Red, task.lineWidth + 1, task.lineType)
             Line(dst2, task.lpGravity.ptE1, task.lpGravity.ptE2, Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
             labels(2) = "Pitch=" + task.pitchDeg.ToString(fmt2) + "  Roll=" + rollDeg.ToString(fmt2) + "  Yaw=" + yawDeg.ToString(fmt2)
-            labels(3) = "longestLine angle=" + task.longestLine.angle.ToString(fmt2) + " deg, lpGravity angle=" + task.lpGravity.angle.ToString(fmt2) + " deg"
+            labels(3) = "lines.lplist(0) angle=" + task.lines.lpList(0).angle.ToString(fmt2) + " deg, lpGravity angle=" + task.lpGravity.angle.ToString(fmt2) + " deg"
 
             strOut = "Roll: atan2(gx, gy) for unit gravity direction in the image (0 when gravity aligns with image +Y / down)." + vbCrLf +
-                 "Pitch: acute angle between longestLine and lpGravity in the image (both edge directions)." + vbCrLf +
-                 "Yaw: signed angle of longestLine vs horizontal perpendicular to gravity (best when the scene line is horizontal in world coordinates)."
+                 "Pitch: acute angle between lines.lplist(0) and lpGravity in the image (both edge directions)." + vbCrLf +
+                 "Yaw: signed angle of lines.lplist(0) vs horizontal perpendicular to gravity (best when the scene line is horizontal in world coordinates)."
             SetTrueText(strOut, 3)
         End Sub
     End Class
