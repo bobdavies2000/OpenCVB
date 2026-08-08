@@ -427,4 +427,37 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class WarpAffine_Line : Inherits TaskParent
+        Dim matcher As New Line_Match
+        Public Sub New()
+            desc = "Use the Line_Match to identify the warpAffine parameters and apply affine transformation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            Static fixedLine As lpData
+            If task.heartBeatLT Then
+                dst3 = src.Clone
+                fixedLine = task.lines.lpList(0)
+            End If
+
+            matcher.lp = task.lines.lpList(0)
+            matcher.Run(task.gray)
+            dst2 = matcher.dst2
+            labels = matcher.labels
+
+            Dim angle = matcher.lp.angle - fixedLine.angle
+            If Math.Abs(angle) > 90 Then angle = angle Mod 90
+            Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1)
+            WarpAffine(src, dst3, M, src.Size(), InterpolationFlags.Cubic)
+        End Sub
+    End Class
+
 End Namespace

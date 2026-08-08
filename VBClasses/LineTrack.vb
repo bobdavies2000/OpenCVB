@@ -4,7 +4,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Const topX = 10
         Const minX = 3
-        Dim lines() As Line_Match
+        Dim matcher() As Line_Match
         Dim refreshCount As New List(Of Integer)
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -16,16 +16,16 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             If task.optionsChanged Then
-                ReDim lines(topX - 1)
-                For i = 0 To lines.Length - 1
-                    lines(i) = New Line_Match
+                ReDim matcher(topX - 1)
+                For i = 0 To matcher.Length - 1
+                    matcher(i) = New Line_Match
                 Next
             End If
 
             Dim count As Integer
             Dim goodCorrelation As Integer
-            For i = 0 To lines.Length - 1
-                If lines(i).goodCorrelation Then goodCorrelation += 1
+            For i = 0 To matcher.Length - 1
+                If matcher(i).goodCorrelation Then goodCorrelation += 1
             Next
             If task.heartBeatLT Or goodCorrelation < minX Then
                 refreshCount.Add(1)
@@ -35,16 +35,16 @@ Namespace VBClasses
                     lpList.Add(lp)
                     Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                     Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-                    lines(i).lp = lp
-                    lines(i).Run(src)
+                    matcher(i).lp = lp
+                    matcher(i).Run(src)
                 Next
             Else
                 refreshCount.Add(0)
                 For i = 0 To lpList.Count - 1
-                    If lines(i).goodCorrelation = False Then Continue For
-                    lines(i).lp = lpList(i)
-                    lines(i).Run(task.gray)
-                    lpList(i) = lines(i).lp
+                    If matcher(i).goodCorrelation = False Then Continue For
+                    matcher(i).lp = lpList(i)
+                    matcher(i).Run(task.gray)
+                    lpList(i) = matcher(i).lp
                     Line(dst2, lpList(i).p1, lpList(i).p2, task.highlight, task.lineWidth, task.lineType)
                     Line(dst3, lpList(i).p1, lpList(i).p2, white, task.lineWidth, task.lineType)
                     count += 1

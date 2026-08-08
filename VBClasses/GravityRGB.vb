@@ -435,4 +435,29 @@ Namespace VBClasses
             labels(3) = "lpGravity angle = " + task.lpGravity.angle.ToString(fmt2) + " deg"
         End Sub
     End Class
+
+
+
+
+    Public Class GravityRGB_ShiftXY : Inherits TaskParent
+        Dim match As New Match_Basics
+        Public Sub New()
+            desc = "Find the amount to shift the image in the X direction then find the shift in the Y direction"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            src = task.gray
+
+            Dim lp = task.lines.lpList(0)
+            match.template = src(lp.rect)
+            match.Run(src)
+            dst3 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
+            Circle(dst3, match.newCenter, task.DotSize, black, -1, task.lineType)
+            labels = match.labels
+
+            Dim rect As New cv.Rect(0, lp.ptCenter - )
+        End Sub
+    End Class
+
 End Namespace
