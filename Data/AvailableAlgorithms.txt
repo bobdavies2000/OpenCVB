@@ -443,12 +443,9 @@ LineSeg_FLD
 LineSeg_LBD
 LineSeg_Match
 LineSeg_Top3
+LineTrack_Basics
 LineTrack_Match
 LineTrack_MatchLines
-LineTrack_PitchRoll
-LineTrack_Rect
-LineTrack_Slices
-LineTrack_Triangle
 LUT_Basics
 LUT_Equalized
 Mat_2to1

@@ -2464,9 +2464,10 @@ Namespace VBClasses
 
     Public Class Line_Match : Inherits TaskParent
         Public lp As lpData
+        Public goodCorrelation As Boolean
         Dim matchP1 As New Match_Basics
         Dim matchP2 As New Match_Basics
-        Dim lowCorrelation As Boolean
+        Dim refreshCount As New List(Of Integer)
         Public Sub New()
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
@@ -2480,24 +2481,27 @@ Namespace VBClasses
 
             dst2 = task.color.Clone
 
-            If lp IsNot Nothing AndAlso lp.length < dst2.Height / 5 Then lp = Nothing
-            If task.heartBeat Or lp Is Nothing Or lowCorrelation Then
-                lowCorrelation = False
+            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100
+
+            If task.heartBeatLT Or lp Is Nothing Or goodCorrelation = False Then
+                refreshCount.Add(1)
+                goodCorrelation = True
                 If standalone Then lp = task.lines.lpList(0)
                 Dim sideSize = task.grid.nabeRectSide
                 Dim r1 = New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize)
                 Dim r2 = New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize)
-                matchP1.template = src(r1)
-                matchP2.template = src(r2)
+                matchP1.template = src(r1).Clone
+                matchP2.template = src(r2).Clone
             Else
+                refreshCount.Add(0)
                 matchP1.Run(src)
                 SetTrueText(matchP1.correlation.ToString(fmt3), matchP1.newRect.BottomRight)
 
                 matchP2.Run(src)
                 SetTrueText(matchP2.correlation.ToString(fmt3), matchP2.newRect.BottomRight)
 
-                lowCorrelation = matchP1.correlation < 0.98 Or matchP2.correlation < 0.98
-                If lowCorrelation = False Then
+                goodCorrelation = matchP1.correlation >= threshold And matchP2.correlation >= threshold
+                If goodCorrelation Then
                     Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
                     Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
                     lp = New lpData(matchP1.newCenter, matchP2.newCenter)
@@ -2509,6 +2513,8 @@ Namespace VBClasses
             End If
 
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
+            If refreshCount.Count > 100 Then refreshCount.RemoveAt(0)
+            labels(3) = "Had to refresh the longest line " + refreshCount.Average.ToString("0.0%") + " of the time"
         End Sub
     End Class
 End Namespace

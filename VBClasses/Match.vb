@@ -30,6 +30,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
+            correlationMat = New cv.Mat
             MatchTemplate(template, src, correlationMat, TemplateMatchModes.CCoeffNormed)
             mm = GetMinMax(correlationMat)
             correlation = mm.maxVal

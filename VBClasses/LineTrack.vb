@@ -1,5 +1,132 @@
 ﻿Imports System.Runtime.InteropServices : Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class LineTrack_Basics : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Const topX = 10
+        Const minX = 3
+        Dim lines() As Line_Match
+        Dim refreshCount As New List(Of Integer)
+        Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            task.fOptions.MatchCorrSlider.Value = 98 ' high threshold for validating the correlation of the endpoints.
+            desc = "Identify the lines to track - the top X longest lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.color.Clone
+            dst3.SetTo(0)
+
+            If task.optionsChanged Then
+                ReDim lines(topX - 1)
+                For i = 0 To lines.Length - 1
+                    lines(i) = New Line_Match
+                Next
+            End If
+
+            Dim count As Integer
+            Dim goodCorrelation As Integer
+            For i = 0 To lines.Length - 1
+                If lines(i).goodCorrelation Then goodCorrelation += 1
+            Next
+            If task.heartBeatLT Or goodCorrelation < minX Then
+                refreshCount.Add(1)
+                lpList.Clear()
+                For i = 0 To Math.Min(task.lines.lpList.Count, topX) - 1
+                    Dim lp = task.lines.lpList(i)
+                    lpList.Add(lp)
+                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                    lines(i).lp = lp
+                    lines(i).Run(src)
+                Next
+            Else
+                refreshCount.Add(0)
+                For i = 0 To lpList.Count - 1
+                    If lines(i).goodCorrelation = False Then Continue For
+                    lines(i).lp = lpList(i)
+                    lines(i).Run(task.gray)
+                    lpList(i) = lines(i).lp
+                    Line(dst2, lpList(i).p1, lpList(i).p2, task.highlight, task.lineWidth, task.lineType)
+                    Line(dst3, lpList(i).p1, lpList(i).p2, white, task.lineWidth, task.lineType)
+                    count += 1
+                Next
+            End If
+
+            If refreshCount.Count > 30 Then refreshCount.RemoveAt(0)
+            labels(2) = "Matched " + CStr(count) + " lines and had to refresh the set of lines " + refreshCount.Average.ToString("0.0%") + " of the time"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LineTrack_Match : Inherits TaskParent
+        Public lpListLast As New List(Of lpData)(task.lines.lpList)
+        Public lpList As New List(Of lpData)
+        Public lpMatches As New List(Of lpData)
+        Dim slices As New XR_LineTrack_Slices
+        Public lpMapLast = task.lines.dst1.Clone
+        Public Sub New()
+            desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count <= 1 Then Exit Sub
+
+            slices.Run(emptyMat)
+
+            Dim lpMatch As lpData
+            lpMatches.Clear()
+            lpList.Clear()
+            Dim missCount As Integer
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            For i = 0 To Math.Min(task.lines.lpList.Count, slices.xSlices.Count) - 1
+                Dim lp = task.lines.lpList(i)
+                Dim color = task.scalarColors(lp.index + 1)
+
+                For Each sliceSet In {slices.xSlices(i), slices.ySlices(i)}
+                    Dim angleDelta As New List(Of Single)
+                    Dim lineIndex As New List(Of Integer)
+                    For j = 0 To sliceSet.Count - 1
+                        Dim lastIndex = sliceSet(j) - 1
+                        If lastIndex >= 0 And lastIndex < lpListLast.Count Then
+                            lpMatch = lpListLast(lastIndex)
+                            angleDelta.Add(Math.Abs(lp.angle - lpMatch.angle))
+                            lineIndex.Add(lastIndex)
+                        End If
+                    Next
+
+                    If angleDelta.Count > 0 Then
+                        Dim minAngleDelta = angleDelta.Min
+                        If minAngleDelta < AngleThreshold Then ' within x degrees of the original line's angle
+                            Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
+                            lpMatch = lpListLast(index)
+                            Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                            Line(dst3, lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
+                            lpList.Add(lp)
+                            lpMatches.Add(lpMatch)
+                        Else
+                            missCount += 1
+                        End If
+                    Else
+                        missCount += 1
+                    End If
+                Next
+            Next
+
+            If task.heartBeat Then
+                labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center "
+                labels(3) = CStr(lpMatches.Count) + " lines matched."
+            End If
+
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+        End Sub
+    End Class
+
+
+
+
+
     Public Class XR_LineTrack_Basics : Inherits TaskParent
         Public lp As lpData
         Public lpNew As lpData
@@ -131,71 +258,6 @@ Namespace VBClasses
 
 
 
-    Public Class LineTrack_Match : Inherits TaskParent
-        Public lpListLast As New List(Of lpData)(task.lines.lpList)
-        Public lpList As New List(Of lpData)
-        Public lpMatches As New List(Of lpData)
-        Dim slices As New LineTrack_Slices
-        Public lpMapLast = task.lines.dst1.Clone
-        Public Sub New()
-            desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.lines.lpList.Count <= 1 Then Exit Sub
-
-            slices.Run(emptyMat)
-
-            Dim lpMatch As lpData
-            lpMatches.Clear()
-            lpList.Clear()
-            Dim missCount As Integer
-            dst2.SetTo(0)
-            dst3.SetTo(0)
-            For i = 0 To Math.Min(task.lines.lpList.Count, slices.xSlices.Count) - 1
-                Dim lp = task.lines.lpList(i)
-                Dim color = task.scalarColors(lp.index + 1)
-
-                For Each sliceSet In {slices.xSlices(i), slices.ySlices(i)}
-                    Dim angleDelta As New List(Of Single)
-                    Dim lineIndex As New List(Of Integer)
-                    For j = 0 To sliceSet.Count - 1
-                        Dim lastIndex = sliceSet(j) - 1
-                        If lastIndex >= 0 And lastIndex < lpListLast.Count Then
-                            lpMatch = lpListLast(lastIndex)
-                            angleDelta.Add(Math.Abs(lp.angle - lpMatch.angle))
-                            lineIndex.Add(lastIndex)
-                        End If
-                    Next
-
-                    If angleDelta.Count > 0 Then
-                        Dim minAngleDelta = angleDelta.Min
-                        If minAngleDelta < AngleThreshold Then ' within x degrees of the original line's angle
-                            Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
-                            lpMatch = lpListLast(index)
-                            Line(dst2, lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
-                            Line(dst3, lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
-                            lpList.Add(lp)
-                            lpMatches.Add(lpMatch)
-                        Else
-                            missCount += 1
-                        End If
-                    Else
-                        missCount += 1
-                    End If
-                Next
-            Next
-
-            If task.heartBeat Then
-                labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center "
-                labels(3) = CStr(lpMatches.Count) + " lines matched."
-            End If
-
-            lpListLast = New List(Of lpData)(task.lines.lpList)
-        End Sub
-    End Class
-
-
-
 
     Public Class XR_LineTrack_Tester : Inherits TaskParent
         Dim match As New LineTrack_Match
@@ -250,7 +312,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineTrack_Slices : Inherits TaskParent
+    Public Class XR_LineTrack_Slices : Inherits TaskParent
         Public xSlices As New List(Of List(Of Byte))
         Public ySlices As New List(Of List(Of Byte))
         Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
@@ -298,7 +360,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineTrack_Rect : Inherits TaskParent
+    Public Class XR_LineTrack_Rect : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public lpInput1 As lpData
         Public lpInput2 As lpData
@@ -571,7 +633,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lastImage As Mat = task.lines.dst3
-            lastImage.setto(0, task.lines.dst3)
+            lastImage.SetTo(0, task.lines.dst3)
             dst2 = lastImage
 
             dst3 = task.lines.dst2
@@ -819,7 +881,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineTrack_Triangle : Inherits TaskParent
+    Public Class XR_LineTrack_Triangle : Inherits TaskParent
         Dim intersect As New Line_Intersection
         Public pitch As Single
         Public roll As Single
@@ -888,8 +950,8 @@ Namespace VBClasses
 
 
 
-    Public Class LineTrack_PitchRoll : Inherits TaskParent
-        Dim triangle As New LineTrack_Triangle
+    Public Class XR_LineTrack_PitchRoll : Inherits TaskParent
+        Dim triangle As New XR_LineTrack_Triangle
         Dim warper As New WarpAffine_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True

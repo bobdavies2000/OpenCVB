@@ -397,8 +397,7 @@ Namespace VBClasses
         Public Const MaxHamming As Integer = 88
         Public Const GeoWeight As Single = 0.35F
         Public Sub New()
-            desc = "Cursor.ai: Match LineSeg_LBD line descriptors frame-to-frame (Hamming + " +
-               "center distance, greedy one-to-one)."
+            desc = "Cursor.ai: Match LineSeg_LBD line descriptors frame-to-frame (Hamming, center distance, greedy one-to-one)."
         End Sub
         Private Shared Function HammingRow(a As Mat, rowA As Integer, b As Mat, rowB As Integer) As Integer
             Dim sum = 0
