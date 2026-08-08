@@ -1,3 +1,40 @@
+**August 8, 2026 – Cameras, Cell Neighbors, XO/XR Change, Misc, Magnify, Line Matching.**
+
+-   There are over 1700 algorithms in various stages of development.
+    -   There are over 700 Core algorithms.
+    -   The jump in lines per algorithm (now 43) is due to longer core algorithms.
+        -   Recently added algorithms are showing more complexity and length.
+        -   Many of the retired core algorithms were short experiments.
+    -   There are over 40 algorithms that were built using Cursor.ai.
+        -   Cursor.ai algorithms often require additional manual work.
+-   Camera Support: all major 3D cameras are supported by OpenCVB.
+    -   Color, left, right, and point cloud images are captured from each camera.
+-   The neighbors of any RedC cell are displayed using 2 different methods.
+    -   The neighbors can be found using a small rect around contour points.
+    -   The neighbors can be found using the padded rect of the selected cell.
+-   Cells can be tracked using the maxDStable point in the cell.
+-   XO\_ algorithms were dropped – too much work to maintain.
+    -   XO.vb remains in the tree but is not included in the VBClasses project.
+-   More and more algorithms have been moved to “XR_” designation
+    -   How often an algorithm is reused determines if it is a core algorithm.
+    -   Improvement: the algorithm combo box shows a shorter list of algorithms.
+-   There were several small classes in VBClasses that didn’t need their own file.
+    -   The small modules are now included in Misc.vb.
+-   FeatureLess_Basics is no longer a task algorithm – not reused often enough.
+-   The Magnify icon in the main tool bar was upgraded with some options.
+    -   Right click the magnifying glass to select a magnification level.
+-   Lines found in OpenCV are difficult to track continuously.
+    -   Lines found in one image might be missed in the next.
+    -   Fast Line Detector and Line Segment Descriptor have the same problem.
+        -   See the Combo pulldown in the “Feature Options”.
+-   On the heartbeat Line_Match picks the longest line to track.
+    -   The line is tracked using correlation coefficients until the next heartbeat.
+    -   The GIF below demonstrates Line_Match but further testing is ongoing.
+
+**![](media/23591c2f26b48a914678642fe0e3f457.gif)**
+
+**Line_Match:** *The default is to track the longest line in the image. The longest line is found on the heartbeat but is tracked using correlation coefficients of the endpoints until the next heartbeat. If that line is lost, the current longest line is obtained again. The rectangles around the end points are the templates for the correlation search. Considerable further testing of this algorithm is planned.*
+
 **July 15, 2026 – Algorithm Reduction, OpenCV5, Foreground, NaN’s, RedC_Basics, MaxDStable**
 
 -   There are over 2200 algorithms in various stages of development.

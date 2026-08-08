@@ -9,6 +9,7 @@ Namespace VBClasses
             desc = "Run LSD (Line Segment Detector) with sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
             Dim lastList = New List(Of lpData)(lpList)
             core.Run(src)
             If core.lpList.Count = 0 Then Exit Sub
@@ -42,6 +43,7 @@ Namespace VBClasses
             lsd = LineSegmentDetector.Create()
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
             Dim vecMat As New Mat
             lsd.Detect(src, vecMat)
             Dim vecArray() As Vec4f = Nothing

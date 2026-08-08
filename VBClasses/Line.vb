@@ -54,17 +54,23 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
-            Dim rect As New cv.Rect(task.gridWH * 5, task.gridWH * 5, dst2.Width - task.gridWH * 10, dst2.Height - task.gridWH * 10)
+            Dim pad = task.gridWH * 3
+            Dim w = dst2.Width - pad * 2
+            Dim h = dst2.Height - pad * 2
+            Dim rect As New cv.Rect(pad, pad, w, h)
+            ' the gridWH can be changed so prevent failure with this...
+            If w < dst2.Width \ 2 Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            If h < dst2.Height \ 2 Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
-                basicsFLD.Run(src(rect))
+                If src.Width = dst2.Width Then basicsFLD.Run(src(rect)) Else basicsFLD.Run(src)
                 dst2 = basicsFLD.dst2
                 lpList = basicsFLD.lpList
                 averageAge = basicsFLD.averageAge
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
-                basicsLSD.Run(src(rect))
+                If src.Width = dst2.Width Then basicsLSD.Run(src(rect)) Else basicsLSD.Run(src)
                 dst2 = basicsLSD.dst2
                 lpList = basicsLSD.lpList
                 averageAge = basicsLSD.averageAge
@@ -174,7 +180,7 @@ Namespace VBClasses
             Return New lpData(lp.p1, lp.p2)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> MatType.CV_8U Then src.ConvertTo(src, MatType.CV_8U)
+            If src.Channels <> 1 Then src = task.gray
 
             lpList = getRawSortedLines(ld.Detect(src))
 
