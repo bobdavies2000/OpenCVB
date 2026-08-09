@@ -439,24 +439,45 @@ Namespace VBClasses
 
 
 
-    Public Class GravityRGB_ShiftXY : Inherits TaskParent
+
+    Public Class GravityRGB_SteadyXY : Inherits TaskParent
         Dim match As New Match_Basics
         Public Sub New()
-            desc = "Find the amount to shift the image in the X direction then find the shift in the Y direction"
+            desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
+            labels = {"", "", "Match correlation", "Shift-aligned gray (black edges)"}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.lines.lpList.Count = 0 Then Exit Sub
+            src = task.grayOriginal
 
-            src = task.gray
+            Static template As cv.Mat = Nothing
+            Static center As cv.Point
+            Static rect As cv.Rect = Nothing
+            If task.heartBeat Then
+                Dim padx = dst2.Width / 3
+                Dim pady = dst2.Height / 3
+                rect = ValidateRect(New cv.Rect(padx, pady, dst2.Width - padx * 2, dst2.Height - pady * 2))
+                template = src(rect).Clone
+                center = New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
+                dst3 = src.Clone
+                Exit Sub
+            End If
 
-            Dim lp = task.lines.lpList(0)
-            match.template = src(lp.rect)
+            match.template = template
             match.Run(src)
-            dst3 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
-            Circle(dst3, match.newCenter, task.DotSize, black, -1, task.lineType)
-            labels = match.labels
+            dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
+            Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
 
-            Dim rect As New cv.Rect(0, lp.ptCenter - )
+            Dim shiftXY = New cv.Point2f(center.X - match.newCenter.X, center.Y - match.newCenter.Y)
+            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            ' Shift gray so content stays locked to the template frame; uncovered edges are black.
+            WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
+            labels(3) = "Aligned gray; black = missing after shift"
+            Rectangle(task.color, rect, task.highlight, task.lineWidth)
         End Sub
     End Class
 

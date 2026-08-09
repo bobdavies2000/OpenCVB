@@ -270,7 +270,7 @@ Gravity_CloudMethod
 Gravity_Jitter
 Gravity_LineTrackStabilize
 GravityRGB_Basics
-GravityRGB_ShiftXY
+GravityRGB_SteadyXY
 GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
