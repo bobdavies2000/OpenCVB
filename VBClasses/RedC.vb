@@ -712,4 +712,31 @@ Namespace VBClasses
             SetTrueText(strOut, 1)
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedC_SteadyCam : Inherits TaskParent
+        Dim steady As New SteadyCam_Basics
+        Dim redC As New RedC_Basics
+        Dim color8U As New Color8U_Basics
+        Public Sub New()
+            desc = "Build the RedC cells using the GravityRGB_SteadyXY output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            steady.Run(task.grayOriginal)
+            dst3 = steady.dst3
+
+            Threshold(dst3, dst1, 0, 255, cv.ThresholdTypes.BinaryInv)
+
+            color8U.Run(dst3)
+            color8U.dst2.SetTo(0, dst1)
+            redC.Run(color8U.dst2)
+            dst2 = redC.dst2
+            dst2.SetTo(0, dst1)
+            labels = redC.labels
+        End Sub
+    End Class
+
 End Namespace

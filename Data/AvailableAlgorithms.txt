@@ -270,7 +270,6 @@ Gravity_CloudMethod
 Gravity_Jitter
 Gravity_LineTrackStabilize
 GravityRGB_Basics
-GravityRGB_SteadyXY
 GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
@@ -610,6 +609,7 @@ RedC_MergeCells
 RedC_NeighborHist
 RedC_NeighborHulls
 RedC_Reliable
+RedC_SteadyCam
 RedC_TrackCell
 RedCloud_Basics
 RedCloud_Core
@@ -667,6 +667,8 @@ StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
+SteadyCam_Basics
+SteadyCam_WarpAffine
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX

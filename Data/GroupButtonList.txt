@@ -168,6 +168,7 @@ Stabilizer
 StableDepth
 StableGray
 StableLine
+SteadyCam
 Stitch
 Stripes
 Structured
