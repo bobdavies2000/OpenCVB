@@ -16,8 +16,6 @@ Namespace VBClasses
             color8U.Run(src)
             contours.Run(src)
 
-            dst3 = color8U.dst3
-
             Dim rcListLast As New List(Of rcData)(rcList)
             rcMap.SetTo(0)
             dst1.SetTo(0)
@@ -27,61 +25,19 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
+            rcList = New List(Of rcData)(contours.sortContours.rcList)
+
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
+            If clickIndex >= 0 And clickIndex < rcList.Count Then
+                task.rcD = rcList(clickIndex)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            End If
+
             dst2 = Palettize(dst1, 0)
             labels(2) = CStr(rcList.Count) + " cells were found"
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class Contour_Core : Inherits TaskParent
-        Implements IDisposable
-        Public sortContours As New Contour_Sort
-        Dim edgeline As New EdgeLine_Basics
-        Public Sub New()
-            labels(3) = "Input to OpenCV's FindContours"
-            desc = "General purpose contour finder"
-        End Sub
-        Public Shared Function buildContours(input As Mat) As cv.Point()()
-            Static options As New Options_Contours
-            options.Run()
-
-            Dim mm = GetMinMax(input)
-            If mm.maxVal < 255 Then input = (input - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-
-            Dim allContours As cv.Point()() = Nothing
-
-            Dim mode = options.options2.ApproximationMode
-            If options.retrievalMode = RetrievalModes.FloodFill Then
-                Dim dst As New Mat(task.workRes, MatType.CV_8U, 0)
-                input.ConvertTo(dst, MatType.CV_32SC1)
-                FindContours(dst, allContours, Nothing, RetrievalModes.FloodFill, mode)
-            Else
-                FindContours(input, allContours, Nothing, options.retrievalMode, mode)
-            End If
-            Return allContours
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type = MatType.CV_8U Then
-                dst3 = src
-            Else
-                edgeline.Run(task.gray)
-                dst3 = edgeline.dst2
-            End If
-
-            sortContours.allContours = buildContours(dst3)
-            If sortContours.allContours.Length <= 1 Then Exit Sub
-
-            sortContours.Run(src)
-            labels(2) = sortContours.labels(2)
-            dst2 = sortContours.dst2
-
-            labels(3) = CStr(sortContours.rcList.Count) + " contours were found"
-        End Sub
-    End Class
 
 
 
@@ -1239,6 +1195,54 @@ Namespace VBClasses
             labels(2) = CStr(tourList.Count) + " contours were found"
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class Contour_Core : Inherits TaskParent
+        Implements IDisposable
+        Public sortContours As New Contour_Sort
+        Dim edgeline As New EdgeLine_Basics
+        Dim options As New Options_Contours
+        Public Sub New()
+            labels(3) = "Input to OpenCV's FindContours"
+            desc = "General purpose contour finder"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If src.Type = MatType.CV_8U Then
+                dst3 = src
+            Else
+                edgeline.Run(task.gray)
+                dst3 = edgeline.dst2
+            End If
+
+            Dim mm = GetMinMax(dst3)
+            If mm.maxVal < 255 Then dst3 = (dst3() - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+
+            sortContours.allContours = Nothing
+
+            Dim mode = options.options2.ApproximationMode
+            If options.retrievalMode = RetrievalModes.FloodFill Then
+                dst3.ConvertTo(dst3, MatType.CV_32SC1)
+                FindContours(dst3, sortContours.allContours, Nothing, RetrievalModes.FloodFill, mode)
+            Else
+                FindContours(dst3, sortContours.allContours, Nothing, options.retrievalMode, mode)
+            End If
+
+            If sortContours.allContours.Length <= 1 Then Exit Sub
+
+            sortContours.Run(src)
+            labels(2) = sortContours.labels(2)
+            dst2 = sortContours.dst2
+
+            labels(3) = CStr(sortContours.rcList.Count) + " contours were found"
+        End Sub
+    End Class
+
 
 
 
