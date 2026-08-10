@@ -332,9 +332,9 @@ Namespace VBClasses
 
     Public Class XR_BrickPoint_ContourCompare : Inherits TaskParent
         Dim fLess As New XR_BrickPoint_FeatureLess
-        Dim contours As New Contour_Basics
+        Dim contours As New Contour_BasicsOld
         Public Sub New()
-            desc = "Compare Contour_Basics to XR_BrickPoint_FeatureLess"
+            desc = "Compare Contour_BasicsOld to XR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
@@ -354,7 +354,7 @@ Namespace VBClasses
 
     Public Class XR_BrickPoint_FeatureLess : Inherits TaskParent
         Public classCount As Integer
-        Public contours As New Contour_Basics
+        Public contours As New Contour_BasicsOld
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)  ' mask for the featureless regions.
             desc = "Identify each grid square as part of a contour or not."

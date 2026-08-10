@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
-    Public Class XR_KeyColor_Basics : Inherits TaskParent
+    Public Class KeyColor_Basics : Inherits TaskParent
         Dim keyList As New List(Of keyData)
         Dim keyMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly

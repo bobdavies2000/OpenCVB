@@ -106,7 +106,7 @@ Namespace VBClasses
 
     Public Class XR_LeftRight_ContourLeft : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Dim contours As New Contour_Basics
+        Dim contours As New Contour_BasicsOld
         Public Sub New()
             desc = "Segment the left view with contour_basics_List"
         End Sub

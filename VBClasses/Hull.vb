@@ -192,8 +192,8 @@ Namespace VBClasses
 
     Public Class XR_Hull_Contour : Inherits TaskParent
         Public hull As New List(Of cv.Point)
-        Public contours1 As New Contour_Basics
-        Public contours2 As New Contour_Basics
+        Public contours1 As New Contour_BasicsOld
+        Public contours2 As New Contour_BasicsOld
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Compare the hull to the contour of a contour cell"

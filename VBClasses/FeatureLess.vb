@@ -384,9 +384,9 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_Contours : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
-        Dim contours As New Contour_Basics
+        Dim contours As New Contour_BasicsOld
         Public Sub New()
-            desc = "Use Contour_Basics to get the contour data for the top contours by size."
+            desc = "Use Contour_BasicsOld to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.gray)

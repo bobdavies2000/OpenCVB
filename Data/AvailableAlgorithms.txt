@@ -54,8 +54,10 @@ Color8U_Complementary
 Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
+Contour_BasicsOld
 Contour_Smoothing
 Contour_Sort
+Contour_SortOld
 Convex_Basics
 Convex_Defects
 Convex_RedCDefects
@@ -376,6 +378,7 @@ Kalman_Single
 Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
+KeyColor_Basics
 KLT_Basics
 KMeans_Basics
 KMeans_Depth

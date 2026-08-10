@@ -117,7 +117,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureMap_BasicsOld : Inherits TaskParent
         Dim fcs As New FeatureMap_Core
-        Dim contours As New Contour_Basics
+        Dim contours As New Contour_BasicsOld
         Public desiredMapCount As Integer = 5
         Public Sub New()
             desc = "Create the reference map for FCS. "

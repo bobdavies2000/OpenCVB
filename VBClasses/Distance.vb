@@ -514,7 +514,7 @@ Namespace VBClasses
 
     Public Class XR_Distance_Contour : Inherits TaskParent
         Dim options As New Options_Distance
-        Dim contours As New Contour_Basics
+        Dim contours As New Contour_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
