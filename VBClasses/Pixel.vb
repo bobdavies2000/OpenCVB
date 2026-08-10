@@ -235,7 +235,7 @@ Namespace VBClasses
 
             SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -289,7 +289,7 @@ Namespace VBClasses
                     If vbc.task.drawRect <> New cv.Rect Then
                         random.range = vbc.task.drawRect
                     Else
-                        random.range = New cv.Rect(msRNG.Next(0, src.Width - w), msRNG.Next(0, src.Height - h), w, h)
+                        random.range = New cv.Rect(task.msRNG.Next(0, src.Width - w), task.msRNG.Next(0, src.Height - h), w, h)
                     End If
                 End If
             Else
@@ -387,7 +387,7 @@ Namespace VBClasses
 
 
     Public Class Pixel_Zoom : Inherits TaskParent
-        Public mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
+        Public mousePoint = New cv.Point(task.msRNG.Next(0, dst1.Width / 2), task.msRNG.Next(0, dst1.Height))
         Public zoomSlider As TrackBar
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom Factor", 2, 16, 4)
@@ -878,7 +878,7 @@ Namespace VBClasses
                     If vbc.task.drawRect <> New cv.Rect Then
                         random.range = vbc.task.drawRect
                     Else
-                        random.range = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
+                        random.range = New cv.Rect(task.msRNG.Next(0, src.Width - width), task.msRNG.Next(0, src.Height - height), width, height)
                     End If
                 End If
             Else
@@ -939,9 +939,9 @@ Namespace VBClasses
             If vbc.task.drawRect.Width <> 0 Then
                 random.range = vbc.task.drawRect
             Else
-                random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
+                random.range = New cv.Rect(task.msRNG.Next(0, dst2.Width - width), task.msRNG.Next(0, dst2.Height - height), width, height)
             End If
-            random.Run(emptyMat)
+            random.Run(task.emptyMat)
             vbc.task.drawRect = random.range
 
             labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."

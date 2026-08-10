@@ -1036,7 +1036,7 @@ Namespace VBClasses
                 dst1 = Palettize(dst0, 0)
             End If
 
-            ml.Run(emptyMat)
+            ml.Run(task.emptyMat)
 
             dst3.SetTo(0)
             Dim maxClass As Integer
@@ -1124,7 +1124,7 @@ Namespace VBClasses
 
             If feat.featureList.Count = 0 Then Exit Sub ' nothing to work with...
 
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             Static maxDistList As New List(Of cv.Point)
             For Each rc In feat.rcList
@@ -1463,7 +1463,7 @@ Namespace VBClasses
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
             Dim index As Integer
 
-            overlap.Run(emptyMat)
+            overlap.Run(task.emptyMat)
 
             regions.Clear()
             dst0 = fLess.dst1.Clone

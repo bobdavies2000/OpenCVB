@@ -389,7 +389,7 @@ Namespace VBClasses
 
             knn.ptListTrain = New List(Of cv.Point)(bPoint.ptList)
             knn.ptListQuery = New List(Of cv.Point)(bPoint.ptList)
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             lplist.Clear()
             For i = 0 To knn.queries.Count - 1

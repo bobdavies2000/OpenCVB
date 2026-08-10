@@ -426,7 +426,7 @@ Namespace VBClasses
 
             If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
             kalman.kInput = trends.resultingValues.ToArray
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
 
             dst2.SetTo(Scalar.Black)
             Dim barWidth As Single = dst2.Width / trends.resultingValues.Count
@@ -554,7 +554,7 @@ Namespace VBClasses
             For i = 0 To auto.valleyOrder.Count - 1
                 kalman.kInput(i) = auto.valleyOrder.ElementAt(i).Value
             Next
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
 
             'Dim lastEntry As Integer
             'For i = 0 To kalman.kOutput.Count - 1

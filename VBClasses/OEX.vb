@@ -223,7 +223,7 @@ Namespace VBClasses
             If task.quarterBeat Then
                 If points.Count < 10 Then
                     dst2.SetTo(0)
-                    Dim pt = New Point2f(msRNG.Next(0, dst2.Width - 10) + 5, msRNG.Next(0, dst2.Height - 10) + 5)
+                    Dim pt = New Point2f(task.msRNG.Next(0, dst2.Width - 10) + 5, task.msRNG.Next(0, dst2.Height - 10) + 5)
                     points.Add(pt)
                     locatePoint(dst2, subdiv, pt, active_facet_color)
                     subdiv.Insert(pt)

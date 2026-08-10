@@ -174,7 +174,7 @@ Namespace VBClasses
                 mats.mat(i) = plotList(i).dst2
             Next
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub

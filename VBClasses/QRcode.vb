@@ -21,8 +21,8 @@ Namespace VBClasses
                 SetTrueText("This QR Code test does not run at low resolutions")
                 Exit Sub
             End If
-            Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))
-            Dim y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height))
+            Dim x = task.msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))
+            Dim y = task.msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height))
             If task.frameCount \ 50 Mod 2 = 0 Then
                 Dim roi = New cv.Rect(x, y, qrInput1.Width, qrInput1.Height)
                 src(roi) = qrInput1

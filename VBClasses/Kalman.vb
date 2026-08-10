@@ -153,7 +153,7 @@ Namespace VBClasses
             Line(dst2, statePt, measPt, New Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
             Line(dst2, statePt, predictPt, New Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
 
-            If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
+            If task.msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
             Randn(processNoise, Scalar.Black, Scalar.All(Math.Sqrt(kf.ProcessNoiseCov.Get(Of Single)(0, 0))))
             kState = kf.TransitionMatrix * kState + processNoise
@@ -182,7 +182,7 @@ Namespace VBClasses
             Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             Static lastRealMouse As cv.Point = task.mouseMovePoint
             kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
             Line(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
             Line(dst2, task.mouseMovePoint, lastRealMouse, Scalar.red)
             lastRealMouse = task.mouseMovePoint

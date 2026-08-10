@@ -116,8 +116,8 @@ Namespace VBClasses
             Dim input = src
             If input.Channels() <> 1 Then CvtColor(input, input, ColorConversionCodes.BGR2GRAY)
 
-            Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
-            Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
+            Dim shiftX = task.msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
+            Dim shiftY = task.msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
 
             If task.firstPass Then
                 lastShiftX = shiftX

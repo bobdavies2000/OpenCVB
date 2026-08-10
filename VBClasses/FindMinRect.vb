@@ -25,7 +25,7 @@ Namespace VBClasses
                 For Each pt In inputPoints
                     Circle(dst2, pt, task.DotSize + 2, Scalar.red, -1, task.lineType)
                 Next
-                Draw_Arc.DrawRotatedOutline(minRect, dst2, Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(minRect, dst2)
             End If
         End Sub
     End Class
@@ -42,9 +42,6 @@ Namespace VBClasses
             desc = "Use minRectArea to encompass detected motion"
             labels(2) = "MinRectArea of MOG motion"
         End Sub
-        Private Function motionRectangles(gray As Mat, colors() As Vec3b) As Mat
-            Return gray
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             bgSub.Run(src)
             dst1 = bgSub.dst2

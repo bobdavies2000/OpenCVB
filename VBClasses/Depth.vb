@@ -302,7 +302,7 @@ Namespace VBClasses
             reduction.dst2.ConvertTo(reducedDepth, MatType.CV_32F)
             colorize.Run(reducedDepth)
             dst2 = colorize.dst2
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst3 = mats.dst2
             labels(2) = smooth.labels(2)
         End Sub
@@ -424,7 +424,7 @@ Namespace VBClasses
                 CvtColor(fgnd.dst2, dst2, ColorConversionCodes.GRAY2BGR)
 
                 kalman.kInput = {xx, yy, rectSize, rectSize}
-                kalman.Run(emptyMat)
+                kalman.Run(task.emptyMat)
                 Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
                 Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
                 Rectangle(dst2, kRect, Scalar.red, 2)
@@ -1303,7 +1303,7 @@ Namespace VBClasses
             desc = "Accumulate the farthest depth value at each pixel"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(emptyMat)
+            pcMotion.Run(task.emptyMat)
             If task.optionsChanged Then stableMax = task.pcSplit(2).Clone
 
             task.pcSplit(2).CopyTo(stableMax, pcMotion.dst2)
@@ -1327,7 +1327,7 @@ Namespace VBClasses
             desc = "Accumulate the farthest depth value at each pixel"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(emptyMat)
+            pcMotion.Run(task.emptyMat)
             If task.optionsChanged Then
                 stableMin = task.pcSplit(2).Clone
                 dst1 = stableMin.Clone
@@ -1571,7 +1571,7 @@ Namespace VBClasses
             desc = "Find the lines that are consistent in both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            linesLR.Run(emptyMat)
+            linesLR.Run(task.emptyMat)
             CvtColor(linesLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
             For Each lp In linesLR.rightList
                 Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index Mod 256), task.lineWidth, LineTypes.AntiAlias)
@@ -1589,7 +1589,7 @@ Namespace VBClasses
             Next
 
             If knn.queries.Count = 0 Or knn.trainInput.Count = 0 Then Exit Sub
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             dst3.SetTo(0)
             Dim count As Integer
@@ -1597,7 +1597,7 @@ Namespace VBClasses
                 pTest.lp1 = linesLR.leftList(i)
                 pTest.lp2 = linesLR.rightList(knn.result(i, 0))
 
-                pTest.Run(emptyMat)
+                pTest.Run(task.emptyMat)
                 If pTest.parallelResult Then
                     Line(dst3, pTest.lp2.p1, pTest.lp2.p2, task.scalarColors(pTest.lp2.index Mod 256), task.lineWidth, LineTypes.AntiAlias)
                     count += 1

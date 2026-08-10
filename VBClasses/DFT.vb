@@ -63,7 +63,7 @@ Namespace VBClasses
             mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
             mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
             mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst3 = mats.dst2
 
             dst2 = inverseDFT(complexImage)
@@ -95,7 +95,7 @@ Namespace VBClasses
             Absdiff(task.gray, dst2, diff)
             Threshold(diff, mats.mat(0), 0, 255, ThresholdTypes.Binary)
             mats.mat(1) = (diff * 50).ToMat
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             If CountNonZero(mats.mat(0)) > 0 Then
                 dst3 = mats.dst2
                 labels(3) = "Mask of difference (top) and relative diff (bot)"
@@ -225,8 +225,8 @@ Namespace VBClasses
                 Case "Draw cv.Point"
                     If task.heartBeat Then
                         dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-                        Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
-                        Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
+                        Dim pt1 = New cv.Point(task.msRNG.Next(0, dst2.Width / 10), task.msRNG.Next(0, dst2.Height / 10))
+                        Dim pt2 = New cv.Point(task.msRNG.Next(0, dst2.Width / 10), task.msRNG.Next(0, dst2.Height / 10))
                         dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)
                         dst2.Set(Of Byte)(pt2.Y, pt2.X, 255)
                         labels(2) = "pt1 = (" + CStr(pt1.X) + "," + CStr(pt1.Y) + ")  pt2 = (" + CStr(pt2.X) + "," + CStr(pt2.Y) + ")"

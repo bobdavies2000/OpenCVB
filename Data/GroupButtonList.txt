@@ -163,7 +163,6 @@ Salience
 Sieve
 SLR
 Sort
-Spectrum
 Stabilizer
 StableDepth
 StableGray

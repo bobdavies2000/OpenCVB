@@ -155,8 +155,8 @@ Namespace VBClasses
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
             dst1 = New Mat(dst1.Size(), MatType.CV_32F, Scalar.All(0))
 
-            p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p1 = New cv.Point(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
+            p2 = New cv.Point(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
             labels(2) = "Click twice in the image below to draw a line and that line's depth is correlated in X to Z and Y to Z in the plot at right"
             desc = "Determine where a 3D line is close to the real depth data"
         End Sub
@@ -336,7 +336,7 @@ Namespace VBClasses
             dst2 = task.pointCloud.Clone
             dst3 = src.Clone
             For Each selection.lp In task.lines.lpList
-                selection.Run(emptyMat)
+                selection.Run(task.emptyMat)
                 lpList.Add(selection.lp)
                 Line(dst3, selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
             Next
@@ -357,7 +357,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Then dst1.SetTo(0)
-            Selection.Run(emptyMat)
+            Selection.Run(task.emptyMat)
             Dim lp = Selection.lp
 
             dst3.SetTo(0)

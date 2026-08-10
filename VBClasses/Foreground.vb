@@ -17,7 +17,7 @@ Namespace VBClasses
                 Threshold(depth, depth, task.MaxZmeters + 0.001, task.MaxZmeters, cv.ThresholdTypes.Binary)
                 Dim columnVector = depth.Reshape(1, depth.Rows * depth.Cols)
                 Dim labelsMat As New Mat
-                Kmeans(columnVector, 2, labelsMat, term, 3, KMeansFlags.PpCenters, centers)
+                Kmeans(columnVector, 2, labelsMat, task.term, 3, KMeansFlags.PpCenters, centers)
 
                 Dim c00 = centers.Get(Of Single)(0, 0)
                 Dim c10 = centers.Get(Of Single)(1, 0)
@@ -50,7 +50,6 @@ Namespace VBClasses
                 ConvertScaleAbs(dst2, dst2, 255)
                 dst3 = Not dst2
             End If
-            If dst2.Channels = 1 AndAlso CountNonZero(dst2) > src.Total * 0.9 Then Dim k = 0
             dst3.SetTo(0, task.noDepthMask)
 
             SetTrueText(strOut, 1)

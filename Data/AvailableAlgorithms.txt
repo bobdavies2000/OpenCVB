@@ -360,7 +360,6 @@ IMU_Plot
 IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime
 IMU_Vertical
-IMU_VerticalVerify
 Indexer_Basics
 Indexer_Corners
 InPaint_Basics
@@ -421,8 +420,9 @@ Line_Intersection
 Line_LeftRight
 Line_LeftRightx
 Line_Match
+Line_MatchCheck
+Line_MatchClosest
 Line_MatchEdge
-Line_MatchTest
 Line_Parallel
 Line_ParallelLR
 Line_Perpendicular
@@ -456,10 +456,8 @@ Mat_Convert
 Match_Basics
 Match_Brick
 Match_DrawRect
-Match_DrawRectOld
 Match_LinesKNN
 Match_Point
-Match_VH
 MatchShapes_Basics
 MatchShapes_Nearby
 Math_CrossProduct2D
@@ -641,12 +639,6 @@ Sort_1Channel
 Sort_3Channel
 Sort_Basics
 Sort_Integer
-Spectrum_Breakdown
-Spectrum_Cloud
-Spectrum_Gray
-Spectrum_X
-Spectrum_Y
-Spectrum_Z
 Stabilizer_Basics
 Stabilizer_IMU
 Stabilizer_OrientationPRY
@@ -668,6 +660,8 @@ StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
 SteadyCam_Basics
+SteadyCam_FindLines
+SteadyCam_Lines
 SteadyCam_WarpAffine
 Stitch_Basics
 Stripes_Basics

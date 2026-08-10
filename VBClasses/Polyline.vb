@@ -29,7 +29,7 @@ Namespace VBClasses
 
             Dim points = Enumerable.Range(0, options.polyCount).Select(Of cv.Point)(
                 Function(i)
-                    Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
+                    Return New cv.Point(CInt(task.msRNG.Next(0, src.Width)), CInt(task.msRNG.Next(0, src.Height)))
                 End Function).ToList
             Dim pts As New List(Of List(Of cv.Point))
             pts.Add(points)

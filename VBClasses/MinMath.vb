@@ -69,7 +69,7 @@ Namespace VBClasses
             Next
 
             knn.trainInput = knn.queries
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             dst2 = src.Clone
             For i = 0 To knn.queries.Count - 1

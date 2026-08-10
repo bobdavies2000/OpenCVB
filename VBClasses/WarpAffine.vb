@@ -61,8 +61,8 @@ Namespace VBClasses
 
             If standaloneTest() And task.heartBeat Then
                 rotateAngle = optionsWarp.angle
-                rotateCenter.X = msRNG.Next(0, dst2.Width)
-                rotateCenter.Y = msRNG.Next(0, dst2.Height)
+                rotateCenter.X = task.msRNG.Next(0, dst2.Width)
+                rotateCenter.Y = task.msRNG.Next(0, dst2.Height)
             End If
 
             warpQT.rotateCenter = rotateCenter
@@ -172,8 +172,8 @@ Namespace VBClasses
             For i = 0 To captchaLength - 1
                 Dim charImage = New Mat(charHeight, charWidth, MatType.CV_8UC3, white)
                 Dim c = characters(rng.Next(0, characters.Length - 1))
-                PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4),
-                               task.vecColors(i), msRNG.Next(1, 5), LineTypes.AntiAlias)
+                PutText(charImage, c, New cv.Point(10, charHeight - 10), task.msRNG.Next(1, 6), task.msRNG.Next(3, 4),
+                               task.vecColors(i), task.msRNG.Next(1, 5), LineTypes.AntiAlias)
                 transformPerspective(charImage)
                 rotateImg(charImage, charImage)
                 scaleImg(charImage, charImage)

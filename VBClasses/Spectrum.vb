@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Spectrum_X : Inherits TaskParent
+    Public Class XR_Spectrum_X : Inherits TaskParent
         Public options As New Options_Spectrum
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -32,7 +32,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Y : Inherits TaskParent
+    Public Class XR_Spectrum_Y : Inherits TaskParent
         Public options As New Options_Spectrum
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -64,7 +64,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Z : Inherits TaskParent
+    Public Class XR_Spectrum_Z : Inherits TaskParent
         Public options As New Options_Spectrum
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -97,11 +97,11 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Cloud : Inherits TaskParent
+    Public Class XR_Spectrum_Cloud : Inherits TaskParent
         Public options As New Options_Spectrum
-        Dim specX As New Spectrum_X
-        Dim specY As New Spectrum_Y
-        Dim specZ As New Spectrum_Z
+        Dim specX As New XR_Spectrum_X
+        Dim specY As New XR_Spectrum_Y
+        Dim specZ As New XR_Spectrum_Z
         Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -139,8 +139,8 @@ Namespace VBClasses
 
     Public Class XR_Spectrum_GrayAndCloud : Inherits TaskParent
         Dim options As New Options_Spectrum
-        Dim gSpec As New Spectrum_Gray
-        Dim sCloud As New Spectrum_Cloud
+        Dim gSpec As New XR_Spectrum_Gray
+        Dim sCloud As New XR_Spectrum_Cloud
         Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -175,7 +175,7 @@ Namespace VBClasses
 
     Public Class XR_Spectrum_RGB : Inherits TaskParent
         Dim options As New Options_Spectrum
-        Dim gSpec As New Spectrum_Gray
+        Dim gSpec As New XR_Spectrum_Gray
         Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -217,7 +217,7 @@ Namespace VBClasses
 
     Public Class XR_Spectrum_CellZoom : Inherits TaskParent
         Dim proportion As New Resize_Proportional
-        Dim breakdown As New Spectrum_Breakdown
+        Dim breakdown As New XR_Spectrum_Breakdown
         Dim redC As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -252,7 +252,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Breakdown : Inherits TaskParent
+    Public Class XR_Spectrum_Breakdown : Inherits TaskParent
         Public options As New Options_Spectrum
         Public buildMaskOnly As Boolean
         Dim proportion As New Resize_Proportional
@@ -330,7 +330,7 @@ Namespace VBClasses
 
 
     Public Class XR_Spectrum_RedCloud : Inherits TaskParent
-        Dim breakdown As New Spectrum_Breakdown
+        Dim breakdown As New XR_Spectrum_Breakdown
         Dim redC As New RedC_Basics
         Public Sub New()
             desc = "Breakdown each cell in rclist."
@@ -358,7 +358,7 @@ Namespace VBClasses
 
 
     Public Class XR_Spectrum_Mask : Inherits TaskParent
-        Dim gSpec As New Spectrum_Gray
+        Dim gSpec As New XR_Spectrum_Gray
         Public Sub New()
             If standalone Then strOut = "Select a cell to see its depth spectrum"
             desc = "Create a mask from the Spectrum ranges"
@@ -378,7 +378,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Gray : Inherits TaskParent
+    Public Class XR_Spectrum_Gray : Inherits TaskParent
         Dim options As New Options_Spectrum
         Public typeSpec As String = "GrayScale"
         Dim redC As New RedC_Basics

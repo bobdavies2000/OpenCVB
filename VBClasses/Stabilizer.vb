@@ -55,7 +55,7 @@ Namespace VBClasses
                 knn.ptListTrain = feat.lastFeatures
                 If feat.lastFeatures.Count = 0 Then knn.ptListTrain = feat.features
                 If feat.features.Count > 0 And feat.lastFeatures.Count > 0 Then
-                    knn.Run(emptyMat)
+                    knn.Run(task.emptyMat)
 
                     dst3.SetTo(0)
                     For i = 0 To Math.Min(knn.ptListTrain.Count, knn.ptListQuery.Count) - 1

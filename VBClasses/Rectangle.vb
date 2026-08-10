@@ -22,11 +22,11 @@ Namespace VBClasses
                 rectangles.Clear()
                 rotatedRectangles.Clear()
                 For i = 0 To options.drawCount - 1
-                    Dim nPoint = New Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
-                    Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
-                    Dim height = msRNG.Next(0, src.Rows - nPoint.Y - 1)
-                    Dim eSize = New Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
-                    Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
+                    Dim nPoint = New Point2f(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
+                    Dim width = task.msRNG.Next(0, src.Cols - nPoint.X - 1)
+                    Dim height = task.msRNG.Next(0, src.Rows - nPoint.Y - 1)
+                    Dim eSize = New Size2f(CSng(task.msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(task.msRNG.Next(0, src.Rows - nPoint.Y - 1)))
+                    Dim angle = 180.0F * CSng(task.msRNG.Next(0, 1000) / 1000.0F)
 
                     Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                     Dim rr = New RotatedRect(nPoint, eSize, angle)
@@ -88,8 +88,8 @@ Namespace VBClasses
                 Dim r2 As RotatedRect = draw.rotatedRectangles(1)
                 rect1 = r1.BoundingRect
                 rect2 = r2.BoundingRect
-                Draw_Arc.DrawRotatedOutline(r1, dst3, Scalar.Yellow)
-                Draw_Arc.DrawRotatedOutline(r2, dst3, Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(r1, dst3)
+                Draw_Arc.DrawRotatedOutline(r2, dst3)
             Else
                 rect1 = draw.rectangles(0)
                 rect2 = draw.rectangles(1)
@@ -145,7 +145,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 If task.heartBeat Then
                     rotatedCheck.Enabled = task.toggleOn
-                    countSlider.Value = msRNG.Next(2, 10)
+                    countSlider.Value = task.msRNG.Next(2, 10)
                     labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 
                     draw.Run(src)
@@ -200,7 +200,7 @@ Namespace VBClasses
                 Static countSlider = OptionParent.FindSlider("DrawCount")
                 Static rotatedCheck = OptionParent.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
                 rotatedCheck.Enabled = False
-                countSlider.Value = msRNG.Next(2, 10)
+                countSlider.Value = task.msRNG.Next(2, 10)
                 labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
 
                 draw.Run(src)
@@ -251,7 +251,7 @@ Namespace VBClasses
                 Static rotatedCheck = OptionParent.FindCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
                 Static countSlider = OptionParent.FindSlider("DrawCount")
                 rotatedCheck.Enabled = False
-                countSlider.Value = msRNG.Next(2, 10)
+                countSlider.Value = task.msRNG.Next(2, 10)
 
                 labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 
@@ -310,7 +310,7 @@ Namespace VBClasses
             Dim w = task.workRes.Width
             Dim h = task.workRes.Height
             For i = 0 To howMany - 1
-                Dim pt = New Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
+                Dim pt = New Point2f(task.msRNG.Next(0, w), task.msRNG.Next(0, h))
                 srcPoints.Add(pt)
             Next
             Return srcPoints
@@ -325,7 +325,7 @@ Namespace VBClasses
             End If
 
             minRect = MinAreaRect(pointList.ToArray)
-            Draw_Arc.DrawRotatedOutline(minRect, dst2, Scalar.Yellow)
+            Draw_Arc.DrawRotatedOutline(minRect, dst2)
         End Sub
     End Class
 

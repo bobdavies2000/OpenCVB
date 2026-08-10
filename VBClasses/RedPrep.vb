@@ -114,6 +114,8 @@ Namespace VBClasses
         Public reduced32s As New Mat
         Public reduced32f As New Mat
         Public presetReductionName As String = ""
+        Public Const wcMinVal As Single = -1000
+        Public Const wcMaxVal As Single = 1000
         Public Sub New()
             desc = "Reduction transform for the cv.Point cloud"
         End Sub

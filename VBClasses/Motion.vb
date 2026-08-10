@@ -192,7 +192,7 @@ Namespace VBClasses
             desc = "Validate that the right image motion mask (Motion_RightImage) is working properly."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionRight.Run(emptyMat)
+            motionRight.Run(task.emptyMat)
 
             dst1 = task.rightView.Clone
             dst2 = motionRight.motion.dst2.Clone()
@@ -360,6 +360,7 @@ Namespace VBClasses
     Public Class Motion_Throttle : Inherits TaskParent
         Dim motionPlot As New Motion_CorrelationToLast
         Public strList As New List(Of String)
+        Const maxTrueTextLines As Integer = 18
         Public Sub New()
             task.gOptions.showMotionMask.Checked = True
             desc = "Adjust the color difference threshold based on the histogram of the grid rects."
@@ -406,7 +407,7 @@ Namespace VBClasses
                     If nextMsg.Trim.Length > 0 Then strList.Add(nextMsg)
                 End If
 
-                If strList.Count > task.maxTrueTextLines Then strList.RemoveAt(0)
+                If strList.Count > maxTrueTextLines Then strList.RemoveAt(0)
             End If
 
             strOut = "Motion Cells" + vbTab + "%Motion" + vbTab + "%Identical" + vbTab +

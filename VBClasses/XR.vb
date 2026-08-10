@@ -109,7 +109,7 @@ Namespace VBClasses
                 mats.mat(i) = plot.dst2.Clone
             Next
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
 
             Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
@@ -170,7 +170,7 @@ Namespace VBClasses
                 mats.mat(i) = plot.dst2.Clone
             Next
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
 
             Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)

@@ -331,7 +331,7 @@ Namespace VBClasses
                 dst2 = mats.mat(i) Or dst2
             Next
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst3 = mats.dst2
         End Sub
     End Class

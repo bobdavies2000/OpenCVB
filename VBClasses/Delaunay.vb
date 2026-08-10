@@ -108,7 +108,7 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim points = Enumerable.Range(0, 100).Select(Of Point2f)(
                 Function(i)
-                    Return New Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+                    Return New Point2f(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
                 End Function).ToArray()
 
             For Each p In points

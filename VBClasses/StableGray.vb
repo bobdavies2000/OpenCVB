@@ -207,7 +207,7 @@ Namespace VBClasses
             desc = "Show the absDiff(min, max)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            compare.Run(emptyMat)
+            compare.Run(task.emptyMat)
             dst1 = compare.dst3
             labels(1) = "Min gray image"
 

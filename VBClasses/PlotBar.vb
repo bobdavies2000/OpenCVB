@@ -110,11 +110,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then redCore.Run(src)
 
-            plotHist.minRange = wcMinVal
-            plotHist.maxRange = wcMaxVal
+            plotHist.minRange = RedPrep_Core.wcMinVal
+            plotHist.maxRange = RedPrep_Core.wcMaxVal
             plotHist.Run(redCore.reduced32f)
             Dim histArray = plotHist.histArray
-            Dim incr = (wcMaxVal - wcMinVal) / task.gOptions.HistBinBar.Value
+            Dim incr = (RedPrep_Core.wcMaxVal - RedPrep_Core.wcMinVal) / task.gOptions.HistBinBar.Value
             dst2 = plotHist.dst2
 
             Dim histList = plotHist.histArray.ToList
@@ -133,9 +133,9 @@ Namespace VBClasses
                 maxCount += histList(maxIndex)
             Next
 
-            Dim minRange = wcMinVal + incr * minIndex
-            Dim maxRange = wcMinVal + incr * maxIndex
-            labels(2) = "Histogram with fixed range from " + wcMinVal.ToString(fmt0) + " to " + wcMaxVal.ToString(fmt0)
+            Dim minRange = RedPrep_Core.wcMinVal + incr * minIndex
+            Dim maxRange = RedPrep_Core.wcMinVal + incr * maxIndex
+            labels(2) = "Histogram with fixed range from " + RedPrep_Core.wcMinVal.ToString(fmt0) + " to " + RedPrep_Core.wcMaxVal.ToString(fmt0)
             labels(3) = "Histogram after trim to " + minRange.ToString(fmt0) + " to " + maxRange.ToString(fmt0)
 
             plotHistNew.minRange = minRange

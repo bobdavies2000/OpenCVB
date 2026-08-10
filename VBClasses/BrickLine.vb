@@ -277,7 +277,7 @@ Namespace VBClasses
                 Rectangle(mats.mat(3), task.gridRects(index), white, task.lineWidth, task.lineType)
             Next
 
-            '  mats.Run(emptyMat)
+            '  mats.Run(task.emptyMat)
 
             dst2 = task.leftView
             CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)

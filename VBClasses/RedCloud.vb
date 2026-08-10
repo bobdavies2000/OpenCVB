@@ -276,7 +276,7 @@ Namespace VBClasses
             desc = "Filter changes to the RedCloud cells with motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(emptyMat)
+            pcMotion.Run(task.emptyMat)
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -333,7 +333,7 @@ Namespace VBClasses
             desc = "Mix the cloud motion and RedCloud output with AddWeighted."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(emptyMat)
+            pcMotion.Run(task.emptyMat)
             redC.Run(src)
             dst1 = redC.dst2
             labels(1) = redC.labels(2)

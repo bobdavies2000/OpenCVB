@@ -72,7 +72,7 @@ Namespace VBClasses
             Dim features1 = Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray)
             Dim features2 = New Mat
             Dim status As New Mat, err As New Mat, winSize As New Size(3, 3)
-            CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, term, options.OpticalFlowFlag)
+            CalcOpticalFlowPyrLK(src, lastGray, features1, features2, status, err, winSize, 3, task.term, options.OpticalFlowFlag)
             features = New List(Of Point2f)
             lastFeatures.Clear()
             For i = 0 To status.Rows - 1

@@ -14,8 +14,8 @@ Namespace VBClasses
             Dim sizeRequest = options.count
             PointList.Clear()
             While PointList.Count < sizeRequest
-                PointList.Add(New Point2f(msRNG.Next(range.X, range.X + range.Width),
-                                                          msRNG.Next(range.Y, range.Y + range.Height)))
+                PointList.Add(New Point2f(task.msRNG.Next(range.X, range.X + range.Width),
+                                                          task.msRNG.Next(range.Y, range.Y + range.Height)))
             End While
             If standaloneTest() Then
                 dst2.SetTo(0)
@@ -43,7 +43,7 @@ Namespace VBClasses
 
             PointList.Clear()
             For i = 0 To options.count - 1
-                PointList.Add(New Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
+                PointList.Add(New Point2d(task.msRNG.Next(range.X, range.X + range.Width), task.msRNG.Next(range.Y, range.Y + range.Height)))
             Next
             If standaloneTest() Then
                 dst2.SetTo(0)
@@ -71,7 +71,7 @@ Namespace VBClasses
 
             points = Enumerable.Range(0, options.count).Select(Of Point2f)(
                 Function(i)
-                    Return New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+                    Return New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
                 End Function).ToArray
             dst2.SetTo(0)
             For Each pt In points
@@ -99,7 +99,7 @@ Namespace VBClasses
 
             PointList.Clear()
             For i = 0 To options.count - 1
-                PointList.Add(New Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
+                PointList.Add(New Point3f(task.msRNG.Next(ranges(0), ranges(1)), task.msRNG.Next(ranges(2), ranges(3)), task.msRNG.Next(ranges(4), ranges(5))))
             Next
             If standaloneTest() Then
                 dst2.SetTo(0)
@@ -130,8 +130,8 @@ Namespace VBClasses
             PointList.Clear()
             Dim count = countSlider.Value
             For i = 0 To count - 1
-                PointList.Add(New Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
-                                               msRNG.Next(ranges(4), ranges(5)), msRNG.Next(ranges(6), ranges(7))))
+                PointList.Add(New Vec4f(task.msRNG.Next(ranges(0), ranges(1)), task.msRNG.Next(ranges(2), ranges(3)),
+                                               task.msRNG.Next(ranges(4), ranges(5)), task.msRNG.Next(ranges(6), ranges(7))))
             Next
             If standaloneTest() Then
                 dst2.SetTo(0)
@@ -359,7 +359,7 @@ Namespace VBClasses
             outputHistogram = New Mat(inputCDF.Size(), MatType.CV_32F, Scalar.All(0))
             Dim size = outputHistogram.Rows
             For i = 0 To outputRandom.rows - 1
-                Dim uniformR1 = msRNG.NextDouble()
+                Dim uniformR1 = task.msRNG.NextDouble()
                 For j = 0 To size - 1
                     If uniformR1 < inputCDF.Get(Of Single)(j, 0) Then
                         outputHistogram.Set(Of Single)(j, 0, outputHistogram.Get(Of Single)(j, 0) + 1)
@@ -394,8 +394,8 @@ Namespace VBClasses
             Dim histogram = New Mat(options.dimension, 1, MatType.CV_32F, Scalar.All(0))
             For i = 0 To outputRandom.rows - 1
                 While (1)
-                    Dim r1 = msRNG.NextDouble()
-                    Dim r2 = msRNG.NextDouble()
+                    Dim r1 = task.msRNG.NextDouble()
+                    Dim r2 = task.msRNG.NextDouble()
                     If r2 < r1 Then
                         Dim index = CInt(options.dimension * r1)
                         histogram.Set(Of Single)(index, 0, histogram.Get(Of Single)(index, 0) + 1)
@@ -524,7 +524,7 @@ Namespace VBClasses
 
             Add(dst2, valMat, dst2, plusMask)
             Subtract(dst2, valMat, dst2, minusMask)
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst3 = mats.dst2
         End Sub
     End Class
@@ -603,7 +603,7 @@ Namespace VBClasses
                 kalman.kInput(i * 2 + 1) = pt.Y
             Next
 
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
             For i = 0 To kalman.kOutput.Length - 1 Step 2
                 currSet(i / 2) = New cv.Point(kalman.kOutput(i), kalman.kOutput(i + 1))
             Next
@@ -651,7 +651,7 @@ Namespace VBClasses
             clusters.Clear()
             clusterLabels.Clear()
             For i = 0 To options.numClusters - 1
-                Dim mean = New Scalar(msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0)
+                Dim mean = New Scalar(task.msRNG.Next(dst2.Width / 8, dst2.Width * 7 / 8), task.msRNG.Next(dst2.Height / 8, dst2.Height * 7 / 8), 0)
                 Dim cList As New List(Of Point2f)
                 Dim labelList As New List(Of Integer)
                 For j = 0 To options.numPoints - 1

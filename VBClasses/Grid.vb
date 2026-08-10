@@ -222,7 +222,7 @@ Namespace VBClasses
 
     Public Class Grid_ValidateNabeMap : Inherits TaskParent
         Public Sub New()
-            task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            task.clickPoint = New cv.Point(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
             desc = "Click any grid element to see its neighbors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

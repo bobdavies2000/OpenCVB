@@ -13,12 +13,12 @@ Namespace VBClasses
             src.CopyTo(dst2)
             noiseMask = New Mat(src.Size(), MatType.CV_8UC1).SetTo(0)
             For n = 0 To options.noiseCount - 1
-                Dim i = msRNG.Next(0, src.Cols - 1)
-                Dim j = msRNG.Next(0, src.Rows - 1)
+                Dim i = task.msRNG.Next(0, src.Cols - 1)
+                Dim j = task.msRNG.Next(0, src.Rows - 1)
                 Dim center = New Point2f(i, j)
-                Dim c = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                Dim c = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                 If addRandomColor = False Then c = Scalar.Black
-                Dim noiseWidth = msRNG.Next(1, options.noiseWidth)
+                Dim noiseWidth = task.msRNG.Next(1, options.noiseWidth)
                 Circle(dst2, center, noiseWidth, c, -1, task.lineType)
                 Circle(noiseMask, center, noiseWidth, white, -1, task.lineType)
             Next
@@ -41,9 +41,9 @@ Namespace VBClasses
             If task.heartBeat Then
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
-                    Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                    Dim eSize = New Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
-                    Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
+                    Dim nPoint = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim eSize = New Size2f(CSng(task.msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(task.msRNG.Next(0, src.Rows - nPoint.Y - 1)))
+                    Dim angle = 180.0F * CSng(task.msRNG.Next(0, 1000) / 1000.0F)
                     Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                     Ellipse(dst2, New RotatedRect(nPoint, eSize, angle), nextColor, options.drawFilled)
                 Next
@@ -65,8 +65,8 @@ Namespace VBClasses
             If task.heartBeat Then
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
-                    Dim nPoint = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                    Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
+                    Dim nPoint = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim radius = task.msRNG.Next(10, 10 + task.msRNG.Next(src.Cols / 4))
                     Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                     Circle(dst2, nPoint, radius, nextColor, options.drawFilled, task.lineType)
                 Next
@@ -91,8 +91,8 @@ Namespace VBClasses
             If task.heartBeat Then
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
-                    Dim nPoint1 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                    Dim nPoint2 = New Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim nPoint1 = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                    Dim nPoint2 = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                     Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                     Line(dst2, nPoint1, nPoint2, nextColor, options.drawFilled, task.lineType)
                 Next
@@ -118,13 +118,13 @@ Namespace VBClasses
             If Not task.heartBeat Then Exit Sub
             Dim height = src.Height / 8
             Dim width = src.Width / 8
-            Dim polyColor = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            Dim polyColor = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
             dst3.SetTo(Scalar.Black)
             For i = 0 To options.drawCount - 1
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To 10
-                    points.Add(New cv.Point(CInt(msRNG.Next(width, width * 7)), CInt(msRNG.Next(height, height * 7))))
+                    points.Add(New cv.Point(CInt(task.msRNG.Next(width, width * 7)), CInt(task.msRNG.Next(height, height * 7))))
                 Next
                 listOfPoints.Add(points)
                 If options.drawFilled <> -1 Then
@@ -166,23 +166,23 @@ Namespace VBClasses
                 Line(dst2, p1, p2, New Scalar(i, i, i), thickness)
             Next
             For i = 1 To 256
-                Dim color = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                Select Case msRNG.Next(0, 3)
+                Dim color = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+                Select Case task.msRNG.Next(0, 3)
                     Case 0 ' circle
-                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                        Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim center = New cv.Point(task.msRNG.Next(offsetX, dst2.Cols - offsetX), task.msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim radius = task.msRNG.Next(1, Math.Min(offsetX, offsetY))
                         Circle(dst2, center, radius, color, -1, task.lineType)
                     Case 1 ' Rectangle
-                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                        Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                        Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                        Dim rcenter As cv.Rect = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
+                        Dim center = New cv.Point(task.msRNG.Next(offsetX, dst2.Cols - offsetX), task.msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim width = task.msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim height = task.msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim rcenter As New cv.Rect(center.X - width, center.Y - height / 2, width, height)
                         Rectangle(dst2, rcenter, color, -1, LineTypes.Link8)
                     Case 2 ' Ellipse
-                        Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
-                        Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                        Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                        Dim angle = msRNG.Next(0, 180)
+                        Dim center = New cv.Point(task.msRNG.Next(offsetX, dst2.Cols - offsetX), task.msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
+                        Dim width = task.msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim height = task.msRNG.Next(1, Math.Min(offsetX, offsetY))
+                        Dim angle = task.msRNG.Next(0, 180)
                         Ellipse(dst2, center, New Size(width / 2, height / 2), angle, 0, 360, color, -1, LineTypes.Link8)
                 End Select
             Next
@@ -246,7 +246,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Use OpenCV's ellipse function to draw an arc"
         End Sub
-        Public Shared Sub DrawRotatedOutline(rotatedRect As RotatedRect, dst2 As Mat, color As Scalar)
+        Public Shared Sub DrawRotatedOutline(rotatedRect As RotatedRect, dst2 As Mat)
             Dim pts = rotatedRect.Points()
             Dim lastPt = pts(0)
             For i = 1 To pts.Length
@@ -257,24 +257,24 @@ Namespace VBClasses
             Next
         End Sub
         Public Shared Function InitRandomRect(margin As Integer) As cv.Rect
-            Return New cv.Rect(msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin),
-                                   msRNG.Next(margin, task.workRes.Width - 2 * margin), msRNG.Next(margin, task.workRes.Height - 2 * margin))
+            Return New cv.Rect(task.msRNG.Next(margin, task.workRes.Width - 2 * margin), task.msRNG.Next(margin, task.workRes.Height - 2 * margin),
+                                   task.msRNG.Next(margin, task.workRes.Width - 2 * margin), task.msRNG.Next(margin, task.workRes.Height - 2 * margin))
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If task.heartBeat Then
                 rect = InitRandomRect(options.saveMargin)
-                angle = msRNG.Next(0, 360)
-                colorIndex = msRNG.Next(0, 255)
-                thickness = msRNG.Next(1, 5)
-                startAngle = msRNG.Next(1, 360)
-                endAngle = msRNG.Next(1, 360)
+                angle = task.msRNG.Next(0, 360)
+                colorIndex = task.msRNG.Next(0, 255)
+                thickness = task.msRNG.Next(1, 5)
+                startAngle = task.msRNG.Next(1, 360)
+                endAngle = task.msRNG.Next(1, 360)
 
                 kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             End If
 
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
             Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
             If r.Width <= 5 Then r.Width = 5
             If r.Height <= 5 Then r.Height = 5
@@ -284,7 +284,7 @@ Namespace VBClasses
             dst2.SetTo(white)
             If options.drawFull Then
                 Ellipse(dst2, rr, color, thickness, task.lineType)
-                Draw_Arc.DrawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
+                Draw_Arc.DrawRotatedOutline(rr, dst2)
             Else
                 Dim angle = kalman.kOutput(4)
                 Dim startAngle = kalman.kOutput(5)
@@ -327,7 +327,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = src
             kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
             Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
             Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
@@ -337,7 +337,7 @@ Namespace VBClasses
 
             Dim clipped = ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
             Line(dst3, p1, p2, If(clipped, white, Scalar.Black), task.lineWidth + 1, task.lineType)
-            Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.red), task.lineWidth + 1, task.lineType)
+            Rectangle(dst3, r, If(clipped, Scalar.Yellow, Scalar.Red), task.lineWidth + 1, task.lineType)
 
             flow.nextMsg = "(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle")
             linenum += 1
@@ -364,16 +364,16 @@ Namespace VBClasses
             desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If p1 <> new cv.Point And p2 <> New cv.Point And task.clickPoint <> new cv.Point Then
-                p1 = new cv.Point
-                p2 = new cv.Point
+            If p1 <> New cv.Point And p2 <> New cv.Point And task.clickPoint <> New cv.Point Then
+                p1 = New cv.Point
+                p2 = New cv.Point
             End If
             dst2 = src
             If task.clickPoint <> New cv.Point Or externalUse Then
                 If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
             End If
-            If p1 <> new cv.Point And p2 = new cv.Point Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
-            If p1 <> new cv.Point And p2 <> new cv.Point Then
+            If p1 <> New cv.Point And p2 = New cv.Point Then Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+            If p1 <> New cv.Point And p2 <> New cv.Point Then
                 Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
             End If
             SetTrueText("Click twice in the image to provide the points below and they will be connected with a line" + vbCrLf +
@@ -394,8 +394,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then
-                line.p1 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
-                line.p2 = New cv.Point(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+                line.p1 = New cv.Point(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
+                line.p2 = New cv.Point(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
             End If
             line.Run(src)
             dst2 = line.dst2

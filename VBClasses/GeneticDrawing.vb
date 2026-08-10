@@ -85,13 +85,13 @@ Namespace VBClasses
 
             For i = 0 To options.strokeCount - 1
                 Dim e = New DNAentry
-                e.color = msRNG.Next(0, 255)
-                e.size = msRNG.NextDouble() * (maxSize - minSize) + minSize
-                e.pt = New cv.Point(r.X + msRNG.Next(r.Width), r.Y + msRNG.Next(r.Height))
+                e.color = task.msRNG.Next(0, 255)
+                e.size = task.msRNG.NextDouble() * (maxSize - minSize) + minSize
+                e.pt = New cv.Point(r.X + task.msRNG.Next(r.Width), r.Y + task.msRNG.Next(r.Height))
                 Dim localMagnitude = gradient.magnitude.Get(Of Single)(e.pt.Y, e.pt.X)
                 Dim localAngle = gradient.angle.Get(Of Single)(e.pt.Y, e.pt.X) + 90
-                e.rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
-                e.brushNumber = CInt(msRNG.Next(0, brushes.Length - 1))
+                e.rotation = (task.msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
+                e.brushNumber = CInt(task.msRNG.Next(0, brushes.Length - 1))
                 DNAseq(i) = e
             Next
 
@@ -134,21 +134,21 @@ Namespace VBClasses
             Next
             Dim changes As Integer, childImg = imgGeneration.Clone, maxOption = 5, bestError As Single
             For i = 0 To nextDNA.Length - 1
-                Dim changeCount = msRNG.Next(0, maxOption) + 1
+                Dim changeCount = task.msRNG.Next(0, maxOption) + 1
                 For j = 0 To changeCount - 1
-                    Select Case msRNG.Next(0, maxOption)
+                    Select Case task.msRNG.Next(0, maxOption)
                         Case 0
-                            nextDNA(i).color = CInt(msRNG.Next(0, 255))
+                            nextDNA(i).color = CInt(task.msRNG.Next(0, 255))
                         Case 1, 2
-                            nextDNA(i).pt = New cv.Point(msRNG.Next(r.x, r.X + r.width), msRNG.Next(r.y, r.y + r.height))
+                            nextDNA(i).pt = New cv.Point(task.msRNG.Next(r.x, r.X + r.width), task.msRNG.Next(r.y, r.y + r.height))
                         Case 3
-                            nextDNA(i).size = msRNG.NextDouble() * (maxSize - minSize) + minSize
+                            nextDNA(i).size = task.msRNG.NextDouble() * (maxSize - minSize) + minSize
                         Case 4
                             Dim localMagnitude = gradient.magnitude.Get(Of Single)(nextDNA(i).pt.Y, nextDNA(i).pt.X)
                             Dim localAngle = gradient.angle.Get(Of Single)(nextDNA(i).pt.Y, nextDNA(i).pt.X) + 90
-                            nextDNA(i).rotation = (msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
+                            nextDNA(i).rotation = (task.msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
                         Case Else
-                            nextDNA(i).brushNumber = CInt(msRNG.Next(0, brushes.Length - 1))
+                            nextDNA(i).brushNumber = CInt(task.msRNG.Next(0, brushes.Length - 1))
                     End Select
                 Next
 
@@ -177,7 +177,7 @@ Namespace VBClasses
                 startNewStage(r)
             End If
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
             labels(3) = " stage " + CStr(stage) + "/" + CStr(options.stageTotal) + " Gen " + generation.ToString("00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
             dst3 = mats.mat(mats.quadrant)

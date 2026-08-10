@@ -7,9 +7,8 @@ Namespace VBClasses
             desc = "Apply the different color maps in OpenCV"
         End Sub
         Public Shared Function randomCellColor() As Scalar
-            Static msRNG As New System.Random
             ' trying to avoid extreme colors... 
-            Return New Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+            Return New Scalar(task.msRNG.Next(50, 240), task.msRNG.Next(50, 240), task.msRNG.Next(50, 240))
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
@@ -58,7 +57,7 @@ Namespace VBClasses
 
     Public Class XR_Palette_LinearPolar : Inherits TaskParent
         Public rotateOptions As New Options_Resize
-        Dim pt = New Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
+        Dim pt = New Point2f(task.msRNG.Next(0, dst2.Cols - 1), task.msRNG.Next(0, dst2.Rows - 1))
         Public Sub New()
             desc = "Use LinearPolar To create gradient image"
             If sliders.Setup(traceName) Then
@@ -67,7 +66,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static radiusSlider = OptionParent.FindSlider("LinearPolar radius")
-            Dim radius = radiusSlider.Value ' msRNG.next(0, dst2.Cols)
+            Dim radius = radiusSlider.Value ' task.msRNG.next(0, dst2.Cols)
 
             dst2.SetTo(0)
             For i = 0 To dst2.Rows - 1
@@ -133,8 +132,8 @@ Namespace VBClasses
             If task.heartBeat Then
                 If standaloneTest() Then
                     ' every 30 frames try a different pair of random colors.
-                    color1 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                    color2 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                    color1 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+                    color2 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                     dst3.SetTo(color1)
                     dst3(New cv.Rect(0, 0, dst3.Width, dst3.Height / 2)).SetTo(color2)
                 End If
@@ -322,7 +321,7 @@ Namespace VBClasses
 
             desc = "Create a new palette"
         End Sub
-        Private Function colorTransition(color1 As Scalar, color2 As Scalar, width As Integer) As Mat
+        Private Shared Function colorTransition(color1 As Scalar, color2 As Scalar, width As Integer) As Mat
             Dim f As Double = 1.0
             Dim gradientColors As New Mat(1, width, MatType.CV_64FC3)
             For i = 0 To width - 1
@@ -347,14 +346,13 @@ Namespace VBClasses
                 activeSchemeName = schemeName
                 saveColorTransitionCount = colorTransitionCount
                 If activeSchemeName = "schemeRandom" Then
-                    Dim msRNG As New System.Random
                     Dim color1 = New Scalar(0, 0, 0)
-                    Dim color2 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                    Dim gradMat As New Mat
+                    Dim color2 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+                    Dim gradMat As Mat
                     For i = 0 To colorTransitionCount
                         gradMat = colorTransition(color1, color2, 255)
                         color1 = color2
-                        color2 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                        color2 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                         If i = 0 Then colorGrad = gradMat Else HConcat(colorGrad, gradMat, colorGrad)
                     Next
                     Resize(colorGrad, colorGrad, New Size(256, 1))
@@ -418,13 +416,13 @@ Namespace VBClasses
             If transitionCount <> paletteSlider.Value Then
                 transitionCount = paletteSlider.Value
 
-                gColor.color1 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                gColor.color2 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                gColor.color1 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+                gColor.color2 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                 For i = 0 To transitionCount - 1
                     gColor.gradientWidth = dst2.Width
                     gColor.Run(src)
                     gColor.color2 = gColor.color1
-                    gColor.color1 = New Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                    gColor.color1 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                     If i = 0 Then gradientColorMap = gColor.gradient Else HConcat(gradientColorMap, gColor.gradient, gradientColorMap)
                 Next
                 Resize(gradientColorMap, gradientColorMap, New Size(256, 1))

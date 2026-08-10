@@ -21,17 +21,6 @@ Namespace VBClasses
                                      (p1(1) - p2(1)) * (p1(1) - p2(1)) +
                                      (p1(2) - p2(2)) * (p1(2) - p2(2)))
         End Function
-        Public Shared Function GetMaxDist(ByRef md As maskData) As cv.Point
-            Dim mask = md.mask.Clone
-            Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), Scalar.All(0), 1)
-            Dim distance32f As New Mat
-            DistanceTransform(mask, distance32f, DistanceTypes.L1, DistanceTransformMasks.Precise, MatType.CV_32F)
-            Dim mm As mmData = GetMinMax(distance32f)
-            mm.maxLoc.X += md.rect.X
-            mm.maxLoc.Y += md.rect.Y
-
-            Return mm.maxLoc
-        End Function
         Public Shared Function GetMaxDist(ByRef maskInput As Mat, rect As cv.Rect) As cv.Point
             Dim mask = maskInput.Clone
             Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), Scalar.All(0), 1)
@@ -135,8 +124,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() And task.heartBeat Then
-                inPoint1 = New Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
-                inPoint2 = New Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
+                inPoint1 = New Point3f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, 10000))
+                inPoint2 = New Point3f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, 10000))
 
                 dst2.SetTo(0)
                 Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
@@ -173,10 +162,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                inPoint1 = New Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                        msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
-                inPoint2 = New Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                        msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
+                inPoint1 = New Vec4f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height),
+                                        task.msRNG.Next(0, task.MaxZmeters), task.msRNG.Next(0, task.MaxZmeters))
+                inPoint2 = New Vec4f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height),
+                                        task.msRNG.Next(0, task.MaxZmeters), task.msRNG.Next(0, task.MaxZmeters))
             End If
 
             Dim x = inPoint1(0) - inPoint2(0)

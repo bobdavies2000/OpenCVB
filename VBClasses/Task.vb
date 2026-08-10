@@ -4,6 +4,7 @@ Imports jsonShared
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Shared Sub Initialize(settings As jsonShared.Settings)
+            Static AlgorithmTestAllCount As Integer = 1
             task.Settings = settings
             Dim paintFreq = task.Settings.paintFrequency
             task.gridRects = New List(Of cv.Rect)
@@ -112,8 +113,8 @@ Namespace VBClasses
 
             ' run any task algorithms here
             task.grid.Run(task.color)
-            task.imuBasics.Run(emptyMat)
-            task.gravityMatrix.Run(emptyMat)
+            task.imuBasics.Run(task.emptyMat)
+            task.gravityMatrix.Run(task.emptyMat)
 
             If task.gOptions.CreateGif.Checked Then
                 task.optionsChanged = False
@@ -121,11 +122,11 @@ Namespace VBClasses
                 task.heartBeat = task.heartBeat Or task.optionsChanged Or task.mouseClickFlag
             End If
 
-            task.filterBasics.Run(Color.Clone)
+            task.filterBasics.Run(color.Clone)
             task.gray = task.filterBasics.dst3
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.clone
-            task.leftRightBrightness.Run(emptyMat)
+            task.leftRightBrightness.Run(task.emptyMat)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 
@@ -181,7 +182,7 @@ Namespace VBClasses
             Cloud_Gravity.preparePointCloud()
 
             If task.gOptions.stableDepthRGB.Checked Then
-                task.stableDepth.Run(emptyMat)
+                task.stableDepth.Run(task.emptyMat)
                 task.depthRGB = task.stableDepth.dst2
             End If
 
@@ -191,7 +192,7 @@ Namespace VBClasses
             task.lines.Run(gray)
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
-            task.foreground.Run(emptyMat)
+            task.foreground.Run(task.emptyMat)
             task.edges.Run(task.gray)
 
 

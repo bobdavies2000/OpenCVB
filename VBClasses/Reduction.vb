@@ -197,7 +197,7 @@ Namespace VBClasses
             Next
 
             mats.mat(3) = (mats.mat(0) + mats.mat(1) + mats.mat(2))
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst3 = mats.dst2
 
             Merge(splitMats, dst2)

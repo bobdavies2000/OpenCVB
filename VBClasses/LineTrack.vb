@@ -72,7 +72,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.lines.lpList.Count <= 1 Then Exit Sub
 
-            slices.Run(emptyMat)
+            slices.Run(task.emptyMat)
 
             Dim lpMatch As lpData
             lpMatches.Clear()
@@ -371,10 +371,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             If standalone Then
-                Dim p1 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-                Dim p2 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-                Dim p3 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-                Dim p4 = New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+                Dim p1 = New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
+                Dim p2 = New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
+                Dim p3 = New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
+                Dim p4 = New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height))
                 lpInput1 = New lpData(p1, p2)
                 lpInput2 = New lpData(p3, p4)
             End If
@@ -390,7 +390,7 @@ Namespace VBClasses
                 Line(dst2, lpInput2.p1, lpInput2.p2, task.highlight, task.lineWidth, task.lineType)
                 SetTrueText("Line 1", lpInput1.p1, 2)
                 SetTrueText("Line 2", lpInput2.p1, 2)
-                Draw_Arc.DrawRotatedOutline(rotatedRect, dst2, Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(rotatedRect, dst2)
             End If
         End Sub
     End Class
@@ -861,7 +861,7 @@ Namespace VBClasses
     '                Next
     '            End If
     '        End If
-    '        lineTrack.Run(emptyMat)
+    '        lineTrack.Run(task.emptyMat)
     '        labels(2) = lineTrack.labels(2)
 
     '        lpCurr = task.lines.lplist(0)
@@ -903,7 +903,7 @@ Namespace VBClasses
 
             intersect.lp1 = lp
             intersect.lp2 = lpPerp
-            intersect.Run(emptyMat)
+            intersect.Run(task.emptyMat)
             Dim p3 = intersect.intersectionPoint
 
             SetTrueText("p1 " + CStr(CInt(p1.X)) + ", " + CStr(CInt(p1.Y)), p1, 2)

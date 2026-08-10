@@ -14,7 +14,7 @@ Namespace VBClasses
 
             Dim hullList As New List(Of cv.Point)
             For i = 0 To options.hullCount - 1
-                hullList.Add(New Point2f(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)))
+                hullList.Add(New Point2f(task.msRNG.Next(dst2.Width / pad, w), task.msRNG.Next(dst2.Height / pad, h)))
             Next
             Return hullList
         End Function

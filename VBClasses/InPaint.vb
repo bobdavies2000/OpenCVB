@@ -8,8 +8,8 @@ Namespace VBClasses
             labels(3) = "Repaired Image"
         End Sub
         Public Function drawRandomLine(dst As Mat) As Mat
-            Dim p1 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-            Dim p2 = New Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+            Dim p1 = New Point2f(task.msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), task.msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+            Dim p2 = New Point2f(task.msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), task.msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
             Line(dst2, p1, p2, New Scalar(0, 0, 0), task.lineWidth, task.lineType)
             Dim mask = New Mat(dst2.Size(), MatType.CV_8UC1)
             mask.SetTo(0)

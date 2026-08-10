@@ -323,7 +323,7 @@ Namespace VBClasses
 
             knn.queries = perif.ptOutside
             knn.trainInput = knn.queries
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             dst2 = src
             For i = 0 To knn.result.GetUpperBound(0)
@@ -437,7 +437,7 @@ Namespace VBClasses
             Dim dimension = 3
             knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
             knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
-            knn.Run(emptyMat)
+            knn.Run(task.emptyMat)
 
             For i = 0 To queries.Count - 1
                 Dim index = knn.result(i, 0)
@@ -570,7 +570,7 @@ Namespace VBClasses
                 random.Run(src)
                 trainInput = New List(Of Vec4f)(random.PointList)
                 queries.Clear()
-                queries.Add(New Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height), msRNG.Next(0, dst2.Height)))
+                queries.Add(New Vec4f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, dst2.Height)))
             End If
 
             Dim dimension = 4
@@ -618,13 +618,13 @@ Namespace VBClasses
                 trainInput.Clear()
                 For i = 0 To knn.options.numPoints - 1
                     For j = 0 To knn.options.knnDimension - 1
-                        trainInput.Add(msRNG.Next(dst2.Height))
+                        trainInput.Add(task.msRNG.Next(dst2.Height))
                     Next
                 Next
 
                 queries.Clear()
                 For j = 0 To knn.options.knnDimension - 1
-                    queries.Add(msRNG.Next(dst2.Height))
+                    queries.Add(task.msRNG.Next(dst2.Height))
                 Next
             End If
 

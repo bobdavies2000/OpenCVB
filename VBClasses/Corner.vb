@@ -201,7 +201,7 @@ Namespace VBClasses
             If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
                 kalman.kInput(0) = m.M10 / m.M00
                 kalman.kInput(1) = m.M01 / m.M00
-                kalman.Run(emptyMat)
+                kalman.Run(task.emptyMat)
                 Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, Scalar.red, -1, task.lineType)
             End If
         End Sub
@@ -365,7 +365,7 @@ Namespace VBClasses
 
             If fast.features.Count = 0 Then Exit Sub ' completely dark?  No features...
             CornerSubPix(task.gray, fast.features, New Size(options.subpixSize, options.subpixSize),
-                                New Size(-1, -1), term)
+                                New Size(-1, -1), task.term)
 
             dst2 = src
             For Each pt In fast.features

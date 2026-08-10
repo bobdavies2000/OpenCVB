@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Spectrum.vb" />
     <Compile Remove="XO.vb" />
   </ItemGroup>
 

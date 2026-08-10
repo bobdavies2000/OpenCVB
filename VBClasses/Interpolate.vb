@@ -66,7 +66,7 @@ Namespace VBClasses
             Dim tmp32f As New Mat
             dst2.ConvertTo(tmp32f, MatType.CV_32F)
             tmp32f.GetArray(Of Single)(kalman.kInput)
-            kalman.Run(emptyMat)
+            kalman.Run(task.emptyMat)
 
             Dim results(kalman.kInput.Length - 1) As Byte
             For i = 0 To kalman.kOutput.Length - 1

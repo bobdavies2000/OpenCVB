@@ -453,8 +453,8 @@ Namespace VBClasses
                 leftCenter = rightCenter ' force iteration...
                 Dim iterations As Integer
                 While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
-                    leftMost = msRNG.Next(minLeft, minRight)
-                    rightmost = msRNG.Next(minLeft, minRight)
+                    leftMost = task.msRNG.Next(minLeft, minRight)
+                    rightmost = task.msRNG.Next(minLeft, minRight)
                     leftCenter = track.redC.rcList(leftMost).maxDist
                     rightCenter = track.redC.rcList(rightmost).maxDist
                     iterations += 1

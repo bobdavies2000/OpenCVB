@@ -104,7 +104,7 @@ Namespace VBClasses
         End Function
         Public Shared Function lineHistogram(input As Mat, nMax As Integer) As Single()
             Dim histogram As New Mat
-            CalcHist({input}, {0}, emptyMat, histogram, 1, {nMax},
+            CalcHist({input}, {0}, task.emptyMat, histogram, 1, {nMax},
                          New Rangef() {New Rangef(-1, nMax + 1)})
 
             Dim histArray(histogram.Total - 1) As Single

@@ -872,7 +872,7 @@ Namespace VBClasses
 
             mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -1027,7 +1027,7 @@ Namespace VBClasses
 
             mats.mat(3) = diffX.dst2 Or diffY.dst2 ' diffz is too much...
 
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -1309,7 +1309,7 @@ Namespace VBClasses
             desc = "Confirm that any edges under the mouse is in both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgesLR.Run(emptyMat)
+            edgesLR.Run(task.emptyMat)
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3
 
@@ -1359,7 +1359,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
-            edgesLR.Run(emptyMat)
+            edgesLR.Run(task.emptyMat)
             dst2 = edgesLR.dst2
             dst3 = edgesLR.dst3
 
@@ -1515,7 +1515,7 @@ Namespace VBClasses
             desc = "Show the edges of the stableLeft/Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stableLR.Run(emptyMat)
+            stableLR.Run(task.emptyMat)
 
             edges.Run(stableLR.dst2)
             dst2 = edges.dst2.Clone

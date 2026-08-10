@@ -1,16 +1,6 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module Structures
-        Public Enum pointStyle
-            unFiltered = 0
-            filtered = 1
-            flattened = 2
-            flattenedAndFiltered = 3
-        End Enum
-
-
-
-
         Public Structure mmData
             Dim minVal As Double
             Dim maxVal As Double
@@ -23,43 +13,6 @@ Namespace VBClasses
 
 
 
-        Public Class tCell
-            Public template As cv.Mat
-            Public searchRect As cv.Rect
-            Public rect As cv.Rect
-            Public center As cv.Point2f
-            Public correlation As Single
-            Public depth As Single
-            Public strOut As String
-            Public Sub New()
-                strOut = ""
-            End Sub
-        End Class
-
-
-
-
-
-        Public Class gravityLine
-            Public pt1 As cv.Point3f
-            Public pt2 As cv.Point3f
-            Public len3D As Single
-            Public imageAngle As Single
-            Public arcX As Single
-            Public arcY As Single
-            Public arcZ As Single
-            Public tc1 As tCell
-            Public tc2 As tCell
-            Public Sub New()
-                tc1 = New tCell
-                tc2 = New tCell
-            End Sub
-        End Class
-
-
-
-
-
         Public Structure DNAentry
             Dim color As Byte
             Dim pt As cv.Point
@@ -67,143 +20,6 @@ Namespace VBClasses
             Dim rotation As Single
             Dim brushNumber As Integer
         End Structure
-
-
-
-
-
-
-        Public Structure coinPoints
-            Dim p1 As cv.Point
-            Dim p2 As cv.Point
-            Dim p3 As cv.Point
-            Dim p4 As cv.Point
-        End Structure
-
-
-
-
-
-
-        Public Structure matchRect
-            Dim p1 As cv.Point
-            Dim p2 As cv.Point
-            Dim p1Correlation As Single
-            Dim p2Correlation As Single
-        End Structure
-
-
-
-
-        Public Structure mlData
-            Dim row As Single
-            Dim col As Single
-            Dim red As Single
-            Dim green As Single
-            Dim blue As Single
-        End Structure
-
-
-
-
-
-
-        Public Class roiData
-            Public depth As Single
-            Public color As cv.Vec3b
-        End Class
-
-
-
-
-
-        Public Class fPolyData
-            Public prevPoly As New List(Of cv.Point2f)
-            Public lengthPrevious As New List(Of Single)
-            Public polyPrevSideIndex As Integer
-
-            Public rotateCenter As cv.Point2f
-            Public rotateAngle As Single
-            Public centerShift As cv.Point2f
-            Public currPoly As New List(Of cv.Point2f)
-            Public currLength As New List(Of Single)
-            Dim jitterCheck As cv.Mat
-            Dim lastJitterPixels As Integer
-            Public featureLineChanged As Boolean
-            Sub New()
-                prevPoly = New List(Of cv.Point2f)
-                currPoly = New List(Of cv.Point2f)
-                polyPrevSideIndex = 0
-            End Sub
-            Sub New(_currPoly As List(Of cv.Point2f))
-                prevPoly = New List(Of cv.Point2f)(_currPoly)
-                currPoly = New List(Of cv.Point2f)(_currPoly)
-                polyPrevSideIndex = 0
-            End Sub
-            Public Function computeCurrLengths() As Single
-                currLength = New List(Of Single)
-                Dim polymp = currmp()
-                Dim d = polymp.p1.DistanceTo(polymp.p2)
-                For i = 0 To currPoly.Count - 1
-                    d = currPoly(i).DistanceTo(currPoly((i + 1) Mod task.polyCount))
-                    currLength.Add(d)
-                Next
-                If lengthPrevious Is Nothing Then lengthPrevious = New List(Of Single)(currLength)
-                Return d
-            End Function
-            Public Function computeFLineLength() As Single
-                Return Math.Abs(currLength(polyPrevSideIndex) - lengthPrevious(polyPrevSideIndex))
-            End Function
-            Public Sub resync()
-                lengthPrevious = New List(Of Single)(currLength)
-                polyPrevSideIndex = lengthPrevious.IndexOf(lengthPrevious.Max)
-                prevPoly = New List(Of cv.Point2f)(currPoly)
-                jitterCheck.SetTo(0)
-            End Sub
-            Public Function prevmp() As lpData
-                Return New lpData(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount))
-            End Function
-            Public Function currmp() As lpData
-                If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
-                Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
-            End Function
-            Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
-                If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-                Dim polymp = currmp()
-                Line(parent.jitterCheck, polymp.p1, polymp.p2, 255, task.lineWidth, task.lineType)
-                Dim jitterPixels = CountNonZero(jitterCheck)
-                If jitterPixels = lastJitterPixels Then featureLineChanged = True Else featureLineChanged = False
-                lastJitterPixels = jitterPixels
-            End Sub
-        End Class
-
-
-
-
-
-
-        Public Class triangleData
-            Public color As cv.Point3f
-            Public facets(3) As cv.Point3f
-        End Class
-
-
-
-
-
-        Public Class rangeData
-            Public index As Integer
-            Public pixels As Integer
-            Public start As Integer
-            Public ending As Integer
-            Public Sub New(_index As Integer, _start As Integer, _ending As Integer, _pixels As Integer)
-                index = _index
-                pixels = _pixels
-                start = _start
-                ending = _ending
-            End Sub
-        End Class
-
 
 
 
@@ -281,23 +97,6 @@ Namespace VBClasses
             End Sub
         End Class
 
-
-
-
-        Public Class maskData
-            Public rect As cv.Rect
-            Public mask As cv.Mat
-            Public contour As New List(Of cv.Point)
-            Public index As Integer
-            Public maxDist As cv.Point
-            Public pixels As Integer
-            Public depthMean As Single
-            Public mm As mmData
-            Public Sub New()
-                mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-                rect = New cv.Rect(0, 0, 1, 1)
-            End Sub
-        End Class
 
 
 

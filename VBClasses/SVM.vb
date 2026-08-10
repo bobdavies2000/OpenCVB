@@ -80,8 +80,8 @@ Namespace VBClasses
             points.Clear()
             responses.Clear()
             For i = 0 To options.sampleCount - 1
-                Dim x = msRNG.Next(0, src.Height - 1)
-                Dim y = msRNG.Next(0, src.Height - 1)
+                Dim x = task.msRNG.Next(0, src.Height - 1)
+                Dim y = task.msRNG.Next(0, src.Height - 1)
                 points.Add(New Point2f(x, y))
                 If y > inputFunction(x) Then
                     responses.Add(1)
@@ -124,7 +124,7 @@ Namespace VBClasses
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
-                    points.Add(New Point2f(msRNG.Next(0, src.Width - 1), msRNG.Next(0, src.Height - 1)))
+                    points.Add(New Point2f(task.msRNG.Next(0, src.Width - 1), task.msRNG.Next(0, src.Height - 1)))
                     responses.Add(Choose(i + 1, labeled, nonlabel, nonlabel, nonlabel))
                 Next
             End If
@@ -190,7 +190,7 @@ Namespace VBClasses
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
-                    points.Add(New Point2f(msRNG.Next(0, src.Height - 1), msRNG.Next(0, src.Height - 1))) ' note: working with a square, not a rectangle
+                    points.Add(New Point2f(task.msRNG.Next(0, src.Height - 1), task.msRNG.Next(0, src.Height - 1))) ' note: working with a square, not a rectangle
                     responses.Add(Choose(i + 1, labeled, nonlabel, nonlabel, nonlabel))
                 Next
             End If
@@ -254,7 +254,7 @@ Namespace VBClasses
                 svm.points.Clear()
                 svm.response.Clear()
                 For i = 0 To svm.options.sampleCount - 1
-                    Dim pt = New Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
+                    Dim pt = New Point2f(task.msRNG.Next(0, width - 1), task.msRNG.Next(0, src.Height - 1))
                     svm.points.Add(pt)
                     Dim res As Integer
                     If svm.options.kernelType = ML.SVM.KernelTypes.Linear Then

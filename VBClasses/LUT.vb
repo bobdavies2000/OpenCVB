@@ -78,7 +78,7 @@ Namespace VBClasses
         Public Sub New()
             For i = 0 To 255
                 ' trying to avoid extreme colors... 
-                Dim vec = New Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+                Dim vec = New Vec3b(task.msRNG.Next(50, 240), task.msRNG.Next(50, 240), task.msRNG.Next(50, 240))
                 vector.Set(Of Vec3b)(i, 0, vec)
             Next
             labels(3) = "Custom Color Lookup Table"

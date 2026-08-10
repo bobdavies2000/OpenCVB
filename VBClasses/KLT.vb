@@ -8,7 +8,6 @@ Namespace VBClasses
         Public options As New Options_KLT
         Public ptInput() As Point2f
         Public Sub New()
-            term = New TermCriteria(CriteriaTypes.Eps Or CriteriaTypes.Count, 10, 1.0)
             desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -22,7 +21,7 @@ Namespace VBClasses
                 options.ptInput = GoodFeaturesToTrack(src, options.maxCorners, options.qualityLevel,
                                                                          options.minDistance, New Mat, options.blockSize, False, 0)
                 If options.ptInput.Length > 0 Then
-                    options.ptInput = CornerSubPix(src, options.ptInput, options.subPixWinSize, New Size(-1, -1), term)
+                    options.ptInput = CornerSubPix(src, options.ptInput, options.subPixWinSize, New Size(-1, -1), task.term)
                 End If
                 outputMat = Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput)
                 status = New Mat(outputMat.Rows, outputMat.Cols, MatType.CV_8U, Scalar.All(1))
@@ -31,7 +30,7 @@ Namespace VBClasses
                 ' convert the point2f vector to an inputarray (Mat)
                 Dim inputMat = Mat.FromPixelData(options.ptInput.Length, 1, MatType.CV_32FC2, options.ptInput)
                 outputMat = inputMat.Clone()
-                CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, term, OpticalFlowFlags.None)
+                CalcOpticalFlowPyrLK(lastGray, src, inputMat, outputMat, status, err, options.winSize, 3, task.term, OpticalFlowFlags.None)
 
                 Dim k As Integer
                 For i = 0 To options.ptInput.Length - 1

@@ -12,8 +12,8 @@ Namespace VBClasses
                 src = New Mat(src.Size(), MatType.CV_8U, Scalar.All(0))
                 Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
                 For i = 0 To srcPoints.Length - 1
-                    srcPoints(i).X = msRNG.Next(0, src.Width)
-                    srcPoints(i).Y = msRNG.Next(0, src.Height)
+                    srcPoints(i).X = task.msRNG.Next(0, src.Width)
+                    srcPoints(i).Y = task.msRNG.Next(0, src.Height)
                     src.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
                 Next
             End If

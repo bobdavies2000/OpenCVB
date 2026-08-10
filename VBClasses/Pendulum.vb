@@ -25,9 +25,9 @@ Namespace VBClasses
             End If
 
             If options.initialize Then
-                l1 = msRNG.Next(50, 300)
-                l2 = msRNG.Next(50, 300)
-                dw = msRNG.Next(2, 4)
+                l1 = task.msRNG.Next(50, 300)
+                l2 = task.msRNG.Next(50, 300)
+                dw = task.msRNG.Next(2, 4)
                 dh = 2 * dw
             End If
 

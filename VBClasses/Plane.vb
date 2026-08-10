@@ -188,7 +188,7 @@
 '                    For x = 0 To rc.rect.Width - 1
 '                        Dim val = rc.mask.Get(Of Byte)(y, x)
 '                        If val > 0 Then
-'                            If msRNG.Next(100) < 10 Then
+'                            If task.msRNG.Next(100) < 10 Then
 '                                Dim pt = task.pointCloud(rc.rect).Get(Of Point3f)(y, x)
 '                                ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
 '                                Dim depth = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)

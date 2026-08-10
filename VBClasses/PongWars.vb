@@ -25,8 +25,8 @@ Namespace VBClasses
                     squares(i, j) = If(i < numSquaresX / 2, DAY_COLOR, NIGHT_COLOR)
                 Next
             Next
-            p1 = New cv.Point(msRNG.Next(0, dst2.Width / 4), msRNG.Next(0, dst2.Height / 2))
-            p2 = New cv.Point(msRNG.Next(dst2.Width / 2, dst2.Width), msRNG.Next(dst2.Height / 4, dst2.Height))
+            p1 = New cv.Point(task.msRNG.Next(0, dst2.Width / 4), task.msRNG.Next(0, dst2.Height / 2))
+            p2 = New cv.Point(task.msRNG.Next(dst2.Width / 2, dst2.Width), task.msRNG.Next(dst2.Height / 4, dst2.Height))
             desc = "Pong as war between the forces of light and darkness."
         End Sub
         Private Function UpdateSquareAndBounce(pt As cv.Point, dxy As Point2f, sqClass As Integer) As Point2f
@@ -89,9 +89,9 @@ Namespace VBClasses
             p2.x += d2.X
             p2.y += d2.Y
 
-            If p1Last = p1 Then p1 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+            If p1Last = p1 Then p1 = New cv.Point(task.msRNG.Next(0, dst2.Width / 2), task.msRNG.Next(0, dst2.Height / 2))
             p1Last = p1
-            If p2Last = p2 Then p2 = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+            If p2Last = p2 Then p2 = New cv.Point(task.msRNG.Next(0, dst2.Width / 2), task.msRNG.Next(0, dst2.Height / 2))
             p2Last = p2
 
             UpdateScoreElement()

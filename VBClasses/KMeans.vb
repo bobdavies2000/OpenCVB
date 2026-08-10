@@ -34,7 +34,7 @@ Namespace VBClasses
                 colors.SetTo(0)
             End If
 
-            Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
+            Kmeans(columnVector, classCount, dst2, task.term, 1, options.kMeansFlag, colors)
 
             saveLabels = dst2.Clone
 
@@ -95,7 +95,7 @@ Namespace VBClasses
             km.Run(task.gray)
             Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-            Mats.Run(emptyMat)
+            Mats.Run(task.emptyMat)
             dst2 = Mats.dst2
             dst3 = Mats.dst3
         End Sub

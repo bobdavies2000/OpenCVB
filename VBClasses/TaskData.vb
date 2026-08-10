@@ -259,7 +259,9 @@ Namespace VBClasses
         Public resolutionDetails As String = ""
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
-        Public maxTrueTextLines As Integer = 18
-        Public newMat As New cv.Mat
+
+        Public emptyMat As New Mat
+        Public term As New TermCriteria(CriteriaTypes.Eps + CriteriaTypes.Count, 10, 1.0)
+        Public msRNG As New System.Random
     End Class
 End Namespace

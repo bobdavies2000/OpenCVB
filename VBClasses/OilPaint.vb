@@ -22,8 +22,8 @@ Namespace VBClasses
                 Dim nPt As New cv.Point
                 For y = 0 To randomMask.Height - 1
                     For x = 0 To randomMask.Width - 1
-                        nPt.X = (msRNG.Next(-1, 1) + x) Mod (randomMask.Width - 1)
-                        nPt.Y = (msRNG.Next(-1, 1) + y) Mod (randomMask.Height - 1)
+                        nPt.X = (task.msRNG.Next(-1, 1) + x) Mod (randomMask.Width - 1)
+                        nPt.Y = (task.msRNG.Next(-1, 1) + y) Mod (randomMask.Height - 1)
                         If nPt.X < 0 Then nPt.X = 0
                         If nPt.Y < 0 Then nPt.Y = 0
                         randomMask.Set(Of cv.Point)(y, x, nPt)

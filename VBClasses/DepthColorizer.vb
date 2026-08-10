@@ -3,6 +3,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class DepthColorizer_Basics_TA : Inherits TaskParent
         Implements IDisposable
+        Public saveDepthColorMap As Mat
+        Public saveVecColors(0) As Vec3b
+        Public saveScalarColors(0) As Scalar
         Public Sub New()
             cPtr = Depth_Colorizer_Open()
             Dim gradientWidth = Math.Min(dst2.Width, 256)
@@ -42,7 +45,7 @@ Namespace VBClasses
 
             task.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, task.vecColors.ToArray)
 
-            Dim color3 = Scalar.Black, color4 = Scalar.red
+            Dim color3 = Scalar.Black, color4 = Scalar.Red
             Dim corrColors = New List(Of Vec3b)
             f = 1.0
             For i = 0 To gradientWidth - 1
@@ -147,7 +150,7 @@ Namespace VBClasses
             desc = "Show the depth colorizer output after removing the unstable pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(emptyMat)
+            pcMotion.Run(task.emptyMat)
             dst2 = pcMotion.dst2
 
             dst1 = task.pcSplit(2)

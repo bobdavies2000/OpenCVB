@@ -295,7 +295,7 @@ Namespace VBClasses
             desc = "Compare the results of using the vertical lines to just using the IMU"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            rotate.Run(emptyMat)
+            rotate.Run(task.emptyMat)
             dst1 = rotate.dst3
             dst3 = GravityRGB_Basics.rotateRGB(task.color, task.verticalizeAngle)
 

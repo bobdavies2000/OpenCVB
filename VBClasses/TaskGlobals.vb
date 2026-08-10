@@ -10,9 +10,6 @@ Public Module vbc
             _task = value
         End Set
     End Property
-    Public AlgorithmTestAllCount As Integer = 1
-    Public wcMinVal As Single = -1000
-    Public wcMaxVal As Single = 1000
 
     Public Const maxSlope As Integer = 100000
     Public Const PixelsPerRad As Single = 60.0F
@@ -32,16 +29,6 @@ Public Module vbc
     Public ReadOnly red As New Scalar(0, 0, 255), green As New Scalar(0, 255, 0)
     Public ReadOnly blue As New Scalar(255, 0, 0)
 
-    Public msRNG As New System.Random
-
-    Public zero3f As New Point3f
-    Public newVec4f As New Vec4f
-    Public emptyMat As New Mat
-    Public pipeCount As Integer
-    Public saveVecColors(0) As Vec3b
-    Public saveScalarColors(0) As Scalar
-    Public saveDepthColorMap As Mat
-    Public term As New TermCriteria(CriteriaTypes.Eps + CriteriaTypes.Count, 10, 1.0)
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj

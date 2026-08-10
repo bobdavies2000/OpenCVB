@@ -171,7 +171,7 @@ Namespace VBClasses
 
     '        mats.mat(3) = New Mat(src.Size(), MatType.CV_8UC3, Scalar.All(0))
     '        src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
-    '        mats.Run(emptyMat)
+    '        mats.Run(task.emptyMat)
     '        dst3 = mats.dst2
     '        ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
     '        Dim r = task.gridRects(maxIndex)

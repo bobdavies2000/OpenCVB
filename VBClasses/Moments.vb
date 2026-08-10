@@ -25,7 +25,7 @@ Namespace VBClasses
             If options.useKalman Then
                 kalman.kInput(0) = m.M10 / m.M00
                 kalman.kInput(1) = m.M01 / m.M00
-                kalman.Run(emptyMat)
+                kalman.Run(task.emptyMat)
                 center = New Point2f(kalman.kOutput(0), kalman.kOutput(1))
             Else
                 center = New Point2f(m.M10 / m.M00, m.M01 / m.M00)
@@ -54,7 +54,7 @@ Namespace VBClasses
             If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
                 kalman.kInput(0) = m.M10 / m.M00
                 kalman.kInput(1) = m.M01 / m.M00
-                kalman.Run(emptyMat)
+                kalman.Run(task.emptyMat)
                 Circle(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), task.DotSize + 5, Scalar.red, -1, task.lineType)
             End If
         End Sub

@@ -1462,7 +1462,7 @@ Namespace VBClasses
                 Dim dimension = 4
                 knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
                 knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
-                knn.Run(emptyMat)
+                knn.Run(task.emptyMat)
 
                 matchList.Clear()
                 dst2.SetTo(0)
@@ -1736,7 +1736,7 @@ Namespace VBClasses
             desc = "Find the lines in the right image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stableR.Run(emptyMat)
+            stableR.Run(task.emptyMat)
 
             Dim lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableR.dst3)
@@ -1762,7 +1762,7 @@ Namespace VBClasses
             desc = "How many lines have both endpoints with depth?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lineLR.Run(emptyMat)
+            lineLR.Run(task.emptyMat)
             CvtColor(lineLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
             labels(2) = lineLR.labels(2)
 
@@ -1853,7 +1853,7 @@ Namespace VBClasses
             desc = "For each line in the lpList output of Line_Depth, update the pointcloud with linear data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lineDepth.Run(emptyMat)
+            lineDepth.Run(task.emptyMat)
             dst2 = lineDepth.dst2
             labels(2) = lineDepth.labels(2)
 
@@ -1903,7 +1903,7 @@ Namespace VBClasses
             Static stableLR As New StableGray_LeftRight
             Static linesLeft As New Line_Core
             Static linesRight As New Line_Core
-            stableLR.Run(emptyMat)
+            stableLR.Run(task.emptyMat)
 
             Dim lastList = New List(Of lpData)(linesLeft.lpList)
             linesLeft.Run(stableLR.dst2)
@@ -1949,7 +1949,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
 
-            rightOnly.Run(emptyMat)
+            rightOnly.Run(task.emptyMat)
             labels(3) = rightOnly.labels(2)
 
             dst3.SetTo(0)
@@ -1988,7 +1988,7 @@ Namespace VBClasses
             labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
 
             Static stableLR As New StableGray_LeftRight
-            stableLR.Run(emptyMat)
+            stableLR.Run(task.emptyMat)
 
             lastList = New List(Of lpData)(rightList)
             linesRight.Run(stableLR.dst3)
@@ -2105,10 +2105,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 If task.heartBeatLT Then
-                    lp1 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                    lp2 = New lpData(New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                     New Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                    lp1 = New lpData(New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)),
+                                     New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)))
+                    lp2 = New lpData(New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)),
+                                     New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)))
                 End If
             End If
 
@@ -2214,7 +2214,7 @@ Namespace VBClasses
             desc = "Find the parallel lines in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            linesLR.Run(emptyMat)
+            linesLR.Run(task.emptyMat)
 
             lpList = New List(Of lpData)(task.lines.lpList)
             For Each lp In linesLR.rightList
@@ -2406,11 +2406,10 @@ Namespace VBClasses
 
 
 
-    Public Class Line_MatchTest : Inherits TaskParent
-        Dim vert As New GravityRGB_Vertical
+    Public Class Line_MatchClosest : Inherits TaskParent
         Dim matchP1 As New Match_Basics
         Dim matchP2 As New Match_Basics
-        Dim lpTracked As lpData
+        Public lp As lpData
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
@@ -2418,23 +2417,18 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
-            vert.Run(src)
-            dst2 = task.color.Clone
-            If vert.lpList.Count = 0 Then
-                labels(2) = "No vertical lines from GravityRGB_Vertical"
-                labels(3) = ""
-                Exit Sub
-            End If
 
-            If lpTracked IsNot Nothing AndAlso lpTracked.length < dst2.Height / 5 Then lpTracked = Nothing
-            If task.heartBeat Or lpTracked Is Nothing Then
-                lpTracked = vert.lpList(0)
-                Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
-                Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+            dst2 = task.color.Clone
+
+            If task.heartBeat Or lp Is Nothing Then
+                If standalone Then lp = task.lines.lpList(0)
+                Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+                Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
                 Dim r1 = task.gridNabeRects(index1)
                 Dim r2 = task.gridNabeRects(index2)
-                Dim offset1 = New cv.Point(lpTracked.p1.X - (r1.X + r1.Width \ 2), lpTracked.p1.Y - (r1.Y + r1.Height \ 2))
-                Dim offset2 = New cv.Point(lpTracked.p2.X - (r2.X + r2.Width \ 2), lpTracked.p2.Y - (r2.Y + r2.Height \ 2))
+                Dim offset1 = New cv.Point(lp.p1.X - (r1.X + r1.Width \ 2), lp.p1.Y - (r1.Y + r1.Height \ 2))
+                Dim offset2 = New cv.Point(lp.p2.X - (r2.X + r2.Width \ 2), lp.p2.Y - (r2.Y + r2.Height \ 2))
                 r1.X += offset1.X
                 r1.Y += offset1.Y
                 r2.X += offset2.X
@@ -2445,16 +2439,16 @@ Namespace VBClasses
                 matchP1.Run(src)
                 Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
                 If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
-                SetTrueText(matchP1.correlation.ToString(fmt3), lpTracked.p1)
+                SetTrueText(matchP1.correlation.ToString(fmt3), lp.p1)
 
                 matchP2.Run(src)
                 Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
                 If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
-                SetTrueText(matchP2.correlation.ToString(fmt3), lpTracked.p2)
-                lpTracked = New lpData(matchP1.newCenter, matchP2.newCenter)
+                SetTrueText(matchP2.correlation.ToString(fmt3), lp.p2)
+                lp = New lpData(matchP1.newCenter, matchP2.newCenter)
             End If
 
-            Line(dst2, lpTracked.p1, lpTracked.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
         End Sub
     End Class
 
@@ -2467,17 +2461,14 @@ Namespace VBClasses
         Public goodCorrelation As Boolean
         Dim matchP1 As New Match_Basics
         Dim matchP2 As New Match_Basics
-        Dim refreshCount As New List(Of Integer)
+        Public refreshCount As New List(Of Integer)
         Public Sub New()
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
-            If task.lines.lpList.Count = 0 Then
-                SetTrueText("No lines found in task.lines.lpList", 3)
-                Exit Sub
-            End If
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             dst2 = task.color.Clone
 
@@ -2515,6 +2506,46 @@ Namespace VBClasses
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
             If refreshCount.Count > 100 Then refreshCount.RemoveAt(0)
             labels(3) = "Had to refresh the longest line " + refreshCount.Average.ToString("0.0%") + " of the time"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_MatchCheck : Inherits TaskParent
+        Dim lp As lpData
+        Dim matcher As New Line_Match
+        Dim closest As New Line_MatchClosest
+        Public resetCount As New List(Of Integer)
+        Public Sub New()
+            desc = "Use 2 methods to match the selected line."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Or lp Is Nothing Or matcher.goodCorrelation = False Then
+                resetCount.Add(1)
+                lp = task.lines.lpList(0)
+            End If
+
+            matcher.lp = lp
+            matcher.Run(task.gray)
+
+            closest.lp = lp
+            closest.Run(task.gray)
+
+            Dim lpC = closest.lp
+            Dim lpM = matcher.lp
+            If Math.Abs(lpC.angle - lpM.angle) < AngleThreshold Then
+                resetCount.Add(0)
+                dst2 = task.color.Clone
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Else
+                resetCount.Add(1)
+                lp = task.lines.lpList(0) ' can't agree!
+            End If
+
+            If resetCount.Count > 100 Then resetCount.RemoveAt(0)
+            labels(2) = resetCount.Average.ToString("0.0%") + " of the frames required restarting with the longest line"
         End Sub
     End Class
 End Namespace

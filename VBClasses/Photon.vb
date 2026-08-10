@@ -62,7 +62,7 @@ Namespace VBClasses
                                counts(i).Min.ToString("###,##0.0") + " max = " + counts(i).Max.ToString("###,##0.0") + vbCrLf
             Next
             SetTrueText(strOut, 3)
-            mats.Run(emptyMat)
+            mats.Run(task.emptyMat)
             dst2 = mats.dst2
 
             Dim colWidth = dst2.Width / testCount

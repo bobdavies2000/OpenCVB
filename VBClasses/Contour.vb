@@ -232,7 +232,7 @@ Namespace VBClasses
                 delaunay.inputPoints.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
 
-            delaunay.Run(emptyMat)
+            delaunay.Run(task.emptyMat)
             dst2 = delaunay.dst2.Clone
 
             For Each pt In maxList
@@ -907,7 +907,7 @@ Namespace VBClasses
             Dim sortedTours As New SortedList(Of Integer, Tuple(Of RotatedRect, Integer))(New compareAllowIdenticalInteger)
             For i = 0 To contours.Length - 1
                 findRect.inputContour = contours(i)
-                findRect.Run(emptyMat)
+                findRect.Run(task.emptyMat)
                 Dim rr = findRect.minRect
                 If rr.BoundingRect.Width > options.minSize And rr.BoundingRect.Height > options.minSize Then
                     Dim tuple = New Tuple(Of RotatedRect, Integer)(rr, i)
