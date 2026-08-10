@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class XR_ContourPlane_Basics : Inherits TaskParent
-        Dim contours As New Contour_BasicsOld
+        Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
             desc = "Construct a simple plane at the average depth for each of the top contours"
@@ -27,7 +27,7 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_MaxDist : Inherits TaskParent
-        Dim contours As New Contour_BasicsOld
+        Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
             desc = "Show the maxDist value in color (yellow) and in depth (blue)"
         End Sub
@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_RectX : Inherits TaskParent
-        Dim contours As New Contour_BasicsOld
+        Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
             desc = "Assume the plane in a contour in X"
         End Sub
@@ -96,7 +96,7 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_X : Inherits TaskParent
-        Dim contours As New Contour_BasicsOld
+        Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
             desc = "Assume the plane in a contour in X"
         End Sub

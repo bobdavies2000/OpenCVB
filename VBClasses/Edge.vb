@@ -18,18 +18,18 @@ Namespace VBClasses
             If saveSelection <> task.fOptions.EdgeMethods.Text Then
                 saveSelection = task.fOptions.EdgeMethods.Text
                 Select Case task.fOptions.EdgeMethods.Text
-                    Case "Binarized Reduction"
+                    Case "Edge_BinarizedReduction"
                         edges = New Edge_BinarizedReduction
-                    Case "Binarized Sobel"
+                    Case "Bin4Way_Sobel"
                         edges = New Bin4Way_Sobel
-                    Case "Canny"
+                    Case "Edge_Canny"
                         edges = New Edge_Canny
-                    Case "Color Gap"
-                        edges = New XR_Edge_ColorGap_CPP
-                    Case "Laplacian"
+                    Case "Edge_Laplacian"
                         edges = New Edge_Laplacian
-                    Case "Sobel"
+                    Case "Edge_Sobel"
                         edges = New Edge_Sobel
+                    Case "EdgeLine_Basics"
+                        edges = New EdgeLine_Basics
                 End Select
             End If
 

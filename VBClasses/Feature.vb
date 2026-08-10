@@ -43,19 +43,19 @@ Namespace VBClasses
                     For i = 0 To kazeKeyPoints.Length - 1
                         ptLatest.Add(kazeKeyPoints(i).Pt)
                     Next
-                Case "BrickPoint"
+                Case "BrickPoint_Basics"
                     Static bPoint As New BrickPoint_Basics
                     bPoint.Run(src)
                     For Each pt In bPoint.ptList
                         ptLatest.Add(pt)
                     Next
                     strOut = bPoint.labels(2)
-                Case "BRISK"
+                Case "Feature_BRISK"
                     Static brisk As New Feature_BRISK
                     brisk.Run(src)
                     ptLatest = brisk.features
                     strOut = "BRISK produced " + CStr(ptLatest.Count) + " features"
-                Case "FAST"
+                Case "Corner_Basics"
                     Static FAST As New Corner_Basics
                     FAST.Run(src)
                     ptLatest = FAST.features
@@ -65,7 +65,7 @@ Namespace VBClasses
                                                       options.minDistance, New Mat,
                                                       options.blockSize, True, options.k).ToList
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-                Case "Harris"
+                Case "Corner_HarrisDetector_CPP"
                     Static harris As New Corner_HarrisDetector_CPP
                     harris.Run(src)
                     ptLatest = harris.features

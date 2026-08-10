@@ -689,7 +689,7 @@ Namespace VBClasses
 
     Public Class XR_BackProject_FeatureLess : Inherits TaskParent
         Dim bProject As New BackProject_Basics
-        Dim contours As New Contour_BasicsOld
+        Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
             labels(3) = "Move mouse over the histogram to backproject a column"
             desc = "Create a histogram of the featureless regions"

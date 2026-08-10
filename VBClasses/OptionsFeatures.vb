@@ -3,28 +3,24 @@ Public Class OptionsFeatures
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics", "Hist3DColor_Basics",
                                    "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
+    Public edgeList() As String = {"Bin4Way_Sobel", "Edge_BinarizedReduction", "Edge_Canny", "Edge_Laplacian", "Edge_Sobel",
+                                   "EdgeLine_Basics"}
+    Public featureList() As String = {"AGAST", "AKAZE", "BrickPoint_Basics", "Corner_Basics", "Corner_HarrisDetector_CPP",
+                                      "Feature_BRISK", "GoodFeatures", "LineInput"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = vbc.task.allOptions
         Me.Left = 0
         Me.Top = 0
 
-        FeatureMethod.Items.Add("AGAST")
-        FeatureMethod.Items.Add("AKAZE")
-        FeatureMethod.Items.Add("BrickPoint")
-        FeatureMethod.Items.Add("BRISK")
-        FeatureMethod.Items.Add("FAST")
-        FeatureMethod.Items.Add("GoodFeatures")
-        FeatureMethod.Items.Add("Harris")
-        FeatureMethod.Items.Add("LineInput")
+        For i = 0 To featureList.Length - 1
+            FeatureMethod.Items.Add(featureList(i))
+        Next
         FeatureMethod.SelectedItem() = "GoodFeatures"
 
-        EdgeMethods.Items.Add("Binarized Reduction")
-        EdgeMethods.Items.Add("Binarized Sobel")
-        EdgeMethods.Items.Add("Canny")
-        EdgeMethods.Items.Add("Color Gap")
-        EdgeMethods.Items.Add("Laplacian")
-        EdgeMethods.Items.Add("Sobel")
-        EdgeMethods.SelectedItem() = "Sobel"
+        For i = 0 To edgeList.Length - 1
+            EdgeMethods.Items.Add(edgeList(i))
+        Next
+        EdgeMethods.SelectedItem() = "Edge_Sobel"
 
         MatchCorrSlider.Value = 95
 
