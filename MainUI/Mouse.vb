@@ -75,7 +75,9 @@ Namespace MainApp
                                                                   vbc.task.drawRect.X, vbc.task.drawRect.Y,
                                                                   vbc.task.drawRect.Width, vbc.task.drawRect.Height)
             End If
-            StatusLabel.Text += "  Current pixel: " + vbc.task.mousePixelValue.ToString
+
+            Dim pixel = vbc.task.mousePixelValue
+            StatusLabel.Text += "  Current pixel: " + CStr(pixel(0)) + "/" + CStr(pixel(1)) + "/" + CStr(pixel(2))
         End Sub
         Private Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
             If CInt(pt.X) < 0 Then pt.X = 0
