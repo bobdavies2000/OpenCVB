@@ -54,10 +54,10 @@ Color8U_Complementary
 Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
+Contour_ConnectContourToLine
+Contour_ConnectLineToCenter
+Contour_ConnectLineToCenterOld
 Contour_Core
-Contour_LineConnect
-Contour_Smoothing
-Contour_SortOld
 Convex_Basics
 Convex_Defects
 Convex_RedCDefects

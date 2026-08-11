@@ -57,6 +57,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each lp In lpList
+                lp.index = (lpList.IndexOf(lp) + 1) Mod 255
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
@@ -166,7 +167,6 @@ Namespace VBClasses
             Dim x = (dst2.Width - src.Width) \ 2
             Dim y = (dst2.Height - src.Height) \ 2
             For i = 0 To lpList.Count - 1
-                lpList(i).index = (i + 1) Mod 255
                 lpList(i) = lpFixup(lpList(i), x, y)
 
                 Line(dst1, lpList(i).p1, lpList(i).p2, lpList(i).index, task.lineWidth, LineTypes.AntiAlias)
