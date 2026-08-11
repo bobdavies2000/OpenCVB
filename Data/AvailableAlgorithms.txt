@@ -55,8 +55,9 @@ Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
 Contour_ConnectContourToLine
-Contour_ConnectLineToCenter
-Contour_ConnectLineToCenterOld
+Contour_ConnectLineToContour
+Contour_ConnectLineToContour1
+Contour_ConnectLineToContourTest
 Contour_Core
 Convex_Basics
 Convex_Defects

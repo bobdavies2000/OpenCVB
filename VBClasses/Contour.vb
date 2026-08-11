@@ -1301,43 +1301,6 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_ConnectLineToCenterOld : Inherits TaskParent
-        Dim contours As New Contour_Basics
-        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Identify any lines that are part of a contour"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1.SetTo(0)
-            For Each lp In task.lines.lpList
-                Line(dst1, lp.p1, lp.p2, lp.index + 1, task.lineWidth)
-            Next
-
-            contours.Run(src)
-            dst2 = contours.dst2
-            labels(2) = contours.labels(2)
-
-            rcLpList.Clear()
-            dst3.SetTo(0)
-            For Each lp In task.lines.lpList
-                For Each rc In contours.rcList
-                    If rc.contour.Contains(lp.ptCenter) Then
-                        rcLpList.Add((lp, rc))
-                        Exit For
-                    End If
-                Next
-            Next
-
-            For i = 0 To rcLpList.Count - 1
-                Line(dst3, rcLpList(i).lp.p1, rcLpList(i).lp.p2, task.highlight, task.lineWidth)
-                DrawContours(dst3, {rcLpList(i).rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
-            Next
-        End Sub
-    End Class
-
-
-
 
     Public Class Contour_ConnectContourToLine : Inherits TaskParent
         Dim contours As New Contour_Basics
@@ -1410,13 +1373,142 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_ConnectLineToCenter : Inherits TaskParent
+    Public Class Contour_ConnectLineToContour1 : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Connect each line to the contour containing its center point"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
+
+            ' Build a CV_8U map of contours: pixel value = rc.index
+            dst0.SetTo(0)
+            For Each rc In contours.rcList
+                DrawContours(dst0, {rc.contour}, 0, rc.index, -1, task.lineType)
+            Next
+
+            rcLpList.Clear()
+            For Each lp In task.lines.lpList
+                Dim cx = CInt(lp.ptCenter.X)
+                Dim cy = CInt(lp.ptCenter.Y)
+                If cx < 0 OrElse cy < 0 OrElse cx >= dst0.Width OrElse cy >= dst0.Height Then Continue For
+
+                Dim index = dst0.Get(Of Byte)(cy, cx)
+                If index = 0 OrElse index > contours.rcList.Count Then Continue For
+
+                ' Keep only lines that touch this contour's boundary
+                Dim touches As Boolean = False
+                Dim steps = Math.Max(CInt(lp.length), 1)
+                For s = 0 To steps
+                    Dim t = s / steps
+                    Dim x = CInt(Math.Round(lp.p1.X + (lp.p2.X - lp.p1.X) * t))
+                    Dim y = CInt(Math.Round(lp.p1.Y + (lp.p2.Y - lp.p1.Y) * t))
+                    If dst0.Get(Of Byte)(y, x) = index Then
+                        touches = True
+                        Exit For
+                    End If
+                Next
+
+                If touches Then rcLpList.Add((lp, contours.rcList(index - 1)))
+            Next
+
+            dst3.SetTo(0)
+            For i = 0 To rcLpList.Count - 1
+                Line(dst3, rcLpList(i).lp.p1, rcLpList(i).lp.p2, task.highlight, task.lineWidth)
+                DrawContours(dst3, {rcLpList(i).rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+            Next
+            labels(3) = CStr(rcLpList.Count) + " line/contour connections"
+
+            If standaloneTest() And task.heartBeat Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                dst1.SetTo(0)
+                If index < rcLpList.Count Then
+                    Dim rc = rcLpList(index).rc
+                    Dim lp = rcLpList(index).lp
+                    DrawContours(dst1, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    Line(dst1, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
+                    strOut = rc.displayCell
+                Else
+                    strOut = "No cell with that index..."
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+    Public Class Contour_ConnectLineToContour : Inherits TaskParent
+        Dim contours As New Contour_Basics
+        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            desc = "Cursor.ai: Connect each line to the contour containing its center point"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
+
+            dst0.SetTo(0)
+            For Each rc In contours.rcList
+                DrawContours(dst0, {rc.contour}, 0, rc.index, task.lineWidth, task.lineType)
+            Next
+
+            rcLpList.Clear()
+            For Each lp In task.lines.lpList
+                Dim index = dst0.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                If index = 0 Then Continue For
+
+                ' Keep only lines that touch this contour's boundary
+                Dim touches As Boolean = False
+                Dim steps = Math.Max(CInt(lp.length), 1)
+                For s = 0 To steps
+                    Dim t = s / steps
+                    Dim x = CInt(Math.Round(lp.p1.X + (lp.p2.X - lp.p1.X) * t))
+                    Dim y = CInt(Math.Round(lp.p1.Y + (lp.p2.Y - lp.p1.Y) * t))
+                    If dst0.Get(Of Byte)(y, x) = index Then
+                        touches = True
+                        Exit For
+                    End If
+                Next
+
+                If touches Then rcLpList.Add((lp, contours.rcList(index - 1)))
+            Next
+
+            labels(3) = CStr(rcLpList.Count) + " line/contour connections"
+
+            If standaloneTest() And task.heartBeat Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                dst3.SetTo(0)
+                If index < rcLpList.Count Then
+                    Dim rc = rcLpList(index).rc
+                    Dim lp = rcLpList(index).lp
+                    DrawContours(dst3, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    Line(dst3, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
+                    strOut = rc.displayCell
+                Else
+                    strOut = "No cell with that index..."
+                End If
+            End If
+        End Sub
+    End Class
+
+
+
+    Public Class Contour_ConnectLineToContourTest : Inherits TaskParent
+        Dim contours As New Contour_Basics
+        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Cursor.ai: Connect each line to the contour containing its center point"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -1462,21 +1554,16 @@ Namespace VBClasses
                 If touches Then rcLpList.Add((lp, contours.rcList(index - 1)))
             Next
 
-            dst3.SetTo(0)
-            For i = 0 To rcLpList.Count - 1
-                Line(dst3, rcLpList(i).lp.p1, rcLpList(i).lp.p2, task.highlight, task.lineWidth)
-                DrawContours(dst3, {rcLpList(i).rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
-            Next
             labels(3) = CStr(rcLpList.Count) + " line/contour connections"
 
             If standaloneTest() And task.heartBeat Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-                dst1.SetTo(0)
+                dst3.SetTo(0)
                 If index < rcLpList.Count Then
                     Dim rc = rcLpList(index).rc
                     Dim lp = rcLpList(index).lp
-                    DrawContours(dst1, {rc.contour}, 0, white, task.lineWidth, task.lineType)
-                    Line(dst1, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
+                    DrawContours(dst3, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    Line(dst3, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
                     strOut = rc.displayCell
                 Else
                     strOut = "No cell with that index..."
