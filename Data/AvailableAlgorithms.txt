@@ -55,6 +55,7 @@ Color8U_Hue
 Color8U_LeftRight
 Contour_Basics
 Contour_Core
+Contour_LineConnect
 Contour_Smoothing
 Contour_SortOld
 Convex_Basics

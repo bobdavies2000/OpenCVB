@@ -8,31 +8,9 @@ Namespace VBClasses
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
-        Public Shared Function removeDuplicates(coreList As List(Of lpData)) As List(Of lpData)
-            Dim lpList As New List(Of lpData)
-
-            Dim removeNearDuplicates As Boolean = True
-            If removeNearDuplicates Then
-                Dim edgeMap As New Mat(task.workRes, MatType.CV_8U, 0)
-                For Each lp In coreList
-                    Dim val1 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                    Dim val2 = edgeMap.Get(Of Byte)(lp.ptE1.Y, lp.ptE1.X)
-                    If val1 > 0 And val2 > 0 Then Continue For
-
-                    lp.index = lpList.Count + 1
-
-                    Dim gridIndex = task.gridMap.Get(Of Integer)(Math.Floor(lp.ptE1.Y), Math.Floor(lp.ptE1.X))
-                    edgeMap(task.gridNabeRects(gridIndex)).SetTo(lp.index)
-                    lpList.Add(lp)
-                Next
-            Else
-                Return coreList
-            End If
-            Return lpList
-        End Function
         Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
-            Static lpFind As New Line_FindClosest With {.LastList = inputList}
-            lpFind.LastList = lastList
+            Static lpFind As New Line_FindClosest With {.lastList = inputList}
+            lpFind.lastList = lastList
             For Each lp In inputList
                 lpFind.inputLine = lp
                 lpFind.Run(Nothing)
@@ -119,8 +97,7 @@ Namespace VBClasses
             lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
-            lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-            averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
+            averageAge = Line_Basics_TA.updateAgesAndLongest(core.lpList, lastList)
 
             labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines." +
                         " Average age all lines = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
@@ -1740,7 +1717,6 @@ Namespace VBClasses
 
             Dim lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableR.dst3)
-            lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
             Dim averageAge = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
             dst2.SetTo(0)
@@ -1907,7 +1883,6 @@ Namespace VBClasses
 
             Dim lastList = New List(Of lpData)(linesLeft.lpList)
             linesLeft.Run(stableLR.dst2)
-            linesLeft.lpList = Line_Basics_TA.removeDuplicates(linesLeft.lpList)
             Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
 
             dst2.SetTo(0)
@@ -1919,7 +1894,6 @@ Namespace VBClasses
 
             lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableLR.dst3)
-            linesRight.lpList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
             Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
             dst3.SetTo(0)
@@ -1992,9 +1966,8 @@ Namespace VBClasses
 
             lastList = New List(Of lpData)(rightList)
             linesRight.Run(stableLR.dst3)
-            rightList = Line_Basics_TA.removeDuplicates(linesRight.lpList)
 
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(rightList, lastList)
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
             showLines(dst3, rightList, 3)
             labels(2) += " and " + CStr(rightList.Count) + " lines in the right image shown in color."
         End Sub

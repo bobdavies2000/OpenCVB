@@ -16,8 +16,7 @@ Namespace VBClasses
             lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
-            lpList = Line_Basics_TA.removeDuplicates(core.lpList)
-            averageAge = Line_Basics_TA.updateAgesAndLongest(lpList, lastList)
+            averageAge = Line_Basics_TA.updateAgesAndLongest(core.lpList, lastList)
 
             labels(2) = "LSD found " + CStr(lpList.Count) + " lines." +
                         " Average age all lines = " + If(lpList.Count > 0, averageAge.ToString(fmt1), "0")

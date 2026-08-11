@@ -6,8 +6,12 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(task.workRes, MatType.CV_32S, 0)
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then
+                task.gOptions.displayDst1.Checked = True
+                labels(3) = "Use the debugslider to display different cells."
+            End If
             desc = "Create an rcMap of the contours using the colors indicated by KMeans"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -18,9 +22,11 @@ Namespace VBClasses
 
             Dim rcListLast As New List(Of rcData)(rcList)
             rcMap.SetTo(0)
+            Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
                 rc.mapID = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                If rc.pixels > pixelThreshold Then DrawContours(dst2, {rc.contour}, 0, white, task.lineWidth, task.lineType)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
@@ -31,7 +37,20 @@ Namespace VBClasses
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
 
-            labels(2) = CStr(rcList.Count) + " cells were found"
+            If standalone And task.heartBeat Then
+                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+                dst3.SetTo(0)
+                If index < rcList.Count Then
+                    Dim rc = rcList(index)
+                    dst3(rc.rect).SetTo(white, rc.mask)
+                    strOut = rc.displayCell
+                Else
+                    strOut = "No cell with that index..."
+                End If
+            End If
+            SetTrueText(strOut, 1)
+
+            labels(2) = CStr(rcList.Count) + " contour cells were found"
         End Sub
     End Class
 
@@ -47,6 +66,7 @@ Namespace VBClasses
         Dim options As New Options_Contours
         Dim allContours As cv.Point()()
         Public Sub New()
+            task.fOptions.EdgeMethods.SelectedItem = "EdgeLine_Basics"
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "General purpose contour finder"
         End Sub
@@ -68,10 +88,10 @@ Namespace VBClasses
                 labels(3) = edgeMethod.labels(2)
             End If
 
+            dst3.SetTo(255, task.lines.dst3) ' more contour cells with this statement.
+
             Dim mm = GetMinMax(dst3)
             If mm.maxVal < 255 Then dst3 = (dst3() - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-
-            allContours = Nothing
 
             Dim mode = options.options2.ApproximationMode
             If options.retrievalMode = RetrievalModes.FloodFill Then
@@ -86,6 +106,7 @@ Namespace VBClasses
             Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             For Each ptArray In allContours
+                If ptArray.Length < 10 Then Continue For
                 Dim rc As New rcData With {.pixels = ContourArea(ptArray)}
                 If rc.pixels < 5 Then Continue For
                 rc.contour = New List(Of cv.Point)(ptArray)
@@ -1054,7 +1075,7 @@ Namespace VBClasses
                 tour.contour = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
-                tour.rect = contourData.buildRect(ptArray)
+                tour.rect = Contour_Core.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)
@@ -1134,7 +1155,7 @@ Namespace VBClasses
                 tour.contour = New List(Of cv.Point)(ptArray)
                 If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
 
-                tour.rect = contourData.buildRect(ptArray)
+                tour.rect = Contour_Core.buildRect(ptArray)
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)
@@ -1276,4 +1297,42 @@ Namespace VBClasses
             labels(2) = CStr(tourList.Count) + " contours were found"
         End Sub
     End Class
+
+
+
+
+    Public Class Contour_LineConnect : Inherits TaskParent
+        Dim contours As New Contour_Basics
+        Public lpList As New List(Of lpData)
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            desc = "Identify any lines that are part of a contour"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            dst2 = contours.dst2
+            labels(2) = contours.labels(2)
+
+            lpList.Clear()
+            rcList.Clear()
+            dst3.SetTo(0)
+            For Each lp In task.lines.lpList
+                For Each rc In contours.rcList
+                    If rc.contour.Contains(lp.ptCenter) Then
+                        lpList.Add(lp)
+                        rcList.Add(rc)
+                        Exit For
+                    End If
+                Next
+            Next
+
+            For i = 0 To lpList.Count - 1
+                Dim lp = lpList(i)
+                Dim rc = rcList(i)
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth)
+                DrawContours(dst3, {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
+
 End Namespace

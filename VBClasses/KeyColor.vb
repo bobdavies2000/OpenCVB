@@ -1,8 +1,8 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
-        Dim keyList As New List(Of keyData)
-        Dim keyMap As New Mat(task.workRes, MatType.CV_8U, 0)
+        Dim rcList As New List(Of rcData)
+        Dim rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
         Dim options As New Options_Contours
         Public Sub New()
@@ -27,33 +27,33 @@ Namespace VBClasses
                 FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
             End If
 
-            Dim sortedList As New SortedList(Of Integer, keyData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
-                Dim tour As New keyData With {.rect = contourData.buildRect(ptArray)}
-                If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
+                Dim rc As New rcData With {.rect = Contour_Core.buildRect(ptArray)}
+                If rc.rect.Width = 0 Or rc.rect.Height = 0 Then Continue For
 
-                tourMat(tour.rect).SetTo(0)
-                tour.contour = ptArray.ToList
-                Dim listOfPoints = New List(Of List(Of cv.Point))({tour.contour})
+                tourMat(rc.rect).SetTo(0)
+                rc.contour = ptArray.ToList
+                Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
                 DrawContours(tourMat, listOfPoints, 0, New Scalar(sortedList.Count), -1, LineTypes.Link8)
-                Threshold(tourMat(tour.rect), tour.mask, 0, 255, ThresholdTypes.Binary)
-                tour.maxDist = keyData.GetMaxDistContour(tour)
-                tour.pixels = ContourArea(ptArray)
-                If tour.pixels >= minSize Then sortedList.Add(tour.pixels, tour)
+                Threshold(tourMat(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
+                rc.maxDist = rc.buildMaxDist(rc.mask)
+                rc.pixels = ContourArea(ptArray)
+                If rc.pixels >= minSize Then sortedList.Add(rc.pixels, rc)
             Next
 
-            keyMap.SetTo(0)
-            keyList.Clear()
+            rcMap.SetTo(0)
+            rcList.Clear()
             For i = 1 To sortedList.Values.Count - 1
-                Dim tour = sortedList.Values(i)
-                keyMap(tour.rect).SetTo(i, tour.mask)
-                tour.index = i
-                keyList.Add(tour)
+                Dim rc = sortedList.Values(i)
+                rcMap(rc.rect).SetTo(i, rc.mask)
+                rc.index = i
+                rcList.Add(rc)
             Next
 
-            dst2 = Palettize(keyMap)
+            dst2 = Palettize(rcMap)
         End Sub
     End Class
 
@@ -91,7 +91,7 @@ Namespace VBClasses
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
-                Dim tour As New keyData With {.rect = contourData.buildRect(ptArray)}
+                Dim tour As New keyData With {.rect = Contour_Core.buildRect(ptArray)}
                 If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
 
                 tourMat(tour.rect).SetTo(0)

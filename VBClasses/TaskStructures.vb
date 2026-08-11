@@ -348,13 +348,6 @@ Namespace VBClasses
             Public pixels As Integer
             Public contour As New List(Of cv.Point)
             Public rect As New cv.Rect(0, 0, 1, 1)
-            Public Shared Function buildRect(tour As cv.Point()) As cv.Rect
-                Dim minX As Single = tour.Min(Function(p) p.X)
-                Dim maxX As Single = tour.Max(Function(p) p.X)
-                Dim minY As Single = tour.Min(Function(p) p.Y)
-                Dim maxY As Single = tour.Max(Function(p) p.Y)
-                Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            End Function
             Public Function GetMaxDistBuild() As cv.Point
                 Dim maskTest = mask.Clone
                 Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
@@ -429,6 +422,7 @@ Namespace VBClasses
             End Function
             Public Function displayCell() As String
                 Dim strout = ""
+                strout += "contour point count = " + CStr(contour.Count) + vbCrLf
                 strout += "index = " + CStr(index) + vbCrLf
                 strout += "mapID = " + CStr(mapID) + vbCrLf
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
