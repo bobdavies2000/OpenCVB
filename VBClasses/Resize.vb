@@ -38,7 +38,7 @@ Namespace VBClasses
             optGrid.Run()
 
             newSize = New Size(Math.Ceiling(src.Width * optGrid.lowResPercent),
-                                   Math.Ceiling(src.Height * optGrid.lowResPercent))
+                               Math.Ceiling(src.Height * optGrid.lowResPercent))
 
             Resize(src, dst2, newSize, 0, 0, options.warpFlag)
             labels(2) = "Image after resizing to: " + CStr(newSize.Width) + "X" + CStr(newSize.Height)

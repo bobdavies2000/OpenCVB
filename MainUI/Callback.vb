@@ -119,7 +119,7 @@ Namespace MainApp
                                            tmp = vbc.task.dstList(i).Clone
                                            cv.Cv2.Rectangle(tmp, vbc.task.drawRect, task.highlight, task.lineWidth)
                                            If vbc.task.pixelViewerRect.Width > 0 Then
-                                           cv.Cv2.Rectangle(tmp, vbc.task.pixelViewerRect, task.highlight, task.lineWidth)
+                                               cv.Cv2.Rectangle(tmp, vbc.task.pixelViewerRect, task.highlight, task.lineWidth)
                                            End If
                                            cv.Cv2.Resize(tmp, tmp, New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()

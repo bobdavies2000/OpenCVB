@@ -1,6 +1,9 @@
 Imports System.IO
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
+Imports System.Windows.Forms.Design.AxImporter
 Imports jsonShared
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Shared Sub Initialize(settings As jsonShared.Settings)
@@ -125,7 +128,7 @@ Namespace VBClasses
             task.filterBasics.Run(color.Clone)
             task.gray = task.filterBasics.dst3
             task.grayOriginal = task.gray.Clone
-            task.originalPointCloud = task.pointCloud.clone
+            task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(task.emptyMat)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
@@ -229,6 +232,9 @@ Namespace VBClasses
             task.dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
             task.dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
 
+            For Each m In task.dstList
+                If m.Size <> task.workRes Then Resize(m, m, task.workRes, 0, 0, InterpolationFlags.Nearest)
+            Next
             Dim pt = task.mouseMovePoint
             Dim tag = task.mousePicTag
             Try
