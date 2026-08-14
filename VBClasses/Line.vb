@@ -60,6 +60,7 @@ Namespace VBClasses
                 lp.index = (lpList.IndexOf(lp) + 1) Mod 255
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+                If lp.index >= 20 Then Exit For
             Next
 
             If standalone Then
