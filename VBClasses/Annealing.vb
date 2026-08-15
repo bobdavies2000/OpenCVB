@@ -88,7 +88,7 @@ Namespace VBClasses
         Dim startTime As DateTime
         Private Sub Setup()
             random.options.count = options.cityCount
-            random.Run(task.emptyMat) ' get the city positions (may or may not be used below.)
+            random.Run(emptyMat) ' get the city positions (may or may not be used below.)
 
             For i = 0 To anneal.Length - 1
                 anneal(i) = New Annealing_Basics_CPP() With {.numberOfCities = options.cityCount,
@@ -132,7 +132,7 @@ Namespace VBClasses
                 mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst2
                 mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
             End If
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
 
             ' copy the top half of the solutions to the bottom half (worst solutions)

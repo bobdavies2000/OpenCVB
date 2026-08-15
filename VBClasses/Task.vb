@@ -115,8 +115,8 @@ Namespace VBClasses
 
             ' run any task algorithms here
             task.grid.Run(task.color)
-            task.imuBasics.Run(task.emptyMat)
-            task.gravityMatrix.Run(task.emptyMat)
+            task.imuBasics.Run(New cv.Mat)
+            task.gravityMatrix.Run(New cv.Mat)
 
             If task.gOptions.CreateGif.Checked Then
                 task.optionsChanged = False
@@ -128,7 +128,7 @@ Namespace VBClasses
             task.gray = task.filterBasics.dst3
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
-            task.leftRightBrightness.Run(task.emptyMat)
+            task.leftRightBrightness.Run(New cv.Mat)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 
@@ -184,7 +184,7 @@ Namespace VBClasses
             Cloud_Gravity.preparePointCloud()
 
             If task.gOptions.stableDepthRGB.Checked Then
-                task.stableDepth.Run(task.emptyMat)
+                task.stableDepth.Run(New cv.Mat)
                 task.depthRGB = task.stableDepth.dst2
             End If
 
@@ -194,7 +194,7 @@ Namespace VBClasses
             task.lines.Run(gray)
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
-            task.foreground.Run(task.emptyMat)
+            task.foreground.Run(New cv.Mat)
             task.edges.Run(task.gray)
 
 

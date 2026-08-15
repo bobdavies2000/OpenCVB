@@ -36,6 +36,9 @@ Brightness_Basics
 CComp_Basics
 CComp_Both
 CComp_Stats
+ClipLine_Basics
+ClipLine_CenterRect
+ClipLine_KNN
 Cloud_Basics
 Cloud_Gravity
 Cloud_GravityRGB
@@ -412,7 +415,6 @@ LeftRight_Reduction
 LeftRight_Stable
 Line_Basics
 Line_Basics_TA
-Line_ClipLine
 Line_Core
 Line_Depth
 Line_DepthSimple

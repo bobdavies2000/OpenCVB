@@ -323,7 +323,7 @@ Namespace VBClasses
 
             knn.queries = perif.ptOutside
             knn.trainInput = knn.queries
-            knn.Run(task.emptyMat)
+            knn.Run(emptyMat)
 
             dst2 = src
             For i = 0 To knn.result.GetUpperBound(0)
@@ -437,7 +437,7 @@ Namespace VBClasses
             Dim dimension = 3
             knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
             knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
-            knn.Run(task.emptyMat)
+            knn.Run(emptyMat)
 
             For i = 0 To queries.Count - 1
                 Dim index = knn.result(i, 0)

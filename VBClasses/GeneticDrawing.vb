@@ -177,7 +177,7 @@ Namespace VBClasses
                 startNewStage(r)
             End If
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             labels(3) = " stage " + CStr(stage) + "/" + CStr(options.stageTotal) + " Gen " + generation.ToString("00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
             dst3 = mats.mat(mats.quadrant)

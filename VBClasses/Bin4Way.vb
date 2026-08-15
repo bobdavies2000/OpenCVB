@@ -65,7 +65,7 @@ Namespace VBClasses
 
             Dim quadrant As Integer
             binary.Run(task.gray)
-            binary.mats.Run(task.emptyMat)
+            binary.mats.Run(emptyMat)
             dst2 = binary.mats.dst2
             dst1 = binary.mats.dst3 * 0.5
             matList = binary.mats.mat
@@ -123,7 +123,7 @@ Namespace VBClasses
                 SetTrueText(labelStr(i), points(i), 3)
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
 
             Rectangle(dst1, grSave, white, task.lineWidth)
@@ -160,7 +160,7 @@ Namespace VBClasses
             edges.Run(binary.mats.mat(3))  ' the darkest of the dark half
             Threshold(edges.dst2, mats.mat(2), 0, 255, ThresholdTypes.Binary)
             mats.mat(3) = mats.mat(2) Or mats.mat(3)
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             If mats.dst3.Channels() = 3 Then
                 labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
@@ -201,7 +201,7 @@ Namespace VBClasses
             Threshold(edges.dst2, mats.mat(2), 0, 255, ThresholdTypes.Binary)
             mats.mat(3) = mats.mat(2) Or mats.mat(3)
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
             dst2 = mats.mat(1)
         End Sub
@@ -343,7 +343,7 @@ Namespace VBClasses
             InRange(task.gray, valley.valleys(2), valley.valleys(3) - 1, mats.mat(2))
             InRange(task.gray, valley.valleys(3), 255, mats.mat(3))
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
             labels(3) = mats.labels(3)
@@ -457,7 +457,7 @@ Namespace VBClasses
                 diff(i).Run(mats.mat(i))
                 dst1 = dst1 Or diff(i).dst2
             Next
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
             labels(1) = "There are " + CStr(CountNonZero(dst1)) + " unstable pixels"
@@ -528,7 +528,7 @@ Namespace VBClasses
             InRange(task.gray, midColor, topColor, mats.mat(2))
             InRange(task.gray, topColor, 255, mats.mat(3))
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
             labels(3) = mats.labels(3)
@@ -612,7 +612,7 @@ Namespace VBClasses
             InRange(task.gray, midColor, topColor, mats.mat(2))
             InRange(task.gray, topColor, 255, mats.mat(3))
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
             labels(3) = mats.labels(3)

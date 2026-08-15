@@ -135,7 +135,7 @@ Namespace VBClasses
             End If
             restartRequest = False
 
-            fcs.Run(task.emptyMat)
+            fcs.Run(emptyMat)
 
             Static paletteRandom = New Palette_RandomColors
             dst2 = paletteRandom.useColorMapFull(fcs.fcsMap)
@@ -384,7 +384,7 @@ Namespace VBClasses
             task.motionFeatures.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
             mats.mat(1) = plothist.dst2.Clone
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
 

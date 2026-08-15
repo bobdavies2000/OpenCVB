@@ -192,7 +192,7 @@ Namespace VBClasses
             desc = "Validate that the right image motion mask (Motion_RightImage) is working properly."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionRight.Run(task.emptyMat)
+            motionRight.Run(emptyMat)
 
             dst1 = task.rightView.Clone
             dst2 = motionRight.motion.dst2.Clone()

@@ -524,7 +524,7 @@ Namespace VBClasses
 
             Add(dst2, valMat, dst2, plusMask)
             Subtract(dst2, valMat, dst2, minusMask)
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
         End Sub
     End Class
@@ -603,7 +603,7 @@ Namespace VBClasses
                 kalman.kInput(i * 2 + 1) = pt.Y
             Next
 
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             For i = 0 To kalman.kOutput.Length - 1 Step 2
                 currSet(i / 2) = New cv.Point(kalman.kOutput(i), kalman.kOutput(i + 1))
             Next

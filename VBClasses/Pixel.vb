@@ -235,7 +235,7 @@ Namespace VBClasses
 
             SetTrueText(output, New cv.Point(src.Width / 2 + 10, src.Height / 2 + 20))
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -941,7 +941,7 @@ Namespace VBClasses
             Else
                 random.range = New cv.Rect(task.msRNG.Next(0, dst2.Width - width), task.msRNG.Next(0, dst2.Height - height), width, height)
             End If
-            random.Run(task.emptyMat)
+            random.Run(emptyMat)
             vbc.task.drawRect = random.range
 
             labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."

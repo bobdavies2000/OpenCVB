@@ -164,7 +164,7 @@ Namespace VBClasses
                 For i = 0 To Math.Min(saveFrames.Count, 4) - 1
                     mats.mat(i) = saveFrames(i).Clone
                 Next
-                mats.Run(task.emptyMat)
+                mats.Run(emptyMat)
                 dst3 = mats.dst2
             End If
         End Sub

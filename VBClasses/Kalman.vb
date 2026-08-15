@@ -182,7 +182,7 @@ Namespace VBClasses
             Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             Static lastRealMouse As cv.Point = task.mouseMovePoint
             kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             Line(dst2, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, white, task.lineWidth, task.lineType)
             Line(dst2, task.mouseMovePoint, lastRealMouse, Scalar.red)
             lastRealMouse = task.mouseMovePoint

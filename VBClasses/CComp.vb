@@ -104,7 +104,7 @@ Namespace VBClasses
             mats.mat(1) = labelview
             mats.mat(2) = binary
             mats.mat(3) = task.gray
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub

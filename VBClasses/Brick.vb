@@ -63,7 +63,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 Static edgesLR As New Edge_LeftRight
-                edgesLR.Run(task.emptyMat)
+                edgesLR.Run(emptyMat)
                 CvtColor(edgesLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
                 CvtColor(edgesLR.dst3, dst3, ColorConversionCodes.GRAY2BGR)
 

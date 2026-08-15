@@ -72,7 +72,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.lines.lpList.Count <= 1 Then Exit Sub
 
-            slices.Run(task.emptyMat)
+            slices.Run(emptyMat)
 
             Dim lpMatch As lpData
             lpMatches.Clear()
@@ -861,7 +861,7 @@ Namespace VBClasses
     '                Next
     '            End If
     '        End If
-    '        lineTrack.Run(task.emptyMat)
+    '        lineTrack.Run(emptyMat)
     '        labels(2) = lineTrack.labels(2)
 
     '        lpCurr = task.lines.lplist(0)
@@ -903,7 +903,7 @@ Namespace VBClasses
 
             intersect.lp1 = lp
             intersect.lp2 = lpPerp
-            intersect.Run(task.emptyMat)
+            intersect.Run(emptyMat)
             Dim p3 = intersect.intersectionPoint
 
             SetTrueText("p1 " + CStr(CInt(p1.X)) + ", " + CStr(CInt(p1.Y)), p1, 2)

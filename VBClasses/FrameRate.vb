@@ -25,7 +25,7 @@ Namespace VBClasses
                 Next
             End If
             SetTrueText(strOut, 3)
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             lastImages = {task.color.Clone, task.leftView.Clone, task.rightView.Clone, task.depthRGB.Clone}
         End Sub
@@ -68,7 +68,7 @@ Namespace VBClasses
                 Next
             End If
             SetTrueText(strOut, 3)
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
 
             lastImages = {task.color.Clone, task.leftView.Clone, task.rightView.Clone, task.depthRGB.Clone}

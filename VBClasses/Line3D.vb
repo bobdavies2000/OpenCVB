@@ -336,7 +336,7 @@ Namespace VBClasses
             dst2 = task.pointCloud.Clone
             dst3 = src.Clone
             For Each selection.lp In task.lines.lpList
-                selection.Run(task.emptyMat)
+                selection.Run(emptyMat)
                 lpList.Add(selection.lp)
                 Line(dst3, selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
             Next
@@ -357,7 +357,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Then dst1.SetTo(0)
-            Selection.Run(task.emptyMat)
+            Selection.Run(emptyMat)
             Dim lp = Selection.lp
 
             dst3.SetTo(0)

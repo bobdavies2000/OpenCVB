@@ -150,7 +150,7 @@ Namespace VBClasses
             desc = "Show the depth colorizer output after removing the unstable pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pcMotion.Run(task.emptyMat)
+            pcMotion.Run(emptyMat)
             dst2 = pcMotion.dst2
 
             dst1 = task.pcSplit(2)

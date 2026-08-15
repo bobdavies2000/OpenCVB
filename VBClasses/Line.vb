@@ -1432,7 +1432,7 @@ Namespace VBClasses
                 Dim dimension = 4
                 knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
                 knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
-                knn.Run(task.emptyMat)
+                knn.Run(emptyMat)
 
                 matchList.Clear()
                 dst2.SetTo(0)
@@ -1706,7 +1706,7 @@ Namespace VBClasses
             desc = "Find the lines in the right image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stableR.Run(task.emptyMat)
+            stableR.Run(emptyMat)
 
             Dim lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableR.dst3)
@@ -1731,7 +1731,7 @@ Namespace VBClasses
             desc = "How many lines have both endpoints with depth?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lineLR.Run(task.emptyMat)
+            lineLR.Run(emptyMat)
             CvtColor(lineLR.dst2, dst2, ColorConversionCodes.GRAY2BGR)
             labels(2) = lineLR.labels(2)
 
@@ -1822,7 +1822,7 @@ Namespace VBClasses
             desc = "For each line in the lpList output of Line_Depth, update the pointcloud with linear data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lineDepth.Run(task.emptyMat)
+            lineDepth.Run(emptyMat)
             dst2 = lineDepth.dst2
             labels(2) = lineDepth.labels(2)
 
@@ -1872,7 +1872,7 @@ Namespace VBClasses
             Static stableLR As New StableGray_LeftRight
             Static linesLeft As New Line_Core
             Static linesRight As New Line_Core
-            stableLR.Run(task.emptyMat)
+            stableLR.Run(emptyMat)
 
             Dim lastList = New List(Of lpData)(linesLeft.lpList)
             linesLeft.Run(stableLR.dst2)
@@ -1916,7 +1916,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
 
-            rightOnly.Run(task.emptyMat)
+            rightOnly.Run(emptyMat)
             labels(3) = rightOnly.labels(2)
 
             dst3.SetTo(0)
@@ -1955,7 +1955,7 @@ Namespace VBClasses
             labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
 
             Static stableLR As New StableGray_LeftRight
-            stableLR.Run(task.emptyMat)
+            stableLR.Run(emptyMat)
 
             lastList = New List(Of lpData)(rightList)
             linesRight.Run(stableLR.dst3)
@@ -2180,7 +2180,7 @@ Namespace VBClasses
             desc = "Find the parallel lines in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            linesLR.Run(task.emptyMat)
+            linesLR.Run(emptyMat)
 
             lpList = New List(Of lpData)(task.lines.lpList)
             For Each lp In linesLR.rightList
@@ -2519,36 +2519,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_ClipLine : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public Sub New()
-            labels(3) = "Only the lines withing the seelected rectangle"
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Use ClipLine to find the lines in the center rect."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.lines.dst2
-            labels(2) = task.lines.labels(2)
-
-            Dim newPoint As New cv.Point
-            Dim rect = Mat_Basics.buildCenterRect(dst2.Width \ 10, dst2.Height \ 10)
-            lpList.Clear()
-            dst3.SetTo(0)
-            Rectangle(dst3, rect, white, task.lineWidth)
-            For i = 0 To task.lines.lpList.Count - 1
-                Dim lp = task.lines.lpList(i)
-                Dim clipped = ClipLine(rect, lp.p1, lp.p2)
-                If clipped Then
-                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
-                    lpList.Add(lp)
-                End If
-            Next
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Line_Intersections : Inherits TaskParent
         Public Sub New()
@@ -2566,7 +2536,6 @@ Namespace VBClasses
             Next
 
             Dim minDistance = 100
-            Dim newPoint As New cv.Point
             dst3.SetTo(0)
             For i = 0 To lpList.Count - 2
                 Dim lp1 = lpList(i)

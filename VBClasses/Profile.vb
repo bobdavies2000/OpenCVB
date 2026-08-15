@@ -330,7 +330,7 @@
 '                kalman.kInput(i * 2 + 1) = sides.corners(i).Y
 '            Next
 
-'            kalman.Run(task.emptyMat)
+'            kalman.Run(emptyMat)
 
 '            If rc.mapID > 0 Then
 '                dst3.SetTo(0)

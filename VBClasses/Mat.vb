@@ -389,7 +389,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mat = mats.mat
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2.Clone
             If standalone Then mats.defaultMats()
             If task.firstPass Then
@@ -404,7 +404,7 @@ Namespace VBClasses
                     quadrant = If(task.clickPoint.X < task.workRes.Width / 2, 2, 3)
                 End If
             End If
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2.Clone
             dst3 = mats.mat(quadrant).Clone
         End Sub

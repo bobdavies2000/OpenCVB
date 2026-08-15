@@ -68,7 +68,7 @@ Namespace VBClasses
 
             If knn.trainInput.Count = 0 Then knn.trainInput = New List(Of Point2f)(knn.queries)
 
-            knn.Run(task.emptyMat)
+            knn.Run(emptyMat)
 
             For i = 0 To knn.queries.Count - 1
                 Dim p1 = knn.queries(i)

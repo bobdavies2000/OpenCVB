@@ -33,7 +33,7 @@ Namespace VBClasses
             InRange(task.gray, halfSplit, 255, mats.mat(1))            ' lightest
 
             If standaloneTest() Then
-                mats.Run(task.emptyMat)
+                mats.Run(emptyMat)
                 dst2 = mats.dst2
             End If
         End Sub
@@ -62,7 +62,7 @@ Namespace VBClasses
                 kmeans.dst3.CopyTo(mats.mat(i), bin2.mats.mat(i))
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -229,7 +229,7 @@ Namespace VBClasses
             mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
             mats.mat(3) = bin2.mats.mat(1)
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -269,7 +269,7 @@ Namespace VBClasses
                 Next
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
 
             rclist.Clear()

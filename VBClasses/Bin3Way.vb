@@ -44,7 +44,7 @@ Namespace VBClasses
             InRange(task.gray, firstThird, lastThird - 1, mats.mat(2)) ' other
 
             If standaloneTest() Then
-                mats.Run(task.emptyMat)
+                mats.Run(emptyMat)
                 dst2 = mats.dst2
             End If
         End Sub
@@ -74,7 +74,7 @@ Namespace VBClasses
                 kmeans.dst3.CopyTo(mats.mat(i), bin3.mats.mat(i))
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub

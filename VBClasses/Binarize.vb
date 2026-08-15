@@ -124,7 +124,7 @@ Namespace VBClasses
                 If i >= 3 Then Exit For
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -152,7 +152,7 @@ Namespace VBClasses
                 src.CopyTo(mats.mat(i), km.masks(i))
                 If i >= 3 Then Exit For
             Next
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub

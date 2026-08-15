@@ -131,7 +131,7 @@ Namespace VBClasses
 
             knn.queries.Clear()
             knn.queries.Add(New Point2f(rclast.maxDist.X, rclast.maxDist.Y))
-            knn.Run(task.emptyMat)
+            knn.Run(emptyMat)
 
             For i = 0 To knn.result.Length - 1
                 Dim rc = redC.rcList(indexList(knn.result(0, i)))

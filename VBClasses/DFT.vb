@@ -63,7 +63,7 @@ Namespace VBClasses
             mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
             mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
             mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
 
             dst2 = inverseDFT(complexImage)
@@ -95,7 +95,7 @@ Namespace VBClasses
             Absdiff(task.gray, dst2, diff)
             Threshold(diff, mats.mat(0), 0, 255, ThresholdTypes.Binary)
             mats.mat(1) = (diff * 50).ToMat
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             If CountNonZero(mats.mat(0)) > 0 Then
                 dst3 = mats.dst2
                 labels(3) = "Mask of difference (top) and relative diff (bot)"

@@ -144,7 +144,7 @@ Namespace VBClasses
             strOut = task.sharpGL.RunSharp(oCase.readPC)
             SetTrueText(strOut, 2)
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -173,7 +173,7 @@ Namespace VBClasses
             dst3 = plotHist.dst3
             labels(2) = plotHist.labels(2)
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -315,7 +315,7 @@ Namespace VBClasses
             strOut = task.sharpGL.RunSharp(oCase.readPC)
             SetTrueText(strOut, 2)
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -355,7 +355,7 @@ Namespace VBClasses
             SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
             labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -379,7 +379,7 @@ Namespace VBClasses
             dst3 = glPlot.dst3
             labels(2) += glPlot.labels(2)
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -492,7 +492,7 @@ Namespace VBClasses
             strOut = task.sharpGL.RunSharp(oCase.readQuads)
             SetTrueText(strOut, 2)
 
-            displayPC.Run(task.emptyMat)
+            displayPC.Run(emptyMat)
             dst2 = displayPC.dst2
         End Sub
     End Class
@@ -754,7 +754,7 @@ Namespace VBClasses
             desc = "Draw the lines with depth found in Line_DepthLines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lineDepth.Run(task.emptyMat)
+            lineDepth.Run(emptyMat)
             dst2 = lineDepth.dst2
             labels(2) = lineDepth.labels(2)
 

@@ -13,6 +13,7 @@ Brick
 BrickPoint
 Brightness
 CComp
+ClipLine
 Cloud
 Cluster
 Coherence

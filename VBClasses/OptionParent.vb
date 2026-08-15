@@ -1,3 +1,4 @@
+Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class OptionParent
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
@@ -5,6 +6,7 @@ Public Class OptionParent
     Public sliders As New OptionsSliders
     Public traceName As String
     Public strOut As String
+    Public emptyMat As New Mat
     Public Shared Function FindSlider(opt As String) As TrackBar
         For Each frm In Application.OpenForms
             If frm.text.endswith(" Sliders") Then

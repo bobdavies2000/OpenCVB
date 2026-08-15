@@ -71,7 +71,7 @@ Namespace VBClasses
             Threshold(dst0, mats.mat(1), options.threshold, 255, ThresholdTypes.Trunc)
             Threshold(dst0, mats.mat(2), options.threshold, 255, ThresholdTypes.Tozero)
             Threshold(dst0, mats.mat(3), options.threshold, 255, ThresholdTypes.TozeroInv)
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
             SetTrueText("Input Gradient Image", 0)

@@ -206,7 +206,7 @@ Namespace VBClasses
                 mats.mat(i) = histogram.plotHist.dst2.Clone
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -437,7 +437,7 @@ Namespace VBClasses
                 task.mousePicTag = 2
             End If
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3
         End Sub
@@ -519,7 +519,7 @@ Namespace VBClasses
             For i = 0 To task.histogramBins - 1
                 kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
             Next
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             histogram = Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput)
 
             Dim splitColors() = {Scalar.Blue, Scalar.Green, Scalar.Red}
@@ -571,7 +571,7 @@ Namespace VBClasses
                 kalmanEq.Run(rgbEq(channel).Clone())
                 mats.mat(1) = kalmanEq.dst2.Clone()
 
-                mats.Run(task.emptyMat)
+                mats.Run(emptyMat)
                 dst3 = mats.dst2
                 labels(3) = "Before (top) and After red Histogram"
             End If
@@ -1124,7 +1124,7 @@ Namespace VBClasses
             For i = 0 To task.histogramBins - 1
                 kalman.kInput(i) = hist.histogram.Get(Of Single)(i, 0)
             Next
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
 
             hist.histogram = Mat.FromPixelData(kalman.kOutput.Length, 1, MatType.CV_32FC1, kalman.kOutput)
             hist.plotHist.Run(hist.histogram)
@@ -1322,7 +1322,7 @@ Namespace VBClasses
             mats.mat(1) = histogramEQ.dst2
             mats.mat(2) = src
             mats.mat(3) = dst2
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst3 = mats.dst2
         End Sub
     End Class

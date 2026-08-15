@@ -104,7 +104,7 @@ Namespace VBClasses
                 ConvertScaleAbs(mats.mat(i), mats.mat(i))
             Next
 
-            mats.Run(task.emptyMat)
+            mats.Run(emptyMat)
             dst2 = mats.dst2
 
             matPlots.Run(src)

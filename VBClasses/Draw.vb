@@ -274,7 +274,7 @@ Namespace VBClasses
             End If
 
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
             If r.Width <= 5 Then r.Width = 5
             If r.Height <= 5 Then r.Height = 5
@@ -327,7 +327,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = src
             kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
             Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 

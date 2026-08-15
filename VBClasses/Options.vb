@@ -1,5 +1,5 @@
-Imports System.IO : Imports System.Numerics : Imports OpenCvSharp.ML
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports System.IO : Imports System.Numerics : Imports OpenCvSharp.ML
 Namespace VBClasses
     Public Class Options_SharpGL : Inherits OptionParent
         Public perspective As Single
@@ -3140,7 +3140,7 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
-                gradient.Run(task.emptyMat)
+                gradient.Run(emptyMat)
                 dst2 = gradient.dst2
             End If
 

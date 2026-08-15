@@ -30,7 +30,9 @@ Namespace VBClasses
         Public cPtr As IntPtr
         Public trueData As New List(Of TrueText)
         Public strOut As String
+        Public emptyMat As New Mat
         Public emptyRect As New cv.Rect
+        Public newPoint As New cv.Point
         Public Sub New()
             traceName = Me.GetType.Name
 

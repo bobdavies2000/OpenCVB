@@ -106,7 +106,7 @@ Namespace VBClasses
             Dim y1 = task.accRadians.Y - PI
             If task.accRadians.X < 0 Then y1 *= -1
 
-            findGravity.Run(task.emptyMat)
+            findGravity.Run(emptyMat)
 
             strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                          x1.ToString(fmt1) + vbTab + (y1 * RadToDeg).ToString(fmt1) + vbTab + (task.accRadians.Z * RadToDeg).ToString(fmt1) + vbCrLf +
@@ -124,14 +124,14 @@ Namespace VBClasses
 
             SetTrueText(strOut)
 
-            imuStabilityCheck.Run(task.emptyMat)
+            imuStabilityCheck.Run(emptyMat)
             imuStabilityMeasure = imuStabilityCheck.avgStable
             noCameraMotion = imuStabilityCheck.imuIsStable
 
             If standaloneTest() Then
                 Static plot As New PlotTime_Scalar With {.plotCount = 1, .plotData = New Scalar(imuStabilityMeasure, 0, 0)}
                 plot.plotData = New Scalar(imuStabilityMeasure, 0, 0)
-                plot.Run(task.emptyMat)
+                plot.Run(emptyMat)
                 dst3 = plot.mats.mat(0)
             End If
         End Sub
@@ -573,7 +573,7 @@ Namespace VBClasses
             Dim sy = 1 ' assume no scaling is taking place.
 
             kalman.kInput = {dx, dy, dz}
-            kalman.Run(task.emptyMat)
+            kalman.Run(emptyMat)
             dx = kalman.kOutput(0)
             dy = kalman.kOutput(1)
             dz = kalman.kOutput(2)

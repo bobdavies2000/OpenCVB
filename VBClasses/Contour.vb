@@ -14,6 +14,22 @@ Namespace VBClasses
             End If
             desc = "Create an rcMap of the contours using the colors indicated by KMeans"
         End Sub
+        Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
+            Dim dst = task.color.Clone
+            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
+            If clickIndex >= 0 And clickIndex < rcList.Count Then
+                task.rcD = rcList(clickIndex)
+                dst(task.rcD.rect).SetTo(white, task.rcD.mask)
+            ElseIf clickIndex < 1 Then
+                Dim mask As New Mat(New Size(dst.Width + 2, dst.Height + 2), MatType.CV_8U, 0)
+                Dim mapID = color8U.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                Dim floodRect As cv.Rect
+                Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                Dim count = FloodFill(color8U, mask, task.clickPoint, 255, floodRect, 0, 0, flags)
+                dst(floodRect).SetTo(white, mask(floodRect))
+            End If
+            Return dst
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
@@ -31,11 +47,7 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(contours.rcList)
 
-            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
-            If clickIndex >= 0 And clickIndex < rcList.Count Then
-                task.rcD = rcList(clickIndex)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            End If
+            task.color = clickContour(rcMap, rcList, color8U.dst2)
 
             If standalone And task.heartBeat Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
@@ -71,10 +83,10 @@ Namespace VBClasses
             desc = "General purpose contour finder"
         End Sub
         Public Shared Function buildRect(ptList As cv.Point()) As cv.Rect
-            Dim minX As Single = ptList.Min(Function(p) p.X)
-            Dim maxX As Single = ptList.Max(Function(p) p.X)
-            Dim minY As Single = ptList.Min(Function(p) p.Y)
-            Dim maxY As Single = ptList.Max(Function(p) p.Y)
+            Dim minX As Integer = ptList.Min(Function(p) p.X)
+            Dim maxX As Integer = ptList.Max(Function(p) p.X)
+            Dim minY As Integer = ptList.Min(Function(p) p.Y)
+            Dim maxY As Integer = ptList.Max(Function(p) p.Y)
             Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -87,11 +99,6 @@ Namespace VBClasses
                 dst3 = edgeMethod.dst2
                 labels(3) = edgeMethod.labels(2)
             End If
-
-            dst3.SetTo(255, task.lines.dst3) ' more contour cells with this statement.
-
-            Dim mm = GetMinMax(dst3)
-            If mm.maxVal < 255 Then dst3 = (dst3() - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
 
             Dim mode = options.options2.ApproximationMode
             If options.retrievalMode = RetrievalModes.FloodFill Then
@@ -287,7 +294,7 @@ Namespace VBClasses
                 delaunay.inputPoints.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
 
-            delaunay.Run(task.emptyMat)
+            delaunay.Run(emptyMat)
             dst2 = delaunay.dst2.Clone
 
             For Each pt In maxList
@@ -962,7 +969,7 @@ Namespace VBClasses
             Dim sortedTours As New SortedList(Of Integer, Tuple(Of RotatedRect, Integer))(New compareAllowIdenticalInteger)
             For i = 0 To contours.Length - 1
                 findRect.inputContour = contours(i)
-                findRect.Run(task.emptyMat)
+                findRect.Run(emptyMat)
                 Dim rr = findRect.minRect
                 If rr.BoundingRect.Width > options.minSize And rr.BoundingRect.Height > options.minSize Then
                     Dim tuple = New Tuple(Of RotatedRect, Integer)(rr, i)

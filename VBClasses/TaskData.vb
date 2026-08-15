@@ -258,7 +258,6 @@ Namespace VBClasses
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
 
-        Public emptyMat As New Mat
         Public term As New TermCriteria(CriteriaTypes.Eps + CriteriaTypes.Count, 10, 1.0)
         Public msRNG As New System.Random
     End Class

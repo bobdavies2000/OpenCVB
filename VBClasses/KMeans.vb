@@ -95,7 +95,7 @@ Namespace VBClasses
             km.Run(task.gray)
             Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-            Mats.Run(task.emptyMat)
+            Mats.Run(emptyMat)
             dst2 = Mats.dst2
             dst3 = Mats.dst3
         End Sub

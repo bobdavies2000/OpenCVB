@@ -106,7 +106,7 @@ Namespace VBClasses
                 knn.trainInput.Add(New Point2f(pt.X, pt.Y))
             Next
             knn.queries = New List(Of Point2f)(knn.trainInput)
-            knn.Run(task.emptyMat)
+            knn.Run(emptyMat)
 
             For i = 0 To knn.queries.Count - 1
                 Line(dst3, knn.trainInput(i), knn.trainInput(knn.result(i, 1)), 255, task.lineWidth, task.lineType)
