@@ -213,8 +213,6 @@ Namespace VBClasses
         Public CPU_TimeStamp As Double
         Public CPU_FrameTime As Double
 
-        Public centerRect As cv.Rect ' image center - potential use for motion.
-
         Public drawRect As cv.Rect ' filled in as the user draws on any of the images.
         Public drawRectFinal As cv.Rect ' After the mouse up
         Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.

@@ -17,19 +17,18 @@ Namespace VBClasses
             Static rect As cv.Rect = Nothing
             If task.heartBeatLT Or forceRecenter Then
                 forceRecenter = False
-                Dim padx = dst2.Width / 3
-                Dim pady = dst2.Height / 3
-                rect = ValidateRect(New cv.Rect(padx, pady, dst2.Width - padx * 2, dst2.Height - pady * 2))
+
+                rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
                 template = src(rect).Clone
                 center = New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
                 shiftXY = New cv.Point2f(0, 0)
                 dst3 = src.Clone
 
-                padx = task.gridWH * 5
-                pady = task.gridWH * 2
-                Dim x = (dst2.Width - match.correlationMat.Width) / 2 + padx
-                Dim y = (dst2.Height - match.correlationMat.Height) / 2 + pady
-                safeCenterRect = New cv.Rect(x, y, match.correlationMat.Width - padx * 2, match.correlationMat.Height - pady * 2)
+                rect.X = task.gridWH * 5
+                rect.Y = task.gridWH * 2
+                Dim x = (dst2.Width - match.correlationMat.Width) / 2 + rect.X
+                Dim y = (dst2.Height - match.correlationMat.Height) / 2 + rect.Y
+                safeCenterRect = New cv.Rect(x, y, match.correlationMat.Width - rect.X * 2, match.correlationMat.Height - rect.Y * 2)
 
                 Exit Sub
             End If

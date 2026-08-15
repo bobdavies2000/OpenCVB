@@ -70,7 +70,6 @@ Namespace VBClasses
             task.fOptions.Show()
             task.gOptions.Show()
             task.treeView.Show()
-            task.centerRect = New cv.Rect(task.workRes.Width / 4, task.workRes.Height / 4, task.workRes.Width / 2, task.workRes.Height / 2)
 
             task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
             task.mainFormLocation = New cv.Rect(task.Settings.MainFormLeft, task.Settings.MainFormTop,

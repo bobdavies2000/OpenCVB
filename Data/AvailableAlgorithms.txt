@@ -128,13 +128,13 @@ Distance_Point3D
 Distance_Point4D
 Draw_Arc
 Draw_Circles
+Draw_ClipLine
 Draw_Ellipses
 Draw_Frustrum
 Draw_Line
 Draw_Lines
 Draw_Noise
 Draw_Polygon
-Draw_RotatedRect
 Draw_Shapes
 Draw_SymmetricalShapes
 Duster_Basics
@@ -412,6 +412,7 @@ LeftRight_Reduction
 LeftRight_Stable
 Line_Basics
 Line_Basics_TA
+Line_ClipLine
 Line_Core
 Line_Depth
 Line_DepthSimple
@@ -420,6 +421,7 @@ Line_FindClosest
 Line_Finder
 Line_FindVertical
 Line_Intersection
+Line_Intersections
 Line_LeftRight
 Line_LeftRightx
 Line_Match

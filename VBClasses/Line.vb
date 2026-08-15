@@ -32,23 +32,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
 
-            Dim pad = task.gridWH * 3
-            Dim w = dst2.Width - pad * 2
-            Dim h = dst2.Height - pad * 2
-            Dim rect As New cv.Rect(pad, pad, w, h)
-            ' the gridWH can be changed so prevent failure with this...
-            If w < dst2.Width \ 2 Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            If h < dst2.Height \ 2 Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
-                If src.Width = dst2.Width Then basicsFLD.Run(src(rect)) Else basicsFLD.Run(src)
+                basicsFLD.Run(src)
                 dst2 = basicsFLD.dst2
                 lpList = basicsFLD.lpList
                 averageAge = basicsFLD.averageAge
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
-                If src.Width = dst2.Width Then basicsLSD.Run(src(rect)) Else basicsLSD.Run(src)
+                basicsLSD.Run(src)
                 dst2 = basicsLSD.dst2
                 lpList = basicsLSD.lpList
                 averageAge = basicsLSD.averageAge
@@ -60,7 +53,6 @@ Namespace VBClasses
                 lp.index = (lpList.IndexOf(lp) + 1) Mod 255
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
-                If lp.index >= 20 Then Exit For
             Next
 
             If standalone Then
@@ -2453,8 +2445,8 @@ Namespace VBClasses
                 goodCorrelation = True
                 If standalone Then lp = task.lines.lpList(0)
                 Dim sideSize = task.grid.nabeRectSide
-                Dim r1 = New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize)
-                Dim r2 = New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize)
+                Dim r1 = ValidateRect(New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize))
+                Dim r2 = ValidateRect(New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize))
                 matchP1.template = src(r1).Clone
                 matchP2.template = src(r2).Clone
             Else
@@ -2522,4 +2514,81 @@ Namespace VBClasses
             labels(2) = resetCount.Average.ToString("0.0%") + " of the frames required restarting with the longest line"
         End Sub
     End Class
+
+
+
+
+
+    Public Class Line_ClipLine : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            labels(3) = "Only the lines withing the seelected rectangle"
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Use ClipLine to find the lines in the center rect."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.lines.dst2
+            labels(2) = task.lines.labels(2)
+
+            Dim newPoint As New cv.Point
+            Dim rect = Mat_Basics.buildCenterRect(dst2.Width \ 10, dst2.Height \ 10)
+            lpList.Clear()
+            dst3.SetTo(0)
+            Rectangle(dst3, rect, white, task.lineWidth)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp = task.lines.lpList(i)
+                Dim clipped = ClipLine(rect, lp.p1, lp.p2)
+                If clipped Then
+                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                    lpList.Add(lp)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Intersections : Inherits TaskParent
+        Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "If an intersection point is close to an end point, extend the line to the intersection point."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.lines.dst2
+            labels(2) = task.lines.labels(2)
+
+            Dim lpList As New List(Of lpData)
+            For Each lp In task.lines.lpList
+                lpList.Add(lp)
+                If lpList.Count >= 2 Then Exit For
+            Next
+
+            Dim minDistance = 100
+            Dim newPoint As New cv.Point
+            dst3.SetTo(0)
+            For i = 0 To lpList.Count - 2
+                Dim lp1 = lpList(i)
+                For j = i To 10 '  task.lines.lpList.Count - 1
+                    Dim lp2 = task.lines.lpList(j)
+                    Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
+                    If intersectionPoint <> newPoint Then
+                        Dim lpNew(3) As lpData
+                        If intersectionPoint.DistanceTo(lp1.p1) < minDistance Then lpNew(0) = New lpData(lp1.p2, intersectionPoint)
+                        If intersectionPoint.DistanceTo(lp1.p2) < minDistance Then lpNew(1) = New lpData(lp1.p1, intersectionPoint)
+                        If intersectionPoint.DistanceTo(lp2.p1) < minDistance Then lpNew(2) = New lpData(lp2.p2, intersectionPoint)
+                        If intersectionPoint.DistanceTo(lp2.p2) < minDistance Then lpNew(3) = New lpData(lp2.p1, intersectionPoint)
+                        Line(dst3, lp1.p1, lp1.p2, white, task.lineWidth, task.lineType)
+                        For Each lp In lpNew
+                            If lp IsNot Nothing Then
+                                Line(dst3, lp.p1, lp.p2, white, task.lineWidth, task.lineType)
+                            End If
+                        Next
+                    End If
+                Next
+            Next
+        End Sub
+    End Class
+
 End Namespace

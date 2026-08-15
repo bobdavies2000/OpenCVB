@@ -302,7 +302,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Draw_ClipLine : Inherits TaskParent
+    Public Class Draw_ClipLine : Inherits TaskParent
         Dim flow As New Font_FlowText
         Dim pt1 As cv.Point
         Dim pt2 As cv.Point
@@ -432,7 +432,7 @@ Namespace VBClasses
 
 
 
-    Public Class Draw_RotatedRect : Inherits TaskParent
+    Public Class XR_Draw_RotatedRect : Inherits TaskParent
         Public rr As RotatedRect
         Public Sub New()
             desc = "Draw an OpenCV rotated rect"
@@ -440,8 +440,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static angle As Single = -10
-                rr = New RotatedRect(New Point2f(dst2.Width / 2, dst2.Height / 2),
-                                        task.centerRect.Size, angle)
+                Dim rect = Mat_Basics.buildCenterRect(task.workRes.Width / 4, task.workRes.Height / 4)
+                rr = New RotatedRect(New Point2f(dst2.Width / 2, dst2.Height / 2), rect.Size, angle)
                 angle += 1
                 If angle > 10 Then angle = -10
             End If

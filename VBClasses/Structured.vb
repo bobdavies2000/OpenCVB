@@ -554,7 +554,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Dim newPoint As New cv.Point
 
             If task.mouseMovePoint = New cv.Point Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
             Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)

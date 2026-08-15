@@ -12,6 +12,18 @@ Namespace VBClasses
             End If
             Return src
         End Function
+        Public Shared Function buildCenterRect(Optional padX As Integer = 0, Optional padY As Integer = 0) As cv.Rect
+            If padX = 0 Then
+                padX = task.gridWH * 3
+                padY = task.gridWH * 3
+            End If
+
+            Dim w = task.workRes.Width - padX * 2
+            Dim h = task.workRes.Height - padY * 2
+
+            Dim rect = ValidateRect(New cv.Rect(padX, padY, w, h))
+            Return rect
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Resize(src, dst2, New Size(src.Cols / 10, src.Rows / 10))
 
