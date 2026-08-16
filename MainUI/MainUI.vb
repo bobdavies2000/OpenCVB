@@ -333,8 +333,8 @@ Namespace MainApp
             settings.displayRes = New cv.Size(w, h)
 
             resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
-                                ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) +
-                                ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
+                                ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
+            ' ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
             If vbc.task IsNot Nothing Then vbc.task.resolutionDetails = resolutionDetails
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)

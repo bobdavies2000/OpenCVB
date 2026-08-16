@@ -38,6 +38,7 @@ CComp_Both
 CComp_Stats
 ClipLine_Basics
 ClipLine_CenterRect
+ClipLine_Edges
 ClipLine_KNN
 Cloud_Basics
 Cloud_Gravity
@@ -152,6 +153,7 @@ Edge_Deriche_CPP
 Edge_DiffX_CPP
 Edge_DiffY_CPP
 Edge_DiffZ_CPP
+Edge_EndPoints
 Edge_Featureless
 Edge_Laplacian
 Edge_LeftRight
@@ -163,10 +165,8 @@ Edge_SobelCustom
 Edge_SobelCustomH
 Edge_SobelCustomV
 Edge_SobelH
-Edge_SobelHorizontal
 Edge_SobelNaive
 Edge_SobelV
-Edge_SobelVertical
 Edge_StableLeftRight
 EdgeLine_Basics
 EdgeLine_Compare
@@ -608,6 +608,7 @@ Rectangle_Fit
 Rectangle_Rotated
 RedC_Basics
 RedC_BasicsList
+RedC_CellLines
 RedC_Depth
 RedC_Hulls
 RedC_MergeCells
@@ -692,6 +693,7 @@ SVM_SampleData
 Swarm_Basics
 Texture_Basics
 TextureFlow_Basics
+Thinning_Basics
 Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions

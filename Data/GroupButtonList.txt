@@ -179,6 +179,7 @@ SVM
 Swarm
 Texture
 TextureFlow
+Thinning
 Threshold
 Track
 TrackOpenCV

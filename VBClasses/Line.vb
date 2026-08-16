@@ -5,6 +5,7 @@ Namespace VBClasses
         Public averageAge As Single
         Public Sub New()
             labels(3) = "Age is shown for the top 10 longest lines."
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
@@ -48,10 +49,12 @@ Namespace VBClasses
                 labels = basicsLSD.labels
             End If
 
+            dst1.SetTo(0)
             dst3.SetTo(0)
             For Each lp In lpList
                 lp.index = (lpList.IndexOf(lp) + 1) Mod 255
-                Line(dst3, lp.p1, lp.p2, white, task.lineWidth)
+                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth + 2)
+                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
 
@@ -1408,10 +1411,8 @@ Namespace VBClasses
         End Function
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.firstPass Then
-                lastImage = src.Clone
-                verticalLast = getVerticals(task.lines.lpList)
-            End If
+            If task.firstPass Then lastImage = src.Clone
+
             If task.heartBeatLT Then
                 dst3.SetTo(0)
                 For Each lp In verticalLast

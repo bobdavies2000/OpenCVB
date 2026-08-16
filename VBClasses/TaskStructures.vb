@@ -379,6 +379,7 @@ Namespace VBClasses
             Public depth As Single
             Public hull As New List(Of cv.Point)
             Public index As Integer
+            Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point

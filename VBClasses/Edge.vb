@@ -1605,7 +1605,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-    Public Class Edge_SobelHorizontal : Inherits TaskParent
+    Public Class XR_Edge_SobelHorizontal : Inherits TaskParent
         Dim edges As New Edge_SobelNaive
         Public Sub New()
             OptionParent.FindCheckBox("Vertical Derivative").Checked = False
@@ -1622,7 +1622,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-    Public Class Edge_SobelVertical : Inherits TaskParent
+    Public Class XR_Edge_SobelVertical : Inherits TaskParent
         Dim edges As New Edge_SobelNaive
         Public Sub New()
             OptionParent.FindCheckBox("Horizontal Derivative").Checked = False
@@ -1729,6 +1729,50 @@ Namespace VBClasses
 
             dst3 = dst2.Clone
             dst3.SetTo(0, task.edges.dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Edge_EndPoints : Inherits TaskParent
+        Dim edges As New Edge_Laplacian
+        Public ptList As New List(Of cv.Point)
+        Public Sub New()
+            labels = {"", "", "Canny edges", "End points of the Canny lines"}
+            desc = "Run Edge_Canny, then apply a 3x3 binary filter to each FindNonZero point"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal
+
+            edges.Run(src)
+            dst2 = edges.dst2.Clone
+            Threshold(dst2, dst2, 0, 255, ThresholdTypes.Binary)
+
+            Dim binary As New cv.Mat
+            Threshold(dst2, binary, 0, 1, ThresholdTypes.Binary)
+            Dim kernel = New Mat(3, 3, MatType.CV_32F).SetTo(1)
+
+            Dim filtered As New cv.Mat
+            Filter2D(binary, filtered, MatType.CV_32F, kernel)
+
+            ptList.Clear()
+            Dim points As New cv.Mat
+            FindNonZero(dst2, points)
+            Dim n = Math.Max(points.Rows, points.Cols)
+            For i = 0 To n - 1
+                Dim pt = If(points.Cols > 1, points.Get(Of cv.Point)(0, i), points.Get(Of cv.Point)(i, 0))
+                If filtered.Get(Of Single)(pt.Y, pt.X) = 2 Then ptList.Add(pt)
+            Next
+
+            dst3 = task.color.Clone
+            For Each pt In ptList
+                Circle(dst3, pt, task.DotSize + 1, task.highlight, -1, task.lineType)
+            Next
+            labels(3) = CStr(ptList.Count) + " end points found"
         End Sub
     End Class
 End Namespace

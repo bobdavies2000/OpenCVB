@@ -486,7 +486,7 @@ Namespace VBClasses
 
 
     Public Class XR_BrickPoint_Vertical : Inherits TaskParent
-        Dim vertical As New Edge_SobelVertical
+        Dim vertical As New XR_Edge_SobelVertical
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
         Public Sub New()
@@ -505,7 +505,7 @@ Namespace VBClasses
 
 
     Public Class XR_BrickPoint_Horizontal : Inherits TaskParent
-        Dim horizontal As New Edge_SobelHorizontal
+        Dim horizontal As New XR_Edge_SobelHorizontal
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
         Public Sub New()

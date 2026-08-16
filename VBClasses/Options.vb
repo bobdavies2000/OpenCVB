@@ -7995,4 +7995,24 @@ Namespace VBClasses
             alpha = alphaSlider.value / 1000.0R
         End Sub
     End Class
+
+
+
+
+    Public Class Options_Thinning : Inherits OptionParent
+        Public thinningType As cv.XImgProc.ThinningTypes
+        Dim radioChoices = {cv.XImgProc.ThinningTypes.ZHANGSUEN, cv.XImgProc.ThinningTypes.GUOHALL}
+        Public Sub New()
+            If findfrm(traceName + " Radio Buttons") Is Nothing Then
+                radio.Setup(traceName)
+                radio.addRadio("Zhang-Suen")
+                radio.addRadio("Guo-Hall")
+                radio.check(0).Checked = True
+            End If
+        End Sub
+        Public Sub Run()
+            Static frm = FindFrm(traceName + " Radio Buttons")
+            thinningType = radioChoices(findRadioIndex(frm.check))
+        End Sub
+    End Class
 End Namespace

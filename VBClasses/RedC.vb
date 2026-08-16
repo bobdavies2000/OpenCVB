@@ -1,5 +1,8 @@
-Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
+Imports System.Buffers
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
@@ -19,6 +22,7 @@ Namespace VBClasses
                 Static color8u As New Color8U_Basics
                 color8u.Run(task.gray)
                 src = color8u.dst2
+                src.SetTo(255, task.lines.dst1)
             End If
 
             flood.Run(src)
@@ -736,6 +740,42 @@ Namespace VBClasses
             dst2 = redC.dst2
             dst2.SetTo(0, dst1)
             labels = redC.labels
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_CellLines : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Find any lines connected to a cell contour."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim histogram As New Mat
+            Dim bins = task.lines.lpList.Count
+            Dim ranges = {New Rangef(0, bins)}
+            Dim histArray(bins) As Single
+            dst3 = dst2.Clone
+            For Each rc In redC.rcList
+                If rc.index = 0 Then Continue For
+                Dim tmp = task.lines.dst1(rc.rect).Clone
+                CalcHist({tmp}, {0}, rc.mask, histogram, 1, {bins}, ranges)
+                histogram.GetArray(Of Single)(histArray)
+                For i = 1 To bins - 1
+                    If histArray(i) > 0 Then rc.lpList.Add(i)
+                Next
+
+                For Each index In rc.lpList
+                    Dim lp = task.lines.lpList(index - 1)
+                    Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                Next
+            Next
         End Sub
     End Class
 
