@@ -301,7 +301,6 @@ Namespace VBClasses
             desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastList = New List(Of lpData)(leftList)
             leftList = New List(Of lpData)(task.lines.lpList)
             labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
 
@@ -314,7 +313,7 @@ Namespace VBClasses
             Static stableLR As New StableGray_LeftRight
             stableLR.Run(emptyMat)
 
-            lastList = New List(Of lpData)(rightList)
+            Dim lastList = New List(Of lpData)(rightList)
             linesRight.Run(stableLR.dst3)
 
             Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)

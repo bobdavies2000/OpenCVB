@@ -9,7 +9,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData) ' includes cloud data.
         Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
-        Public displayCell As Boolean = True
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -62,7 +61,10 @@ Namespace VBClasses
                 Dim val1 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Or rc.rect.Contains(rc.maxDStable) = False Then rc.maxDStable = rc.maxDist
+                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
+
+            dst3 = Palettize(dst1)
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
@@ -71,19 +73,12 @@ Namespace VBClasses
                 SetTrueText("There is no cell defined for that point.", 1)
             Else
                 task.rcD = rcList(clickIndex)
-                If displayCell Then
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                    Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
-                    Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                    SetTrueText(task.rcD.displayCell, 1)
-                    SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
-
-                    If standaloneTest() Then
-                        dst1.SetTo(0)
-                        dst1(task.rcD.rect).SetTo(255, task.rcD.mask)
-                    End If
-                End If
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                SetTrueText(task.rcD.displayCell, 1)
+                SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
             End If
 
             labels(2) = CStr(rcList.Count) + " cells were found."
@@ -733,7 +728,6 @@ Namespace VBClasses
     Public Class RedC_TrackCell : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
-            redC.displayCell = False
             task.gOptions.displayDst1.Checked = True
             desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
         End Sub

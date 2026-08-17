@@ -1,12 +1,12 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Namespace VBClasses
-    Public Class XR_Smoothing_Exterior : Inherits TaskParent
+    Public Class Smoothing_Interior : Inherits TaskParent
         Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)
         Public plotColor = Scalar.Yellow
-        Dim smOptions As New Options_Smoothing
+        Dim Options As New Options_Smoothing
         Public Sub New()
             labels(2) = "Original Points (white) Smoothed (yellow)"
             labels(3) = ""
@@ -15,8 +15,7 @@ Namespace VBClasses
         Private Shared Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
             Dim spline As New List(Of cv.Point)
             ' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
-            Dim spoints As New List(Of cv.Point)
-            spoints = points
+            Dim spoints As New List(Of cv.Point)(points)
 
             Dim startPt = (spoints(1) + spoints(0)) * 0.5
             spoints.Insert(0, startPt)
@@ -25,7 +24,7 @@ Namespace VBClasses
 
             ' Note the nrOfInterpolatedPoints acts as a kind of tension factor between 0 and 1 because it is normalised
             ' to 1/nrOfInterpolatedPoints. It can never be 0
-            Dim t As Double = 0
+            Dim t As Double
             Dim spoint As cv.Point
             For i = 0 To spoints.Count - 4
                 spoint = New cv.Point()
@@ -53,7 +52,7 @@ Namespace VBClasses
             DrawContours(result, listOfPoints, 0, color, 2)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            smOptions.Run()
+            Options.Run()
             If standaloneTest() Then
                 If task.heartBeat Then
                     Dim hullList = hull.buildRandomHullPoints()
@@ -69,7 +68,7 @@ Namespace VBClasses
                 dst2.SetTo(0)
             End If
             If inputPoints.Count > 1 Then
-                smoothPoints = getSplineInterpolationCatmullRom(inputPoints, smOptions.iterations)
+                smoothPoints = getSplineInterpolationCatmullRom(inputPoints, Options.iterations)
                 DrawPoly(dst2, smoothPoints, plotColor)
             End If
         End Sub
@@ -80,7 +79,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-    Public Class XR_Smoothing_Interior : Inherits TaskParent
+    Public Class Smoothing_Exterior : Inherits TaskParent
         Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)
@@ -104,11 +103,9 @@ Namespace VBClasses
 
             Return nl
         End Function
-
         Private Shared Function getSmootherChaikin(points As List(Of Point2d), cuttingDist As Double) As List(Of Point2d)
-            Dim nl As New List(Of Point2d)
             'always add the first cv.Point
-            nl.Add(points(0))
+            Dim nl As New List(Of Point2d)({points(0)})
 
             For i = 0 To points.Count - 2
                 Dim pt1 = New Point2d((1 - cuttingDist) * points.ElementAt(i).X, (1 - cuttingDist) * points.ElementAt(i).Y)
@@ -139,7 +136,7 @@ Namespace VBClasses
                     hull.Run(src)
                     Dim nextHull = ConvexHull(hullList.ToArray, True)
                     inputPoints = nextHull.ToList
-                    XR_Smoothing_Exterior.DrawPoly(dst2, nextHull.ToList, white)
+                    Smoothing_Interior.DrawPoly(dst2, nextHull.ToList, white)
                 Else
                     Exit Sub
                 End If
@@ -151,7 +148,7 @@ Namespace VBClasses
             For i = 0 To smoothPoints2d.Count - 1 Step options.stepSize
                 smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
             Next
-            If smoothPoints.Count > 0 Then XR_Smoothing_Exterior.DrawPoly(dst2, smoothPoints, plotColor)
+            If smoothPoints.Count > 0 Then Smoothing_Interior.DrawPoly(dst2, smoothPoints, plotColor)
         End Sub
     End Class
 End Namespace

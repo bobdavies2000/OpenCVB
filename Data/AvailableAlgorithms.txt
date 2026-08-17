@@ -638,6 +638,8 @@ SLR_Core
 SLR_Plot
 SLR_PlotTest
 SLR_Trends
+Smoothing_Exterior
+Smoothing_Interior
 Sort_1Channel
 Sort_3Channel
 Sort_Basics

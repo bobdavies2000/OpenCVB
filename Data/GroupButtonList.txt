@@ -164,6 +164,7 @@ Rotate
 Salience
 Sieve
 SLR
+Smoothing
 Sort
 Stabilizer
 StableDepth

@@ -100,6 +100,7 @@ Namespace VBClasses
     Public Class Derivative_Sobel : Inherits TaskParent
         Public options As New Options_Derivative
         Public plotHist As New PlotBar_Basics
+        Dim histogram As New Mat
         Public Sub New()
             desc = "Display a first or second derivative of the selected depth dimension and direction."
         End Sub
@@ -110,7 +111,6 @@ Namespace VBClasses
             Sobel(src, src, MatType.CV_32F, 1, 1, options.kernelSize)
 
             Dim ranges = {New Rangef(-options.derivativeRange, options.derivativeRange)}
-            Dim histogram As New Mat
             CalcHist({src}, {0}, task.depthmask, histogram, 1, {task.histogramBins}, ranges)
 
             plotHist.Run(histogram)
