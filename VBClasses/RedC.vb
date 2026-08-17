@@ -1,5 +1,6 @@
 Imports System.Buffers
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
@@ -10,7 +11,6 @@ Namespace VBClasses
         Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create the rcData representation of the image."
         End Sub
@@ -61,10 +61,7 @@ Namespace VBClasses
                 Dim val1 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Or rc.rect.Contains(rc.maxDStable) = False Then rc.maxDStable = rc.maxDist
-                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
-
-            dst3 = Palettize(dst1)
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
@@ -782,6 +779,32 @@ Namespace VBClasses
 
             strOut = task.rcD.displayCell() + vbCrLf + vbCrLf + "Track point " + task.clickPoint.ToString + vbCrLf
             SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedC_Smoothing : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Reduce the rc.contours points if the distance to the next is < X"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2.Clone
+            labels(2) = redC.labels(2)
+
+            dst1.SetTo(0)
+            For Each rc In redC.rcList
+                If rc.pixels > 100 Then
+                    Dim epsilon = 0.01 * Cv2.ArcLength(rc.contour, True)
+                    Dim simplified() As Point = Cv2.ApproxPolyDP(rc.contour.ToArray, epsilon, True)
+                    rc.contour = simplified.ToList
+                End If
+                DrawContours(dst2(rc.rect), {rc.contour.ToArray}, 0, task.highlight, task.lineWidth, task.lineType)
+            Next
         End Sub
     End Class
 End Namespace

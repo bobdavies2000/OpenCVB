@@ -2,7 +2,6 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Namespace VBClasses
     Public Class Smoothing_Interior : Inherits TaskParent
-        Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)
         Public plotColor = Scalar.Yellow
@@ -12,27 +11,25 @@ Namespace VBClasses
             labels(3) = ""
             desc = "Smoothing the line connecting a series of points."
         End Sub
-        Private Shared Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
+        Public Shared Function getSplineInterpolationCatmullRom(ByVal points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
             Dim spline As New List(Of cv.Point)
-            ' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
-            Dim spoints As New List(Of cv.Point)(points)
 
-            Dim startPt = (spoints(1) + spoints(0)) * 0.5
-            spoints.Insert(0, startPt)
-            Dim endPt = (spoints(spoints.Count - 1) + spoints(spoints.Count - 2)) * 0.5
-            spoints.Insert(spoints.Count, endPt)
+            Dim startPt = (points(1) + points(0)) * 0.5
+            points.Insert(0, startPt)
+            Dim endPt = (points.Last + points(points.Count - 2)) * 0.5
+            points.Insert(points.Count, endPt)
 
             ' Note the nrOfInterpolatedPoints acts as a kind of tension factor between 0 and 1 because it is normalised
             ' to 1/nrOfInterpolatedPoints. It can never be 0
             Dim t As Double
             Dim spoint As cv.Point
-            For i = 0 To spoints.Count - 4
+            For i = 0 To points.Count - 4
                 spoint = New cv.Point()
                 For j = 0 To nrOfInterpolatedPoints - 1
-                    Dim x0 = spoints.ElementAt((i) Mod spoints.Count)
-                    Dim x1 = spoints.ElementAt((i + 1) Mod spoints.Count)
-                    Dim x2 = spoints.ElementAt((i + 2) Mod spoints.Count)
-                    Dim x3 = spoints.ElementAt((i + 3) Mod spoints.Count)
+                    Dim x0 = points.ElementAt((i) Mod points.Count)
+                    Dim x1 = points.ElementAt((i + 1) Mod points.Count)
+                    Dim x2 = points.ElementAt((i + 2) Mod points.Count)
+                    Dim x3 = points.ElementAt((i + 3) Mod points.Count)
                     t = 1 / nrOfInterpolatedPoints * j
                     spoint.X = 0.5 * (2 * x1.X + (-1 * x0.X + x2.X) * t + (2 * x0.X - 5 * x1.X + 4 * x2.X - x3.X) * t ^ 2 +
                                        (-1 * x0.X + 3 * x1.X - 3 * x2.X + x3.X) * t ^ 3)
@@ -43,7 +40,7 @@ Namespace VBClasses
             Next
 
             'add the last cv.Point, but skip the interpolated last cv.Point, so second last...
-            spline.Add(spoints(spoints.Count - 2))
+            spline.Add(points(points.Count - 2))
             Return spline
         End Function
         Public Shared Sub DrawPoly(result As Mat, polyPoints As List(Of cv.Point), color As Scalar)
@@ -53,7 +50,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Options.Run()
+
             If standaloneTest() Then
+                Static hull As New Convex_Basics
                 If task.heartBeat Then
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
@@ -67,6 +66,7 @@ Namespace VBClasses
             Else
                 dst2.SetTo(0)
             End If
+
             If inputPoints.Count > 1 Then
                 smoothPoints = getSplineInterpolationCatmullRom(inputPoints, Options.iterations)
                 DrawPoly(dst2, smoothPoints, plotColor)
@@ -85,7 +85,7 @@ Namespace VBClasses
         Public smoothPoints As List(Of cv.Point)
         Public plotColor = Scalar.Yellow
         Dim options As New Options_Smoothing
-        Private Shared Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of Point2d)
+        Public Shared Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of Point2d)
             'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
             'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
             'with a tension value of 0.5 this amounts to 0.25 = 1/4 and 0.75 = 3/4 the original Chaikin values

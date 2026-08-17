@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports SharpGL.SceneGraph.Raytracing
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ' You can find the main direction of a series of points using principal component analysis �(PCA).
@@ -199,10 +198,10 @@ Namespace VBClasses
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
             Marshal.Copy(src.Data, buff, 0, buff.Length)
 
-            palette = nColor.MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
+            palette = PCA_NColor.MakePalette(rgb, dst2.Width, dst2.Height, options.desiredNcolors)
 
             If standaloneTest() Then
-                paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
+                paletteImage = PCA_NColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palette, options.desiredNcolors)
 
                 Dim img8u = New Mat(dst2.Size, MatType.CV_8U, Scalar.All(0))
                 Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)
@@ -231,13 +230,13 @@ Namespace VBClasses
             Public blue As Byte
             Public ErrorVal As Double
         End Structure
-        Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startPal As Integer) As Double
+        Shared Function CDiff(ByVal a As Byte(), start As Integer, ByVal b As Byte(), startPal As Integer) As Double
             Return (CInt(a(start + 0)) - CInt(b(startPal + 0))) * (CInt(a(start + 0)) - CInt(b(startPal + 0))) * 5 +
                    (CInt(a(start + 1)) - CInt(b(startPal + 1))) * (CInt(a(start + 1)) - CInt(b(startPal + 1))) * 8 +
                    (CInt(a(start + 2)) - CInt(b(startPal + 2))) * (CInt(a(start + 2)) - CInt(b(startPal + 2))) * 2
         End Function
         ' Convert an image to indexed form, using passed-in palette
-        Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColor As Integer) As Byte()
+        Shared Function RgbToIndex(rgb As Byte(), width As Integer, height As Integer, pal As Byte(), nColor As Integer) As Byte()
             Dim answer(width * height - 1) As Byte
 
             For i = 0 To width * height - 1
@@ -258,7 +257,7 @@ Namespace VBClasses
             Return answer
         End Function
 
-        Public Function MakePalette(rgb As Byte(), width As Integer, height As Integer, nColors As Integer) As Byte()
+        Public Shared Function MakePalette(rgb As Byte(), width As Integer, height As Integer, nColors As Integer) As Byte()
             Dim buff(width * height * 3 - 1) As Byte
             Dim entry(nColors - 1) As paletteEntry
             Dim best As Double
@@ -292,7 +291,7 @@ Namespace VBClasses
             Return pal
         End Function
 
-        Public Sub CalcError(ByRef entry As paletteEntry, ByRef buff() As Byte)
+        Public Shared Sub CalcError(ByRef entry As paletteEntry, ByRef buff() As Byte)
             entry.red = CByte(MeanColor(buff, entry.start * 3, entry.nCount, 0))
             entry.green = CByte(MeanColor(buff, entry.start * 3, entry.nCount, 1))
             entry.blue = CByte(MeanColor(buff, entry.start * 3, entry.nCount, 2))
@@ -357,7 +356,7 @@ Namespace VBClasses
         ''' Then we apply Otsu thresholding along that axis, and cut.
         ''' We partition using one pass of quick sort.
         ''' </summary>
-        Public Sub SplitPCA(ByRef entry As paletteEntry, ByRef split As paletteEntry, ByRef buff As Byte())
+        Public Shared Sub SplitPCA(ByRef entry As paletteEntry, ByRef split As paletteEntry, ByRef buff As Byte())
             Dim low As Integer = 0
             Dim high As Integer = entry.nCount - 1
             Dim cut As Integer
@@ -508,7 +507,7 @@ Namespace VBClasses
                         g = -g
                     End If
                     e(i) = scale * g
-                    h = h - f * g
+                    h -= f * g
                     d(i - 1) = f - g
                     For j = 0 To i - 1
                         e(j) = 0.0
@@ -812,8 +811,6 @@ Namespace VBClasses
     Public Class XR_PCA_NColorPalettize : Inherits TaskParent
         Dim custom As New Palette_CustomColorMap
         Dim pcaPalette As New PCA_Palettize
-        Dim answer(dst2.Width * dst2.Height - 1) As Byte
-        Dim nColor As New PCA_NColor
         Dim rgb(dst1.Total * dst1.ElemSize - 1) As Byte
         Public Sub New()
             OptionParent.FindSlider("Desired number of colors").Value = 8
@@ -823,7 +820,7 @@ Namespace VBClasses
             If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net which is very fast.
 
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
-            Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, pcaPalette.palette, pcaPalette.options.desiredNcolors)
+            Dim paletteImage = PCA_NColor.RgbToIndex(rgb, dst1.Width, dst1.Height, pcaPalette.palette, pcaPalette.options.desiredNcolors)
 
             Dim img8u = New Mat(dst2.Size, MatType.CV_8U, Scalar.All(0))
             Marshal.Copy(paletteImage, 0, img8u.Data, paletteImage.Length)

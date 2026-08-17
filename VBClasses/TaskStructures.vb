@@ -397,13 +397,19 @@ Namespace VBClasses
             Public Sub contourHull()
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count >= 3 Then ' need at least 3 points for a contour.
-                    Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                    DrawContours(mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
 
                     ' keep the hull points around (there aren't many of them.)
                     hull = ConvexHull(contour.ToArray, True).ToList
                 End If
                 pixels = CountNonZero(mask)
+                If pixels > 100 Then
+                    Dim epsilon = 0.01 * ArcLength(contour, True)
+                    Dim simplified() As cv.Point = ApproxPolyDP(contour.ToArray, epsilon, True)
+                    contour = simplified.ToList
+                    mask.SetTo(0)
+                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                End If
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
             End Sub

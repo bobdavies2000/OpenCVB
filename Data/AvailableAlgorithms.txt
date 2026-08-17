@@ -611,6 +611,7 @@ RedC_CellLines
 RedC_Depth
 RedC_MergeCells
 RedC_NeighborHist
+RedC_Smoothing
 RedC_TrackCell
 RedCloud_Basics
 RedCloud_Core
