@@ -1,4 +1,6 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LeftRight_Basics : Inherits TaskParent
         Public meanLeft As Double
@@ -281,6 +283,49 @@ Namespace VBClasses
             lastRight = dst3.Clone
 
             labels(3) = "RightView accumulated pixels after update for maximums and motion."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class LeftRight_Lines : Inherits TaskParent
+        Public leftList As New List(Of lpData)
+        Public rightList As New List(Of lpData)
+        Dim linesRight As New Line_Core
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastList = New List(Of lpData)(leftList)
+            leftList = New List(Of lpData)(task.lines.lpList)
+            labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
+
+            dst2 = task.leftView.Clone
+            For Each lp In leftList
+                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+
+            Static stableLR As New StableGray_LeftRight
+            stableLR.Run(emptyMat)
+
+            lastList = New List(Of lpData)(rightList)
+            linesRight.Run(stableLR.dst3)
+
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+            dst3 = task.rightView.Clone
+            rightList.Clear()
+            For Each lp In linesRight.lpList
+                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+                rightList.Add(lp)
+            Next
+            labels(3) = CStr(rightList.Count) + " lines were found in the right image shown in white "
         End Sub
     End Class
 End Namespace

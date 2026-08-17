@@ -1564,7 +1564,7 @@ Namespace VBClasses
 
 
     Public Class Depth_ReliableLines : Inherits TaskParent
-        Dim linesLR As New Line_LeftRight
+        Dim linesLR As New LeftRight_Lines
         Dim knn As New KNN_Basics
         Dim pTest As New Math_CrossProduct2D
         Public Sub New()

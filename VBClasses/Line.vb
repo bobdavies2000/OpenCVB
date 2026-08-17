@@ -1727,7 +1727,7 @@ Namespace VBClasses
 
 
     Public Class Line_DepthSimple : Inherits TaskParent
-        Dim lineLR As New Line_LeftRight
+        Dim lineLR As New LeftRight_Lines
         Public Sub New()
             desc = "How many lines have both endpoints with depth?"
         End Sub
@@ -1857,115 +1857,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class XR_Line_LeftRight : Inherits TaskParent
-        Public leftList As New List(Of lpData)
-        Public rightList As New List(Of lpData)
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static stableLR As New StableGray_LeftRight
-            Static linesLeft As New Line_Core
-            Static linesRight As New Line_Core
-            stableLR.Run(emptyMat)
-
-            Dim lastList = New List(Of lpData)(linesLeft.lpList)
-            linesLeft.Run(stableLR.dst2)
-            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
-
-            dst2.SetTo(0)
-            For Each lp In linesLeft.lpList
-                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
-            Next
-            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
-
-            lastList = New List(Of lpData)(linesRight.lpList)
-            linesRight.Run(stableLR.dst3)
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
-
-            dst3.SetTo(0)
-            For Each lp In linesRight.lpList
-                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            Next
-            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
-        End Sub
-    End Class
-
-
-
-
-    Public Class Line_LeftRightx : Inherits TaskParent
-        Public rightOnly As New Line_RightOnly
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Find the lines in the left and right images.  Left image is already found for StereoLabs..."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2.SetTo(0)
-            For Each lp In task.lines.lpList
-                Line(dst2, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 2)
-            Next
-            labels(2) = CStr(task.lines.lpList.Count) + " lines in the left image."
-
-            rightOnly.Run(emptyMat)
-            labels(3) = rightOnly.labels(2)
-
-            dst3.SetTo(0)
-            For Each lp In rightOnly.lpList
-                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
-            Next
-        End Sub
-    End Class
-
-
-
-
-    Public Class Line_LeftRight : Inherits TaskParent
-        Public leftList As New List(Of lpData)
-        Public rightList As New List(Of lpData)
-        Dim linesRight As New Line_Core
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
-        End Sub
-        Private Sub showLines(dst As Mat, lpList As List(Of lpData), pictag As Integer)
-            dst.SetTo(0)
-            For Each lp In lpList
-                Line(dst, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), pictag)
-            Next
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastList = New List(Of lpData)(leftList)
-            leftList = New List(Of lpData)(task.lines.lpList)
-
-            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(leftList, lastList)
-            showLines(dst2, leftList, 2)
-            labels(2) = CStr(leftList.Count) + " lines were found in the left image shown in white "
-
-            Static stableLR As New StableGray_LeftRight
-            stableLR.Run(emptyMat)
-
-            lastList = New List(Of lpData)(rightList)
-            linesRight.Run(stableLR.dst3)
-
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
-            showLines(dst3, rightList, 3)
-            labels(2) += " and " + CStr(rightList.Count) + " lines in the right image shown in color."
-        End Sub
-    End Class
 
 
 
@@ -2175,7 +2066,7 @@ Namespace VBClasses
 
 
     Public Class Line_ParallelLR : Inherits TaskParent
-        Dim linesLR As New Line_LeftRight
+        Dim linesLR As New LeftRight_Lines
         Dim lpList As New List(Of lpData)
         Public Sub New()
             desc = "Find the parallel lines in the left and right images."
@@ -2423,63 +2314,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Match : Inherits TaskParent
-        Public lp As lpData
-        Public goodCorrelation As Boolean
-        Dim matchP1 As New Match_Basics
-        Dim matchP2 As New Match_Basics
-        Public refreshCount As New List(Of Integer)
-        Public Sub New()
-            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            If task.lines.lpList.Count = 0 Then Exit Sub
-
-            dst2 = task.color.Clone
-
-            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100
-
-            If task.heartBeatLT Or lp Is Nothing Or goodCorrelation = False Then
-                refreshCount.Add(1)
-                goodCorrelation = True
-                If standalone Then lp = task.lines.lpList(0)
-                Dim sideSize = task.grid.nabeRectSide
-                Dim r1 = ValidateRect(New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize))
-                Dim r2 = ValidateRect(New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize))
-                matchP1.template = src(r1).Clone
-                matchP2.template = src(r2).Clone
-            Else
-                refreshCount.Add(0)
-                matchP1.Run(src)
-                SetTrueText(matchP1.correlation.ToString(fmt3), matchP1.newRect.BottomRight)
-
-                matchP2.Run(src)
-                SetTrueText(matchP2.correlation.ToString(fmt3), matchP2.newRect.BottomRight)
-
-                goodCorrelation = matchP1.correlation >= threshold And matchP2.correlation >= threshold
-                If goodCorrelation Then
-                    Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-                    Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-                    lp = New lpData(matchP1.newCenter, matchP2.newCenter)
-                    labels(2) = "Correlation P1/P2 templates = " + matchP1.correlation.ToString("0.000") + "/" +
-                                                                   matchP2.correlation.ToString("0.000")
-                Else
-                    labels(2) = "Low correlation.  Selecting line again..."
-                End If
-            End If
-
-            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
-            If refreshCount.Count > 100 Then refreshCount.RemoveAt(0)
-            labels(3) = "Had to refresh the longest line " + refreshCount.Average.ToString("0.0%") + " of the time"
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Line_MatchCheck : Inherits TaskParent
         Dim lp As lpData
         Dim matcher As New Line_Match
@@ -2561,4 +2395,122 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class XR_Line_LeftRight : Inherits TaskParent
+        Public leftList As New List(Of lpData)
+        Public rightList As New List(Of lpData)
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static stableLR As New StableGray_LeftRight
+            Static linesLeft As New Line_Core
+            Static linesRight As New Line_Core
+            stableLR.Run(emptyMat)
+
+            Dim lastList = New List(Of lpData)(linesLeft.lpList)
+            linesLeft.Run(stableLR.dst2)
+            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
+
+            dst2.SetTo(0)
+            For Each lp In linesLeft.lpList
+                Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
+            Next
+            labels(2) = CStr(linesLeft.lpList.Count) + " lines in the left image.  Highlighted line is the current longest line."
+
+            lastList = New List(Of lpData)(linesRight.lpList)
+            linesRight.Run(stableLR.dst3)
+            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
+
+            dst3.SetTo(0)
+            For Each lp In linesRight.lpList
+                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 3)
+            Next
+            labels(3) = CStr(linesRight.lpList.Count) + " lines in the right image."
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_LeftRight : Inherits TaskParent
+        Public lines As New LeftRight_Lines
+        Public Sub New()
+            desc = "Find the lines in the left and right images.  Left image is already found."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lines.Run(src)
+            dst2 = lines.dst2
+            labels(2) = lines.labels(2)
+
+            dst3 = lines.dst3
+            labels(3) = lines.labels(3)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Match : Inherits TaskParent
+        Public lp As lpData
+        Public goodCorrelation As Boolean
+        Dim clipped As New ClipLine_CenterRect
+        Dim matchP1 As New Match_Basics
+        Dim matchP2 As New Match_Basics
+        Public refreshCount As New List(Of Integer)
+        Public Sub New()
+            dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            dst2 = task.color.Clone
+
+            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100
+
+            If task.heartBeatLT Or lp Is Nothing Or goodCorrelation = False Then
+                refreshCount.Add(1)
+                clipped.Run(src) ' why clipped lines?  So we can track it longer regardless of camera motion.
+                goodCorrelation = True
+                If standalone Then lp = clipped.lpList(0)
+                Dim sideSize = task.grid.nabeRectSide
+                Dim r1 = ValidateRect(New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize))
+                Dim r2 = ValidateRect(New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize))
+                matchP1.template = src(r1).Clone
+                matchP2.template = src(r2).Clone
+            Else
+                refreshCount.Add(0)
+                matchP1.Run(src)
+                SetTrueText(matchP1.correlation.ToString(fmt3), matchP1.newRect.BottomRight)
+
+                matchP2.Run(src)
+                SetTrueText(matchP2.correlation.ToString(fmt3), matchP2.newRect.BottomRight)
+
+                goodCorrelation = matchP1.correlation >= threshold And matchP2.correlation >= threshold
+                If goodCorrelation Then
+                    Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
+                    Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
+                    lp = New lpData(matchP1.newCenter, matchP2.newCenter)
+                    labels(2) = "Correlation P1/P2 templates = " + matchP1.correlation.ToString("0.000") + "/" +
+                                                                   matchP2.correlation.ToString("0.000")
+                Else
+                    labels(2) = "Low correlation.  Selecting line again..."
+                End If
+            End If
+
+            Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
+            If refreshCount.Count > 100 Then refreshCount.RemoveAt(0)
+            labels(3) = "Had to refresh the longest line " + refreshCount.Average.ToString("0.0%") + " of the time"
+        End Sub
+    End Class
 End Namespace

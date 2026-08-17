@@ -411,6 +411,7 @@ LeftRight_Basics
 LeftRight_Brightness_TA
 LeftRight_FeatureLess
 LeftRight_Features
+LeftRight_Lines
 LeftRight_Reduction
 LeftRight_Stable
 Line_Basics
@@ -425,7 +426,6 @@ Line_FindVertical
 Line_Intersection
 Line_Intersections
 Line_LeftRight
-Line_LeftRightx
 Line_Match
 Line_MatchCheck
 Line_MatchClosest

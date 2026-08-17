@@ -25,7 +25,6 @@ Namespace VBClasses
             Dim barWidth = dst2.Width / task.histogramBins
             Dim histIndex = Math.Truncate(task.mouseMovePoint.X / barWidth)
 
-            Dim index As Integer = 1
             Dim bars = subD.options.histBars
             Dim center As Integer = task.histogramBins / 2
             Dim centerAdjust As Integer = If(task.histogramBins Mod 2 = 0, 1, 0)
