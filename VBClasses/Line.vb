@@ -53,7 +53,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lp In lpList
                 lp.index = (lpList.IndexOf(lp) + 1) Mod 255
-                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth + 2)
+                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth)
                 Line(dst3, lp.p1, lp.p2, 255, task.lineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next

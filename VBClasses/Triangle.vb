@@ -46,8 +46,8 @@ Namespace VBClasses
 
 
 
-    Public Class Triangle_HullContour : Inherits TaskParent
-        Dim hulls As New RedC_Hulls
+    Public Class XR_Triangle_HullContour : Inherits TaskParent
+        Dim hulls As New XR_RedC_Hulls
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Selected hull", "RedC_Basics output", "Selected contour"}
