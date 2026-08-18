@@ -391,25 +391,21 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
                 rect = _rect
                 If mapID >= 0 Then InRange(_mask, mapID, mapID, mask) Else mask = _mask.Clone
+                pixels = CountNonZero(mask)
                 age = 1
                 contourHull()
             End Sub
             Public Sub contourHull()
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If contour.Count >= 3 Then ' need at least 3 points for a contour.
-                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-
-                    ' keep the hull points around (there aren't many of them.)
-                    hull = ConvexHull(contour.ToArray, True).ToList
-                End If
-                pixels = CountNonZero(mask)
-                If pixels > 100 Then
+                If pixels <= 100 Then
+                    If pixels > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                Else
                     Dim epsilon = 0.01 * ArcLength(contour, True)
-                    Dim simplified() As cv.Point = ApproxPolyDP(contour.ToArray, epsilon, True)
-                    contour = simplified.ToList
+                    contour = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
                     mask.SetTo(0)
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 End If
+                pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
             End Sub
@@ -429,6 +425,7 @@ Namespace VBClasses
             End Function
             Public Function displayCell() As String
                 Dim strout = ""
+                strout += "age = " + CStr(age) + vbCrLf
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf
                 strout += "index = " + CStr(index) + vbCrLf
                 strout += "mapID = " + CStr(mapID) + vbCrLf
@@ -436,7 +433,7 @@ Namespace VBClasses
                 strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf
                 strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+                strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf + vbCrLf
                 strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
 
                 Return strout

@@ -11,6 +11,7 @@ Namespace VBClasses
         Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
         Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create the rcData representation of the image."
         End Sub
@@ -23,7 +24,6 @@ Namespace VBClasses
                 Static color8u As New Color8U_Basics
                 color8u.Run(task.gray)
                 src = color8u.dst2
-                src.SetTo(255, task.lines.dst1)
             End If
 
             flood.Run(src)
@@ -61,7 +61,11 @@ Namespace VBClasses
                 Dim val1 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Or rc.rect.Contains(rc.maxDStable) = False Then rc.maxDStable = rc.maxDist
+                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
+
+            dst3 = Palettize(dst1, 0)
+            dst1.SetTo(0)
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
