@@ -689,6 +689,31 @@ Namespace VBClasses
 
 
 
+    Public Class XR_RedC_Smoothing : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Reduce the rc.contours points if the distance to the next is < X"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2.Clone
+            labels(2) = redC.labels(2)
+
+            dst1.SetTo(0)
+            For Each rc In redC.rcList
+                If rc.pixels > 100 Then
+                    Dim epsilon = 0.01 * Cv2.ArcLength(rc.contour, True)
+                    Dim simplified() As Point = Cv2.ApproxPolyDP(rc.contour.ToArray, epsilon, True)
+                    rc.contour = simplified.ToList
+                End If
+                DrawContours(dst2(rc.rect), {rc.contour.ToArray}, 0, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
+
+
+
 
     Public Class RedC_CellLines : Inherits TaskParent
         Dim redC As New RedC_Basics
@@ -754,7 +779,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
-            dst2 = redC.dst2
+            dst2 = redC.dst3
             labels(2) = redC.labels(2)
             If task.rcD Is Nothing Then Exit Sub
 
@@ -783,32 +808,6 @@ Namespace VBClasses
 
             strOut = task.rcD.displayCell() + vbCrLf + vbCrLf + "Track point " + task.clickPoint.ToString + vbCrLf
             SetTrueText(strOut, 1)
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedC_Smoothing : Inherits TaskParent
-        Dim redC As New RedC_Basics
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Reduce the rc.contours points if the distance to the next is < X"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2.Clone
-            labels(2) = redC.labels(2)
-
-            dst1.SetTo(0)
-            For Each rc In redC.rcList
-                If rc.pixels > 100 Then
-                    Dim epsilon = 0.01 * Cv2.ArcLength(rc.contour, True)
-                    Dim simplified() As Point = Cv2.ApproxPolyDP(rc.contour.ToArray, epsilon, True)
-                    rc.contour = simplified.ToList
-                End If
-                DrawContours(dst2(rc.rect), {rc.contour.ToArray}, 0, task.highlight, task.lineWidth, task.lineType)
-            Next
         End Sub
     End Class
 End Namespace
