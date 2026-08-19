@@ -376,12 +376,14 @@ Namespace VBClasses
         Public Class rcData
             Public age As Integer
             Public contour As New List(Of cv.Point)
+            Public contourApprox As New List(Of cv.Point)
             Public depth As Single
             Public hull As New List(Of cv.Point)
             Public index As Integer
             Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
+            Public maskApprox As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
             Public pixels As Integer
@@ -391,19 +393,21 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, mapID As Integer)
                 rect = _rect
                 If mapID >= 0 Then InRange(_mask, mapID, mapID, mask) Else mask = _mask.Clone
+                maskApprox = mask.Clone
                 pixels = CountNonZero(mask)
                 age = 1
                 contourHull()
             End Sub
             Public Sub contourHull()
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If pixels <= 100 Then
-                    If pixels > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                Else
-                    Dim epsilon = 0.01 * ArcLength(contour, True)
-                    contour = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
-                    mask.SetTo(0)
+                If pixels > 0 Then
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    Dim epsilon = 0.01 * ArcLength(contour, True)
+                    contourApprox = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
+                    mask.SetTo(0)
+                    maskApprox.SetTo(0)
+                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    DrawContours(maskApprox, {contourApprox}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 End If
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)

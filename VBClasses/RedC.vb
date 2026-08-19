@@ -1,6 +1,4 @@
-Imports System.Buffers
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
@@ -44,7 +42,7 @@ Namespace VBClasses
             maxDStableList.Clear()
             For Each rc In rcList
                 Dim rcIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-                If rcIndex > 0 Then
+                If rcIndex > 0 And rcIndex < rcListLast.Count Then
                     Dim rcLast = rcListLast(rcIndex)
                     Dim index = maxDLast.IndexOf(rcLast.maxDStable)
                     If index >= 0 Then
@@ -58,10 +56,11 @@ Namespace VBClasses
 
             ' verify each maxDStable is within the cell.
             For Each rc In rcList
+                If rc.index = 0 Then Continue For
                 Dim val1 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Or rc.rect.Contains(rc.maxDStable) = False Then rc.maxDStable = rc.maxDist
-                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
+                dst1(rc.rect).SetTo(rc.mapID, rc.maskApprox)
             Next
 
             dst3 = Palettize(dst1, 0)

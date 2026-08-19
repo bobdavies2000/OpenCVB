@@ -1,12 +1,15 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Download and install ZED SDK 5.3 for OpenCVB (CUDA 12 build matches CUDA 12.x toolkits).
+  Download and install ZED SDK 5.4 for OpenCVB (CUDA 12 build matches CUDA 12.x toolkits).
 
 .DESCRIPTION
-  1. Downloads ZED_SDK_Windows_cuda12_v5.3.0.exe into ZED_SDK/installer/
+  1. Downloads ZED_SDK_Windows_cuda12_v5.4.0.exe into ZED_SDK/installer/
   2. Runs the Stereolabs installer (admin required)
   3. Copies sl_zed64.dll (+ peers) into ZED_SDK/native/bin for project-local deployment
+
+  Stereolabs.zed 5.4.0's sl_zed_c.dll will not load against a 5.3 sl_zed64.dll
+  (Windows error 127; .NET reports sl_zed_c.dll as missing).
 
 .PARAMETER SkipInstall
   Only download the installer; do not run setup.
@@ -24,21 +27,22 @@ $repoRoot = Split-Path $PSScriptRoot -Parent
 $installerDir = Join-Path $PSScriptRoot 'installer'
 $nativeBin = Join-Path $PSScriptRoot 'native\bin'
 # Resolves via Stereolabs CDN (direct .exe URL redirects to stereolabs.com HTML).
-$installerUrl = 'https://download.stereolabs.com/zedsdk/5.3/cu12/win'
-$installerPath = Join-Path $installerDir 'ZED_SDK_Windows_cuda12_v5.3.0.exe'
+$installerUrl = 'https://download.stereolabs.com/zedsdk/5.4/cu12/win'
+$installerPath = Join-Path $installerDir 'ZED_SDK_Windows_cuda12_v5.4.0.exe'
 $systemSdkBin = 'C:\Program Files (x86)\ZED SDK\bin'
-$encodingMarker = 'SVO_ENCODING_PRESET'
+# 5.4 C wrapper imports this C++ export; 5.3 sl_zed64.dll does not have it.
+$sdk54Marker = 'ingestCustomDepth'
 
 New-Item -ItemType Directory -Force -Path $installerDir, $nativeBin | Out-Null
 
-function Test-ZedSdk53Native([string]$binDir) {
+function Test-ZedSdk54Native([string]$binDir) {
     $dll = Join-Path $binDir 'sl_zed64.dll'
     if (-not (Test-Path $dll)) { return $false }
     $text = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($dll))
-    return $text.Contains($encodingMarker)
+    return $text.Contains($sdk54Marker)
 }
 
-Write-Host "OpenCVB ZED SDK 5.3 installer (CUDA 12)"
+Write-Host "OpenCVB ZED SDK 5.4 installer (CUDA 12)"
 Write-Host "  Repo: $repoRoot"
 Write-Host "  URL:  $installerUrl"
 
@@ -75,7 +79,7 @@ if (-not $SkipInstall) {
         exit $LASTEXITCODE
     }
 
-    Write-Host "Running ZED SDK 5.3 setup (silent)..."
+    Write-Host "Running ZED SDK 5.4 setup (silent)..."
     $proc = Start-Process -FilePath $installerPath -ArgumentList '/S' -Wait -PassThru
     if ($proc.ExitCode -ne 0) {
         Write-Warning "Installer exit code $($proc.ExitCode). If setup failed, run manually: $installerPath"
@@ -89,8 +93,8 @@ if (-not $SkipInstall -and -not $SkipCopy) {
     if (-not (Test-Path $systemSdkBin)) {
         throw "ZED SDK bin not found at $systemSdkBin. Install SDK first or run without -SkipInstall."
     }
-    if (-not (Test-ZedSdk53Native $systemSdkBin)) {
-        throw "Installed sl_zed64.dll at $systemSdkBin does not look like ZED SDK 5.3 (missing $encodingMarker)."
+    if (-not (Test-ZedSdk54Native $systemSdkBin)) {
+        throw "Installed sl_zed64.dll at $systemSdkBin does not look like ZED SDK 5.4 (missing $sdk54Marker)."
     }
 
     Write-Host "Copying native DLLs to $nativeBin ..."
@@ -100,12 +104,12 @@ if (-not $SkipInstall -and -not $SkipCopy) {
     Write-Host "Project-native ZED SDK ready: $nativeBin"
 }
 
-if (Test-ZedSdk53Native $nativeBin) {
-    Write-Host "OK: ZED SDK 5.3 native binaries verified under ZED_SDK/native/bin"
-} elseif (Test-ZedSdk53Native $systemSdkBin) {
-    Write-Host "OK: ZED SDK 5.3 installed under Program Files (rebuild MainUI to copy sl_zed64.dll to output)."
+if (Test-ZedSdk54Native $nativeBin) {
+    Write-Host "OK: ZED SDK 5.4 native binaries verified under ZED_SDK/native/bin"
+} elseif (Test-ZedSdk54Native $systemSdkBin) {
+    Write-Host "OK: ZED SDK 5.4 installed under Program Files (rebuild MainUI to copy sl_zed64.dll to output)."
 } else {
-    Write-Warning "ZED SDK 5.3 native DLLs not verified yet."
+    Write-Warning "ZED SDK 5.4 native DLLs not verified yet. Stereolabs.zed 5.4.0 will fail to load sl_zed_c.dll until you upgrade."
 }
 
 Write-Host "Next: rebuild OpenCVB (x64), e.g. MainUI or OpenCVB.sln"

@@ -70,8 +70,14 @@ Namespace MainApp
             updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
             Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-            If cudaPath IsNot Nothing AndAlso settings IsNot Nothing AndAlso settings.cameraName.StartsWith("StereoLabs") Then
-                updatePath(cudaPath, "Cuda - needed for StereoLabs")
+            If String.IsNullOrEmpty(cudaPath) Then
+                cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH", EnvironmentVariableTarget.Machine)
+            End If
+            If settings IsNot Nothing AndAlso settings.cameraName.StartsWith("StereoLabs") Then
+                If Not String.IsNullOrEmpty(cudaPath) Then
+                    updatePath(Path.Combine(cudaPath, "bin"), "Cuda bin - needed for StereoLabs")
+                    updatePath(cudaPath, "Cuda - needed for StereoLabs")
+                End If
                 updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             End If
             updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")

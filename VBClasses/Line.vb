@@ -2291,8 +2291,8 @@ Namespace VBClasses
                 r1.Y += offset1.Y
                 r2.X += offset2.X
                 r2.Y += offset2.Y
-                matchP1.template = src(r1)
-                matchP2.template = src(r2)
+                matchP1.template = src(ValidateRect(r1))
+                matchP2.template = src(ValidateRect(r2))
             Else
                 matchP1.Run(src)
                 Rectangle(dst2, matchP1.newRect, white, task.lineWidth)

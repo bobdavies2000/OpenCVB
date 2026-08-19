@@ -7,7 +7,7 @@ Namespace MainApp
             ' Select camera based on settings.cameraName
             Select Case settings.cameraName
                 Case "StereoLabs ZED 2/2i"
-                    camera = New Camera_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                    camera = New Camera_ZED(settings.workRes, settings.captureRes)
                 Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                     Dim emitterOn As Integer = 0 ' does this need to be an option in the user interface?
                     camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName, emitterOn)
@@ -76,6 +76,7 @@ Namespace MainApp
                                        vbc.task.IMU_FrameTime = camera.IMU_FrameTime
                                        vbc.task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
                                        vbc.task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                                       vbc.task.IMU_TimeStamp = camera.IMU_TimeStamp
                                    End SyncLock
 
                                    vbc.task.RunAlgorithm()

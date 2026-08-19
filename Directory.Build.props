@@ -1,10 +1,14 @@
 <Project>
-  <!-- Shared ZED SDK paths for OpenCVB (see ZED_SDK/Install-ZedSdk.ps1). -->
+  <!-- Shared ZED SDK paths for OpenCVB (see ZED_SDK/Install-ZedSdk.ps1). Must be SDK 5.4 to match Stereolabs.zed 5.4.0. -->
   <PropertyGroup>
     <OpenCVBRepoRoot>$(MSBuildThisFileDirectory.TrimEnd('\'))</OpenCVBRepoRoot>
     <ZedSdkProjectNativeBin>$(OpenCVBRepoRoot)\ZED_SDK\native\bin</ZedSdkProjectNativeBin>
     <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('$(ZedSdkProjectNativeBin)\sl_zed64.dll')">$(ZedSdkProjectNativeBin)</ZedSdkBin>
     <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('C:\Program Files (x86)\ZED SDK\bin\sl_zed64.dll')">C:\Program Files (x86)\ZED SDK\bin</ZedSdkBin>
     <ZedSdkBin Condition="'$(ZedSdkBin)' == '' and Exists('C:\Program Files\ZED SDK\bin\sl_zed64.dll')">C:\Program Files\ZED SDK\bin</ZedSdkBin>
+    <!-- Do not use $(PkgStereolabs_zed) here: VS design-time builds set ExcludeRestorePackageImports
+         and leave that property empty, so Content includes become '\runtimes\...' and never copy. -->
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+    <SlZedCDll Condition="'$(SlZedCDll)' == ''">$(NuGetPackageRoot)stereolabs.zed\5.4.0\runtimes\win-x64\native\sl_zed_c.dll</SlZedCDll>
   </PropertyGroup>
 </Project>
