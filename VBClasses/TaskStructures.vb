@@ -378,6 +378,7 @@ Namespace VBClasses
             Public contour As New List(Of cv.Point)
             Public contourApprox As New List(Of cv.Point)
             Public depth As Single
+            Public hull As New List(Of cv.Point)
             Public index As Integer
             Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
@@ -385,6 +386,7 @@ Namespace VBClasses
             Public maskApprox As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
+            Public neighborMask As cv.Mat
             Public pixels As Integer
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Sub New()
@@ -407,6 +409,13 @@ Namespace VBClasses
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
+
+                If contour.Count > 0 Then
+                    hull = ConvexHull(contour.ToArray, True).ToList
+                    neighborMask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
+                    DrawContours(neighborMask, {hull}, 0, cv.Scalar.All(255), -1, task.lineType)
+                    neighborMask.SetTo(0, mask)
+                End If
             End Sub
             Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
                 ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.

@@ -505,6 +505,7 @@ MSER_Detect
 MSER_Left
 MSER_Right
 MSER_SyntheticInput
+Neighbor_Basics
 OEX_CalcBackProject_Demo1
 OEX_PointPolygon
 OpAuto_Peaks2D
@@ -637,6 +638,7 @@ SLR_Core
 SLR_Plot
 SLR_PlotTest
 SLR_Trends
+Smoothing_Basics
 Smoothing_Exterior
 Smoothing_Interior
 Sort_1Channel

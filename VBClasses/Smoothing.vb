@@ -1,6 +1,31 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Namespace VBClasses
+    Public Class Smoothing_Basics : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "ApproxPoly is an interior and hull is an exterior"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            If task.rcD IsNot Nothing Then
+                Dim rc = task.rcD
+                dst3.SetTo(0)
+                dst3(rc.rect).SetTo(255, rc.neighborMask)
+                Rectangle(dst3, rc.rect, cv.Scalar.All(255), task.lineWidth)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
     Public Class Smoothing_Interior : Inherits TaskParent
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)

@@ -121,6 +121,7 @@ Moments
 Motion
 Mouse
 MSER
+Neighbor
 OEX
 OpAuto
 Open3D
