@@ -21,9 +21,10 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
-            DrawTour(dst1(rc.rect), rc.hull, task.highlight)
+            Dim hull() As Point = Cv2.ConvexHull(rc.contour)
+            DrawTour(dst1(rc.rect), hull.ToList, task.highlight)
 
-            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(rc.hull.Count)
+            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(hull.Length)
         End Sub
     End Class
 
@@ -43,7 +44,7 @@ Namespace VBClasses
 
             CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
             For Each rc In redC.rcList
-                DrawTour(dst3(rc.rect), rc.hull, task.highlight, task.lineWidth)
+                DrawTour(dst3(rc.rect), rc.contourApprox, task.highlight, task.lineWidth)
             Next
         End Sub
     End Class
@@ -300,7 +301,8 @@ Namespace VBClasses
             End If
             Dim tmp As New cv.Mat(newSize, cv.MatType.CV_8UC3, 0)
             DrawTour(tmp, rc.contour, white, task.lineWidth)
-            DrawTour(tmp, rc.hull, task.highlight, task.lineWidth)
+            Dim hull() As Point = Cv2.ConvexHull(rc.contour)
+            DrawTour(tmp, hull.ToList, task.highlight, task.lineWidth)
             Resize(tmp, dst1, dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
             Dim defects As Vec4i() = Nothing
@@ -349,6 +351,7 @@ Namespace VBClasses
 
     Public Class Hull_RedC : Inherits TaskParent
         Dim redC As New RedC_Basics
+        Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Public Sub New()
@@ -367,10 +370,11 @@ Namespace VBClasses
             rclist.Clear()
             For Each rc In redC.rcList
                 If rc.contour.Count >= 3 Then
-                    rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
-                    Dim color = task.scalarColors(rc.index Mod 255)
+                    Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
+                    hulls.Add(hull.ToList)
+                    Dim color = task.scalarColors(rc.mapID)
                     dst3(rc.rect).SetTo(color, rc.mask)
-                    DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                    DrawTour(rcMap(rc.rect), hull.ToList, rc.index, -1)
 
                     Dim defects As Vec4i() = Nothing
                     rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
@@ -379,11 +383,7 @@ Namespace VBClasses
                     Else
                         ' Fill each defect triangle (start / far / end) into mask, map, and display.
                         For Each d In defects
-                            Dim tri = New cv.Point() {
-                                rc.contour(d.Item0),
-                                rc.contour(d.Item2),
-                                rc.contour(d.Item1)
-                            }
+                            Dim tri = New cv.Point() {rc.contour(d.Item0), rc.contour(d.Item2), rc.contour(d.Item1)}
                             FillConvexPoly(dst3(rc.rect), tri, Scalar.All(255))
                             filledDefects += 1
                         Next

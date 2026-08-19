@@ -606,7 +606,7 @@ Namespace VBClasses
                 rc.maxDist.Y = mm.maxLoc.Y + rc.rect.Y
             End If
 
-            rc.hull = ConvexHull(contour.ToArray, True).ToList
+            Dim hull = ConvexHull(contour.ToArray, True).ToList
 
             rc.pixels = CountNonZero(rc.mask)
             Return rc

@@ -26,7 +26,7 @@ Namespace VBClasses
         Public ppy = task.calibData.leftIntrinsics.ppy
         Public fx = task.calibData.leftIntrinsics.fx
         Public fy = task.calibData.leftIntrinsics.fy
-        Public hulls As RedCloud_Basics
+        Public redC As RedCloud_Basics
         Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
             options = New Options_SharpGL
             options1 = New Options_GL
@@ -314,8 +314,8 @@ Namespace VBClasses
                     label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
 
                 Case oCase.imageTriangles
-                    If hulls Is Nothing Then hulls = New RedCloud_Basics
-                    hulls.Run(task.color)
+                    If redC Is Nothing Then redC = New RedCloud_Basics
+                    redC.Run(task.color)
 
                     Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
                     Dim rgba As New cv.Mat
@@ -344,18 +344,18 @@ Namespace VBClasses
                     Dim vec(2) As cv.Vec3f
                     Dim pts(2) As cv.Point
                     Dim triangleCount As Integer
-                    For Each rc In hulls.rcList
-                        Dim count As Single = rc.hull.Count
-                        For i = 0 To rc.hull.Count - 1
+                    For Each rc In redC.rcList
+                        Dim count As Single = rc.contourApprox.Count
+                        For i = 0 To rc.contourApprox.Count - 1
                             Dim goodDepth As Boolean = True
                             For j = 0 To vec.Length - 1
                                 Select Case j
                                     Case 0
-                                        pt = New cv.Point(CInt(rc.hull(i).X + rc.rect.X), CInt(rc.hull(i).Y + rc.rect.Y))
+                                        pt = New cv.Point(CInt(rc.contourApprox(i).X + rc.rect.X), CInt(rc.contourApprox(i).Y + rc.rect.Y))
                                     Case 1
                                         pt = rc.maxDist
                                     Case 2
-                                        pt = New cv.Point(CInt(rc.hull((i + 1) Mod count).X + rc.rect.X), CInt(rc.hull((i + 1) Mod count).Y + rc.rect.Y))
+                                        pt = New cv.Point(CInt(rc.contourApprox((i + 1) Mod count).X + rc.rect.X), CInt(rc.contourApprox((i + 1) Mod count).Y + rc.rect.Y))
                                 End Select
 
                                 pts(j) = pt

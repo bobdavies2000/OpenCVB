@@ -384,9 +384,9 @@ Namespace VBClasses
             Dim pixels As Integer
             dst3.SetTo(0)
             For Each rc In mser.redC.rcList
-                rc.hull = ConvexHull(rc.contour.ToArray, True).ToList
+                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
                 pixels += rc.pixels
-                DrawTour(dst3(rc.rect), rc.hull, task.scalarColors(rc.index Mod 255), -1)
+                DrawTour(dst3(rc.rect), hull, task.scalarColors(rc.index Mod 255), -1)
             Next
 
             labels(2) = CStr(mser.redC.rcList.Count) + " Regions with average size " +

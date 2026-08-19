@@ -342,7 +342,8 @@ Namespace VBClasses
 
             For i = 0 To redC.rcList.Count - 1
                 Dim rc = redC.rcList(i)
-                If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
+                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
+                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.mapID)
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
@@ -356,7 +357,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_TrackHull : Inherits TaskParent
+    Public Class RedC_TrackHull : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim lastCenter As cv.Point
         Dim lastMapID As Byte
@@ -375,7 +376,8 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
-                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
+                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.index)
             Next
 
             Dim index As Integer
@@ -395,14 +397,15 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             task.color(rcD.rect).SetTo(white, rcD.mask)
-            FillPoly(dst3(rcD.rect), {rcD.hull}, task.scalarColors(rcD.mapID + 1))
+            Dim hullD = ConvexHull(rcD.contour.ToArray, True).ToList
+            FillPoly(dst3(rcD.rect), {hullD}, task.scalarColors(rcD.mapID + 1))
             dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
             Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
             Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
             SetTrueText(rcD.displayCell() + vbCrLf, 1)
 
             task.rcD = rcD
-            lastCenter = Utility_Basics.ComputeHullCentroid(rcD.hull.ToArray, rcD)
+            lastCenter = Utility_Basics.ComputeHullCentroid(hullD.ToArray, rcD)
             lastMapID = rcD.mapID
             lastRect = rcD.rect
         End Sub
@@ -428,7 +431,8 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
-                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
+                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.index)
             Next
 
             Dim index As Integer

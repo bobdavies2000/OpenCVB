@@ -129,7 +129,7 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Hulls : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim hulls As New XR_RedColor_Hulls
+        Dim redC As New XR_RedColor_Hulls
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3
             labels = {"", "", "Output of XR_RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
@@ -138,16 +138,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            hulls.Run(src)
-            dst2 = hulls.dst2
+            redC.Run(src)
+            dst2 = redC.dst2
             If task.heartBeat Then dst3.SetTo(0)
 
             If task.rcD IsNot Nothing Then
                 Dim rcX = task.rcD
-                For Each rc In hulls.rclist
-                    If rc.hull.Count = 0 Or rcX.hull.Count = 0 Then Continue For
-                    Dim matchVal = MatchShapes(rcX.hull, rc.hull, options.matchOption)
-                    If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
+                For Each rc In redC.rclist
+                    If rc.contourApprox.Count = 0 Or rcX.contourApprox.Count = 0 Then Continue For
+                    Dim matchVal = MatchShapes(rcX.contourApprox, rc.contourApprox, options.matchOption)
+                    If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contourApprox, white, -1)
                 Next
             End If
         End Sub
@@ -208,7 +208,7 @@ Namespace VBClasses
         Public bestCell As Integer
         Dim rc As New rcData
         Dim options As New Options_MatchShapes
-        Dim hulls As New XR_RedColor_Hulls
+        Dim redC As New XR_RedColor_Hulls
         Public Sub New()
             labels = {"", "", "Output of XR_RedColor_Hulls", "Cells similar to selected cell"}
             desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
@@ -217,9 +217,9 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                hulls.Run(task.color)
-                If hulls.rclist.Count = 0 Then Exit Sub
-                dst2 = hulls.dst2
+                redC.Run(task.color)
+                If redC.rclist.Count = 0 Then Exit Sub
+                dst2 = redC.dst2
                 rc = task.rcD
             End If
 
@@ -228,16 +228,16 @@ Namespace VBClasses
                 similarCells.Clear()
 
                 Dim minMatch As Single = Single.MaxValue
-                For Each rc2 In hulls.rclist
-                    If rc.hull.Count = 0 Or rc2.hull.Count = 0 Then Continue For
+                For Each rc2 In redC.rclist
+                    If rc.contourApprox.Count = 0 Or rc2.contourApprox.Count = 0 Then Continue For
                     If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
-                    Dim matchVal = MatchShapes(rc.hull, rc2.hull, options.matchOption)
+                    Dim matchVal = MatchShapes(rc.contourApprox, rc2.contourApprox, options.matchOption)
                     If matchVal < options.matchThreshold Then
                         If matchVal < minMatch And matchVal > 0 Then
                             minMatch = matchVal
                             bestCell = similarCells.Count
                         End If
-                        DrawTour(dst3(rc2.rect), rc2.hull, white, -1)
+                        DrawTour(dst3(rc2.rect), rc2.contourApprox, white, -1)
                         similarCells.Add(rc2)
                     End If
                 Next

@@ -567,25 +567,6 @@ Namespace VBClasses
 
 
 
-    'Public Class XR_GL_LogicalCloud : Inherits TaskParent
-    '    Dim glTest As New GL_LogicalLines
-    '    Public Sub New()
-    '        glTest.drawRequest = oCase.draw3DLinesAndCloud
-    '        desc = "Draw the logical lines found and include the entire pointcloud."
-    '    End Sub
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        glTest.Run(src)
-    '        SetTrueText(glTest.strOut, 3)
-    '        dst2 = glTest.dst2
-    '        labels = glTest.labels
-    '    End Sub
-    'End Class
-
-
-
-
-
-
     Public Class XR_GL_ImageHullsColor : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -599,18 +580,18 @@ Namespace VBClasses
             Dim dataBuffer As New List(Of Vec3f)
             Dim vec(2) As Vec3f, pt As cv.Point
             For Each rc In redC.rcList
-                Dim count As Single = rc.hull.Count
-                For i = 0 To rc.hull.Count - 1
+                Dim count As Single = rc.contourApprox.Count
+                For i = 0 To rc.contourApprox.Count - 1
                     Dim goodDepth As Boolean = True
                     For j = 0 To vec.Length - 1
                         Select Case j
                             Case 0
-                                pt = New cv.Point(CInt(rc.hull(i).X + rc.rect.X), CInt(rc.hull(i).Y + rc.rect.Y))
+                                pt = New cv.Point(CInt(rc.contourApprox(i).X + rc.rect.X), CInt(rc.contourApprox(i).Y + rc.rect.Y))
                             Case 1
                                 pt = rc.maxDist
                             Case 2
-                                pt = New cv.Point(CInt(rc.hull((i + 1) Mod count).X + rc.rect.X),
-                                                      CInt(rc.hull((i + 1) Mod count).Y + rc.rect.Y))
+                                pt = New cv.Point(CInt(rc.contourApprox((i + 1) Mod count).X + rc.rect.X),
+                                                      CInt(rc.contourApprox((i + 1) Mod count).Y + rc.rect.Y))
                         End Select
 
                         vec(j) = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
@@ -639,21 +620,21 @@ Namespace VBClasses
 
     Public Class XR_GL_ImageHulls : Inherits TaskParent
         Public Sub New()
-            desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat hulls"
+            desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat contourApprox"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             strOut = task.sharpGL.RunTriangles(oCase.imageTriangles, Nothing)
 
-            dst2 = task.sharpGL.hulls.dst2
-            dst3 = task.sharpGL.hulls.dst3
-            labels(2) = task.sharpGL.hulls.labels(2)
+            dst2 = task.sharpGL.redC.dst2
+            dst3 = task.sharpGL.redC.dst3
+            labels(2) = task.sharpGL.redC.labels(2)
         End Sub
     End Class
 
 
 
 
-    Public Class GL_LogicalLines : Inherits TaskParent
+    Public Class XR_GL_LogicalLines : Inherits TaskParent
         Dim logLines As New Line3D_LogicalLines
         Public Sub New()
             desc = "Draw the logical lines found in the cv.Point cloud with the RGB lines."
@@ -675,7 +656,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_LogicalLines1 : Inherits TaskParent
+    Public Class XR_GL_LogicalLines1 : Inherits TaskParent
         Dim logLines As New Line3D_LogicalLines
         Public Sub New()
             desc = "Draw the logical lines found in the cv.Point cloud with the RGB lines."

@@ -162,14 +162,13 @@
   </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\GifBuilder\GifBuilder.vbproj" />
     <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
     <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
+    <ProjectReference Include="..\VBClasses\VisionClasses.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@ VisualStudioVersion = 18.0.11222.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MainUI", "MainUI\MainUI.vbproj", "{588E10EE-E08E-C828-C025-34AE198F3512}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBClasses", "VBClasses\VBClasses.vbproj", "{100D06BD-65A4-4FD9-3080-D701C7F29260}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VisionClasses", "VBClasses\VisionClasses.vbproj", "{100D06BD-65A4-4FD9-3080-D701C7F29260}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "jsonShared", "jsonShared\jsonShared.vbproj", "{577FBD81-039B-E742-D761-0FAAF71E23CD}"
 EndProject

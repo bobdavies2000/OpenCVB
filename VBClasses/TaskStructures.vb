@@ -374,11 +374,10 @@ Namespace VBClasses
 
 
         Public Class rcData
-            Public age As Integer
+            Public age As Integer = 1
             Public contour As New List(Of cv.Point)
             Public contourApprox As New List(Of cv.Point)
             Public depth As Single
-            Public hull As New List(Of cv.Point)
             Public index As Integer
             Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
@@ -395,10 +394,6 @@ Namespace VBClasses
                 If mapID >= 0 Then InRange(_mask, mapID, mapID, mask) Else mask = _mask.Clone
                 maskApprox = mask.Clone
                 pixels = CountNonZero(mask)
-                age = 1
-                contourHull()
-            End Sub
-            Public Sub contourHull()
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If pixels > 0 Then
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)

@@ -960,6 +960,7 @@ Namespace VBClasses
             desc = "Create a map with the lp.rect field."
         End Sub
         Private Function fillTriangle(p1 As cv.Point) As Boolean
+            p1 = lpData.validatePoint(p1)
             Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
             If val > 0 Then
                 FloodFill(dst3, p1, 255)
