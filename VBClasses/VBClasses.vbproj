@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.26.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.29.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
     <PackageReference Include="OpenCvSharp5" Version="5.0.0.20260806" />
     <PackageReference Include="OpenCvSharp5.GdipExtensions" Version="5.0.0.20260806" />
