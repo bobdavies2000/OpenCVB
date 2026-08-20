@@ -62,7 +62,7 @@ Namespace VBClasses
     Public Class Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -328,7 +328,7 @@ Namespace VBClasses
     Public Class Flood_OriginalNew : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()

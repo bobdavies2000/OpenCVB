@@ -830,7 +830,7 @@ Namespace VBClasses
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
@@ -882,7 +882,7 @@ Namespace VBClasses
                 If task.heartBeat Or True Then
                     rc.mapID = rcList.Count + 1
                 Else
-                    Dim lastIndex = lastMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim lastIndex = lastMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                     rc.mapID = rcList.Count + 1
                     If lastIndex > 0 And lastIndex < rcLastList.Count Then
                         rc.mapID = lastIndex

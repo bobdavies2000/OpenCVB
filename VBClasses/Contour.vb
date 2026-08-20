@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(task.workRes, MatType.CV_32S, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -16,7 +16,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
-            Dim clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X) - 1
+            Dim clickIndex = rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex)
                 dst(task.rcD.rect).SetTo(white, task.rcD.mask)

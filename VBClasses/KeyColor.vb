@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim rcList As New List(Of rcData)
-        Dim rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
+        Dim rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
         Dim options As New Options_Contours
         Public Sub New()

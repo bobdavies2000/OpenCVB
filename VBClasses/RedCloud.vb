@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public options As New Options_RedCloud
         Dim reduction As New Reduction_BasicsParmInput
         Public runSelectCell As Boolean = True
@@ -44,11 +44,6 @@ Namespace VBClasses
 
                 dst2(rc.rect).SetTo(task.scalarColors(rc.mapID Mod 255), rc.mask)
             Next
-
-            If runSelectCell Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                                 "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
@@ -269,7 +264,7 @@ Namespace VBClasses
     Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)

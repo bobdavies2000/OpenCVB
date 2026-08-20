@@ -353,7 +353,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}
             desc = "Cursor.ai: Fill convexity defect regions for each hull in RedC.rcList"

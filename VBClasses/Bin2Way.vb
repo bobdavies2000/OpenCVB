@@ -244,7 +244,7 @@ Namespace VBClasses
         Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)
-        Dim rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Dim rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
                 redCs(i) = New RedC_Basics

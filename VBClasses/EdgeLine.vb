@@ -21,7 +21,8 @@ Namespace VBClasses
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                                       task.lineWidth)
             handlesrc.Free()
-            rcMap = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
+            Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr)
+            tmp.ConvertTo(rcMap, cv.MatType.CV_32F)
             rcMap.ConvertTo(dst2, MatType.CV_8U)
 
             Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)

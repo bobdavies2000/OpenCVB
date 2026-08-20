@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
@@ -204,11 +204,6 @@ Namespace VBClasses
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
-            If standaloneTest() Then
-                strOut = Utility_Basics.selectCell(rcMap, rcList)
-                SetTrueText(strOut, 3)
-            End If
-
             labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
                         " minpixels.  " + CStr(count) + " matched to previous generation"
         End Sub
@@ -311,7 +306,7 @@ Namespace VBClasses
 
     Public Class XR_RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim redC As New RedC_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -367,13 +362,12 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
+                Dim index As Integer = redC.rcMap.Get(Of Single)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
                 rcGridMap(r).SetTo(rc.mapID)
             Next
-            strOut = Utility_Basics.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 
@@ -651,7 +645,7 @@ Namespace VBClasses
 
             Dim cx = task.workRes.Width \ 2
             Dim cy = task.workRes.Height \ 2
-            Dim idxCenter = rcMap.Get(Of Integer)(cy, cx) - 1
+            Dim idxCenter As Integer = rcMap.Get(Of Single)(cy, cx) - 1
             If idxCenter >= 0 And idxCenter < rcList.Count Then
                 Dim rc0 = rcList(idxCenter)
                 If rc0.pixels >= minPx And rc0.pixels <= maxPx Then Return rc0
@@ -664,7 +658,7 @@ Namespace VBClasses
                 For dx = -4 To 4
                     Dim y = Clip(cy + dy, 0, rcMap.Rows - 1)
                     Dim x = Clip(cx + dx, 0, rcMap.Cols - 1)
-                    Dim ix = rcMap.Get(Of Integer)(y, x)
+                    Dim ix = rcMap.Get(Of Single)(y, x)
                     If ix <= 0 OrElse ix > rcList.Count Then Continue For
                     Dim rc = rcList(ix - 1)
                     If rc.pixels < minPx OrElse rc.pixels > maxPx Then Continue For

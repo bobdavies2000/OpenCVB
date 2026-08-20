@@ -67,7 +67,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                Dim indexLast = redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = redC.rcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast <> 0 And indexLast < redC.rcList.Count Then
                     Dim lrc = redC.rcList(indexLast)
                     matched.Add(indexLast)

@@ -4,7 +4,7 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
@@ -41,7 +41,7 @@ Namespace VBClasses
 
             maxDStableList.Clear()
             For Each rc In rcList
-                Dim rcIndex = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim rcIndex = rcMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 If rcIndex > 0 And rcIndex < rcListLast.Count Then
                     Dim rcLast = rcListLast(rcIndex)
                     Dim index = maxDLast.IndexOf(rcLast.maxDStable)
@@ -68,7 +68,7 @@ Namespace VBClasses
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex = rcMap.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
             If clickIndex <= 0 Then
                 SetTrueText("There is no cell defined for that point.", 1)
             Else
@@ -95,14 +95,14 @@ Namespace VBClasses
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim rcListLast As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
         Public Shared Function displayCell(rcIndexMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             task.rcD = rcList(clickIndex)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             If clickIndex = 0 Then Return task.rcD.displayCell() + vbCrLf + vbCrLf + "Unmapped region.  No cell present" + vbCrLf
@@ -157,7 +157,7 @@ Namespace VBClasses
             For Each rc In rcList
                 Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
 
                 If indexLast < rcListLast.Count Then
                     rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
@@ -185,14 +185,14 @@ Namespace VBClasses
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim rcListLast As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
         Public Shared Function displayCell(rcIndexMap As cv.Mat, rcList As List(Of rcData)) As String
-            Dim clickIndex = rcIndexMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             task.rcD = rcList(clickIndex)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             If clickIndex = 0 Then Return task.rcD.displayCell() + vbCrLf + vbCrLf + "Unmapped region.  No cell present" + vbCrLf
@@ -247,7 +247,7 @@ Namespace VBClasses
             For Each rc In rcList
                 Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim indexLast = rcIndexMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
 
                 If indexLast < rcListLast.Count Then
                     rc.maxDStable = If(mapIDCurr = mapIDLast, rcListLast(indexLast).maxDStable, rc.maxDist)
@@ -490,15 +490,14 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim index As Integer
             If task.mouseClickFlag Then lastCenter = task.clickPoint
-            index = redC.rcMap.Get(Of Integer)(lastCenter.Y, lastCenter.X)
+            Dim index As Integer = redC.rcMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
 
             If index > 0 Then
                 rcD = redC.rcList(index)
             Else
                 Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
-                Dim myMapID = redC.rcMap.Get(Of Byte)(lastCenter.Y, lastCenter.X)
+                Dim myMapID As Integer = redC.rcMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
                 For Each rc In redC.rcList
                     If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
                         rcD = rc
@@ -648,7 +647,7 @@ Namespace VBClasses
             ApplyColorMap(dst0, dst3, task.colorMapDepth)
             dst3.SetTo(0, task.noDepthMask)
 
-            Dim clickIndex = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex As Integer = redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex > 0 AndAlso clickIndex < redC.rcList.Count Then
                 Dim rc = redC.rcList(clickIndex)
                 SetTrueText(rc.displayCell() + vbCrLf + "Mean depth = " + rc.depth.ToString(fmt2) + "m", 1)

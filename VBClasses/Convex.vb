@@ -123,7 +123,7 @@ Namespace VBClasses
         ''' Returns the cleaned contour. defects is empty when ConvexityDefects cannot be used.
         ''' </summary>
         Public Shared Function checkDefects(c As List(Of cv.Point), ByRef defects As Vec4i()) As List(Of cv.Point)
-            defects = New Vec4i() {}
+            defects = New Vec4i(0) {}
             If c Is Nothing OrElse c.Count < 3 Then Return If(c, New List(Of cv.Point))
 
             ' Update contour first: duplicate vertices make hull indices non-monotonous.
@@ -140,7 +140,7 @@ Namespace VBClasses
                     Dim hullIndices = ConvexHullIndices(cleaned.ToArray(), False)
                     defects = ConvexityDefects(cleaned, hullIndices.ToList())
                 Catch
-                    defects = New Vec4i() {}
+                    defects = New Vec4i(0) {}
                 End Try
             End If
             Return cleaned
@@ -149,8 +149,6 @@ Namespace VBClasses
             redC.Run(src)
             dst1 = redC.dst2
             labels(2) = redC.labels(2)
-
-            Utility_Basics.selectCell(redC.rcMap, redC.rcList)
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub

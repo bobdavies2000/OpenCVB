@@ -473,7 +473,7 @@ Namespace VBClasses
     Public Class Delaunay_Map : Inherits TaskParent
         Dim subdiv As New Subdiv2D
         Public rcList As List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."

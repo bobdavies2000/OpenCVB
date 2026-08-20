@@ -92,32 +92,6 @@ Namespace VBClasses
                 PutText(dst, nextText, p3, HersheyFonts.HersheyPlain, fontSize, white, fontThickness, task.lineType)
             Next
         End Sub
-        Public Shared Function selectCell(rcMap As Mat, rcList As List(Of rcData)) As String
-            'Dim clickIndex As Integer, dMsg As String
-            'If rcMap.Type = MatType.CV_32S Then
-            '    clickIndex = rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            'Else
-            '    clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            'End If
-
-            'If clickIndex = 0 Then
-            '    If rcList.Count = 0 Then rcList.Add(New rcData(task.color, New cv.Rect(0, 0, task.color.Width, task.color.Height), 1))
-            '    task.rcD = rcList(0)
-            'End If
-
-            'For Each rc In rcList
-            '    If clickIndex = rc.mapID Then
-            '        task.rcD = rc
-            '        If task.rcD.rect.Contains(task.clickPoint) Then Exit For
-            '    End If
-            'Next
-            'task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            'dMsg = task.rcD.displayCell()
-            'task.clickPoint = task.rcD.maxDist
-
-            'Return dMsg
-            Return ""
-        End Function
         Public Shared Function Magnify(src As cv.Mat) As cv.Mat
             If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
                 Dim dst As cv.Mat = src(task.drawRect)
