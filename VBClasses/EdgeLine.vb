@@ -32,7 +32,7 @@ Namespace VBClasses
             Dim rectPtr = EdgeLineRaw_Rects(cPtr)
             If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
 
-            classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
+            classCount = EdgeLineRaw_GetSegCount(cPtr)
             If classCount = 0 Then Exit Sub ' nothing to work with....
 
             Dim rects(classCount - 1) As cv.Rect
@@ -408,10 +408,6 @@ Namespace VBClasses
 
 
 
-
-
-
-
     Public Class EdgeLine_LeftRightMotion : Inherits TaskParent
         Dim edges As New EdgeLine_Basics
         Public Sub New()
@@ -424,6 +420,31 @@ Namespace VBClasses
 
             edges.Run(task.rightView)
             dst3 = edges.dst2.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class EdgeLine_Compare : Inherits TaskParent
+        Dim edgeLine As New EdgeLine_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "The output of EdgeLine_basics after using task.edges.dst2 to zero out overlap."
+            desc = "Compare EdgeLine with Edge_Basics - edgeline is cleaner with more straight lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edgeLine.Run(task.gray)
+            Threshold(edgeLine.dst2, dst2, 0, 255, ThresholdTypes.Binary)
+            labels(2) = edgeLine.labels(2)
+
+            dst3 = task.edges.dst2
+            labels(3) = task.edges.labels(2)
+
+            dst1 = dst2.Clone
+            dst1.SetTo(0, dst3)
         End Sub
     End Class
 
@@ -444,13 +465,13 @@ Namespace VBClasses
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                                  task.lineWidth)
+            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handlesrc.Free()
             Dim rcMap = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
             rcMap.ConvertTo(dst2, MatType.CV_8U)
 
             Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
+
             ' prevent leaks at the image boundary...
             Rectangle(dst2, New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), Scalar.All(255), imageEdgeWidth)
 
@@ -479,28 +500,4 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class EdgeLine_Compare : Inherits TaskParent
-        Dim edgeLine As New EdgeLine_Basics
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(1) = "The output of EdgeLine_basics after using task.edges.dst2 to zero out overlap."
-            desc = "Compare EdgeLine with Edge_Basics - edgeline is cleaner with more straight lines."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeLine.Run(task.gray)
-            Threshold(edgeLine.dst2, dst2, 0, 255, ThresholdTypes.Binary)
-            labels(2) = edgeLine.labels(2)
-
-            dst3 = task.edges.dst2
-            labels(3) = task.edges.labels(2)
-
-            dst1 = dst2.Clone
-            dst1.SetTo(0, dst3)
-        End Sub
-    End Class
 End Namespace

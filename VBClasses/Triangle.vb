@@ -68,9 +68,8 @@ Namespace VBClasses
             Next
 
             dst1.SetTo(0)
-            Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
-            If hull IsNot Nothing Then
-                For Each pt In hull
+            If rc.hull IsNot Nothing Then
+                For Each pt In rc.hull
                     pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
                     Circle(dst1, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 Next

@@ -21,10 +21,9 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
-            Dim hull() As Point = Cv2.ConvexHull(rc.contour)
-            DrawTour(dst1(rc.rect), hull.ToList, task.highlight)
+            DrawTour(dst1(rc.rect), rc.hull, task.highlight)
 
-            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(hull.Length)
+            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(rc.hull.Count)
         End Sub
     End Class
 

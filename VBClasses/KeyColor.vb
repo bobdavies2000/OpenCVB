@@ -32,7 +32,6 @@ Namespace VBClasses
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
                 Dim rc As New rcData With {.rect = Contour_Core.buildRect(ptArray)}
-                If rc.rect.Width = 0 Or rc.rect.Height = 0 Then Continue For
 
                 tourMat(rc.rect).SetTo(0)
                 rc.contour = ptArray.ToList
@@ -54,8 +53,14 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(rcMap)
+
+            Static clickPoint As cv.Point
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            SetTrueText(RedC_Basics.displayCell(rcList, clickIndex - 1), 3)
         End Sub
     End Class
+
 
 
 

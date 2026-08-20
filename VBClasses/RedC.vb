@@ -13,6 +13,17 @@ Namespace VBClasses
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Create the rcData representation of the image."
         End Sub
+        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
+            Dim displayStr As String
+            If clickIndex <= 0 Then
+                displayStr = "There is no cell defined for that point."
+            Else
+                task.rcD = rclist(clickIndex)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                displayStr = task.rcD.displayCell
+            End If
+            Return displayStr
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcMapLast = rcMap.Clone
             Dim rcListLast = New List(Of rcData)(rcList)
@@ -54,6 +65,18 @@ Namespace VBClasses
                 maxDStableList.Add(rc.maxDStable)
             Next
 
+            Static clickPoint As cv.Point
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            SetTrueText(displayCell(rcList, clickIndex), 1)
+
+            If task.rcD IsNot Nothing Then
+                SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            End If
+
             ' verify each maxDStable is within the cell.
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
@@ -65,21 +88,6 @@ Namespace VBClasses
 
             dst3 = Palettize(dst1, 0)
             dst1.SetTo(0)
-
-            Static clickPoint As cv.Point
-            If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
-            If clickIndex <= 0 Then
-                SetTrueText("There is no cell defined for that point.", 1)
-            Else
-                task.rcD = rcList(clickIndex)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
-                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                SetTrueText(task.rcD.displayCell, 1)
-                SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
-            End If
 
             labels(2) = CStr(rcList.Count) + " cells were found."
         End Sub
@@ -342,8 +350,7 @@ Namespace VBClasses
 
             For i = 0 To redC.rcList.Count - 1
                 Dim rc = redC.rcList(i)
-                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
-                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.mapID)
+                If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
@@ -376,8 +383,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
-                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
-                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.index)
+                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
             Next
 
             Dim index As Integer
@@ -397,15 +403,14 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             task.color(rcD.rect).SetTo(white, rcD.mask)
-            Dim hullD = ConvexHull(rcD.contour.ToArray, True).ToList
-            FillPoly(dst3(rcD.rect), {hullD}, task.scalarColors(rcD.mapID + 1))
+            FillPoly(dst3(rcD.rect), {rcD.hull}, task.scalarColors(rcD.mapID + 1))
             dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
             Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
             Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
             SetTrueText(rcD.displayCell() + vbCrLf, 1)
 
             task.rcD = rcD
-            lastCenter = Utility_Basics.ComputeHullCentroid(hullD.ToArray, rcD)
+            lastCenter = Utility_Basics.ComputeHullCentroid(rcD.hull.ToArray, rcD)
             lastMapID = rcD.mapID
             lastRect = rcD.rect
         End Sub
@@ -431,8 +436,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
-                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
-                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.index)
+                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
             Next
 
             Dim index As Integer

@@ -322,7 +322,6 @@ Namespace VBClasses
             rclist.Clear()
             For Each rc In redC.rcList
                 If rc.contour IsNot Nothing AndAlso rc.contour.Count >= 3 Then
-                    Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
                     Dim defects As Vec4i() = Nothing
                     rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
                     If defects.Length > 0 Then
@@ -330,7 +329,7 @@ Namespace VBClasses
                     Else
                         defectCount += 1
                     End If
-                    DrawTour(rcMap(rc.rect), hull, rc.mapID, -1)
+                    DrawTour(rcMap(rc.rect), rc.hull, rc.mapID, -1)
                     rclist.Add(rc)
                 End If
             Next
