@@ -45,7 +45,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bgSub.Run(src)
             dst1 = bgSub.dst2
-            Dim contours = FindContoursAsArray(dst1, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+            Dim contours = FindContoursAsArray(dst1, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
 
             Dim contourCount As Integer
             For Each tour In contours

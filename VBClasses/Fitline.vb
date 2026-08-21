@@ -89,7 +89,7 @@ Namespace VBClasses
             End If
 
             Dim contours As cv.Point()()
-            contours = FindContoursAsArray(dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+            contours = FindContoursAsArray(dst3, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
             For i = 0 To contours.Length - 1
                 Dim cnt = contours(i)
                 Dim line2d = FitLine(cnt, DistanceTypes.L2, 0, options.radiusAccuracy, options.angleAccuracy)

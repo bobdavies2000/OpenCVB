@@ -98,7 +98,7 @@ Public Module vbc
         Return GetMinMax(mat)
     End Function
     ' alternative optional parameter: ApproxTC89L1 or ApproxNone
-    Public Function ContourBuild(mask As Mat, Optional approxMode As ContourApproximationModes = ContourApproximationModes.ApproxNone) As List(Of cv.Point)
+    Public Function ContourBuild(mask As Mat, Optional approxMode As contourApproximationModes = contourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing
         FindContours(mask, allContours, Nothing, RetrievalModes.External, approxMode)
 

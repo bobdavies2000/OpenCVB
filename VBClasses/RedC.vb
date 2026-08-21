@@ -11,6 +11,7 @@ Namespace VBClasses
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "ApproxPoly results for each cell"
             desc = "Create the rcData representation of the image."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
@@ -670,6 +671,7 @@ Namespace VBClasses
 
 
 
+
     Public Class XR_RedC_SteadyCam : Inherits TaskParent
         Dim steady As New SteadyCam_Basics
         Dim redC As New RedC_Basics
@@ -814,6 +816,153 @@ Namespace VBClasses
 
             strOut = task.rcD.displayCell() + vbCrLf + vbCrLf + "Track point " + task.clickPoint.ToString + vbCrLf
             SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_DepthMerge : Inherits TaskParent
+        Public redC As New RedC_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            desc = "Cursor.ai: Merge neighboring RedC color cells when their min/max depths overlap."
+        End Sub
+        Private Shared Function cellDepthRange(rc As rcData) As mmData
+            Dim mm As mmData
+            If rc Is Nothing OrElse rc.mask.Width <= 1 OrElse rc.pixels = 0 Then Return mm
+            Dim depthMask As New Mat
+            BitwiseAnd(rc.mask, task.depthmask(rc.rect), depthMask)
+            If CountNonZero(depthMask) = 0 Then Return mm
+            Return GetMinMax(task.pcSplit(2)(rc.rect), depthMask)
+        End Function
+        Private Shared Function findRoot(parent() As Integer, i As Integer) As Integer
+            If parent(i) <> i Then parent(i) = findRoot(parent, parent(i))
+            Return parent(i)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim n = redC.rcList.Count
+            If n <= 1 Then
+                rcList = New List(Of rcData)(redC.rcList)
+                rcMap = redC.rcMap
+                dst3 = dst2.Clone
+                Exit Sub
+            End If
+
+            Dim minZ(n - 1) As Single, maxZ(n - 1) As Single
+            For i = 1 To n - 1
+                Dim mm = cellDepthRange(redC.rcList(i))
+                minZ(i) = CSng(mm.minVal)
+                maxZ(i) = CSng(mm.maxVal)
+            Next
+
+            Dim nabes(n - 1) As HashSet(Of Integer)
+            For i = 0 To n - 1
+                nabes(i) = New HashSet(Of Integer)
+            Next
+            Dim w = redC.rcMap.Width, h = redC.rcMap.Height
+            Dim mapData(w * h - 1) As Single
+            redC.rcMap.GetArray(Of Single)(mapData)
+            For y = 0 To h - 1
+                Dim row = y * w
+                For x = 0 To w - 1
+                    Dim a = CInt(mapData(row + x))
+                    If a <= 0 OrElse a >= n Then Continue For
+                    If x + 1 < w Then
+                        Dim b = CInt(mapData(row + x + 1))
+                        If b > 0 AndAlso b < n AndAlso a <> b Then
+                            nabes(a).Add(b)
+                            nabes(b).Add(a)
+                        End If
+                    End If
+                    If y + 1 < h Then
+                        Dim b = CInt(mapData(row + w + x))
+                        If b > 0 AndAlso b < n AndAlso a <> b Then
+                            nabes(a).Add(b)
+                            nabes(b).Add(a)
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim parent(n - 1) As Integer
+            For i = 0 To n - 1
+                parent(i) = i
+            Next
+            Dim slack = task.depthDiffMeters
+            For i = 1 To n - 1
+                If maxZ(i) <= 0 Then Continue For
+                For Each j In nabes(i)
+                    If j <= i OrElse maxZ(j) <= 0 Then Continue For
+                    If minZ(i) <= maxZ(j) + slack AndAlso minZ(j) <= maxZ(i) + slack Then
+                        Dim ra = findRoot(parent, i)
+                        Dim rb = findRoot(parent, j)
+                        If ra <> rb Then parent(ra) = rb
+                    End If
+                Next
+            Next
+
+            Dim groups As New Dictionary(Of Integer, List(Of rcData))
+            For i = 1 To n - 1
+                Dim root = findRoot(parent, i)
+                If groups.ContainsKey(root) = False Then groups(root) = New List(Of rcData)
+                groups(root).Add(redC.rcList(i))
+            Next
+
+            Dim sorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim fullMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            For Each members In groups.Values
+                fullMask.SetTo(0)
+                Dim unionRect = members(0).rect
+                Dim biggest = members(0)
+                For Each rc In members
+                    unionRect = unionRect.Union(rc.rect)
+                    fullMask(rc.rect).SetTo(255, rc.mask)
+                    If rc.pixels > biggest.pixels Then biggest = rc
+                Next
+                unionRect = ValidateRect(unionRect)
+                Dim merged As New rcData(fullMask(unionRect), unionRect, -1) With {.mapID = biggest.mapID}
+                If merged.pixels > 0 Then sorted.Add(merged.pixels, merged)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData)
+            rcMap.SetTo(0)
+            dst1.SetTo(0)
+            For Each rc In sorted.Values
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(CByte(rc.index Mod 255), rc.mask)
+            Next
+            dst3 = Palettize(dst1, 0)
+            dst1.SetTo(0)
+
+            Static clickPoint As cv.Point
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            If clickIndex > 0 AndAlso clickIndex < rcList.Count Then
+                Dim rc = rcList(clickIndex)
+                Dim mm = cellDepthRange(rc)
+                SetTrueText(RedC_Basics.displayCell(rcList, clickIndex) +
+                            "Mean depth = " + rc.depth.ToString(fmt2) + "m" + vbCrLf +
+                            "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
+                            mm.maxVal.ToString(fmt2) + "m", 1)
+                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+                Circle(dst3, rc.maxDist, task.DotSize + 1, white, -1)
+            End If
+
+            labels(3) = CStr(rcList.Count) + " cells after merging neighbors of " +
+                    CStr(n) + " color cells with overlapping depth"
         End Sub
     End Class
 End Namespace

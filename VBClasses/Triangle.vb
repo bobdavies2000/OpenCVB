@@ -59,7 +59,7 @@ Namespace VBClasses
             If hulls.rcList.Count <= 1 Then Exit Sub
             Static rc As rcData = hulls.rcList(0)
 
-            rc.contour = ContourBuild(rc.mask, ContourApproximationModes.ApproxTC89L1)
+            rc.contour = ContourBuild(rc.mask, contourApproximationModes.ApproxTC89L1)
 
             dst3.SetTo(0)
             For Each pt In rc.contour

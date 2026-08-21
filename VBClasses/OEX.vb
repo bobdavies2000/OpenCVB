@@ -320,7 +320,7 @@ Namespace VBClasses
 
             dst2 = src.Clone
             Dim contours As cv.Point()() = Nothing
-            FindContours(src, contours, Nothing, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+            FindContours(src, contours, Nothing, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
 
             dst1 = New Mat(dst1.Size(), MatType.CV_32F, Scalar.All(0))
             For i = 0 To dst1.Rows - 1

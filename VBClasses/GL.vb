@@ -580,18 +580,18 @@ Namespace VBClasses
             Dim dataBuffer As New List(Of Vec3f)
             Dim vec(2) As Vec3f, pt As cv.Point
             For Each rc In redC.rcList
-                Dim count As Single = rc.contourApprox.Count
-                For i = 0 To rc.contourApprox.Count - 1
+                Dim count As Single = rc.approxPoly.Count
+                For i = 0 To rc.approxPoly.Count - 1
                     Dim goodDepth As Boolean = True
                     For j = 0 To vec.Length - 1
                         Select Case j
                             Case 0
-                                pt = New cv.Point(CInt(rc.contourApprox(i).X + rc.rect.X), CInt(rc.contourApprox(i).Y + rc.rect.Y))
+                                pt = New cv.Point(CInt(rc.approxPoly(i).X + rc.rect.X), CInt(rc.approxPoly(i).Y + rc.rect.Y))
                             Case 1
                                 pt = rc.maxDist
                             Case 2
-                                pt = New cv.Point(CInt(rc.contourApprox((i + 1) Mod count).X + rc.rect.X),
-                                                      CInt(rc.contourApprox((i + 1) Mod count).Y + rc.rect.Y))
+                                pt = New cv.Point(CInt(rc.approxPoly((i + 1) Mod count).X + rc.rect.X),
+                                                      CInt(rc.approxPoly((i + 1) Mod count).Y + rc.rect.Y))
                         End Select
 
                         vec(j) = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
@@ -620,7 +620,7 @@ Namespace VBClasses
 
     Public Class XR_GL_ImageHulls : Inherits TaskParent
         Public Sub New()
-            desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat contourApprox"
+            desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat approxPoly"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             strOut = task.sharpGL.RunTriangles(oCase.imageTriangles, Nothing)

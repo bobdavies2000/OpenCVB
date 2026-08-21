@@ -375,8 +375,8 @@ Namespace VBClasses
 
         Public Class rcData
             Public age As Integer = 1
+            Public approxPoly As New List(Of cv.Point)
             Public contour As New List(Of cv.Point)
-            Public contourApprox As New List(Of cv.Point)
             Public depth As Single
             Public hull As New List(Of cv.Point)
             Public index As Integer
@@ -400,11 +400,11 @@ Namespace VBClasses
                 If pixels > 0 Then
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                     Dim epsilon = 0.01 * ArcLength(contour, True)
-                    contourApprox = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
+                    approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
                     mask.SetTo(0)
                     maskApprox.SetTo(0)
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                    DrawContours(maskApprox, {contourApprox}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 End If
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
@@ -434,7 +434,23 @@ Namespace VBClasses
             Public Function displayCell() As String
                 Dim strout = ""
                 strout += "age = " + CStr(age) + vbCrLf
+
+                strout += "ApproxPoly point count = " + CStr(approxPoly.Count) + vbCrLf
+                Dim totalDistance As Single
+                For i = 0 To approxPoly.Count - 2
+                    totalDistance += approxPoly(i).DistanceTo(approxPoly(i + 1))
+                Next
+                Dim approxDensity = totalDistance / approxPoly.Count
+                strout += "ApproxPoly density (distance/point) " + approxDensity.ToString("#0.0") + vbCrLf
+
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf
+                totalDistance = 0
+                For i = 0 To contour.Count - 2
+                    totalDistance += contour(i).DistanceTo(contour(i + 1))
+                Next
+                Dim density = totalDistance / contour.Count
+                strout += "contour density (distance/point) " + density.ToString("#0.0") + vbCrLf
+
                 strout += "index = " + CStr(index) + vbCrLf
                 strout += "mapID = " + CStr(mapID) + vbCrLf
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf

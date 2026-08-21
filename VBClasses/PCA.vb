@@ -119,7 +119,7 @@ Namespace VBClasses
             Threshold(gray, gray, 50, 255, ThresholdTypes.Binary Or ThresholdTypes.Otsu)
             Dim hierarchy() As HierarchyIndex = Nothing
             Dim contours As cv.Point()() = Nothing
-            FindContours(gray, contours, hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxNone)
+            FindContours(gray, contours, hierarchy, RetrievalModes.List, contourApproximationModes.ApproxNone)
 
             dst3.SetTo(0)
             For i = 0 To contours.Length - 1

@@ -167,7 +167,7 @@ Namespace VBClasses
 
 
     Public Class Options_Contours2 : Inherits OptionParent
-        Public ApproximationMode As ContourApproximationModes = ContourApproximationModes.ApproxTC89KCOS
+        Public ApproximationMode As contourApproximationModes = contourApproximationModes.ApproxTC89KCOS
         Public Sub New()
             If radio.Setup(traceName) Then
                 radio.addRadio("ApproxNone")
@@ -178,9 +178,9 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Static radioChoices() As ContourApproximationModes = {ContourApproximationModes.ApproxNone,
-                                        ContourApproximationModes.ApproxSimple, ContourApproximationModes.ApproxTC89KCOS,
-                                        ContourApproximationModes.ApproxTC89L1}
+            Static radioChoices() As contourApproximationModes = {contourApproximationModes.ApproxNone,
+                                        contourApproximationModes.ApproxSimple, contourApproximationModes.ApproxTC89KCOS,
+                                        contourApproximationModes.ApproxTC89L1}
             Static frm = FindFrm(traceName + " Radio Buttons")
             ApproximationMode = radioChoices(findRadioIndex(frm.check))
         End Sub
@@ -192,7 +192,7 @@ Namespace VBClasses
 
     Public Class Options_Contours : Inherits OptionParent
         Public retrievalMode As RetrievalModes = RetrievalModes.External
-        Public ApproximationMode As ContourApproximationModes = ContourApproximationModes.ApproxTC89KCOS
+        Public ApproximationMode As contourApproximationModes = contourApproximationModes.ApproxTC89KCOS
         Public epsilon As Double = 0.03
         Public options2 As New Options_Contours2
         Public Sub New()

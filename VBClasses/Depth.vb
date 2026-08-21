@@ -80,7 +80,7 @@ Namespace VBClasses
 
             Dim contours As cv.Point()()
             If shadow.dst3.Channels() = 3 Then CvtColor(shadow.dst3, shadow.dst3, ColorConversionCodes.BGR2GRAY)
-            contours = FindContoursAsArray(shadow.dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+            contours = FindContoursAsArray(shadow.dst3, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
 
             Dim sortContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
             For Each c In contours

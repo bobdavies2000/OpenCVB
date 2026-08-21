@@ -345,17 +345,17 @@ Namespace VBClasses
                     Dim pts(2) As cv.Point
                     Dim triangleCount As Integer
                     For Each rc In redC.rcList
-                        Dim count As Single = rc.contourApprox.Count
-                        For i = 0 To rc.contourApprox.Count - 1
+                        Dim count As Single = rc.approxPoly.Count
+                        For i = 0 To rc.approxPoly.Count - 1
                             Dim goodDepth As Boolean = True
                             For j = 0 To vec.Length - 1
                                 Select Case j
                                     Case 0
-                                        pt = New cv.Point(CInt(rc.contourApprox(i).X + rc.rect.X), CInt(rc.contourApprox(i).Y + rc.rect.Y))
+                                        pt = New cv.Point(CInt(rc.approxPoly(i).X + rc.rect.X), CInt(rc.approxPoly(i).Y + rc.rect.Y))
                                     Case 1
                                         pt = rc.maxDist
                                     Case 2
-                                        pt = New cv.Point(CInt(rc.contourApprox((i + 1) Mod count).X + rc.rect.X), CInt(rc.contourApprox((i + 1) Mod count).Y + rc.rect.Y))
+                                        pt = New cv.Point(CInt(rc.approxPoly((i + 1) Mod count).X + rc.rect.X), CInt(rc.approxPoly((i + 1) Mod count).Y + rc.rect.Y))
                                 End Select
 
                                 pts(j) = pt

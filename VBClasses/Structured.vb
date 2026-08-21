@@ -741,7 +741,7 @@ Namespace VBClasses
             dst2 = Not multi.dst3
             If dst2.Channels <> 1 Then CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
             Dim rawContours = FindContoursAsArray(dst2, RetrievalModes.Tree,
-                                                          ContourApproximationModes.ApproxSimple)
+                                                          contourApproximationModes.ApproxSimple)
             Dim contours(rawContours.Length - 1)() As cv.Point
             For j = 0 To rawContours.Length - 1
                 contours(j) = ApproxPolyDP(rawContours(j), 3, True)

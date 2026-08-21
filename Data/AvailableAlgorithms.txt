@@ -611,6 +611,7 @@ Rectangle_Rotated
 RedC_Basics
 RedC_CellLines
 RedC_Depth
+RedC_DepthMerge
 RedC_MergeCells
 RedC_NeighborHist
 RedC_TrackCell

@@ -99,7 +99,7 @@ Namespace VBClasses
             If video.dst2.Empty() = False Then
                 bgSub.Run(video.dst2)
 
-                contours = FindContoursAsArray(bgSub.dst2, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
+                contours = FindContoursAsArray(bgSub.dst2, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
                 CvtColor(bgSub.dst2, dst2, ColorConversionCodes.GRAY2BGR)
                 If standaloneTest() Then
                     For i = 0 To contours.Length - 1

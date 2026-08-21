@@ -145,9 +145,9 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then
                 Dim rcX = task.rcD
                 For Each rc In redC.rclist
-                    If rc.contourApprox.Count = 0 Or rcX.contourApprox.Count = 0 Then Continue For
-                    Dim matchVal = MatchShapes(rcX.contourApprox, rc.contourApprox, options.matchOption)
-                    If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contourApprox, white, -1)
+                    If rc.approxPoly.Count = 0 Or rcX.approxPoly.Count = 0 Then Continue For
+                    Dim matchVal = MatchShapes(rcX.approxPoly, rc.approxPoly, options.matchOption)
+                    If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.approxPoly, white, -1)
                 Next
             End If
         End Sub
@@ -229,15 +229,15 @@ Namespace VBClasses
 
                 Dim minMatch As Single = Single.MaxValue
                 For Each rc2 In redC.rclist
-                    If rc.contourApprox.Count = 0 Or rc2.contourApprox.Count = 0 Then Continue For
+                    If rc.approxPoly.Count = 0 Or rc2.approxPoly.Count = 0 Then Continue For
                     If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
-                    Dim matchVal = MatchShapes(rc.contourApprox, rc2.contourApprox, options.matchOption)
+                    Dim matchVal = MatchShapes(rc.approxPoly, rc2.approxPoly, options.matchOption)
                     If matchVal < options.matchThreshold Then
                         If matchVal < minMatch And matchVal > 0 Then
                             minMatch = matchVal
                             bestCell = similarCells.Count
                         End If
-                        DrawTour(dst3(rc2.rect), rc2.contourApprox, white, -1)
+                        DrawTour(dst3(rc2.rect), rc2.approxPoly, white, -1)
                         similarCells.Add(rc2)
                     End If
                 Next
