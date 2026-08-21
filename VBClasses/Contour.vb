@@ -78,6 +78,7 @@ Namespace VBClasses
         Dim options As New Options_Contours
         Dim allContours As cv.Point()()
         Public Sub New()
+            OptionParent.findRadio("FloodFill").Checked = True
             task.fOptions.EdgeMethods.SelectedItem = "EdgeLine_Basics"
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "General purpose contour finder"
@@ -88,6 +89,42 @@ Namespace VBClasses
             Dim minY As Integer = ptList.Min(Function(p) p.Y)
             Dim maxY As Integer = ptList.Max(Function(p) p.Y)
             Return ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+        End Function
+        ' FloodFill/CComp can read a 32-bit label map. External/List/Tree cannot — they treat every
+        ' non-zero pixel as one blob, and EdgeLine's 255 frame welds every cell that touches the border.
+        Private Shared Function retrieveContours(input As Mat, retrieval As RetrievalModes,
+                                          approx As ContourApproximationModes) As cv.Point()()
+            Dim contours As cv.Point()() = Nothing
+            If retrieval = RetrievalModes.FloodFill OrElse retrieval = RetrievalModes.CComp Then
+                Dim labels32s As New Mat
+                input.ConvertTo(labels32s, MatType.CV_32SC1)
+                FindContours(labels32s, contours, Nothing, retrieval, approx)
+                If contours Is Nothing Then Return Nothing
+                Return contours
+            End If
+
+            Dim work = input.Clone()
+            Dim border = If(work.Width >= 1280, 4, 2)
+            Rectangle(work, New cv.Rect(0, 0, work.Width - 1, work.Height - 1), Scalar.All(0), border)
+
+            Dim histogram As New Mat
+            CalcHist({work}, {0}, New Mat, histogram, 1, {256}, {New Rangef(0, 256)})
+            Dim bins(255) As Single
+            histogram.GetArray(Of Single)(bins)
+
+            Dim foundList As New List(Of cv.Point())
+            Dim mask As New Mat
+            For id = 1 To 255
+                If bins(id) < 5 Then Continue For
+                InRange(work, id, id, mask)
+                Dim found As cv.Point()() = Nothing
+                FindContours(mask, found, Nothing, retrieval, approx)
+                If found Is Nothing Then Continue For
+                For Each c In found
+                    foundList.Add(c)
+                Next
+            Next
+            Return foundList.ToArray()
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -100,15 +137,9 @@ Namespace VBClasses
                 labels(3) = edgeMethod.labels(2)
             End If
 
-            Dim mode = options.options2.ApproximationMode
-            If options.retrievalMode = RetrievalModes.FloodFill Then
-                dst3.ConvertTo(dst3, MatType.CV_32SC1)
-                FindContours(dst3, allContours, Nothing, RetrievalModes.FloodFill, mode)
-            Else
-                FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
-            End If
+            allContours = retrieveContours(dst3, options.retrievalMode, options.options2.ApproximationMode)
 
-            If allContours.Length = 0 Then Exit Sub
+            If allContours Is Nothing OrElse allContours.Length = 0 Then Exit Sub
 
             Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
@@ -118,13 +149,13 @@ Namespace VBClasses
                 If rc.pixels < 5 Then Continue For
                 rc.contour = New List(Of cv.Point)(ptArray)
                 If rc.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
-                If rc.rect.Width = dst2.Width - 1 And rc.rect.Height = dst2.Height - 1 Then Continue For
 
                 rc.rect = buildRect(ptArray)
                 If rc.rect.Width = 0 Or rc.rect.Height = 0 Then Continue For
+                If rc.rect.Width >= dst2.Width - 1 And rc.rect.Height >= dst2.Height - 1 Then Continue For
                 tourMat(rc.rect).SetTo(0)
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
-                DrawContours(tourMat, listOfPoints, 0, New Scalar(sortedList.Count), -1, LineTypes.Link8)
+                DrawContours(tourMat, listOfPoints, 0, New Scalar(sortedList.Count + 1), -1, LineTypes.Link8)
                 Threshold(tourMat(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
                 rc.maxDist = rc.buildMaxDist(rc.mask)
                 sortedList.Add(rc.pixels, rc)

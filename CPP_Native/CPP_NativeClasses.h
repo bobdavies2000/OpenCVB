@@ -2,6 +2,9 @@
 #include <string.h>
 #include <Windows.h>
 #include <cstdlib>
+#include <cfloat> // IWYU pragma: keep
+#include <cmath> // IWYU pragma: keep
+#include <limits>
 #include <iostream>
 #include <algorithm>
 #include <opencv2/core.hpp>
@@ -54,7 +57,7 @@ public:
     void RunCPP(int minSize) {
         result = Mat(src.rows + 2, src.cols + 2, CV_8U);
         result.setTo(0);
-        int maskFill = 255;
+        int maskFill = MASKFILL;
 
         //multimap<int, Point, less_equal<int>> sizeSorted;
         multimap<int, Point, greater<int>> sizeSorted;
@@ -2721,7 +2724,7 @@ public:
 
                 ANN->setLayerSizes(layer_sizes);
                 ANN->setActivationFunction(ANN_MLP::SIGMOID_SYM, 1, 1);
-                ANN->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 300, FLT_EPSILON));
+                ANN->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 300, numeric_limits<float>::epsilon()));
                 ANN->setTrainMethod(ANN_MLP::BACKPROP, 0.001);
                 ANN->train(tdata);
             }
@@ -2761,7 +2764,7 @@ public:
                 // classify coordinate plane points using the bayes classifier, i.e.
                 // y(x) = arg max_i=1_modelsCount likelihoods_i(x)
                 Mat testSample(1, 2, CV_32FC1);
-                Mat logLikelihoods(1, nmodels, CV_64FC1, Scalar(-DBL_MAX));
+                Mat logLikelihoods(1, nmodels, CV_64FC1, Scalar(-numeric_limits<double>::max()));
 
                 for (int y = 0; y < img.rows; y++)
                 {

@@ -6,7 +6,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
         End Sub
-        Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
+        Public Shared Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
             Const EPSILON As Double = 0.000000001
 
             ' --- Handle Vertical Lines (Infinite Slope) ---

@@ -1,3 +1,4 @@
+#define MASKFILL 255
 #ifdef _DEBUG
 #pragma comment(lib, "opencv_aruco4140d.lib")
 #pragma comment(lib, "opencv_bgsegm4140d.lib")
