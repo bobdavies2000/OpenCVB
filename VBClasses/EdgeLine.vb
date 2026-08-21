@@ -18,10 +18,9 @@ Namespace VBClasses
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                                      task.lineWidth)
+            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handlesrc.Free()
-            Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32F, imagePtr)
+            Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
             tmp.ConvertTo(rcMap, cv.MatType.CV_32F)
             rcMap.ConvertTo(dst2, MatType.CV_8U)
 
@@ -45,7 +44,7 @@ Namespace VBClasses
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
                 Dim mask = rcMap(rects(i))
-                Dim rc = New rcData(mask, rects(i), index)
+                Dim rc = New rcData(mask, ValidateRect(rects(i)), index)
 
                 rcList.Add(rc)
                 If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(index Mod 255), rc.mask)

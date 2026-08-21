@@ -13,7 +13,7 @@ Namespace VBClasses
             For j = 0 To vertices2f.Length - 1
                 vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
             Next
-            FillConvexPoly(dst, vertices, color, task.lineType)
+            FillConvexPoly(dst, vertices, color, cv.LineTypes.Link8)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -28,13 +28,13 @@ Namespace VBClasses
                     Dim eSize = New Size2f(CSng(task.msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(task.msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                     Dim angle = 180.0F * CSng(task.msRNG.Next(0, 1000) / 1000.0F)
 
-                    Dim nextColor = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                    Dim nextColor = New cv.Scalar(i + 1, i + 1, i + 1) ' New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                     Dim rr = New RotatedRect(nPoint, eSize, angle)
                     Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
                     If options.drawRotated Then
                         DrawRotatedRect(rr, dst2, nextColor)
                     Else
-                        Rectangle(dst2, r, nextColor, options.drawFilled)
+                        Rectangle(dst2, r, nextColor, options.drawFilled, cv.LineTypes.Link8)
                     End If
                     rotatedRectangles.Add(rr)
                     rectangles.Add(r)

@@ -168,7 +168,7 @@
     <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\VBClasses\VisionClasses.vbproj" />
+    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

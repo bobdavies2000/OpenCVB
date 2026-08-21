@@ -34,7 +34,7 @@ Namespace VBClasses
             color8U.Run(src)
             dst2 = color8U.dst3
 
-            contours.Run(src)
+            contours.Run(color8U.dst2.Clone)
 
             Dim rcListLast As New List(Of rcData)(rcList)
             rcMap.SetTo(0)
@@ -108,7 +108,7 @@ Namespace VBClasses
                 FindContours(dst3, allContours, Nothing, options.retrievalMode, mode)
             End If
 
-            If allContours.Length <= 1 Then Exit Sub
+            If allContours.Length = 0 Then Exit Sub
 
             Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
@@ -118,6 +118,7 @@ Namespace VBClasses
                 If rc.pixels < 5 Then Continue For
                 rc.contour = New List(Of cv.Point)(ptArray)
                 If rc.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
+                If rc.rect.Width = dst2.Width - 1 And rc.rect.Height = dst2.Height - 1 Then Continue For
 
                 rc.rect = buildRect(ptArray)
                 If rc.rect.Width = 0 Or rc.rect.Height = 0 Then Continue For
@@ -152,7 +153,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Contour_Regions : Inherits TaskParent
+    Public Class Contour_Regions : Inherits TaskParent
         Public tourList As New List(Of cv.Point())
         Public areaList As New List(Of Integer) ' cv.Point counts for each contour in tourList above.
         Public options As New Options_Contours
@@ -333,7 +334,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_RotatedRects : Inherits TaskParent
         Public rotatedRect As New Rectangle_Rotated
-        Dim basics As New XR_Contour_Regions
+        Dim basics As New Contour_Regions
         Public Sub New()
             labels(3) = "Find contours of several rotated rects"
             desc = "Demo options on FindContours."
@@ -363,7 +364,7 @@ Namespace VBClasses
 
 
     ' https://github.com/SciSharp/SharpCV/blob/master/src/Sharpcvb.Examples/Program.cs
-    Public Class XR_Contour_RemoveLines : Inherits TaskParent
+    Public Class Contour_RemoveLines : Inherits TaskParent
         Dim options As New Options_Morphology
         Dim image As Mat
         Public Sub New()
@@ -479,7 +480,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Foreground : Inherits TaskParent
         Dim km As New XR_Foreground_KMeans
-        Dim contour As New XR_Contour_Regions
+        Dim contour As New Contour_Regions
         Public Sub New()
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             labels = {"", "", "Kmeans foreground output", "Contour of foreground"}
@@ -502,7 +503,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Contour_Largest : Inherits TaskParent
+    Public Class Contour_Largest : Inherits TaskParent
         Public bestContour As New List(Of cv.Point)
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -516,19 +517,20 @@ Namespace VBClasses
             If standaloneTest() Then
                 If task.heartBeat Then
                     rotatedRect.Run(src)
-                    dst2 = rotatedRect.dst2
+                    dst0 = rotatedRect.dst2
+                    dst2 = Palettize(dst0, 0)
                 End If
             Else
-                dst2 = src
+                dst0 = src
             End If
 
-            If dst2.Channels() <> 1 Then CvtColor(dst2, dst2, ColorConversionCodes.BGR2GRAY)
+            If dst0.Channels() <> 1 Then CvtColor(dst0, dst0, ColorConversionCodes.BGR2GRAY)
             If options.retrievalMode = RetrievalModes.FloodFill Then
-                dst2.ConvertTo(dst1, MatType.CV_32SC1)
+                dst0.ConvertTo(dst1, MatType.CV_32SC1)
                 FindContours(dst1, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
                 dst1.ConvertTo(dst3, MatType.CV_8UC1)
             Else
-                FindContours(dst2, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
+                FindContours(dst0, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
             End If
 
             Dim maxCount As Integer, maxIndex As Integer
@@ -1381,13 +1383,13 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_ConnectLineToContour : Inherits TaskParent
+    Public Class Contour_ToLineCenter : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            desc = "Cursor.ai: Connect each line to the contour containing its center point"
+            desc = "Cursor.ai: Find the contour for a line overlapping the contour points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -1422,7 +1424,7 @@ Namespace VBClasses
 
             labels(3) = CStr(rcLpList.Count) + " line/contour connections"
 
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
                 dst3.SetTo(0)
                 If index < rcLpList.Count Then
@@ -1434,19 +1436,22 @@ Namespace VBClasses
                 Else
                     strOut = "No cell with that index..."
                 End If
+                SetTrueText(strOut, 3)
             End If
         End Sub
     End Class
 
 
 
-    Public Class Contour_ConnectLineToContourTest : Inherits TaskParent
+
+
+    Public Class Contour_ToLineOverlaps : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Cursor.ai: Connect each line to the contour containing its center point"
+            desc = "Cursor.ai: Connect each line to the contour containing the lines center point"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
@@ -1494,7 +1499,7 @@ Namespace VBClasses
 
             labels(3) = CStr(rcLpList.Count) + " line/contour connections"
 
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
                 dst3.SetTo(0)
                 If index < rcLpList.Count Then
@@ -1506,6 +1511,7 @@ Namespace VBClasses
                 Else
                     strOut = "No cell with that index..."
                 End If
+                SetTrueText(strOut, 3)
             End If
         End Sub
     End Class

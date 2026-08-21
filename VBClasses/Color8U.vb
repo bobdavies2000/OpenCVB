@@ -34,7 +34,7 @@ Namespace VBClasses
             End If
 
             classifier.run(If(src.Type = MatType.CV_8U, src, task.gray))
-            dst2 = classifier.dst2.clone
+            dst2 = classifier.dst2
 
             classCount = classifier.classCount
 
