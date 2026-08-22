@@ -60,6 +60,7 @@ Namespace VBClasses
             task.filterBasics = New Filter_Basics_TA
             task.foreground = New Foreground_Basics_TA
             task.leftRightBrightness = New LeftRight_Brightness_TA
+            task.steadyCam = New SteadyCam_Basics_TA
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To task.cpu.callTrace.Count - 1
@@ -84,6 +85,7 @@ Namespace VBClasses
             Options_PointCloud.setupCalcHist()
             Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm + " at " + CStr(Now))
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
+            task.cpu.displayObjectName = settings.algorithm
             AlgorithmTestAllCount += 1
 
             Select Case task.Settings.cameraName
@@ -129,6 +131,7 @@ Namespace VBClasses
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(New cv.Mat)
+            task.steadyCam.run(Nothing)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 
@@ -206,16 +209,14 @@ Namespace VBClasses
 
             Dim displayObject = task.MainUI_Algorithm
             Dim index As Integer = 0
-            If task.cpu.displayObjectName IsNot Nothing Then
-                If task.cpu.displayObjectName <> displayObject.traceName Then
-                    For Each td In task.cpu.activeObjects
-                        If td.traceName.endswith(task.cpu.displayObjectName) Then
-                            index = task.cpu.activeObjects.IndexOf(td)
-                            Exit For
-                        End If
-                    Next
-                    displayObject = cpu.activeObjects(index)
-                End If
+            If task.cpu.displayObjectName <> displayObject.traceName Then
+                For Each td In task.cpu.activeObjects
+                    If td.traceName.endswith(task.cpu.displayObjectName) Then
+                        index = task.cpu.activeObjects.IndexOf(td)
+                        Exit For
+                    End If
+                Next
+                displayObject = cpu.activeObjects(index)
             End If
 
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData

@@ -6,7 +6,6 @@ Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
-        Public maxDStableList As New List(Of cv.Point)
         Public flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -26,9 +25,7 @@ Namespace VBClasses
             Return displayStr
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcMapLast = rcMap.Clone
             Dim rcListLast = New List(Of rcData)(rcList)
-            Dim maxDLast = New List(Of cv.Point)(maxDStableList)
 
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
@@ -51,19 +48,17 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            maxDStableList.Clear()
-            For Each rc In rcList
-                Dim rcIndex = rcMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                If rcIndex > 0 And rcIndex < rcListLast.Count Then
-                    Dim rcLast = rcListLast(rcIndex)
-                    Dim index = maxDLast.IndexOf(rcLast.maxDStable)
-                    If index >= 0 Then
-                        rc.age = rcLast.age + 1
-                        If rc.age >= 1000 Then rc.age = 10
-                        rc.maxDStable = rcLast.maxDStable
-                    End If
-                End If
-                maxDStableList.Add(rc.maxDStable)
+            Dim assigned(rcList.Count - 1) As Boolean
+            For i = 1 To rcListLast.Count - 1
+                Dim rcLast = rcListLast(i)
+                Dim pt = rcLast.maxDStable
+                If pt.X < 0 OrElse pt.Y < 0 OrElse pt.X >= rcMap.Width OrElse pt.Y >= rcMap.Height Then Continue For
+                Dim idx = CInt(rcMap.Get(Of Single)(pt.Y, pt.X))
+                If idx <= 0 OrElse idx >= rcList.Count OrElse assigned(idx) Then Continue For
+                rcList(idx).maxDStable = pt
+                rcList(idx).age = rcLast.age + 1
+                If rcList(idx).age >= 1000 Then rcList(idx).age = 10
+                assigned(idx) = True
             Next
 
             Static clickPoint As cv.Point
@@ -78,13 +73,9 @@ Namespace VBClasses
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            ' verify each maxDStable is within the cell.
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                Dim val1 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-                Dim val2 = flood.dst2.Get(Of cv.Vec3b)(rc.maxDStable.Y, rc.maxDStable.X)
-                If val1 <> val2 Or rc.rect.Contains(rc.maxDStable) = False Then rc.maxDStable = rc.maxDist
-                dst1(rc.rect).SetTo(rc.mapID, rc.maskApprox)
+            For i = 1 To rcList.Count - 1
+                dst1(rcList(i).rect).SetTo(rcList(i).mapID, rcList(i).maskApprox)
+                If rcList(i).index <= 10 Then SetTrueText(CStr(rcList(i).age), rcList(i).maxDStable, 3)
             Next
 
             dst3 = Palettize(dst1, 0)
@@ -673,7 +664,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_SteadyCam : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics
+        Dim steady As New SteadyCam_Basics_TA
         Dim redC As New RedC_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
@@ -755,69 +746,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class RedC_TrackCell : Inherits TaskParent
-        Dim redC As New RedC_Basics
-        Public Sub New()
-            task.gOptions.displayDst1.Checked = True
-            desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
-        End Sub
-        Private Function rcDFindCell(rcLast As rcData) As rcData
-            Dim rcD As rcData = Nothing
-            Dim candidates As New List(Of (index As Integer, rc As rcData))
-            For Each rc In redC.rcList
-                If rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc))
-            Next
-
-            If candidates.Count > 0 Then
-                Dim pixelsSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-                For i = 0 To candidates.Count - 1
-                    Dim rc = candidates(i).rc
-                    Dim rect = rc.rect.Intersect(rcLast.rect)
-                    pixelsSorted.Add(rect.Width * rect.Height, rc)
-                Next
-                rcD = redC.rcList(candidates(0).index)
-                dst1.SetTo(0)
-                dst1(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
-            End If
-            Return rcD
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst3
-            labels(2) = redC.labels(2)
-            If task.rcD Is Nothing Then Exit Sub
-
-            Dim mapID = redC.flood.dst1.Get(Of Byte)(task.rcD.maxDStable.Y, task.rcD.maxDStable.X)
-            If mapID <> task.rcD.mapID Then
-                task.rcD = rcDFindCell(task.rcD)
-                task.rcD.maxDStable = task.rcD.maxDist
-            End If
-
-            Dim index = redC.maxDStableList.IndexOf(task.rcD.maxDStable)
-            dst3.SetTo(0)
-            If index > 0 Then
-                task.rcD = redC.rcList(index)
-            Else
-                Dim rcD = rcDFindCell(task.rcD)
-                If rcD IsNot Nothing Then task.rcD = rcD
-            End If
-
-            task.clickPoint = task.rcD.maxDStable
-
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.mapID), task.rcD.mask)
-            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            Circle(dst3, task.rcD.maxDStable, task.DotSize + 1, white, -1)
-            Circle(dst3, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
-
-            strOut = task.rcD.displayCell() + vbCrLf + vbCrLf + "Track point " + task.clickPoint.ToString + vbCrLf
-            SetTrueText(strOut, 1)
-        End Sub
-    End Class
 
 
 
@@ -963,6 +891,98 @@ Namespace VBClasses
 
             labels(3) = CStr(rcList.Count) + " cells after merging neighbors of " +
                     CStr(n) + " color cells with overlapping depth"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_TrackCellOld : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            task.gOptions.displayDst1.Checked = True
+            desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
+        End Sub
+        Private Function rcDFindCell(rcLast As rcData) As rcData
+            Dim rcD As rcData = Nothing
+            Dim candidates As New List(Of (index As Integer, rc As rcData))
+            For Each rc In redC.rcList
+                If rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc))
+            Next
+
+            If candidates.Count > 0 Then
+                Dim pixelsSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+                For i = 0 To candidates.Count - 1
+                    Dim rc = candidates(i).rc
+                    Dim rect = rc.rect.Intersect(rcLast.rect)
+                    pixelsSorted.Add(rect.Width * rect.Height, rc)
+                Next
+                rcD = redC.rcList(candidates(0).index)
+                dst1.SetTo(0)
+                dst1(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+            End If
+            Return rcD
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst3
+            labels(2) = redC.labels(2)
+            If task.rcD Is Nothing Then Exit Sub
+
+            'Dim mapID = redC.flood.dst1.Get(Of Byte)(task.rcD.maxDStable.Y, task.rcD.maxDStable.X)
+            'If mapID <> task.rcD.mapID Then
+            '    task.rcD = rcDFindCell(task.rcD)
+            '    task.rcD.maxDStable = task.rcD.maxDist
+            'End If
+
+            'Dim index = redC.maxDStableList.IndexOf(task.rcD.maxDStable)
+            'dst3.SetTo(0)
+            'If index > 0 Then
+            '    task.rcD = redC.rcList(index)
+            'Else
+            '    Dim rcD = rcDFindCell(task.rcD)
+            '    If rcD IsNot Nothing Then task.rcD = rcD
+            'End If
+
+            'task.clickPoint = task.rcD.maxDStable
+
+            'task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            'dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.mapID), task.rcD.mask)
+            'Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            'Circle(dst3, task.rcD.maxDStable, task.DotSize + 1, white, -1)
+            'Circle(dst3, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+
+            'strOut = task.rcD.displayCell() + vbCrLf + vbCrLf + "Track point " + task.clickPoint.ToString + vbCrLf
+            'SetTrueText(strOut, 1)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_Features : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "Ages for the top X lines..."
+            desc = "Find the features in a RedC cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            feat.Run(src)
+            dst3 = feat.dst2
+            labels(3) = feat.labels(2)
+
+            For Each lp In task.lines.lpList
+                Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 1)
+            Next
         End Sub
     End Class
 End Namespace

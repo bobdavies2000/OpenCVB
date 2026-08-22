@@ -612,9 +612,10 @@ RedC_Basics
 RedC_CellLines
 RedC_Depth
 RedC_DepthMerge
+RedC_Features
 RedC_MergeCells
 RedC_NeighborHist
-RedC_TrackCell
+RedC_TrackCellOld
 RedC_TrackHull
 RedCloud_Basics
 RedCloud_Core
@@ -669,7 +670,7 @@ StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
-SteadyCam_Basics
+SteadyCam_Basics_TA
 SteadyCam_FindLines
 SteadyCam_Lines
 SteadyCam_WarpAffine

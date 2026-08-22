@@ -85,10 +85,7 @@ Namespace VBClasses
             Static percentTime As String = ""
 
             Dim algorithm_ms = New List(Of Single)(task.cpu.algorithm_ms)
-            Dim sumTime As Single
-            For i = 0 To algorithm_ms.Count - 1
-                sumTime += algorithm_ms(i)
-            Next
+            Dim sumTime = algorithm_ms.Sum()
             If sumTime = 0 Then Return percentTime
             For i = 0 To algorithm_ms.Count - 1
                 task.cpu.algorithm_ms(i) = 0

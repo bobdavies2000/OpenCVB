@@ -62,10 +62,7 @@ Public Class TreeviewForm
                     nodeList.Add(found.Text)
                 End If
 
-                If found IsNot Nothing Then
-                    currentNode = found
-                    currentNodes = found.Nodes
-                End If
+                If found IsNot Nothing Then currentNodes = found.Nodes
             Next
         Next
 

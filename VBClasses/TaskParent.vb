@@ -47,6 +47,7 @@ Namespace VBClasses
             For i = 0 To lines.Length - 1
                 If lines(i).Contains("  at System.Environment") Then Continue For
                 If lines(i).Contains("  at TaskParent") Then Continue For
+                If lines(i).Contains("InvokeStub") Then Continue For
                 lines(i) = Trim(lines(i))
                 lines(i) = lines(i).Replace("at VBClasses.", "")
                 lines(i) = lines(i).Substring(0, InStr(lines(i), ".") - 1)

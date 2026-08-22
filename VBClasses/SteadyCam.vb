@@ -1,16 +1,15 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class SteadyCam_Basics : Inherits TaskParent
+    Public Class SteadyCam_Basics_TA : Inherits TaskParent
         Dim match As New Match_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
         Dim safeCenterRect As cv.Rect
         Public Sub New()
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
-            labels = {"", "", "Match correlation", "Shift-aligned gray (black edges)"}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayOriginal
+            src = task.grayOriginal
 
             Static template As cv.Mat = Nothing
             Static center As cv.Point
@@ -35,11 +34,12 @@ Namespace VBClasses
 
             match.template = template
             match.Run(src)
-            dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
+            If standaloneTest() Then
+                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
+                Rectangle(dst2, safeCenterRect, white, task.lineWidth)
+                Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
+            End If
 
-            Rectangle(dst2, safeCenterRect, white, task.lineWidth)
-
-            Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
             If safeCenterRect.Contains(match.newCenter) = False Then forceRecenter = True
 
             shiftXY = New cv.Point2f(center.X - match.newCenter.X, center.Y - match.newCenter.Y)
@@ -47,11 +47,13 @@ Namespace VBClasses
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
 
-            ' Shift gray so content stays locked to the template frame; uncovered edges are black.
-            WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            If standaloneTest() Then
+                ' Shift gray so content stays locked to the template frame; 
+                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
-            labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
-            labels(3) = "Aligned gray; black = missing after shift"
+                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
+                labels(3) = "Aligned gray; missing data is black."
+            End If
         End Sub
     End Class
 
@@ -59,7 +61,7 @@ Namespace VBClasses
 
 
     Public Class SteadyCam_WarpAffine : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics
+        Dim steady As New SteadyCam_Basics_TA
         Public Sub New()
             desc = "Cursor.ai: Use SteadyCam_Basics shift output as WarpAffine input, then rotate with verticalizeAngle."
             labels = {"", "", "SteadyCam_Basics match", "Original gray with rotation + shift"}
@@ -84,7 +86,7 @@ Namespace VBClasses
 
 
     Public Class SteadyCam_Lines : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics
+        Dim steady As New SteadyCam_Basics_TA
         Dim refLine As lpData
         Public rotateAngle As Double
         Dim forceRecenter As Boolean
