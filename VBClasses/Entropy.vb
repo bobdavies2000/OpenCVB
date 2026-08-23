@@ -7,7 +7,7 @@ Namespace VBClasses
             labels(2) = "Control entropy values with histogram bins slider"
             desc = "Compute the entropy in an image - a measure of contrast(iness)"
         End Sub
-        Private Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
+        Private Shared Function validatePreserve(ByVal r As cv.Rect) As cv.Rect
             If r.Width <= 0 Then r.Width = 1
             If r.Height <= 0 Then r.Height = 1
             If r.X < 0 Then r.X = 0
@@ -124,7 +124,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Calculate the entropy in the drawRect when run standalone"
         End Sub
-        Public Function channelEntropy(total As Integer, hist As Mat) As Single
+        Public Shared Function channelEntropy(total As Integer, hist As Mat) As Single
             channelEntropy = 0
             For i = 0 To hist.Rows - 1
                 Dim hc = Math.Abs(hist.Get(Of Single)(i))
@@ -232,7 +232,7 @@ Namespace VBClasses
                 CalcHist({dst1(r)}, {0}, New Mat(), hist, 1, dimensions, ranges)
                 Normalize(hist, hist, 0, hist.Rows, NormTypes.MinMax)
 
-                Dim nextEntropy = entropy.channelEntropy(dst1(r).Total, hist) * 1000
+                Dim nextEntropy = Entropy_Rectangle.channelEntropy(dst1(r).Total, hist) * 1000
 
                 entropies(subDivisions(i)).Add(nextEntropy)
                 eROI(subDivisions(i)).Add(r)

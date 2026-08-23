@@ -85,7 +85,8 @@ Namespace VBClasses
                 Dim x = (dst2.Width - match.correlationMat.Width) / 2 + rect.X
                 Dim y = (dst2.Height - match.correlationMat.Height) / 2 + rect.Y
                 safeCenterRect = New cv.Rect(x, y, match.correlationMat.Width - rect.X * 2, match.correlationMat.Height - rect.Y * 2)
-
+                M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+                M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
                 Exit Sub
             End If
 
@@ -121,6 +122,7 @@ Namespace VBClasses
         Public forceRecenter As Boolean
         Dim safeCenterRect As cv.Rect
         Dim rect As cv.Rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
+        Dim center As New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
         Public Sub New()
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
@@ -128,13 +130,11 @@ Namespace VBClasses
             src = task.grayOriginal
 
             Static template As cv.Mat = Nothing
-            Static center As cv.Point
             If task.heartBeatLT Or forceRecenter Then
                 forceRecenter = False
 
                 rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
                 template = src(rect).Clone
-                center = New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
                 shiftXY = New cv.Point2f(0, 0)
                 dst3 = src.Clone
 

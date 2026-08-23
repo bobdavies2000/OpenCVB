@@ -359,4 +359,42 @@ Namespace VBClasses
             dst2(New cv.Rect(0, 0, sz.Width, sz.Height)) = dst0.Clone
         End Sub
     End Class
+
+
+
+
+
+    Public Class Rectangle_Quadrants : Inherits TaskParent
+        Public quads(3) As cv.Rect
+        Public mQuads(3) As cv.Rect
+        Public Sub New()
+            quads = buildQuads()
+            mQuads = buildMQuads()
+            desc = "Build 4 quadrants and an interior rectangle for Match_Basics usage."
+        End Sub
+        Public Shared Function buildQuads() As cv.Rect()
+            Dim w = task.workRes.Width / 2
+            Dim h = task.workRes.Height / 2
+            Return {New cv.Rect(0, 0, w, h), New cv.Rect(w, 0, w, h), New cv.Rect(0, h, w, h), New cv.Rect(w, h, w, h)}
+        End Function
+        Public Shared Function buildMQuads() As cv.Rect()
+            Dim w = task.workRes.Width / 2
+            Dim h = task.workRes.Height / 2
+
+            Dim pad = w / 10
+            Return {New cv.Rect(pad, pad, w - pad * 2, h - pad * 2), New cv.Rect(w + pad, pad, w - pad * 2, h - pad * 2),
+                    New cv.Rect(pad, h + pad, w - pad * 2, h - pad * 2), New cv.Rect(w + pad, h + pad, w - pad * 2, h - pad * 2)}
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src
+
+            For Each r In quads
+                Rectangle(dst2, r, task.highlight, task.lineWidth)
+            Next
+
+            For Each r In mQuads
+                Rectangle(dst2, r, task.highlight, task.lineWidth)
+            Next
+        End Sub
+    End Class
 End Namespace

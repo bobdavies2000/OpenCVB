@@ -607,6 +607,7 @@ Random_UniformDist
 Rectangle_Basics
 Rectangle_EnclosingPoints
 Rectangle_Fit
+Rectangle_Quadrants
 Rectangle_Rotated
 RedC_Basics
 RedC_CellLines
