@@ -670,9 +670,10 @@ StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
+SteadyCam_Basics
 SteadyCam_Basics_TA
+SteadyCam_Basics_TA1
 SteadyCam_FindLines
-SteadyCam_Lines
 SteadyCam_WarpAffine
 Stitch_Basics
 Stripes_Basics

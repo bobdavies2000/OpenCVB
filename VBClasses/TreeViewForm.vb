@@ -1,4 +1,3 @@
-Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String) ' treedata is used to trigger a rebuild of the tree nodes.
@@ -11,10 +10,10 @@ Public Class TreeviewForm
         PercentTime.Height = TreeView1.Height
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        Task.Settings.TreeViewLeft = Me.Left
-        Task.Settings.TreeViewTop = Me.Top
-        Task.Settings.TreeViewWidth = Me.Width
-        Task.Settings.TreeViewHeight = Me.Height
+        task.Settings.TreeViewLeft = Me.Left
+        task.Settings.TreeViewTop = Me.Top
+        task.Settings.TreeViewWidth = Me.Width
+        task.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -39,7 +38,6 @@ Public Class TreeviewForm
         For Each path In paths
             Dim parts = path.Split("\"c)
             Dim currentNodes = tree.Nodes
-            Dim currentNode As TreeNode = Nothing
 
             For i = 0 To parts.Length - 1
                 Dim part = parts(i)
@@ -71,13 +69,13 @@ Public Class TreeviewForm
     End Sub
 
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        If Task Is Nothing Then Exit Sub
-        If Task.cpu.callTrace.Count <> treeData.Count Then
+        If task Is Nothing Then Exit Sub
+        If task.cpu.callTrace.Count <> treeData.Count Then
             treeData.Clear()
-            For Each td In Task.cpu.callTrace
-                If td.EndsWith("\") Then td = td.Substring(0, td.Length - 1)
-                If td.StartsWith(Task.Settings.algorithm) = False Then
-                    td = Task.Settings.algorithm + "\" + td
+            For Each td In task.cpu.callTrace
+                If td.EndsWith("\"c) Then td = td.Substring(0, td.Length - 1)
+                If td.StartsWith(task.Settings.algorithm) = False Then
+                    td = task.Settings.algorithm + "\" + td
                 End If
                 treeData.Add(td)
             Next
@@ -91,13 +89,13 @@ Public Class TreeviewForm
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New System.Drawing.Point(Task.Settings.TreeViewLeft, Task.Settings.TreeViewTop)
-        Me.Size = New System.Drawing.Size(Task.Settings.TreeViewWidth, Task.Settings.TreeViewHeight)
+        Me.Location = New System.Drawing.Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
+        Me.Size = New System.Drawing.Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
 
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        Task.cpu.displayObjectName = e.Node.Text
+        task.cpu.displayObjectName = e.Node.Text
         Timer2_Tick(sender, e)
     End Sub
 End Class
