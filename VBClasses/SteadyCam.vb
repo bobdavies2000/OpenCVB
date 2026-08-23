@@ -265,6 +265,76 @@ Namespace VBClasses
 
 
 
+    Public Class SteadyCam_LongestLine : Inherits TaskParent
+        Dim matcher As New Line_Match
+        Public shiftXY As cv.Point2f
+        Public rotateAngle As Double
+        Public forceRecenter As Boolean
+        Dim snapshot As cv.Mat
+        Dim refLine As lpData
+        Public Sub New()
+            desc = "Cursor.ai: Snapshot gray at heartBeatLT; match the current image to that snapshot using the longest line."
+            labels = {"", "", "Longest line match vs heartBeatLT snapshot", "Current gray aligned to snapshot"}
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            src = task.grayOriginal
+            If task.lines.lpList.Count = 0 Then
+                dst2 = src.Clone
+                dst3 = src.Clone
+                labels(2) = "No lines found"
+                Exit Sub
+            End If
+
+            Dim lp = task.lines.lpList(0)
+            If task.heartBeatLT Or forceRecenter Or snapshot Is Nothing Or refLine Is Nothing Then
+                forceRecenter = False
+                snapshot = src.Clone
+                refLine = New lpData(lp.p1, lp.p2)
+                matcher.lp = refLine
+                matcher.goodCorrelation = False
+                matcher.Run(src)
+                shiftXY = New cv.Point2f(0, 0)
+                rotateAngle = 0
+                dst2 = matcher.dst2
+                Line(dst2, refLine.p1, refLine.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                dst3 = src.Clone
+                labels(2) = "heartBeatLT snapshot  len=" + refLine.length.ToString(fmt1) + "  angle=" + refLine.angle.ToString(fmt2)
+                labels(3) = "Snapshot gray (identity until next frame)"
+                Exit Sub
+            End If
+
+            matcher.Run(src)
+            If matcher.goodCorrelation = False Then
+                forceRecenter = True
+                dst2 = matcher.dst2
+                dst3 = src.Clone
+                labels(2) = matcher.labels(2)
+                labels(3) = "Low correlation — recapture longest line on next frame"
+                Exit Sub
+            End If
+
+            Dim matched = matcher.lp
+            shiftXY = New cv.Point2f(refLine.ptCenter.X - matched.ptCenter.X, refLine.ptCenter.Y - matched.ptCenter.Y)
+            rotateAngle = refLine.angle - matched.angle
+            If Math.Abs(rotateAngle) > 15 Then forceRecenter = True
+
+            Dim M = GetRotationMatrix2D(matched.ptCenter, -rotateAngle, 1.0)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + shiftXY.X)
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + shiftXY.Y)
+            WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            dst2 = matcher.dst2
+            Line(dst2, refLine.p1, refLine.p2, Scalar.Yellow, task.lineWidth, task.lineType)
+            Line(dst2, matched.p1, matched.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+            labels(2) = matcher.labels(2)
+            labels(3) = "shift=" + shiftXY.ToString + "  rotate=" + rotateAngle.ToString(fmt2) + " deg"
+        End Sub
+    End Class
+
+
+
+
     Public Class SteadyCam_FindLines : Inherits TaskParent
         Dim steady As New SteadyCam_WarpAffine
         Dim lines As New Line_Basics
