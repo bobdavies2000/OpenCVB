@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Mat_Basics : Inherits TaskParent
         Public Sub New()
@@ -12,20 +12,8 @@ Namespace VBClasses
             End If
             Return src
         End Function
-        Public Shared Function buildCenterRect(Optional padX As Integer = 0, Optional padY As Integer = 0) As cv.Rect
-            If padX = 0 Then
-                padX = task.gridWH * 3
-                padY = task.gridWH * 3
-            End If
-
-            Dim w = task.workRes.Width - padX * 2
-            Dim h = task.workRes.Height - padY * 2
-
-            Dim rect = ValidateRect(New cv.Rect(padX, padY, w, h))
-            Return rect
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Resize(src, dst2, New Size(src.Cols / 10, src.Rows / 10))
+            Resize(src, dst2, New cv.Size(src.Cols / 10, src.Rows / 10))
 
             Dim tmp As New Mat
             Repeat(dst2, 10, 10, tmp)
@@ -420,10 +408,18 @@ Namespace VBClasses
         Public mat(3) As Mat
         Public lineSeparators = True ' if they want lines or not...
         Public quadrant As Integer = 0
+        Dim quads(3) As cv.Rect
+        Dim nSize As New cv.Size(dst2.Width / 2, dst2.Height / 2)
         Public Sub New()
             For i = 0 To mat.Length - 1
                 mat(i) = dst2.Clone
             Next
+
+            quads(0) = New cv.Rect(0, 0, nSize.Width, nSize.Height)
+            quads(1) = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
+            quads(2) = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
+            quads(3) = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
+
             labels(2) = "Combining 4 images into one"
             labels(3) = "Click any quadrant at left to view it below"
             desc = "Use one Mat for up to 4 images"
@@ -444,20 +440,11 @@ Namespace VBClasses
             mat = {task.color.Clone, task.depthRGB.Clone, tmpLeft, tmpRight}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim nSize = New Size(dst2.Width / 2, dst2.Height / 2)
-            Dim roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
-            Dim roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
-            Dim roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-            Dim roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
             If standalone Then defaultMats()
 
-            dst2 = New Mat(dst2.Size(), MatType.CV_8UC3)
-            For i = 0 To 4 - 1
-                Dim tmp = mat(i).Clone
-                If tmp.Channels() = 1 Then CvtColor(mat(i), tmp, ColorConversionCodes.GRAY2BGR)
-                Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-                Dim resizeInput As Mat = dst2(roi)
-                Resize(tmp, resizeInput, nSize)
+            dst2 = New Mat(dst2.Size(), mat(0).Type)
+            For i = 0 To 3
+                If mat(i).Size <> quads(i).Size Then Resize(dst2(quads(i)), mat(i), nSize) Else dst2(quads(i)) = mat(i)
             Next
             If lineSeparators Then
                 Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)

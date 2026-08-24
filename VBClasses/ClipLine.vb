@@ -8,7 +8,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                rect = Mat_Basics.buildCenterRect(dst2.Width \ 10, dst2.Height \ 10)
+                rect = Rectangle_Basics.centerRect(dst2.Size, 6)
             End If
 
             lpList.Clear()
@@ -39,7 +39,7 @@ Namespace VBClasses
             dst2 = task.lines.dst2
             labels(2) = task.lines.labels(2)
 
-            Dim rect = Mat_Basics.buildCenterRect(dst2.Width \ 10, dst2.Height \ 10)
+            Dim rect = Rectangle_Basics.centerRect(dst2.Size, 6)
             lpList.Clear()
             dst3.SetTo(0)
             Rectangle(dst3, rect, white, task.lineWidth)

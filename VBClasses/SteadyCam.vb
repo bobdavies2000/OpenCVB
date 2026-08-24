@@ -1,129 +1,14 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class SteadyCam_Basics : Inherits TaskParent
-        Dim match As New Match_Basics
-        Public shiftXY As cv.Point2f
-        Public forceRecenter As Boolean
-        Dim templateRect As cv.Rect
-        Dim center As cv.Point
-        Public Sub New()
-            desc = "Cursor.ai: buildCenterRect template for Match_Basics X/Y shift; IMU verticalizeAngle rotates the stabilized gray."
-            labels = {"", "", "Match_Basics dst2", "Stabilized grayscale"}
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            src = task.grayOriginal
-
-            Dim angle = task.verticalizeAngle
-            Static lastAngle = task.verticalizeAngle
-            If task.imuBasics.noCameraMotion Then angle = lastAngle
-            lastAngle = angle
-            src = GravityRGB_Basics.rotateRGB(src, angle)
-
-            Static template As cv.Mat = Nothing
-            If task.heartBeatLT Or forceRecenter Or template Is Nothing Then
-                forceRecenter = False
-                templateRect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
-                template = src(templateRect).Clone
-                center = New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
-                shiftXY = New cv.Point2f(0, 0)
-                match.template = template
-                Rectangle(match.dst2, templateRect, white, task.lineWidth)
-                dst2 = match.dst2
-                dst3 = src.Clone
-                labels(2) = "Template from buildCenterRect"
-                labels(3) = "Stabilized gray  angle=" + angle.ToString(fmt2) + " deg"
-                Exit Sub
-            End If
-
-            match.template = template
-            match.Run(src)
-
-            match.dst2 = src.Clone
-            Rectangle(match.dst2, match.newRect, white, task.lineWidth)
-            dst2 = match.dst3
-
-            shiftXY = New cv.Point2f(center.X - match.newCenter.X, center.Y - match.newCenter.Y)
-
-            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
-            WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-            labels(2) = match.labels(2)
-            labels(3) = "shift=" + shiftXY.ToString + "  angle=" + angle.ToString(fmt2) + " deg"
-        End Sub
-    End Class
-
-
-
-
-    Public Class SteadyCam_Basics_TA1 : Inherits TaskParent
-        Dim match As New Match_Basics
-        Public forceRecenter As Boolean
-        Dim safeCenterRect As cv.Rect
-        Dim rect As cv.Rect
-        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Dim center As cv.Point
-        Dim shiftXY As cv.Point2f
-        Public Sub New()
-            rect.X = task.gridWH * 5
-            rect.Y = task.gridWH * 2
-            desc = "Cursor.ai: Match centerRect using Match_Basics to find X/Y shift.  Black edges where there is no data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            src = task.grayOriginal
-
-            Static template As cv.Mat = Nothing
-            If task.heartBeatLT Or forceRecenter Then
-                forceRecenter = False
-
-                rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
-                template = src(rect).Clone
-                If standaloneTest() Then dst3 = src.Clone
-                shiftXY = New cv.Point2f(0, 0)
-
-                Dim x = (dst2.Width - match.correlationMat.Width) / 2 + rect.X
-                Dim y = (dst2.Height - match.correlationMat.Height) / 2 + rect.Y
-                safeCenterRect = New cv.Rect(x, y, match.correlationMat.Width - rect.X * 2, match.correlationMat.Height - rect.Y * 2)
-                M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
-                M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
-                Exit Sub
-            End If
-
-            match.template = template
-            match.Run(src)
-
-            If safeCenterRect.Contains(match.newCenter) = False Then forceRecenter = True
-
-            shiftXY = New cv.Point2f(center.X - match.newCenter.X, center.Y - match.newCenter.Y)
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
-
-            If standaloneTest() Then
-                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
-                Rectangle(dst2, safeCenterRect, white, task.lineWidth)
-                Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
-
-                ' Shift gray so content stays locked to the template frame; 
-                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
-                labels(3) = "Aligned gray; missing data is black."
-            End If
-        End Sub
-    End Class
-
-
-
-
     Public Class SteadyCam_Basics_TA : Inherits TaskParent
         Dim match As New Match_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
         Dim safeCenterRect As cv.Rect
-        Dim rect As cv.Rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
-        Dim center As New cv.Point(dst2.Width \ 2, dst2.Height \ 2)
+        Dim centerRect As cv.Rect
+        Dim kalman As New Kalman_Basics
         Public Sub New()
+            centerRect = Rectangle_Basics.centerRect(dst2.Size, 3)
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -133,16 +18,13 @@ Namespace VBClasses
             If task.heartBeatLT Or forceRecenter Then
                 forceRecenter = False
 
-                rect = Mat_Basics.buildCenterRect(dst2.Width \ 3, dst2.Height \ 3)
-                template = src(rect).Clone
+                template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
-                dst3 = src.Clone
+                If standaloneTest() Then dst3 = src.Clone
 
-                rect.X = task.gridWH * 5
-                rect.Y = task.gridWH * 2
-                Dim x = (dst2.Width - match.correlationMat.Width) / 2 + rect.X
-                Dim y = (dst2.Height - match.correlationMat.Height) / 2 + rect.Y
-                safeCenterRect = New cv.Rect(x, y, match.correlationMat.Width - rect.X * 2, match.correlationMat.Height - rect.Y * 2)
+                Dim x = (dst2.Width - match.correlationMat.Width) / 2
+                Dim y = (dst2.Height - match.correlationMat.Height) / 2
+                safeCenterRect = New cv.Rect(x, y, centerRect.X * 2, centerRect.Y * 2)
 
                 Exit Sub
             End If
@@ -150,14 +32,22 @@ Namespace VBClasses
             match.template = template
             match.Run(src)
             If standaloneTest() Then
-                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal)
+                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, dst2.Size)
                 Rectangle(dst2, safeCenterRect, white, task.lineWidth)
                 Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
             End If
 
             If safeCenterRect.Contains(match.newCenter) = False Then forceRecenter = True
 
-            shiftXY = New cv.Point2f(center.X - match.newCenter.X, center.Y - match.newCenter.Y)
+            shiftXY = New cv.Point2f(dst2.Width \ 2 - match.newCenter.X, dst2.Height \ 2 - match.newCenter.Y)
+
+            ' turn off kalman filtering with the debugCheckbox - or just comment out this conditional because kalman looks valuable.
+            If task.gOptions.DebugCheckBox.Checked = False Then
+                kalman.kInput = {shiftXY.X, shiftXY.Y}
+                kalman.Run(emptyMat)
+                shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+            End If
+
             Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
@@ -171,6 +61,35 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class SteadyCam_Kalman : Inherits TaskParent
+        Dim kalman As New Kalman_Basics
+        Public Sub New()
+            desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics_TA"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim shiftXY = task.steadyCam.shiftXY
+            kalman.kInput = {shiftXY.X, shiftXY.Y}
+            kalman.Run(emptyMat)
+            shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            ' Shift gray so content stays locked to the template frame; 
+            WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            dst2 = task.steadyCam.dst2
+            labels = task.steadyCam.labels
+        End Sub
+    End Class
+
+
 
 
 

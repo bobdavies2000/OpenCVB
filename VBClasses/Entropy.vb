@@ -44,81 +44,6 @@ Namespace VBClasses
 
 
 
-    Public Class Entropy_Highest : Inherits TaskParent
-        Dim entropy As New Entropy_Rectangle
-        Public eMaxRect As cv.Rect
-        Public Sub New()
-            dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
-            If standalone Then
-                Dim val As Integer = dst2.Width / 10
-                If task.gOptions.GridSlider.Maximum < val Then task.gOptions.GridSlider.Maximum = val
-                task.gOptions.GridSlider.Value = dst2.Width \ 10
-            End If
-            desc = "Find the highest entropy section of the color image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim entropyList(task.gridRects.Count - 1) As Single
-            Dim maxEntropy As Single = Single.MinValue
-            Dim minEntropy As Single = Single.MaxValue
-            trueData.Clear()
-
-            dst1.SetTo(0)
-            For Each roi In task.gridRects
-                If roi.Width = roi.Height Then
-                    entropy.Run(task.gray(roi))
-                    dst1(roi).SetTo(entropy.entropyVal)
-
-                    If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
-                        maxEntropy = entropy.entropyVal
-                        eMaxRect = roi
-                    End If
-                    If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
-                    If standaloneTest() And task.gridWH > 16 Then
-                        Dim pt = New cv.Point(CInt(roi.X), CInt(roi.Y))
-                        SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 2)
-                        SetTrueText(entropy.entropyVal.ToString(fmt2), pt, 3)
-                    End If
-                End If
-            Next
-
-            ConvertScaleAbs(dst1, dst2, 255 / (maxEntropy - minEntropy), minEntropy)
-            dst2 = ShowAddweighted(task.gray, dst2, labels(3))
-
-            If standaloneTest() Then
-                Rectangle(dst2, eMaxRect, Scalar.All(255), task.lineWidth)
-                dst3.SetTo(0)
-                Rectangle(dst3, eMaxRect, white, task.lineWidth)
-            End If
-            labels(2) = "Lighter = higher entropy. Range: " + minEntropy.ToString("0.0") + " to " + maxEntropy.ToString("0.0")
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_Entropy_FAST : Inherits TaskParent
-        Dim fast As New Corner_Basics
-        Dim entropy As New Entropy_Highest
-        Public Sub New()
-            labels = {"", "", "Output of Corner_FAST, input to entropy calculation", "Lighter color is higher entropy, highlight shows highest"}
-            desc = "Use FAST markings to add to entropy"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fast.Run(src)
-
-            entropy.Run(fast.dst2)
-            dst2 = entropy.dst2
-            dst3 = entropy.dst2
-            Rectangle(dst3, entropy.eMaxRect, task.highlight, task.lineWidth)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Entropy_Rectangle : Inherits TaskParent
         Public entropyVal As Single
         Public Sub New()
@@ -273,4 +198,43 @@ Namespace VBClasses
             SetTrueText(entropy.strOut, 3)
         End Sub
     End Class
+
+
+
+
+    Public Class Entropy_Highest : Inherits TaskParent
+        Dim entropy As New Entropy_Rectangle
+        Public Sub New()
+            If standalone Then setLargeGridSize()
+            dst3 = New Mat(dst3.Size, MatType.CV_32F, 0)
+            labels(3) = "High entropy = busy, detailed, noisy. Low entropy = smooth"
+            desc = "What is the entropy for each cell using the task.lines.dst3 as input"
+        End Sub
+        Public Shared Sub setLargeGridSize()
+            Dim val As Integer = task.workRes.Width / 10
+            If task.gOptions.GridSlider.Maximum < val Then task.gOptions.GridSlider.Maximum = val
+            task.gOptions.GridSlider.Value = task.workRes.Width \ 10
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            dst3.SetTo(0)
+            Dim entropies As New List(Of Single)
+            For Each roi In task.gridRects
+                If roi.Width <> roi.Height Then Continue For
+                entropy.Run(src(roi))
+                Dim eVal = entropy.entropyVal
+                entropies.Add(eVal)
+                dst3(roi).SetTo(eVal)
+
+                If task.gridWH > 16 Then SetTrueText(eVal.ToString("#0.00"), roi.TopLeft, 2)
+            Next
+
+            ConvertScaleAbs(dst3, dst2, 255 / (entropies.Max - entropies.Min), entropies.Min)
+            dst2 = ShowAddweighted(src, dst2, labels(1))
+
+            labels(2) = "Lighter = higher entropy. Range: " + entropies.Max.ToString("0.0") + " to " + entropies.Min.ToString("0.0")
+        End Sub
+    End Class
+
 End Namespace

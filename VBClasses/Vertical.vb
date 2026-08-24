@@ -17,6 +17,8 @@ Namespace VBClasses
                     If Math.Abs(lp.p1.X - lp.p2.X) <= 1 Then sortScores.Add(lp.length, i)
                 Next
             Next
+            If sortScores.Values.Count = 0 Then Exit Sub
+
             Dim optimalAngle = task.verticalizeAngle + 0.01 * sortScores.Values(0)
 
             If task.heartBeat Then dst2.SetTo(0)

@@ -1,8 +1,5 @@
-Imports System.Security.Cryptography
 Imports System.Threading
-Imports OpenCvSharp
-Imports OpenCvSharp.Cv2
-Imports cv = OpenCvSharp
+Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Match_Basics : Inherits TaskParent
         Public template As New Mat ' caller provides this!
@@ -16,12 +13,12 @@ Namespace VBClasses
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                    "(allows multiple targets per image.)"
         End Sub
-        Public Shared Function showCorrelationMat(correlationMat As cv.Mat, minVal As Single) As cv.Mat
-            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        Public Shared Function showCorrelationMat(correlationMat As cv.Mat, minVal As Single, sz As cv.Size) As cv.Mat
+            Dim dst As New cv.Mat(sz, cv.MatType.CV_8U, 0)
             Dim x = (dst.Width - correlationMat.Width) / 2
             Dim y = (dst.Height - correlationMat.Height) / 2
-            Dim rect = New cv.Rect(x, y, correlationMat.Width, correlationMat.Height)
-            ConvertScaleAbs(correlationMat, dst(rect), 255, -minVal)
+            Dim r = New cv.Rect(x, y, correlationMat.Width, correlationMat.Height)
+            ConvertScaleAbs(correlationMat, dst(r), 255, -minVal)
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -35,7 +32,9 @@ Namespace VBClasses
             mm = GetMinMax(correlationMat)
             correlation = mm.maxVal
 
-            If standaloneTest() Then dst3 = showCorrelationMat(correlationMat, mm.minVal)
+            dst3 = showCorrelationMat(correlationMat, mm.minVal, dst2.Size)
+            Circle(dst3, newCenter, task.DotSize, black, -1, task.lineType)
+            cv.Cv2.ImShow("circle", dst3)
 
             labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
             Dim w = template.Width, h = template.Height
@@ -170,31 +169,6 @@ Namespace VBClasses
                             "Min Correlation = " + minCorrelation.ToString(fmt3) + vbCrLf +
                             "Max Correlation = " + maxCorrelation.ToString(fmt3), 3)
             End If
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_Match_BestEntropy : Inherits TaskParent
-        Dim entropy As New Entropy_Highest
-        Dim match As New Match_DrawRect
-        Public Sub New()
-            labels(2) = "Probabilities that the template matches image"
-            labels(3) = "red is the best template to match (highest entropy)"
-            desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
-                entropy.Run(src)
-                task.drawRect = entropy.eMaxRect
-            End If
-            match.Run(src)
-            dst2 = match.dst2
-            dst3 = match.dst3
-            dst2.SetTo(white, task.gridMask)
         End Sub
     End Class
 
@@ -610,4 +584,66 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Match_Quadrants : Inherits TaskParent
+        Dim match As New Match_Basics
+        Dim quads(3) As cv.Rect
+        Dim mRect(3) As cv.Rect
+        Dim shiftXY(3) As cv.Point2f
+        Dim template(3) As cv.Mat
+        Dim safeCenterRect(3) As cv.Rect
+        Dim M(3) As cv.Mat
+        Dim forceRecenter(3) As Boolean
+        Dim mats As New Mat_4to1
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            quads = Rectangle_Basics.buildQuads()
+            For i = 0 To mRect.Length - 1
+                mRect(i) = Rectangle_Basics.buildInteriorRect(quads(i))
+            Next
+            desc = "Use the mRect in each quad to match the motion in that quadrant"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            src = task.grayOriginal
+
+            For i = 0 To quads.Length - 1
+                If task.heartBeatLT Or forceRecenter(i) Then
+                    forceRecenter(i) = False
+                    template(i) = src(mRect(i)).Clone
+                    shiftXY(i) = New cv.Point2f(0, 0)
+                    dst3 = src.Clone
+
+                    Dim x = (dst2.Width - match.correlationMat.Width) / 2 + mRect(i).X
+                    Dim y = (dst2.Height - match.correlationMat.Height) / 2 + mRect(i).Y
+                    safeCenterRect(i) = New cv.Rect(x, y, mRect(i).X * 2, mRect(i).Y * 2)
+                    Continue For
+                End If
+
+                match.template = template(i)
+                match.Run(src(quads(i)))
+                Resize(match.dst3, mats.mat(i), mats.mat(i).Size)
+
+                If safeCenterRect(i).Contains(match.newCenter) = False Then forceRecenter(i) = True
+
+                shiftXY(i) = New cv.Point2f(quads(i).Width \ 2 - match.newCenter.X, quads(i).Height \ 2 - match.newCenter.Y)
+                M(i) = New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+                M(i).Set(Of Double)(0, 0, 1) : M(i).Set(Of Double)(0, 1, 0) : M(i).Set(Of Double)(0, 2, shiftXY(i).X)
+                M(i).Set(Of Double)(1, 0, 0) : M(i).Set(Of Double)(1, 1, 1) : M(i).Set(Of Double)(1, 2, shiftXY(i).Y)
+
+                If standaloneTest() Then
+                    ' Shift gray so content stays locked to the template frame; 
+                    WarpAffine(src(quads(i)), dst3(quads(i)), M(i), src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+                    labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
+                    labels(3) = "Aligned gray; missing data is black."
+                End If
+            Next
+
+            mats.Run(emptyMat)
+            dst2 = mats.dst2
+        End Sub
+    End Class
 End Namespace

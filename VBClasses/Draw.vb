@@ -440,7 +440,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static angle As Single = -10
-                Dim rect = Mat_Basics.buildCenterRect(task.workRes.Width / 4, task.workRes.Height / 4)
+                Dim rect = Rectangle_Basics.centerRect(task.workRes)
                 rr = New RotatedRect(New Point2f(dst2.Width / 2, dst2.Height / 2), rect.Size, angle)
                 angle += 1
                 If angle > 10 Then angle = -10

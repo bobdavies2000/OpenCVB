@@ -466,6 +466,7 @@ Match_Brick
 Match_DrawRect
 Match_LinesKNN
 Match_Point
+Match_Quadrants
 MatchShapes_Basics
 MatchShapes_Nearby
 Math_CrossProduct2D
@@ -671,10 +672,11 @@ StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
 StableLine_BasicsOld
-SteadyCam_Basics
+StDev_Highest
+StDev_Range
 SteadyCam_Basics_TA
-SteadyCam_Basics_TA1
 SteadyCam_FindLines
+SteadyCam_Kalman
 SteadyCam_LongestLine
 SteadyCam_WarpAffine
 Stitch_Basics

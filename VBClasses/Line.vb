@@ -2297,12 +2297,16 @@ Namespace VBClasses
             Else
                 matchP1.Run(src)
                 Rectangle(dst2, matchP1.newRect, white, task.lineWidth)
-                If standaloneTest() Then dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal).Clone
+                If standaloneTest() Then
+                    dst1 = Match_Basics.showCorrelationMat(matchP1.correlationMat, matchP1.mm.minVal, dst2.Size).Clone
+                End If
                 SetTrueText(matchP1.correlation.ToString(fmt3), lp.p1)
 
                 matchP2.Run(src)
                 Rectangle(dst2, matchP2.newRect, white, task.lineWidth)
-                If standaloneTest() Then dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal).Clone
+                If standaloneTest() Then
+                    dst3 = Match_Basics.showCorrelationMat(matchP2.correlationMat, matchP2.mm.minVal, dst2.Size)
+                End If
                 SetTrueText(matchP2.correlation.ToString(fmt3), lp.p2)
                 lp = New lpData(matchP1.newCenter, matchP2.newCenter)
             End If

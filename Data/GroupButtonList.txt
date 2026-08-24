@@ -171,6 +171,7 @@ Stabilizer
 StableDepth
 StableGray
 StableLine
+StDev
 SteadyCam
 Stitch
 Stripes
