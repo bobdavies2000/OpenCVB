@@ -676,6 +676,7 @@ StableLine_BasicsOld
 StDev_Highest
 StDev_Range
 SteadyCam_Basics_TA
+SteadyCam_BasicsOriginal
 SteadyCam_FindLines
 SteadyCam_Kalman
 SteadyCam_LongestLine

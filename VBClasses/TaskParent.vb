@@ -23,6 +23,7 @@ Namespace VBClasses
         Public radio As New OptionsRadioButtons
         Public sliders As New OptionsSliders
         Public standalone As Boolean
+        Public displayRequest As Boolean
         Public dst0 As Mat, dst1 As Mat, dst2 As Mat, dst3 As Mat
         Public labels() As String = {"", "", "", ""}
         Public traceName As String
@@ -101,7 +102,7 @@ Namespace VBClasses
             trueData.Add(strnext)
         End Sub
         Public Function standaloneTest() As Boolean
-            If standalone Or task.cpu.displayObjectName = traceName Then Return True
+            If standalone Or task.cpu.displayObjectName = traceName Or displayRequest Then Return True
             Return False
         End Function
         Public Shared Function Palettize(input As Mat, Optional first As Byte = 1) As Mat

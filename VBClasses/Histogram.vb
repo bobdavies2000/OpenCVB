@@ -546,7 +546,6 @@ Namespace VBClasses
         Public kalmanEq As New Histogram_Basics
         Public kalman As New Histogram_Basics
         Dim mats As New Mat_2to1
-        Public displayHist As Boolean = False
         Public channel = 2
         Public Sub New()
             kalmanEq.plotHist.addLabels = False
@@ -562,7 +561,7 @@ Namespace VBClasses
                 EqualizeHist(rgbEq(i), rgbEq(i))
             Next
 
-            If standaloneTest() Or displayHist Then
+            If standaloneTest() Then
                 Split(task.color, rgb) ' equalizehist alters the input...
                 kalman.plotHist.backgroundColor = Scalar.Red
                 kalman.Run(rgb(channel).Clone())

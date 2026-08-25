@@ -1,6 +1,31 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class SteadyCam_Basics_TA : Inherits TaskParent
+        Dim match As New Match_CenterRect
+        Public shiftXY As cv.Point
+        Public M As cv.Mat
+        Public Sub New()
+            match.displayRequest = True
+            desc = "Use Match_CenterRect to determine the offset due to camera motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal
+            match.Run(src)
+            dst2 = match.dst2
+            dst3 = match.dst3
+            labels = match.labels
+            shiftXY = match.shiftXY
+            M = match.M
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class SteadyCam_BasicsOriginal : Inherits TaskParent
         Dim match As New Match_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
@@ -10,7 +35,7 @@ Namespace VBClasses
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            src = task.grayOriginal
+            If src.Channels <> 1 Then src = task.grayOriginal
 
             If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
                 forceRecenter = False
@@ -19,11 +44,6 @@ Namespace VBClasses
                 match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
                 If standaloneTest() Then dst3 = src.Clone
-
-                Dim x = (dst2.Width - match.correlationMat.Width) / 2
-                Dim y = (dst2.Height - match.correlationMat.Height) / 2
-                centerRect = New cv.Rect(x, y, centerRect.X * 2, centerRect.Y * 2)
-
                 Exit Sub
             End If
 

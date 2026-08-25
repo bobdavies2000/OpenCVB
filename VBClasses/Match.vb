@@ -657,6 +657,7 @@ Namespace VBClasses
         Public forceRecenter As Boolean
         Dim centerRect As cv.Rect
         Dim kalman As New Kalman_Basics
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
@@ -666,28 +667,25 @@ Namespace VBClasses
             If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
                 forceRecenter = False
 
-                centerRect = Rectangle_Basics.centerRect(dst2.Size, 3)
+                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
                 match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
                 If standaloneTest() Then dst3 = src.Clone
-
-                Dim x = (dst2.Width - match.correlationMat.Width) / 2
-                Dim y = (dst2.Height - match.correlationMat.Height) / 2
-                centerRect = New cv.Rect(x, y, centerRect.X * 2, centerRect.Y * 2)
 
                 Exit Sub
             End If
 
             match.Run(src)
             If standaloneTest() Then
-                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, dst2.Size)
+                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
+                Dim rect = New cv.Rect()
                 Rectangle(dst2, centerRect, white, task.lineWidth)
                 Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
             End If
 
             If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
 
-            shiftXY = New cv.Point2f(dst2.Width \ 2 - match.newCenter.X, dst2.Height \ 2 - match.newCenter.Y)
+            shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
 
             ' turn off kalman filtering with the debugCheckbox - or just comment out this conditional because kalman looks valuable.
             If task.gOptions.DebugCheckBox.Checked = False Then
@@ -696,7 +694,6 @@ Namespace VBClasses
                 shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
             End If
 
-            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
 

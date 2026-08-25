@@ -131,7 +131,7 @@ Namespace VBClasses
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(New cv.Mat)
-            task.steadyCam.run(Nothing)
+            task.steadyCam.Run(task.grayOriginal)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 
