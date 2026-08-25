@@ -624,7 +624,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "cursor.ai: Display the depth of each cell using the same colors as the DepthColorizer_Basics"
+            desc = "Cursor.ai: Display the depth of each cell using the same colors as the DepthColorizer_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)

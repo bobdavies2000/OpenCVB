@@ -4,40 +4,37 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
-        Dim safeCenterRect As cv.Rect
         Dim centerRect As cv.Rect
         Dim kalman As New Kalman_Basics
         Public Sub New()
-            centerRect = Rectangle_Basics.centerRect(dst2.Size, 3)
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             src = task.grayOriginal
 
-            Static template As cv.Mat = Nothing
             If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
                 forceRecenter = False
 
-                template = src(centerRect).Clone
+                centerRect = Rectangle_Basics.centerRect(dst2.Size, 3)
+                match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
                 If standaloneTest() Then dst3 = src.Clone
 
                 Dim x = (dst2.Width - match.correlationMat.Width) / 2
                 Dim y = (dst2.Height - match.correlationMat.Height) / 2
-                safeCenterRect = New cv.Rect(x, y, centerRect.X * 2, centerRect.Y * 2)
+                centerRect = New cv.Rect(x, y, centerRect.X * 2, centerRect.Y * 2)
 
                 Exit Sub
             End If
 
-            match.template = template
             match.Run(src)
             If standaloneTest() Then
                 dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, dst2.Size)
-                Rectangle(dst2, safeCenterRect, white, task.lineWidth)
+                Rectangle(dst2, centerRect, white, task.lineWidth)
                 Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
             End If
 
-            If safeCenterRect.Contains(match.newCenter) = False Then forceRecenter = True
+            If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
 
             shiftXY = New cv.Point2f(dst2.Width \ 2 - match.newCenter.X, dst2.Height \ 2 - match.newCenter.Y)
 
