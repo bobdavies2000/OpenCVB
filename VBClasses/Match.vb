@@ -34,7 +34,6 @@ Namespace VBClasses
 
             dst3 = showCorrelationMat(correlationMat, mm.minVal, dst2.Size)
             Circle(dst3, newCenter, task.DotSize, black, -1, task.lineType)
-            cv.Cv2.ImShow("circle", dst3)
 
             labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
             Dim w = template.Width, h = template.Height
@@ -599,18 +598,21 @@ Namespace VBClasses
         Dim forceRecenter(3) As Boolean
         Dim mats As New Mat_4to1
         Public Sub New()
+            task.gOptions.DebugSlider.Value = 3
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             quads = Rectangle_Basics.buildQuads()
-            For i = 0 To mRect.Length - 1
-                mRect(i) = Rectangle_Basics.buildInteriorRect(quads(i))
-            Next
+
             desc = "Use the mRect in each quad to match the motion in that quadrant"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             src = task.grayOriginal
 
+            For i = 0 To mRect.Length - 1
+                mRect(i) = Rectangle_Basics.buildInteriorRect(quads(i), Math.Abs(task.gOptions.DebugSlider.Value))
+            Next
+
             For i = 0 To quads.Length - 1
-                If task.heartBeatLT Or forceRecenter(i) Then
+                If task.heartBeatLT Or forceRecenter(i) Or task.optionsChanged Then
                     forceRecenter(i) = False
                     template(i) = src(mRect(i)).Clone
                     shiftXY(i) = New cv.Point2f(0, 0)
@@ -624,7 +626,7 @@ Namespace VBClasses
 
                 match.template = template(i)
                 match.Run(src(quads(i)))
-                Resize(match.dst3, mats.mat(i), mats.mat(i).Size)
+                mats.mat(i) = match.dst3.Clone
 
                 If safeCenterRect(i).Contains(match.newCenter) = False Then forceRecenter(i) = True
 

@@ -444,7 +444,7 @@ Namespace VBClasses
 
             dst2 = New Mat(dst2.Size(), mat(0).Type)
             For i = 0 To 3
-                If mat(i).Size <> quads(i).Size Then Resize(dst2(quads(i)), mat(i), nSize) Else dst2(quads(i)) = mat(i)
+                If mat(i).Size <> quads(i).Size Then Resize(mat(i), dst2(quads(i)), nSize) Else dst2(quads(i)) = mat(i)
             Next
             If lineSeparators Then
                 Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)

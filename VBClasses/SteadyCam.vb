@@ -15,7 +15,7 @@ Namespace VBClasses
             src = task.grayOriginal
 
             Static template As cv.Mat = Nothing
-            If task.heartBeatLT Or forceRecenter Then
+            If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
                 forceRecenter = False
 
                 template = src(centerRect).Clone

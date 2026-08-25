@@ -393,7 +393,7 @@ Namespace VBClasses
         Public Sub New()
             quads = Rectangle_Basics.buildQuads()
             For i = 0 To quads.Length - 1
-                mRects(i) = Rectangle_Basics.buildInteriorRect(quads(i))
+                mRects(i) = Rectangle_Basics.buildInteriorRect(quads(i), 3)
             Next
             desc = "Build 4 quadrants and an interior rectangle for Match_Basics usage."
         End Sub
