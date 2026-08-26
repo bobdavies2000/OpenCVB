@@ -1,3 +1,4 @@
+Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -9,7 +10,6 @@ Namespace VBClasses
         Public mm As mmData
         Public correlationMat As New cv.Mat
         Public Sub New()
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                    "(allows multiple targets per image.)"
         End Sub
@@ -32,7 +32,7 @@ Namespace VBClasses
             mm = GetMinMax(correlationMat)
             correlation = mm.maxVal
 
-            dst3 = showCorrelationMat(correlationMat, mm.minVal, dst2.Size)
+            dst3 = showCorrelationMat(correlationMat, mm.minVal, src.Size)
             Circle(dst3, newCenter, task.DotSize, black, -1, task.lineType)
 
             labels(2) = "Template (at right) has " + correlation.ToString(fmt3) + " Correlation to the src input"
@@ -47,73 +47,6 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-    Public Class Match_Quadrants : Inherits TaskParent
-        Dim match As New Match_Basics
-        Dim quads(3) As cv.Rect
-        Dim mRect(3) As cv.Rect
-        Dim shiftXY(3) As cv.Point2f
-        Dim template(3) As cv.Mat
-        Dim safeCenterRect(3) As cv.Rect
-        Dim M(3) As cv.Mat
-        Dim forceRecenter(3) As Boolean
-        Dim mats As New Mat_4to1
-        Public Sub New()
-            task.gOptions.DebugSlider.Value = 3
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            quads = Rectangle_Basics.buildQuads()
-
-            desc = "Use the mRect in each quad to match the motion in that quadrant"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            src = task.grayOriginal
-
-            For i = 0 To mRect.Length - 1
-                mRect(i) = Rectangle_Basics.buildInteriorRect(quads(i), Math.Abs(task.gOptions.DebugSlider.Value))
-            Next
-
-            For i = 0 To quads.Length - 1
-                If task.heartBeatLT Or forceRecenter(i) Or task.optionsChanged Then
-                    forceRecenter(i) = False
-                    template(i) = src(mRect(i)).Clone
-                    shiftXY(i) = New cv.Point2f(0, 0)
-                    dst3 = src.Clone
-
-                    Dim x = (dst2.Width - match.correlationMat.Width) / 2 + mRect(i).X
-                    Dim y = (dst2.Height - match.correlationMat.Height) / 2 + mRect(i).Y
-                    safeCenterRect(i) = New cv.Rect(x, y, mRect(i).X * 2, mRect(i).Y * 2)
-                    Continue For
-                End If
-
-                match.template = template(i)
-                match.Run(src(quads(i)))
-                mats.mat(i) = match.dst3.Clone
-
-                If safeCenterRect(i).Contains(match.newCenter) = False Then forceRecenter(i) = True
-
-                shiftXY(i) = New cv.Point2f(quads(i).Width \ 2 - match.newCenter.X, quads(i).Height \ 2 - match.newCenter.Y)
-                M(i) = New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-                M(i).Set(Of Double)(0, 0, 1) : M(i).Set(Of Double)(0, 1, 0) : M(i).Set(Of Double)(0, 2, shiftXY(i).X)
-                M(i).Set(Of Double)(1, 0, 0) : M(i).Set(Of Double)(1, 1, 1) : M(i).Set(Of Double)(1, 2, shiftXY(i).Y)
-
-                If standaloneTest() Then
-                    ' Shift gray so content stays locked to the template frame; 
-                    WarpAffine(src(quads(i)), dst3(quads(i)), M(i), src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-                    labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
-                    labels(3) = "Aligned gray; missing data is black."
-                End If
-            Next
-
-            mats.Run(emptyMat)
-            dst2 = mats.dst2
-        End Sub
-    End Class
-
 
 
 
@@ -652,12 +585,13 @@ Namespace VBClasses
 
 
     Public Class Match_CenterRect : Inherits TaskParent
-        Dim match As New Match_Basics
+        Public match As New Match_Basics
+        Dim kalman As New Kalman_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
-        Dim centerRect As cv.Rect
-        Dim kalman As New Kalman_Basics
+        Public centerRect As cv.Rect
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public useKalman As Boolean = True
         Public Sub New()
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
@@ -671,14 +605,12 @@ Namespace VBClasses
                 match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
                 If standaloneTest() Then dst3 = src.Clone
-
                 Exit Sub
             End If
 
             match.Run(src)
             If standaloneTest() Then
                 dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
-                Dim rect = New cv.Rect()
                 Rectangle(dst2, centerRect, white, task.lineWidth)
                 Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
             End If
@@ -687,8 +619,7 @@ Namespace VBClasses
 
             shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
 
-            ' turn off kalman filtering with the debugCheckbox - or just comment out this conditional because kalman looks valuable.
-            If task.gOptions.DebugCheckBox.Checked = False Then
+            If useKalman Then
                 kalman.kInput = {shiftXY.X, shiftXY.Y}
                 kalman.Run(emptyMat)
                 shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
@@ -704,6 +635,49 @@ Namespace VBClasses
                 labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
                 labels(3) = "Aligned gray; missing data is black."
             End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Match_Quadrants : Inherits TaskParent
+        Dim matchCenter As New Match_CenterRect
+        Dim quads(3) As cv.Rect
+        Dim templates(quads.Length - 1) As cv.Mat
+        Public Sub New()
+            matchCenter.displayRequest = True
+            matchCenter.useKalman = False
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            quads = Rectangle_Basics.buildQuads()
+            desc = "Run Match_CenterRect on each of the 4 quadrants of the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal
+
+            dst2.SetTo(0)
+            Dim forceRecenter As Boolean
+            Static saveRecenter As Boolean
+            For i = 0 To quads.Length - 1
+                If templates(i) IsNot Nothing Then matchCenter.match.template = templates(i).Clone
+                matchCenter.forceRecenter = saveRecenter
+                matchCenter.Run(src(quads(i)))
+                templates(i) = matchCenter.match.template.Clone
+
+                If matchCenter.forceRecenter Then forceRecenter = True
+                If task.firstPass = False Then
+                    dst2(quads(i)) = matchCenter.dst2.Clone
+                    Rectangle(dst2(quads(i)), matchCenter.centerRect, white, task.lineWidth)
+                    Circle(dst2(quads(i)), matchCenter.match.newCenter, task.DotSize, black, -1, task.lineType)
+
+                    dst3(quads(i)) = matchCenter.dst3.Clone
+                End If
+            Next
+
+            saveRecenter = forceRecenter
         End Sub
     End Class
 End Namespace
