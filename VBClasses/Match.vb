@@ -649,7 +649,6 @@ Namespace VBClasses
         Dim templates(quads.Length - 1) As cv.Mat
         Public Sub New()
             matchCenter.displayRequest = True
-            matchCenter.useKalman = False
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             quads = Rectangle_Basics.buildQuads()
@@ -678,6 +677,24 @@ Namespace VBClasses
             Next
 
             saveRecenter = forceRecenter
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Match_RedC : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Create a stable RedC output image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
 End Namespace
