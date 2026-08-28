@@ -231,7 +231,7 @@ Namespace VBClasses
         Dim sort3 As New Sort_3Channel
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use LUT on the grayscale image after masking with rc.mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

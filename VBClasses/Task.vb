@@ -227,8 +227,8 @@ Namespace VBClasses
 
             pixelViewerOrGIFProcessing(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            task.dstList(0) = If(task.gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), task.color.Clone)
-            task.dstList(1) = If(task.gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), task.depthRGB.Clone)
+            task.dstList(0) = If(task.gOptions.showMyDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), task.color.Clone)
+            task.dstList(1) = If(task.gOptions.showMyDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), task.depthRGB.Clone)
             task.dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
             task.dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
 
@@ -261,8 +261,8 @@ Namespace VBClasses
 
             displayObject.trueData.Clear()
             task.labels = displayObject.labels
-            If task.gOptions.displayDst0.Checked = False Then task.labels(0) = task.resolutionDetails
-            If task.gOptions.displayDst1.Checked = False Then task.labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
+            If task.gOptions.showMyDst0.Checked = False Then task.labels(0) = task.resolutionDetails
+            If task.gOptions.showMyDst1.Checked = False Then task.labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
         Private Sub pixelViewerOrGIFProcessing(src As Mat, dst1 As Mat, dst2 As Mat, dst3 As Mat)
             If vbc.task.pixelViewerOn Then

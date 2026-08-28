@@ -6,7 +6,7 @@ Namespace VBClasses
         Public trackbox As New cv.Rect
         Dim histogram As New Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Draw anywhere to start mean shift tracking."
             desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
         End Sub

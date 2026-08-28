@@ -460,7 +460,7 @@ Namespace VBClasses
         Public xDelta As Single
         Public yDelta As Single
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             task.fOptions.FrameHistoryCount.Value = task.fOptions.FrameHistoryCount.Maximum
             desc = "Cursor.ai: Measure gravity-vector jitter over time and plot it. Control jitter with IMU alpha filtering and stable mounting."
         End Sub

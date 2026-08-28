@@ -192,7 +192,7 @@ Namespace VBClasses
         Dim blurB As New Blur_Bilateral
         Dim myhist As New Histogram_EqualizeGray
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Use Blur slider to see impact on histogram peak values"
             desc = "Compound algorithms Blur and Histogram"
         End Sub

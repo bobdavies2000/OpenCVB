@@ -188,7 +188,7 @@ Namespace VBClasses
         Dim binary As New Binarize_Simple
         Dim distance As New Distance_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Measure the fragmentation of a binary image by using the distance transform"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -516,8 +516,8 @@ Namespace VBClasses
         Dim options As New Options_Distance
         Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Compute the distance of each cv.Point from the top contour (or a selected contour.)"
         End Sub

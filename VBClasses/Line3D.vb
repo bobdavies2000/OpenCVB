@@ -149,7 +149,7 @@ Namespace VBClasses
         Dim plot As New PlotTime_Scalar
         Dim toggleFirstSecond As Boolean
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             plot.plotCount = 2
 
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))

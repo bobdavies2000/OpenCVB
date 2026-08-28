@@ -101,7 +101,7 @@ Namespace VBClasses
             plotHist.minRange = -1
             plotHist.maxRange = 1
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Click on a rectangle to see the correlation of the current to last image."
             desc = "Measure the correlation of all grid squares."
         End Sub

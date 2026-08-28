@@ -143,7 +143,7 @@ Namespace VBClasses
     '    Public Sub New()
     '        flow.parentData = Me
     '        labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-    '        If standalone Then task.gOptions.displayDst0.Checked = False
+    '        If standalone Then task.gOptions.showMyDst0.Checked = False
     '        desc = "Find plane equation for a featureless surface - debugging one region for now."
     '    End Sub
     '    Public Overrides Sub RunAlg(src As cv.Mat)

@@ -62,7 +62,7 @@ Namespace VBClasses
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True
 
-            'If standalone Then task.gOptions.displaydst1.checked = true
+            'If standalone Then task.gOptions.showMyDst1.checked = true
             'labels(1) = "Mask of differences > deltaZ (only last shown)"
             labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
             desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
@@ -127,7 +127,7 @@ Namespace VBClasses
         Public pc As Mat
         Public options As New Options_LinearInput
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
 
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True

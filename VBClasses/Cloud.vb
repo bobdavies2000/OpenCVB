@@ -835,7 +835,7 @@ Namespace VBClasses
 
     Public Class Cloud_GravityRGB : Inherits TaskParent
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "Original RGB", "RGB rotated with the same IMU data as Cloud_Gravity"}
             desc = "Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
         End Sub

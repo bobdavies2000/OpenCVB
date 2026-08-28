@@ -146,7 +146,7 @@ Namespace VBClasses
         Dim ml As New ML_Basics
         Dim bounds As New XR_Brick_FeaturesAndEdges
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             ml.buildEveryPass = True
             dst1 = New Mat(dst2.Size, MatType.CV_8U)
             desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."

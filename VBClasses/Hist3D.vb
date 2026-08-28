@@ -93,7 +93,7 @@ Namespace VBClasses
         Dim hist3D As New Hist3D_Basics
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Run RedFlood_List on the combined Hist3D color/cloud output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

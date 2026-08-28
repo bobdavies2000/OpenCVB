@@ -58,7 +58,7 @@ Namespace VBClasses
         Dim indexBasics As New Indexer_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Find the corners in the RedPrep XY data and clip.  Identical to Indexer_Basics"
         End Sub
         Private Sub addVal(val As Byte)

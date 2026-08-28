@@ -40,7 +40,7 @@ Namespace VBClasses
         Dim counts(4 - 1) As List(Of Integer)
         Dim mats As New Mat_4to1
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             For i = 0 To counts.Length - 1
                 counts(i) = New List(Of Integer)
             Next

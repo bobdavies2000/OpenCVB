@@ -5,7 +5,7 @@ Namespace VBClasses
         Public baselineRoll As Single
         Public baselinePitch As Single
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Given a delta X and delta Y, use WarpAffine to reorient the image to the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

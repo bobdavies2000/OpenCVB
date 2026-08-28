@@ -553,7 +553,7 @@ Namespace VBClasses
     Public Class Edge_ColorGap_VB : Inherits TaskParent
         Dim options As New Options_Edges3
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
 
             labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
@@ -796,8 +796,8 @@ Namespace VBClasses
     Public Class XR_Edge_SobelCustomLeftRight : Inherits TaskParent
         Dim custom As New Edge_SobelCustom
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
             desc = "Show Sobel edge detection for both left and right images"
         End Sub
@@ -1043,7 +1043,7 @@ Namespace VBClasses
     Public Class XR_Edge_LaplacianColor : Inherits TaskParent
         Dim options As New Options_LaplacianKernels
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             If standalone Then labels(3) = "Laplacian of DepthRGB"
             desc = "Show Laplacian edge detection with varying kernel sizes"
         End Sub
@@ -1066,7 +1066,7 @@ Namespace VBClasses
     Public Class Edge_Laplacian : Inherits TaskParent
         Dim options As New Options_LaplacianKernels
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Show Laplacian edge detection with varying kernel sizes"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1208,7 +1208,7 @@ Namespace VBClasses
     Public Class XR_Edge_NoDepth : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
             desc = "Find the edges where there is depth and no depth."
         End Sub
@@ -1303,7 +1303,7 @@ Namespace VBClasses
         Public ptLeft As New List(Of cv.Point)
         Public ptRight As New List(Of cv.Point)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Move mouse to confirm edges are in both images "
             dst1 = New Mat(dst0.Size, MatType.CV_8U, 0)
             desc = "Confirm that any edges under the mouse is in both the left and right images."
@@ -1354,7 +1354,7 @@ Namespace VBClasses
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Translate bricks with edges and depth from the left to the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1460,7 +1460,7 @@ Namespace VBClasses
         Dim frames As New History_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "The Edge_Canny output for the current frame"
             labels(3) = "The difference from the current edges and the accumulated edges"
             desc = "Collect edges over several frames controlled with global frame history"

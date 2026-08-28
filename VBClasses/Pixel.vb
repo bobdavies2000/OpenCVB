@@ -659,7 +659,7 @@ Namespace VBClasses
         Public pixelVector As New List(Of List(Of Single))
         Dim redC As New RedColor_Basics
         Public Sub New()
-            If standalone Then vbc.task.gOptions.displayDst1.Checked = True
+            If standalone Then vbc.task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 3
             labels = {"", "RedFlood_List output", "3D Histogram counts for each of the cells at left", ""}
             desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."

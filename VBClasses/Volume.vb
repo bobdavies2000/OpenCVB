@@ -5,7 +5,7 @@ Namespace VBClasses
         Public volume As Single
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build a box containing all the 3D points of a RedCloud cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

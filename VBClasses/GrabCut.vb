@@ -101,7 +101,7 @@ Namespace VBClasses
         Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
         Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Grabcut example using a single image.  Fix this."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

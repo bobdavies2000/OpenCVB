@@ -9,7 +9,7 @@ Namespace VBClasses
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then
-                task.gOptions.displayDst1.Checked = True
+                task.gOptions.showMyDst1.Checked = True
                 labels(3) = "Use the debugslider to display different cells."
             End If
             desc = "Create an rcMap of the contours using the colors indicated by KMeans"
@@ -625,7 +625,7 @@ Namespace VBClasses
         Dim options As New Options_Contours2
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
             desc = "Compare contours of the selected cell.  Approximation has a lot fewer points."
         End Sub
@@ -1033,7 +1033,7 @@ Namespace VBClasses
     Public Class XR_Contour_Info : Inherits TaskParent
         Dim contours As New XR_Contour_BasicsOld
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Provide details about the selected contour's tourList entry."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1066,7 +1066,7 @@ Namespace VBClasses
         Public options As New Options_Contours
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Details for the selected contour."
             task.fOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
@@ -1346,7 +1346,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Connect each contour to the line that shares the most points"
         End Sub
@@ -1418,7 +1418,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Find the contour for a line overlapping the contour points"
         End Sub

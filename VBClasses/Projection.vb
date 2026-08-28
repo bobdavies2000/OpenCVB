@@ -248,7 +248,7 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Top View projection of the selected cell", "RedColor_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
             desc = "Create a top and side projection of the selected cell"
         End Sub
@@ -289,7 +289,7 @@ Namespace VBClasses
         Dim heatDeriv As New HeatMap_Basics
         Dim deriv As New Derivative_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a top and side projection the best derivative data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

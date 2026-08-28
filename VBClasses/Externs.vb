@@ -55,8 +55,8 @@ Module Externs
                                      lineType As Integer, DotSize As Integer, cellSize As Integer,
                                      histogramBins As Integer, ocvheartBeat As Boolean, gravityPointCloud As Boolean,
                                      pixelDiffThreshold As Integer, UseKalman As Boolean, paletteIndex As Integer,
-                                     frameHistory As Integer, displayDst0 As Boolean,
-                                     displayDst1 As Boolean) As IntPtr
+                                     frameHistory As Integer, showMyDst0 As Boolean,
+                                     showMyDst1 As Boolean) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_Close(cPtr As IntPtr) As IntPtr
@@ -64,8 +64,8 @@ Module Externs
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, channels As Integer, frameCount As Integer,
                                            rows As Integer, cols As Integer, x As Single, y As Single, z As Single,
-                                           optionsChanged As Boolean, heartBeat As Boolean, displayDst0 As Boolean,
-                                           displayDst1 As Boolean, debugCheckBox As Boolean) As IntPtr
+                                           optionsChanged As Boolean, heartBeat As Boolean, showMyDst0 As Boolean,
+                                           showMyDst1 As Boolean, debugCheckBox As Boolean) As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function cppTask_PointCloud(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr

@@ -134,7 +134,7 @@ Namespace VBClasses
             task.gOptions.setHistogramBins(10)
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -443,7 +443,7 @@ Namespace VBClasses
         Dim masks As New PlotMouse_MaskBackProject
         Dim core As New Line_Core
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
             labels(2) = "Move mouse to see lines detected in the backprojection mask"
             desc = "Inspect the lines from individual backprojection masks from a histogram"
@@ -737,7 +737,7 @@ Namespace VBClasses
             plotHist.maxRange = task.MaxZmeters
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = False
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a histogram for the depth image, uniquely identify each bin, and backproject it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -234,7 +234,7 @@ Namespace VBClasses
         Dim options As New Options_BackProject2D
         Public Sub New()
             OptionParent.findRadio("HSV").Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             task.gOptions.GridSlider.Value = 10
             desc = "Backproject the whole row or column of the 2D histogram"
         End Sub

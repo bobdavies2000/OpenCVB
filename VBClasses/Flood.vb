@@ -6,7 +6,7 @@ Namespace VBClasses
         Public indexList As New List(Of Integer)
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             labels(3) = "FloodFill mask"
@@ -66,7 +66,7 @@ Namespace VBClasses
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             cPtr = RedFlood_Open()
             desc = "Match the previous featureLess regions as best as possible."
         End Sub
@@ -167,7 +167,7 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim tiers As New Depth_Tiers
         Public Sub New()
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.showMyDst1.Checked = True
             desc = "Subdivide the Flood_Original cells using depth tiers."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -234,7 +234,7 @@ Namespace VBClasses
 
     Public Class Flood_Edges : Inherits TaskParent
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Floodfill the selected segment of the RedPrep image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -332,7 +332,7 @@ Namespace VBClasses
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             cPtr = RedFlood_Open()
             desc = "Match the previous featureLess regions as best as possible."
         End Sub

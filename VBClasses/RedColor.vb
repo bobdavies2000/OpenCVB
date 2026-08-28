@@ -7,7 +7,7 @@ Namespace VBClasses
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
             desc = "Use the FeatureLess regions to improve the RedColor output."
         End Sub
@@ -86,7 +86,7 @@ Namespace VBClasses
         Public rcMap As New Mat
         Public runSelectCell As Boolean = True
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -270,7 +270,7 @@ Namespace VBClasses
         Public brickList As New List(Of brickData)
         Dim redC As New RedColor_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Attach an color8u class to each r."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -723,7 +723,7 @@ Namespace VBClasses
         Public redC As New RedC_Basics
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -261,7 +261,7 @@ Namespace VBClasses
         Dim randEnum As New Random_Enumerable
         Dim subdiv As New Subdiv2D
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             facet32s = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
             labels(1) = "Input points to subdiv"
             labels(3) = "Inconsistent colors in dst2 are duplicate randomCellColor output."
@@ -316,7 +316,7 @@ Namespace VBClasses
     Public Class Delaunay_LineSelect : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Each delaunay cell will select the line that it contains."
             labels(3) = "The mouse is hovering over the Delaunay cell for the end cv.Point of the line."
             desc = "Create a map for selecting lines"
@@ -475,7 +475,7 @@ Namespace VBClasses
         Public rcList As List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."
             desc = "Create a map using the rcList provided."
         End Sub

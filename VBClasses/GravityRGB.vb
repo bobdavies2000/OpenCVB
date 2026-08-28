@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class GravityRGB_Basics : Inherits TaskParent
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "Original RGB", "RGB rotated with IMU gravity data"}
             desc = "Cursor.ai: Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
         End Sub
@@ -50,7 +50,7 @@ Namespace VBClasses
         Dim center As cv.Point2f
         Public Sub New()
             center = New Point2f(dst2.Width / 2, dst2.Height / 2)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",
                   "AbsDiff of inverse vs original lines (jagged residual)"}
             desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst3: rotateRGB, inverse WarpAffine, compare to original."
@@ -106,7 +106,7 @@ Namespace VBClasses
         Dim center As cv.Point2f
         Public Sub New()
             center = New Point2f(dst2.Width / 2, dst2.Height / 2)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "", "AbsDiff of inverse vs original lines (jagged residual)"}
             desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst3: rotateRGB, inverse WarpAffine, compare to original."
         End Sub
@@ -159,7 +159,7 @@ Namespace VBClasses
         Dim lines As New Line_Core
         Dim para As New Line_Parallel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find the lines in the gravity-rotated grayscale image."
         End Sub
@@ -237,7 +237,7 @@ Namespace VBClasses
     Public Class XR_GravityRGB_Rotate : Inherits TaskParent
         Dim vert As New GravityRGB_Vertical
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Cursor.ai: Average GravityRGB_Vertical angles-to-vertical and rotate task.color."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -291,7 +291,7 @@ Namespace VBClasses
     Public Class XR_GravityRGB_Compare : Inherits TaskParent
         Dim rotate As New XR_GravityRGB_Rotate
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare the results of using the vertical lines to just using the IMU"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

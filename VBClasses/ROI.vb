@@ -85,7 +85,7 @@ Namespace VBClasses
         Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
         Dim options As New Options_ROI
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "Area of Interest", ""}
             dst1 = New Mat(dst2.Size(), MatType.CV_8UC1, 0)
             task.fOptions.ColorDiffSlider.Value = 30

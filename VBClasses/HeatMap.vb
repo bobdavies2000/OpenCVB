@@ -110,7 +110,7 @@ Namespace VBClasses
         Dim flood As New Flood_Original
         Dim heat As New HeatMap_Hot
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Display the heat map for the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

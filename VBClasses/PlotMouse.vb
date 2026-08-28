@@ -183,7 +183,7 @@ Namespace VBClasses
     Public Class PlotMouse_StableGray : Inherits TaskParent
         Dim plot As New PlotMouse_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Plot the stable grayscale image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

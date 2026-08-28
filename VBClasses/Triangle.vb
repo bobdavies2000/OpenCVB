@@ -49,7 +49,7 @@ Namespace VBClasses
     Public Class XR_Triangle_HullContour : Inherits TaskParent
         Dim hulls As New XR_RedC_Hulls
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Selected hull", "RedC_Basics output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
@@ -87,7 +87,7 @@ Namespace VBClasses
         Public triangles As New List(Of Point3f)
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
@@ -149,7 +149,7 @@ Namespace VBClasses
         Public triangles As New List(Of Point3f)
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. red dot is maxDist."}
             desc = "Given a RedCloud cell, resize it and show the points with depth."
         End Sub

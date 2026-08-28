@@ -41,7 +41,7 @@ Namespace VBClasses
         Dim diff(3) As Diff_Basics
         Dim labelStr(3) As String, points(3) As cv.Point
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
             For i = 0 To diff.Length - 1
                 diff(i) = New Diff_Basics
@@ -239,7 +239,7 @@ Namespace VBClasses
         Dim blurC As New Blur_Basics
         Dim unstable As New XR_Bin4Way_Unstable
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Find unstable pixels but remove those that are also edges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -438,7 +438,7 @@ Namespace VBClasses
                 diff(i) = New Diff_Basics
                 mats.mat(i) = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             Next
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
             labels(2) = "A 4-way split - darkest (upper left) to lightest (lower right)"
             desc = "Separate the quartiles of the image using the fuzzy grayscale pixel values"
@@ -544,7 +544,7 @@ Namespace VBClasses
         Dim bin4 As New Bin4Way_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Test Bin4Way_Basics with different src inputs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -9,7 +9,7 @@ Namespace VBClasses
         Public flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "ApproxPoly results for each cell"
             desc = "Create the rcData representation of the image."
         End Sub
@@ -97,7 +97,7 @@ Namespace VBClasses
         Dim rcListLast As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
@@ -187,7 +187,7 @@ Namespace VBClasses
         Dim rcListLast As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The tracked cell.  The dot is the maxDStable for the tracked cell."
             desc = "FloodFill each color8U output and create an rclist"
         End Sub
@@ -362,7 +362,7 @@ Namespace VBClasses
         Dim lastMapID As Byte
         Dim lastRect As cv.Rect
         Public Sub New()
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
             desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
         End Sub
@@ -416,7 +416,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Dim clickPoint As cv.Point
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
             desc = "Find the neighbors for the selected cell."
         End Sub
@@ -477,7 +477,7 @@ Namespace VBClasses
         Public rcD As rcData
         Public neighbors As New List(Of Integer)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use a histogram to find the neighbors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -548,7 +548,7 @@ Namespace VBClasses
         Public merged As New rcData
         Public mergeList As New List(Of rcData)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Merge the selected cell with neighbors that are at about the same depth."
         End Sub
         Private Shared Function cellDepth(rc As rcData) As Single
@@ -622,7 +622,7 @@ Namespace VBClasses
     Public Class RedC_Depth : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Cursor.ai: Display the depth of each cell using the same colors as the DepthColorizer_Basics"
         End Sub
@@ -757,7 +757,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Cursor.ai: Merge neighboring RedC color cells when their min/max depths overlap."
         End Sub
@@ -901,7 +901,7 @@ Namespace VBClasses
     Public Class RedC_TrackCellOld : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.showMyDst1.Checked = True
             desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
         End Sub
         Private Function rcDFindCell(rcLast As rcData) As rcData
@@ -966,7 +966,7 @@ Namespace VBClasses
         Dim feat As New Feature_Basics
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Ages for the top X lines..."
             desc = "Find the features in a RedC cell."
         End Sub

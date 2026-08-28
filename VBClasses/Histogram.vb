@@ -222,7 +222,7 @@ Namespace VBClasses
     Public Class XR_Histogram_Frustrum : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             task.gOptions.setGravityUsage(False)
             desc = "Options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
         End Sub
@@ -675,7 +675,7 @@ Namespace VBClasses
         Dim comp As New Histogram_CompareGray
         Dim plot As New PlotTime_Scalar
         Public Sub New()
-            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+            If standaloneTest() Then task.gOptions.showMyDst1.Checked = True
             plot.plotCount = 2
 
             labels = {"", "", "Kalman-smoothed normalized histogram output", "Plot of the sum of the differences between recent normalized histograms"}
@@ -774,8 +774,8 @@ Namespace VBClasses
     Public Class XR_Histogram_Lab : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"Lab Colors ", "Lab Channel 0", "Lab Channel 1", "Lab Channel 2"}
             desc = "Create a histogram from a BGR image converted to LAB."
         End Sub
@@ -806,7 +806,7 @@ Namespace VBClasses
         Public plotHist As New PlotBar_Basics
         Public Sub New()
             plotHist.createHistogram = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Histogram of the X channel", "Histogram of the Y channel", "Histogram of the Z channel"}
             desc = "Show individual channel of the cv.Point cloud data as a histogram."
         End Sub
@@ -1461,7 +1461,7 @@ Namespace VBClasses
     Public Class XR_Histogram_LeftRightAndColor : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Left View Histogram"
             labels(2) = "Left View Histogram"
             labels(3) = "Grayscale Histogram"
@@ -1485,7 +1485,7 @@ Namespace VBClasses
     Public Class XR_Histogram_InverseLUT : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Public Sub New()
-            task.gOptions.displayDst1.Checked = True
+            task.gOptions.showMyDst1.Checked = True
             task.gOptions.HistBinBar.Value = 5
             desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
         End Sub

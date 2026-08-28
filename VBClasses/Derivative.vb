@@ -5,7 +5,7 @@ Namespace VBClasses
         Dim plotHist As New PlotBar_Basics
         Public Sub New()
             plotHist.removeZeroEntry = False
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Compute the gradient in the Z depth and maintain the units for depth."
         End Sub
@@ -153,8 +153,8 @@ Namespace VBClasses
     Public Class XR_Derivative_Sobel1 : Inherits TaskParent
         Dim deriv As New Derivative_Sobel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Display the derivative of the selected depth dimension."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

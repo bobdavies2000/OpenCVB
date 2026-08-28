@@ -7,7 +7,7 @@ Namespace VBClasses
         Public histogram As New Mat
         Public ranges() As Rangef
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

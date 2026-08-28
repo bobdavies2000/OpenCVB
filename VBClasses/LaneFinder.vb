@@ -4,8 +4,8 @@ Namespace VBClasses
     Public Class LaneFinder_Basics : Inherits TaskParent
         Dim lane As New LaneFinder_SlopeIntercept
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -26,8 +26,8 @@ Namespace VBClasses
         Public video As New Video_Basics
         Dim options As New Options_LaneFinder
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
 
             Dim inputfile = New FileInfo(task.homeDir + options.inputName)
             video.options.fileInfo = New FileInfo(inputfile.FullName)

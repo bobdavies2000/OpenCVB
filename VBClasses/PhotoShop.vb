@@ -30,7 +30,7 @@ Namespace VBClasses
     Public Class PhotoShop_HSV : Inherits TaskParent
         Public hsv_planes(2) As Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "HSV (8UC3)", "Hue (8uC1)"}
             desc = "HSV 8UC3 is in dst2, dst3 is Hue in 8UC1, and dst1 is Saturation 8UC1."
         End Sub

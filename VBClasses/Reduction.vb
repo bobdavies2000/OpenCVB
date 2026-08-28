@@ -214,7 +214,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare reduction with and without motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

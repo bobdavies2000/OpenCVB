@@ -358,8 +358,8 @@ Namespace VBClasses
         Dim options As New Options_Features
         Public Sub New()
             task.gOptions.GridSlider.Value = 16
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
             desc = "Capture the above average standard deviation roi's for the left and right images."
         End Sub

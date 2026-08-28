@@ -11,7 +11,7 @@
 '        Public cornersRaw As New List(Of cv.Point)
 '        Public redC As New RedCloud_Basics
 '        Public Sub New()
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            desc = "Find the left/right, top/bottom, and near/far sides of a cell"
 '        End Sub
 '        Private Function point3fToString(v As Point3f) As String
@@ -144,7 +144,7 @@
 '        Public sides As New Profile_Basics
 '        Dim saveTrueText As New List(Of TrueText)
 '        Public Sub New()
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
 '            desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
 '        End Sub
@@ -245,7 +245,7 @@
 '        Dim peakRotation As Integer
 '        Public Sub New()
 '            task.gOptions.setGravityUsage(False)
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
 '        End Sub
 '        Public Overrides Sub RunAlg(src As cv.Mat)
@@ -312,7 +312,7 @@
 '        Dim kalman As New Kalman_Basics
 '        Public Sub New()
 '            ReDim kalman.kInput(12 - 1)
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
 '            desc = "Use Kalman to smooth the results of the contour key points"
 '        End Sub

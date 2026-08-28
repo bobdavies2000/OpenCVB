@@ -6,7 +6,7 @@ Namespace VBClasses
         Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
         Public motionRightMask As New Mat(dst2.Size, MatType.CV_8U, 255) ' motion in the right image.
         Public Sub New()
-            ' If standalone Then task.gOptions.displayDst1.Checked = True
+            ' If standalone Then task.gOptions.showMyDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Find all the grid rects that had motion since the last frame."
@@ -90,7 +90,7 @@ Namespace VBClasses
         Dim diff As New Diff_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Current grayscale image"
             labels(2) = "Grayscale image constructed from previous images + motion updates."
             labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
@@ -185,7 +185,7 @@ Namespace VBClasses
         Dim diff As New Diff_Basics
         Dim motionRight As New Motion_Right
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Current right image"
             labels(2) = "Right image constructed from previous images + motion updates."
             labels(3) = "Highlighted difference of task.rightView and the one built with the motion data."
@@ -253,7 +253,7 @@ Namespace VBClasses
         Public plotHist As New PlotBar_Basics
         Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             plotHist.createHistogram = True
             plotHist.minRange = -1.01
             plotHist.maxRange = 1.01
@@ -310,7 +310,7 @@ Namespace VBClasses
         Public plotHist As New PlotBar_Basics
         Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             plotHist.createHistogram = True
             plotHist.minRange = -1.01
             plotHist.maxRange = 1.01

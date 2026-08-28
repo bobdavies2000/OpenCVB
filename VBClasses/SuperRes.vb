@@ -99,7 +99,7 @@ Namespace VBClasses
         Dim zoom As New Pixel_SubPixel
         Dim video As New SuperRes_Input
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

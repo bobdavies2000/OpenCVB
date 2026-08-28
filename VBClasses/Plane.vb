@@ -605,7 +605,7 @@
 '        Dim solo As New Cloud_Solo
 '        Dim frames As New History_Basics
 '        Public Sub New()
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
 '                      "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
 '                      "Thresholded heatmap top view mask"}
@@ -639,7 +639,7 @@
 '        Dim solo As New Cloud_Solo
 '        Dim frames As New History_Basics
 '        Public Sub New()
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
 '                      "Heatmap side view", "Single frame backprojection areas in the heatmap",
 '                      "Thresholded heatmap side view mask"}
@@ -677,7 +677,7 @@
 '        Public planeY As Single
 '        Dim options = New Options_PlaneFloor()
 '        Public Sub New()
-'            If standalone Then task.gOptions.displayDst1.Checked = True
+'            If standalone Then task.gOptions.showMyDst1.Checked = True
 '            labels = {"", "", "", ""}
 '            desc = "Find the floor plane (if present)"
 '        End Sub

@@ -150,7 +150,7 @@ Namespace VBClasses
     Public Class XR_LeftRight_EdgesColor : Inherits TaskParent
         Dim edges As New Edge_Basics_TA
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Display the edges in the left, right, and color views"
             labels(2) = "Left Image"
             labels(3) = "Right Image"

@@ -303,7 +303,7 @@ Namespace VBClasses
         Dim smallGrid As New Grid_SquaresOnly
         Public options As New Options_FeatureLess
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
         End Sub
@@ -832,7 +832,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -954,7 +954,7 @@ Namespace VBClasses
         Dim ranges() As Rangef
         Public bpArray() As Single
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Use edges, depth, color, and location to predict featureless regions."
         End Sub
@@ -1105,7 +1105,7 @@ Namespace VBClasses
         Dim feat As New FeatureLess_Features
         Dim knn As New KNN_IndividualQuery
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             knn.dimension = feat.inputVariableCount
             desc = "Predict the index for each featureLess region using the features Mat."
         End Sub
@@ -1455,7 +1455,7 @@ Namespace VBClasses
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

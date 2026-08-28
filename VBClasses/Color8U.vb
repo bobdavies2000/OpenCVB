@@ -118,7 +118,7 @@ Namespace VBClasses
         Public km2 As New KMeans_Basics
         Public colorFmt As New Color_Basics
         Public Sub New()
-            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+            If standaloneTest() Then task.gOptions.showMyDst1.Checked = True
             labels(0) = "Recombined channels in other images."
             desc = "Run KMeans on each of the 3 color channels"
         End Sub
@@ -404,7 +404,7 @@ Namespace VBClasses
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Attach a color8u class to each brick."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

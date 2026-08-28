@@ -9,7 +9,7 @@ Namespace VBClasses
         Public dst(2) As Mat
         Public pcFiltered(2) As Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_32FC1, New Scalar(0))
             dst2 = New Mat(dst2.Size, MatType.CV_32FC1, New Scalar(0))
             dst3 = New Mat(dst3.Size, MatType.CV_32FC1, New Scalar(0))
@@ -257,7 +257,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Public Sub New()
             task.fOptions.ReductionColor.Value = 50
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use RedCloud on a photo instead of the video stream."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -288,7 +288,7 @@ Namespace VBClasses
         Dim core As New MSER_Detect
         Dim options As New Options_Images
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("MSER Min Area").Value = 15
             OptionParent.FindSlider("MSER Max Area").Value = 200000
             desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
@@ -342,7 +342,7 @@ Namespace VBClasses
         Public Sub New()
             Dim floodRadio = OptionParent.findRadio("FloodFill")
             If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             cPtr = Fuzzy_Open()
             OptionParent.findRadio("CComp").Checked = True
             labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}

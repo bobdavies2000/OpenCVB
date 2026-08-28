@@ -124,7 +124,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedCloud cell."
         End Sub
@@ -323,7 +323,7 @@ Namespace VBClasses
         Dim addw As New AddWeighted_Basics
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Pixels with changes in depth that are larger than the expected error at that distance."
             desc = "Mix the cloud motion and RedCloud output with AddWeighted."
         End Sub

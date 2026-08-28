@@ -162,7 +162,7 @@ Namespace VBClasses
         Dim color8u As New Color8U_LeftRight
         Dim disparity As New Disparity_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Measure the impact of the color8u transforms on the bricks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

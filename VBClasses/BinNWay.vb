@@ -6,7 +6,7 @@ Namespace VBClasses
         Public classCount As Integer
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Run RedColor for each gradation from light to dark."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -185,7 +185,7 @@ Namespace VBClasses
         Public maskFeat As Mat
         Public maskPredict As Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             task.gOptions.GridSlider.Value = 10
             maskFless = New Mat(dst2.Size(), MatType.CV_8U)
             maskFeat = New Mat(dst2.Size(), MatType.CV_8U)

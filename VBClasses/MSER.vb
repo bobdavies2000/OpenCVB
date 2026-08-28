@@ -543,7 +543,7 @@ Namespace VBClasses
         Public Sub New()
             labels(2) = "Contour regions from MSER"
             labels(3) = "Box regions from MSER"
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             image = ImRead(task.homeDir + "Data/MSERtestfile.jpg", ImreadModes.Color)
             mser = MSER.Create()
             desc = "Maximally Stable Extremal Regions example - still image"

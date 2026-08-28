@@ -252,7 +252,7 @@ Namespace VBClasses
             labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
             labels(3) = "Right view with the translated trace of bricks under the mouse."
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Map the bricks from the color image into the left view and the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -509,7 +509,7 @@ Namespace VBClasses
         Dim ml As New ML_Basics
         Dim bounds As New XR_Brick_FeaturesAndEdges
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             ml.buildEveryPass = True
             dst1 = New Mat(dst2.Size, MatType.CV_8U)
             desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
@@ -846,7 +846,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             labels(2) = "The lines are for the left image."
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Find bricks that contain lines and depth zeros."

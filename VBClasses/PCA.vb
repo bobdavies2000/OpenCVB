@@ -20,7 +20,7 @@ Namespace VBClasses
     'Public Class PCA_Basics : Inherits TaskParent
     '    Dim pcaLine As New PCA_LineMask
     '    Public Sub New()
-    '        If standalone Then task.gOptions.displayDst1.Checked = True
+    '        If standalone Then task.gOptions.showMyDst1.Checked = True
     '        desc = "Compute the principal component for the selected line."
     '    End Sub
     '    Public Overrides Sub RunAlg(src As cv.Mat)

@@ -84,7 +84,7 @@ Namespace VBClasses
         Dim stripeY As New Stripes_CloudY
         Dim stripeZ As New Stripes_CloudZ
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Stripes in the X-direction", "Stripes in the Y-direction", "Stripes in the Z-direction"}
             desc = "Outline stripes in all 3 dimensions."
         End Sub

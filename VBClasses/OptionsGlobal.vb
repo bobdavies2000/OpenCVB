@@ -110,10 +110,10 @@ Public Class OptionsGlobal
         DotSizeLabel.Text = CStr(vbc.task.DotSize)
         vbc.task.optionsChanged = True
     End Sub
-    Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
+    Private Sub showMyDst0_CheckedChanged(sender As Object, e As EventArgs) Handles showMyDst0.CheckedChanged
         vbc.task.optionsChanged = True
     End Sub
-    Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
+    Private Sub showMyDst1_CheckedChanged(sender As Object, e As EventArgs) Handles showMyDst1.CheckedChanged
         vbc.task.optionsChanged = True
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged

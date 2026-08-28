@@ -249,7 +249,7 @@ Namespace VBClasses
             For i = 0 To redCs.Length - 1
                 redCs(i) = New RedC_Basics
             Next
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "4 separate RedColor runs - darkest to lightest."
             labels(3) = "All 4 gradations of light"
             desc = "Run RedColor one each gradation of the colors - better separation?"

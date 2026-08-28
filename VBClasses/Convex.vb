@@ -89,7 +89,7 @@ Namespace VBClasses
         Dim contours As New Contour_Largest
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
             labels(3) = "Original mask that produces the hull at left"
             desc = "Find the convexityDefects in the selected RedCloud cell"

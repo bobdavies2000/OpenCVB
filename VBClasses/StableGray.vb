@@ -171,7 +171,7 @@ Namespace VBClasses
         Dim minRGB As New StableGray_BasicsMin
         Dim maxRGB As New StableGray_BasicsMax
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare the difference between the min and max accumulated images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -203,7 +203,7 @@ Namespace VBClasses
         Dim compare As New StableGray_MinMaxCompare
         Dim plot As New PlotMouse_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Show the absDiff(min, max)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -233,7 +233,7 @@ Namespace VBClasses
         Dim averageHistory As New List(Of Single)
         Public motionDecision As Boolean
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Measure the amount of variation in the grayscale image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -801,7 +801,7 @@ Namespace VBClasses
         Dim rcMap As New cv.Mat
         Dim mapID As Byte = 0
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use the clickpoint to confirm the "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

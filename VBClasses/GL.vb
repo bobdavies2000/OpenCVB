@@ -524,7 +524,7 @@ Namespace VBClasses
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Display the selected line in 3D with the pointcloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -546,7 +546,7 @@ Namespace VBClasses
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Display the selected line in 3D with the pointcloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -114,7 +114,7 @@ Namespace VBClasses
     Public Class XR_StableLine_Lines : Inherits TaskParent
         Public basics As New FeatureMap_StablePoints
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the line end points found in the BGR image and keep those that are stable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

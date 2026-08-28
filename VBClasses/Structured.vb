@@ -109,7 +109,7 @@ Namespace VBClasses
         Dim plot As New PlotBar_Basics
         Dim counts As New List(Of Single)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
             desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
         End Sub
@@ -442,7 +442,7 @@ Namespace VBClasses
         Public Sub New()
             rotate.rotateCenter = New Point2f(dst2.Width / 2, dst2.Width / 2)
             rotate.rotateAngle = -90
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
             desc = "Count the number of pixels found in each slice of the cv.Point cloud data."
         End Sub

@@ -656,7 +656,7 @@ Namespace VBClasses
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -691,7 +691,7 @@ Namespace VBClasses
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare the results of the line segment detector and fast line detector."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

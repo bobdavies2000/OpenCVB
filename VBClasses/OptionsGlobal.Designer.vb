@@ -52,8 +52,8 @@ Partial Class OptionsGlobal
         gravityPointCloud = New CheckBox()
         CreateGif = New CheckBox()
         ShowAllOptions = New CheckBox()
-        displayDst1 = New CheckBox()
-        displayDst0 = New CheckBox()
+        showMyDst1 = New CheckBox()
+        showMyDst0 = New CheckBox()
         showMotionMask = New CheckBox()
         CrossHairs = New CheckBox()
         ShowGrid = New CheckBox()
@@ -337,8 +337,8 @@ Partial Class OptionsGlobal
         GroupBox2.Controls.Add(gravityPointCloud)
         GroupBox2.Controls.Add(CreateGif)
         GroupBox2.Controls.Add(ShowAllOptions)
-        GroupBox2.Controls.Add(displayDst1)
-        GroupBox2.Controls.Add(displayDst0)
+        GroupBox2.Controls.Add(showMyDst1)
+        GroupBox2.Controls.Add(showMyDst0)
         GroupBox2.Location = New Point(854, 48)
         GroupBox2.Margin = New Padding(3, 4, 3, 4)
         GroupBox2.Name = "GroupBox2"
@@ -394,27 +394,27 @@ Partial Class OptionsGlobal
         ShowAllOptions.Text = "Show All Options on Open"
         ShowAllOptions.UseVisualStyleBackColor = True
         ' 
-        ' displayDst1
+        ' showMyDst1
         ' 
-        displayDst1.AutoSize = True
-        displayDst1.Location = New Point(14, 78)
-        displayDst1.Margin = New Padding(3, 4, 3, 4)
-        displayDst1.Name = "displayDst1"
-        displayDst1.Size = New Size(209, 34)
-        displayDst1.TabIndex = 1
-        displayDst1.Text = "Show dst1 output"
-        displayDst1.UseVisualStyleBackColor = True
+        showMyDst1.AutoSize = True
+        showMyDst1.Location = New Point(14, 78)
+        showMyDst1.Margin = New Padding(3, 4, 3, 4)
+        showMyDst1.Name = "showMyDst1"
+        showMyDst1.Size = New Size(209, 34)
+        showMyDst1.TabIndex = 1
+        showMyDst1.Text = "Show dst1 output"
+        showMyDst1.UseVisualStyleBackColor = True
         ' 
-        ' displayDst0
+        ' showMyDst0
         ' 
-        displayDst0.AutoSize = True
-        displayDst0.Location = New Point(14, 40)
-        displayDst0.Margin = New Padding(3, 4, 3, 4)
-        displayDst0.Name = "displayDst0"
-        displayDst0.Size = New Size(209, 34)
-        displayDst0.TabIndex = 0
-        displayDst0.Text = "Show dst0 output"
-        displayDst0.UseVisualStyleBackColor = True
+        showMyDst0.AutoSize = True
+        showMyDst0.Location = New Point(14, 40)
+        showMyDst0.Margin = New Padding(3, 4, 3, 4)
+        showMyDst0.Name = "showMyDst0"
+        showMyDst0.Size = New Size(209, 34)
+        showMyDst0.TabIndex = 0
+        showMyDst0.Text = "Show dst0 output"
+        showMyDst0.UseVisualStyleBackColor = True
         ' 
         ' showMotionMask
         ' 
@@ -586,8 +586,8 @@ Partial Class OptionsGlobal
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowGrid As CheckBox
     Friend WithEvents ShowAllOptions As CheckBox
-    Friend WithEvents displayDst1 As CheckBox
-    Friend WithEvents displayDst0 As CheckBox
+    Friend WithEvents showMyDst1 As CheckBox
+    Friend WithEvents showMyDst0 As CheckBox
     Friend WithEvents gravityPointCloud As CheckBox
     Friend WithEvents CrossHairs As CheckBox
     Friend WithEvents CreateGif As CheckBox

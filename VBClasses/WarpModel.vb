@@ -6,8 +6,8 @@ Namespace VBClasses
         Dim ecc As New WarpModel_ECC
         Dim options As New Options_WarpModel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"Original Blue plane", "Original Green plane", "Original red plane", "ECC Aligned image"}
             desc = "Align the BGR inputs raw images from the Prokudin examples."
         End Sub
@@ -142,7 +142,7 @@ Namespace VBClasses
         Dim sobel As New Edge_SobelNaive
         Dim options As New Options_WarpModel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"Original Blue plane", "Original Green plane", "Original red plane", "Naively Aligned image"}
             desc = "Import the misaligned input."
         End Sub

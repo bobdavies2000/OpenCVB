@@ -199,7 +199,7 @@ Namespace VBClasses
         ''' <summary>Unit gravity vector from the accelerometer (points down in the camera/body frame).</summary>
         Public gravityVector As Point3f
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Cursor.ai: Find the camera's angle from vertical using the IMU accelerometer."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -764,7 +764,7 @@ Namespace VBClasses
     Public Class XR_IMU_PlotGravityAngles : Inherits TaskParent
         Dim plot As New PlotTime_Scalar
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Plot the motion of the camera based on the IMU data in degrees"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -791,7 +791,7 @@ Namespace VBClasses
     Public Class XR_IMU_PlotAngularVelocity : Inherits TaskParent
         Dim plot As New PlotTime_Scalar
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Plot the IMU Velocity over time."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -819,7 +819,7 @@ Namespace VBClasses
     Public Class XR_IMU_PlotAcceleration : Inherits TaskParent
         Dim plot As New PlotTime_Scalar
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Plot the IMU Acceleration in m/Sec^2 over time."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -868,8 +868,8 @@ Namespace VBClasses
         Dim plot(3 - 1) As PlotTime_Scalar
         Dim imuAll As New IMU_Methods
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
 
             For i = 0 To plot.Length - 1
                 plot(i) = New PlotTime_Scalar With {.plotCount = 4}
@@ -966,7 +966,7 @@ Namespace VBClasses
     Public Class XR_IMU_VelocityPlot : Inherits TaskParent
         Dim plot As New IMU_Plot
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Plot the angular velocity"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1111,7 +1111,7 @@ Namespace VBClasses
         Public HostInterruptDelayEstimate As Double
         Dim options As New Options_IMUFrameTime
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             plot.plotCount = 4
             labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
             desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"

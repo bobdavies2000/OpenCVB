@@ -175,7 +175,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Public correlation As Single
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Correlation measures how similar the previous template is to the current one."
             desc = "Concatenate the end cv.Point templates to return a single correlation to the previous frame."
         End Sub
@@ -954,7 +954,7 @@ Namespace VBClasses
         Dim triangle As New XR_LineTrack_Triangle
         Dim warper As New WarpAffine_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compute the pitch and roll and use it to accumulate pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

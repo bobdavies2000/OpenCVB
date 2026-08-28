@@ -305,7 +305,7 @@ Namespace VBClasses
         Dim fcs As New FeatureMap_CreateList
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Output of FeatureMap_CreateList."
             desc = "Isolate FCS cells for each redCell."
         End Sub
@@ -359,7 +359,7 @@ Namespace VBClasses
             plothist.createHistogram = True
             plothist.addLabels = False
             task.gOptions.setHistogramBins(64) ' should this be an odd number.
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Using all the feature points with motion, determine any with a common direction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -490,7 +490,7 @@ Namespace VBClasses
             plotHist.addLabels = False
             plotHist.removeZeroEntry = True
             plotHist.createHistogram = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             task.gOptions.setHistogramBins(20)
             desc = "Use cell depth to break down the layers in an image."
         End Sub
@@ -690,7 +690,7 @@ Namespace VBClasses
             plot.maxScale = 100
             plot.minScale = 0
             plot.plotCount = 1
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Plot of % of cells that moved - move camera to see value."
             desc = "Highlight the motion of each feature identified in the current and previous frame"
         End Sub

@@ -20,8 +20,8 @@ Namespace VBClasses
 
     Public Class XR_Depth_Display : Inherits TaskParent
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"task.pcSplit(2)", "task.pointcloud", "task.depthMask", "task.noDepthMask"}
             desc = "Display the task.pcSplit(2), task.pointcloud, task.depthMask, and task.noDepthMask"
         End Sub
@@ -648,7 +648,7 @@ Namespace VBClasses
         Public classCount As Integer = 1
         Public Sub New()
             labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New Mat(dst0.Size(), MatType.CV_8U)
             desc = "Create the selected number of depth ranges "
         End Sub

@@ -93,7 +93,7 @@ Namespace VBClasses
     Public Class XR_Boundary_RemovedRects : Inherits TaskParent
         Public bRects As New XR_Boundary_Rectangles
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build the boundaries for rcList and remove interior rectangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

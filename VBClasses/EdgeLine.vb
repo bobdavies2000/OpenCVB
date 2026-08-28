@@ -294,7 +294,7 @@ Namespace VBClasses
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "EdgeLine segments displayed one for each frame starting with the longest."
             desc = "Find lines using the r points"
         End Sub
@@ -430,7 +430,7 @@ Namespace VBClasses
     Public Class EdgeLine_Compare : Inherits TaskParent
         Dim edgeLine As New EdgeLine_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "The output of EdgeLine_basics after using task.edges.dst2 to zero out overlap."
             desc = "Compare EdgeLine with Edge_Basics - edgeline is cleaner with more straight lines."
         End Sub

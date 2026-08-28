@@ -23,7 +23,7 @@ Namespace VBClasses
         Dim pyr As New PyrFilter_Basics_TA
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "PyrFilter output before reduction"}
             desc = "Use RedColor to segment the output of PyrFilter"
         End Sub

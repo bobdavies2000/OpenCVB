@@ -5,7 +5,7 @@ Namespace VBClasses
     Public Class Hull_Basics : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare hulls and contours for the redC cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -282,7 +282,7 @@ Namespace VBClasses
     Public Class Hull_Contour : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Contour is in white and hull is highlighted."
             desc = "Compare the hull to the contour of a contour cell"
         End Sub

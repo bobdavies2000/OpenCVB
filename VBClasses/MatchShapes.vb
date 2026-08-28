@@ -90,7 +90,7 @@ Namespace VBClasses
 
             similarCells.Clear()
 
-            If task.gOptions.displayDst0.Checked Then
+            If task.gOptions.showMyDst0.Checked Then
                 dst0 = task.color.Clone
             End If
 
@@ -167,7 +167,7 @@ Namespace VBClasses
         Dim options As New Options_MatchShapes
         Dim redC As New RedC_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("Match Threshold %").Value = 3
             labels = {"", "", "Output of RedFlood_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."

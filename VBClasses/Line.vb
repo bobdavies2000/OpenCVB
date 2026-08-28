@@ -575,7 +575,7 @@ Namespace VBClasses
     Public Class XR_Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Select a line With mouse movement And put the selection into task.lpD."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -604,7 +604,7 @@ Namespace VBClasses
             plot.plotHist.createHistogram = True
             plot.plotHist.removeZeroEntry = True
             If standalone Then task.gOptions.DebugCheckBox.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Show the histogram Of the depth data For a line.  Use debug check box To study longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -724,7 +724,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
             desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
         End Sub
@@ -952,7 +952,7 @@ Namespace VBClasses
         Public pointCloud As New Mat
         Dim depthToWorld As New XR_Cloud_DepthToWorld
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
@@ -1036,7 +1036,7 @@ Namespace VBClasses
 
     Public Class XR_Line_Map : Inherits TaskParent
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -1540,7 +1540,7 @@ Namespace VBClasses
     Public Class XR_Line_LongestTest : Inherits TaskParent
         Dim lpLast As New lpData
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Check to see that the longest line is always present."
         End Sub
         Public Shared Function compareLines(lpCurr As lpData, lpLast As lpData) As Boolean
@@ -2187,7 +2187,7 @@ Namespace VBClasses
         Dim lpTracked As lpData
         Dim lpFind As New Line_FindClosest
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the longest vertical line on the heartbeat and track it using correlation."
         End Sub
@@ -2223,7 +2223,7 @@ Namespace VBClasses
         Dim vert As New GravityRGB_Vertical
         Dim lpTracked As lpData
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the longest vertical line on the heartbeat and track it using correlation."
         End Sub
@@ -2270,7 +2270,7 @@ Namespace VBClasses
         Dim matchP2 As New Match_Basics
         Public lp As lpData
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the longest vertical line on the heartbeat and track it using correlation."
         End Sub

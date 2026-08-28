@@ -88,14 +88,14 @@ Namespace VBClasses
                 Select Case task.gifCaptureIndex
                     Case gifTypes.gifdst0
                         If task.gOptions.CrossHairs.Checked Then Gravity_Basics_TA.showVectors(task.color)
-                        Dim dst = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+                        Dim dst = If(task.gOptions.showMyDst0.Checked, dst0, task.color)
                         If dst.Channels() = 1 Then
                             CvtColor(dst, dst, ColorConversionCodes.GRAY2BGR)
                         End If
                         nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                         cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                     Case gifTypes.gifdst1
-                        Dim dst = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
+                        Dim dst = If(task.gOptions.showMyDst1.Checked, dst1, task.depthRGB)
                         If dst.Channels() = 1 Then
                             CvtColor(dst, dst, ColorConversionCodes.GRAY2BGR)
                         End If

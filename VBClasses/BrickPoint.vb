@@ -412,7 +412,7 @@ Namespace VBClasses
     Public Class XR_BrickPoint_EndPoints : Inherits TaskParent
         Dim brickKNN As New XR_BrickPoint_KNN
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
             desc = "Use the lp end points to find lines in the grid square points"
         End Sub
