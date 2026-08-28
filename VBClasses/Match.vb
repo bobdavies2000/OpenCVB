@@ -605,28 +605,25 @@ Namespace VBClasses
 
                 centerRect = Rectangle_Basics.centerRect(src.Size, 3)
                 match.template = src(centerRect).Clone
-                shiftXY = New cv.Point2f(0, 0)
-                M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
-                M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
+                shiftXY = New cv.Point2f(-shiftXY.X, -shiftXY.Y) ' return to zero, zero
                 If standaloneTest() Then dst3 = src.Clone
-                Exit Sub
-            End If
+            Else
+                match.Run(src)
+                If standaloneTest() Then
+                    dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
+                    Rectangle(dst2, centerRect, white, task.lineWidth)
+                    Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
+                End If
 
-            match.Run(src)
-            If standaloneTest() Then
-                dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
-                Rectangle(dst2, centerRect, white, task.lineWidth)
-                Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
-            End If
+                If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
 
-            If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
+                shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
 
-            shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
-
-            If useKalman Then
-                kalman.kInput = {shiftXY.X, shiftXY.Y}
-                kalman.Run(emptyMat)
-                shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+                If useKalman Then
+                    kalman.kInput = {shiftXY.X, shiftXY.Y}
+                    kalman.Run(emptyMat)
+                    shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+                End If
             End If
 
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
@@ -641,6 +638,7 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
 
 
 
@@ -682,23 +680,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class Match_RedC : Inherits TaskParent
-        Dim redC As New RedC_Basics
-        Public Sub New()
-            desc = "Create a stable RedC output image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-        End Sub
-    End Class
 
 
 
@@ -758,7 +739,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_Point : Inherits TaskParent
+    Public Class Match_Features : Inherits TaskParent
         Dim feat As New Feature_Basics
         Dim knn As New KNN_Basics
         Public Sub New()
@@ -793,4 +774,56 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class Match_RedC : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Create a stable RedC output image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+        End Sub
+    End Class
+
+
+
+
+    Public Class Match_ClickPoint : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Dim rcMap As New cv.Mat
+        Dim mapID As Byte = 0
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the clickpoint to confirm the "
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            If task.mouseClickFlag Then mapID = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+
+            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redC.rcMap, rcMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            If task.rcD Is Nothing Then Exit Sub
+
+            Dim pt = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+            Dim mapIDaligned = rcMap.Get(Of Integer)(pt.Y, pt.X)
+            If mapIDaligned <> mapID Then
+                SetTrueText("Tracking the selected cell was lost", 1)
+                Exit Sub
+            End If
+
+        End Sub
+    End Class
+
 End Namespace
