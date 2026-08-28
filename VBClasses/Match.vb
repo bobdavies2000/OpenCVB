@@ -759,7 +759,6 @@ Namespace VBClasses
 
 
     Public Class Match_Point : Inherits TaskParent
-        Public ptSteady As New List(Of cv.Point)
         Dim feat As New Feature_Basics
         Dim knn As New KNN_Basics
         Public Sub New()
@@ -767,6 +766,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(src)
+
             If task.heartBeatLT Then dst3.SetTo(0)
 
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
@@ -775,25 +775,22 @@ Namespace VBClasses
                 knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
             Next
 
-            Dim ptList As New List(Of cv.Point2f)
             CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In knn.queries
-                Dim ptAligned = GravityRGB_Basics.WarpPoint(pt, task.steadyCam.M)
-                ptList.Add(ptAligned)
-                Circle(dst2, ptAligned, task.DotSize, task.highlight, -1, task.lineType)
+                pt = GravityRGB_Basics.WarpPoint(pt, task.steadyCam.M)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
             knn.Run(emptyMat)
             If knn.result Is Nothing Then Exit Sub
 
-            For i = 0 To ptList.Count - 1
+            For i = 0 To knn.queries.Count - 1
                 Dim pt = knn.queries(i)
                 Dim ptAligned = knn.trainInput(knn.result(i, 0))
-                If pt.DistanceTo(ptAligned) < 10 Then
+                If pt.DistanceTo(ptAligned) < 3 Then
                     Line(dst3, pt, ptAligned, task.highlight, task.lineWidth, task.lineType)
                 End If
             Next
         End Sub
     End Class
-
 End Namespace
