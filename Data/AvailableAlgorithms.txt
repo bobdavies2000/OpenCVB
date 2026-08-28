@@ -465,6 +465,7 @@ Match_Basics
 Match_Brick
 Match_CenterRect
 Match_DrawRect
+Match_Lines
 Match_LinesKNN
 Match_Point
 Match_Quadrants

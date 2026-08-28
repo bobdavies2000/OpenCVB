@@ -321,7 +321,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_Point : Inherits TaskParent
+    Public Class XR_Match_Point : Inherits TaskParent
         Public pt As Point2f
         Public target As Mat
         Public correlation As Single
@@ -593,6 +593,8 @@ Namespace VBClasses
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public useKalman As Boolean = True
         Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -604,6 +606,8 @@ Namespace VBClasses
                 centerRect = Rectangle_Basics.centerRect(src.Size, 3)
                 match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0)
+                M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+                M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
                 If standaloneTest() Then dst3 = src.Clone
                 Exit Sub
             End If
@@ -637,8 +641,6 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
 
 
 
@@ -697,4 +699,101 @@ Namespace VBClasses
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
+
+
+
+
+
+    Public Class Match_Lines : Inherits TaskParent
+        Dim accum As New AddWeighted_Accumulate
+        Public Sub New()
+            labels(3) = "The current set of lines after steadycam filter."
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Accumulate the lines in dst2 as a measure of how closely the lines will land."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            WarpAffine(task.lines.dst3, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            accum.Run(dst3)
+            dst2 = accum.dst2
+            labels(2) = "Accumulated lines with each frame given " + accum.options.accumWeighted.ToString("0%")
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_Match_Point2 : Inherits TaskParent
+        Public ptLast As New List(Of Point2f)
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Cursor.ai: Use Match_CenterRect.M to translate a point from the last image to the current image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static lastM As cv.Mat = Mat.Eye(2, 3, MatType.CV_64FC1)
+
+            If task.heartBeatLT Then
+                feat.Run(src)
+                ptLast = New List(Of cv.Point2f)(feat.features)
+                lastM = Mat.Eye(2, 3, MatType.CV_64FC1)
+            End If
+
+            If task.heartBeatLT = False Then
+                Dim Minv As New Mat
+                InvertAffineTransform(task.steadyCam.M, Minv)
+                dst2 = task.steadyCam.dst3
+                For Each pt In ptLast
+                    Dim ptAligned = GravityRGB_Basics.WarpPoint(pt, lastM)
+                    pt = GravityRGB_Basics.WarpPoint(ptAligned, Minv)
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Next
+            End If
+
+            lastM = task.steadyCam.M.Clone
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Match_Point : Inherits TaskParent
+        Public ptSteady As New List(Of cv.Point)
+        Dim feat As New Feature_Basics
+        Dim knn As New KNN_Basics
+        Public Sub New()
+            desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(src)
+            If task.heartBeatLT Then dst3.SetTo(0)
+
+            knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+            knn.queries.Clear()
+            For Each pt In feat.features
+                knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+
+            Dim ptList As New List(Of cv.Point2f)
+            CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            For Each pt In knn.queries
+                Dim ptAligned = GravityRGB_Basics.WarpPoint(pt, task.steadyCam.M)
+                ptList.Add(ptAligned)
+                Circle(dst2, ptAligned, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            knn.Run(emptyMat)
+            If knn.result Is Nothing Then Exit Sub
+
+            For i = 0 To ptList.Count - 1
+                Dim pt = knn.queries(i)
+                Dim ptAligned = knn.trainInput(knn.result(i, 0))
+                If pt.DistanceTo(ptAligned) < 10 Then
+                    Line(dst3, pt, ptAligned, task.highlight, task.lineWidth, task.lineType)
+                End If
+            Next
+        End Sub
+    End Class
+
 End Namespace
