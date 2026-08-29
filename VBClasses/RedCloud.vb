@@ -216,7 +216,7 @@ Namespace VBClasses
                 Dim hullList As New List(Of cv.Point)
                 For i = 0 To 3
                     Dim pt = knn.trainInput(knn.result(i, 0))
-                    hullList.Add(New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
+                    hullList.Add(pt + rc.rect.TopLeft)
                 Next
                 listOfPoints.Add(hullList)
                 FillPoly(dst3, listOfPoints, task.scalarColors(rc.index Mod 255))

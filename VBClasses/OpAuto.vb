@@ -128,7 +128,7 @@ Namespace VBClasses
             For Each roi In task.gridRects
                 Dim mm As mmData = GetMinMax(src(roi))
                 If mm.maxVal = 0 Then Continue For
-                pointPop.Add(mm.maxVal, New cv.Point(CInt(roi.X + mm.maxLoc.X), CInt(roi.Y + mm.maxLoc.Y)))
+                pointPop.Add(mm.maxVal, roi.TopLeft + mm.maxLoc)
             Next
 
             clusterPoints.Clear()

@@ -67,8 +67,8 @@ Namespace VBClasses
             dst0.SetTo(0, task.noDepthMask)
 
             Dim mm = GetMinMax(task.pcSplit(2), dst0)
-            Dim ptMin = New cv.Point(brickMin.mm.minLoc.X + brickMin.rect.X, brickMin.mm.minLoc.Y + brickMin.rect.Y)
-            Dim ptMax = New cv.Point(brickMin.mm.maxLoc.X + brickMin.rect.X, brickMin.mm.maxLoc.Y + brickMin.rect.Y)
+            Dim ptMin = brickMin.mm.minLoc + brickMin.rect.TopLeft
+            Dim ptMax = brickMin.mm.maxLoc + brickMin.rect.TopLeft
             If ptMin.DistanceTo(mm.minLoc) > ptMax.DistanceTo(mm.maxLoc) Then
                 Dim tmp = brickMin
                 brickMin = brickMax

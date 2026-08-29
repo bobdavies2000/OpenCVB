@@ -49,13 +49,13 @@ Namespace VBClasses
                     If src.Channels() = 1 Then CvtColor(src, src, ColorConversionCodes.GRAY2BGR)
                     dst2 = src.Clone
                     Circle(dst2, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                    Line(dst2, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.red, task.lineWidth + 1, task.lineType)
+                    Line(dst2, center, center + New cv.Point(CInt(shift.X), CInt(shift.Y)), Scalar.red, task.lineWidth + 1, task.lineType)
 
                     src(srcRect).CopyTo(dst3(stableRect))
 
                     If radius > 5 Then
                         Circle(dst3, center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                        Line(dst3, center, New cv.Point(center.X + shift.X, center.Y + shift.Y), Scalar.red, task.lineWidth + 1, task.lineType)
+                        Line(dst3, center, center + New cv.Point(CInt(shift.X), CInt(shift.Y)), Scalar.red, task.lineWidth + 1, task.lineType)
                     End If
                 Else
                     resetLastFrame = True
@@ -175,7 +175,7 @@ Namespace VBClasses
                 tmp.ConvertTo(dst3, MatType.CV_8UC1)
 
                 Circle(dst3, phaseC.center, phaseC.radius, task.highlight, task.lineWidth + 2, task.lineType)
-                Line(dst3, phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), Scalar.red, task.lineWidth + 1, task.lineType)
+                Line(dst3, phaseC.center, phaseC.center + New cv.Point(CInt(phaseC.shift.X), CInt(phaseC.shift.Y)), Scalar.red, task.lineWidth + 1, task.lineType)
             End If
 
             lastFrame = task.pcSplit(2).Clone

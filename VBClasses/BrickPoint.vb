@@ -51,7 +51,7 @@ Namespace VBClasses
             ptList.Clear()
             For Each brick In bricks.brickList
                 brick.mm = GetMinMax(src(brick.rect))
-                Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                Dim pt = brick.mm.maxLoc + brick.rect.TopLeft
                 If brick.mm.maxVal >= options.threshold Then ptList.Add(pt)
             Next
 
@@ -101,7 +101,7 @@ Namespace VBClasses
             dst3 = src
             For Each brick In bPoint.bpCore.bricks.brickList
                 If brick.mm.maxVal <= maxVal And brick.mm.maxVal >= minVal Then
-                    Circle(dst3, New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y), task.DotSize, task.highlight, -1, task.lineType)
+                    Circle(dst3, brick.mm.maxLoc + brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
                 End If
             Next
             labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -128,7 +128,7 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each brick In bricks.brickList
-                If brick.mm.maxLoc = new cv.Point Then Continue For
+                If brick.mm.maxLoc = New cv.Point Then Continue For
                 If brick.mm.maxVal <> 255 Then Continue For
                 If brick.mm.maxLoc.Y = brick.rect.Y Then
                     Circle(dst2, brick.mm.maxLoc, task.DotSize, task.highlight, -1, task.lineType)
@@ -165,8 +165,8 @@ Namespace VBClasses
                     lpList.Add(lpZero)
                 Else
                     Dim brick1 = bricks.brickList(brick.index - task.bricksPerRow)
-                    Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
-                    Dim ptbrick = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                    Dim pt = brick.mm.maxLoc + brick.rect.TopLeft
+                    Dim ptbrick = brick.mm.maxLoc + brick.rect.TopLeft
                     Dim lp = New lpData(pt, ptbrick)
                     lpList.Add(lp)
                 End If
@@ -302,7 +302,7 @@ Namespace VBClasses
 
             For Each brick In bricks.brickList
                 If brick.mm.maxLoc.X = col And brick.mm.maxLoc.Y = row Then
-                    Dim ptfeat = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                    Dim ptfeat = brick.mm.maxLoc + brick.rect.TopLeft
                     Circle(dst3, ptfeat, task.DotSize, task.highlight, -1, task.lineType)
                 End If
             Next
@@ -401,7 +401,7 @@ Namespace VBClasses
 
             dst2 = src.Clone
             For Each lp In task.lines.lpList
-                cv.Cv2.Line(dst2, lp.p1.x, lp.p1.y, lp.p2.x, lp.p2.y, task.highlight, task.lineWidth, task.lineWidth)
+                cv.Cv2.Line(dst2, lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y, task.highlight, task.lineWidth, task.lineWidth)
             Next
         End Sub
     End Class
@@ -470,7 +470,7 @@ Namespace VBClasses
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(sobel.dst2(rect))
                 If mm.maxVal >= options.sobelThreshold Then
-                    Dim pt = New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y))
+                    Dim pt = mm.maxLoc + rect.TopLeft
                     features.Add(pt)
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 End If
@@ -540,7 +540,7 @@ Namespace VBClasses
             dst2 = task.color.Clone
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(src(rect))
-                Dim pt = New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y))
+                Dim pt = mm.maxLoc + rect.TopLeft
                 If mm.maxVal >= options.sobelThreshold Then Rectangle(dst2, rect, task.highlight, task.lineWidth, task.lineType)
             Next
         End Sub

@@ -138,7 +138,7 @@ Namespace VBClasses
                 Dim roi = grid.gridRects(gIndex)
                 Dim pt = samples.Get(Of Point2f)(i, 0)
                 centers.Add(pt)
-                Dim ePt = New Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))
+                Dim ePt = roi.TopLeft + pt
                 eSamples.Add(ePt) ' easier to debug with just integers...
                 Dim label = eLabelMat.Get(Of Integer)(i)
                 Circle(dst2, ePt, task.DotSize + 2, task.highlight, -1, task.lineType)

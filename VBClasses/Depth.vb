@@ -158,14 +158,14 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
                 Dim mm As mmData = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
                 If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New Point2f(0, 0)
-                minPoint(i) = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
-                maxPoint(i) = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
+                minPoint(i) = mm.minLoc + r.TopLeft
+                maxPoint(i) = mm.maxLoc + r.TopLeft
 
                 Circle(dst2(r), mm.minLoc, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst2(r), mm.maxLoc, task.DotSize, Scalar.red, -1, task.lineType)
 
-                Dim p1 = New cv.Point(mm.minLoc.X + r.X, mm.minLoc.Y + r.Y)
-                Dim p2 = New cv.Point(mm.maxLoc.X + r.X, mm.maxLoc.Y + r.Y)
+                Dim p1 = mm.minLoc + r.TopLeft
+                Dim p2 = mm.maxLoc + r.TopLeft
                 Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst3, p2, task.DotSize, Scalar.red, -1, task.lineType)
             Next
@@ -1161,7 +1161,7 @@ Namespace VBClasses
             dst1.SetTo(white, task.gridMask)
             For Each brick In bricks.brickList
                 Dim pt = brick.mm.minLoc
-                subdiv.Insert(New cv.Point(pt.X + brick.rect.X, pt.Y + brick.rect.Y))
+                subdiv.Insert(pt + brick.rect.TopLeft)
                 Circle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, Scalar.red, -1, task.lineType)
                 Circle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, Scalar.Blue, -1, task.lineType)
             Next

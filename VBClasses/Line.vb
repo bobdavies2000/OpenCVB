@@ -880,7 +880,7 @@ Namespace VBClasses
                 Dim brick = dst1(rect)
                 If CountNonZero(brick) = 0 Then Continue For
                 Dim mm = GetMinMax(brick)
-                Dim pt = New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y))
+                Dim pt = mm.maxLoc + rect.TopLeft
                 allPoints.Add(pt)
                 brickList.Add(rect)
             Next
@@ -1777,14 +1777,14 @@ Namespace VBClasses
                 Dim p1 As cv.Point = Nothing
                 Dim p2 As cv.Point
                 For Each p1 In ptArray
-                    p1 = New cv.Point(CInt(lp.rect.X + p1.X), CInt(lp.rect.Y + p1.Y))
+                    p1 = lp.rect.TopLeft + p1
                     depth1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
                     If depth1 > 0 Then Exit For
                 Next
 
                 If depth1 > 0 Then
                     For i = ptArray.Length - 1 To 0 Step -1
-                        p2 = New cv.Point(CInt(lp.rect.X + ptArray(i).X), CInt(lp.rect.Y + ptArray(i).Y))
+                        p2 = lp.rect.TopLeft + ptArray(i)
                         depth2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                         If depth2 > 0 Then
                             Dim lpNew = New lpData(p1, p2)

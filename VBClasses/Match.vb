@@ -348,7 +348,7 @@ Namespace VBClasses
             MatchTemplate(target(rect), src(searchRect), dst0, TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation = mmData.maxVal
-            pt = New Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
+            pt = mmData.maxLoc + searchRect.TopLeft + New Point2f(radius, radius)
             Circle(src, pt, task.DotSize, white, -1, task.lineType)
             Rectangle(src, searchRect, Scalar.Yellow, 1)
         End Sub
@@ -460,7 +460,7 @@ Namespace VBClasses
                     dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
                     Threshold(dst2, dst2, task.fCorrThreshold, 255, ThresholdTypes.Binary)
                 End If
-                ptx(i) = New Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
+                ptx(i) = mmData.maxLoc + searchRect.TopLeft + New Point2f(radius, radius)
                 Circle(dst3, ptx(i), task.DotSize, task.highlight, -1, task.lineType)
                 Rectangle(dst3, searchRect, Scalar.Yellow, 1)
                 rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.gridWH, task.gridWH))
@@ -777,7 +777,7 @@ Namespace VBClasses
             CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In knn.queries
                 pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize * 3, task.highlight, -1, task.lineType)
             Next
 
             knn.Run(emptyMat)

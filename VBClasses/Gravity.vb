@@ -367,7 +367,7 @@ Namespace VBClasses
 
             dst1 = src
             For Each brick In bricks.brickList
-                Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                Dim pt = brick.mm.maxLoc + brick.rect.TopLeft
                 If pt.Y = brick.rect.Y Then
                     Circle(dst1, pt, task.DotSize, task.highlight, -1, task.lineType)
                 End If

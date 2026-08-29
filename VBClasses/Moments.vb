@@ -31,7 +31,7 @@ Namespace VBClasses
                 center = New Point2f(m.M10 / m.M00, m.M01 / m.M00)
             End If
             If standaloneTest() Then Circle(dst2, center, task.DotSize + 5, Scalar.red, -1, task.lineType)
-            centroid = New Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
+            centroid = (offsetPt + center) * scaleFactor
         End Sub
     End Class
 

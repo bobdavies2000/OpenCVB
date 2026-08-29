@@ -18,7 +18,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)
             For Each pt In task.rcD.contour
-                pt = New cv.Point(pt.X + task.rcD.rect.X, pt.Y + task.rcD.rect.Y)
+                pt = pt + task.rcD.rect.TopLeft
                 Dim vec = task.pointCloud.Get(Of Point3f)(pt.Y, pt.X)
                 If vec.Z = 0 Then
                     vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcD.depth))
@@ -63,14 +63,14 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each pt In rc.contour
-                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                pt = pt + rc.rect.TopLeft
                 Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
 
             dst1.SetTo(0)
             If rc.hull IsNot Nothing Then
                 For Each pt In rc.hull
-                    pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                    pt = pt + rc.rect.TopLeft
                     Circle(dst1, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 Next
             End If

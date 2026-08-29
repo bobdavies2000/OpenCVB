@@ -227,7 +227,7 @@ Namespace VBClasses
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
-                If mm.maxVal > 0 Then ptList.Add(New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y)))
+                If mm.maxVal > 0 Then ptList.Add(mm.maxLoc + rect.TopLeft)
             Next
 
 
@@ -269,7 +269,7 @@ Namespace VBClasses
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
-                If mm.maxVal > 0 Then ptList.Add(New cv.Point(CInt(mm.maxLoc.X + rect.X), CInt(mm.maxLoc.Y + rect.Y)))
+                If mm.maxVal > 0 Then ptList.Add(mm.maxLoc + rect.TopLeft)
             Next
 
             If standalone Then
@@ -499,7 +499,7 @@ Namespace VBClasses
             For Each brick In bricks.brickList
                 Dim mm = GetMinMax(dst2(brick.rect))
                 If mm.maxVal >= threshold Then
-                    Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
+                    Dim pt = mm.maxLoc + brick.rect.TopLeft
                     Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
                 End If
             Next
