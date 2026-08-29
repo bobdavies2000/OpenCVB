@@ -823,7 +823,7 @@ Namespace VBClasses
                 If standaloneTest() Then dst3 = src.Clone
             Else
                 match.Run(src)
-                If standaloneTest() Then
+                If standaloneTest() And match.correlationMat.Width > 0 Then
                     dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
                     Rectangle(dst2, centerRect, white, task.lineWidth)
                     Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
@@ -859,173 +859,89 @@ Namespace VBClasses
 
 
     Public Class Match_Points : Inherits TaskParent
+        Public ptDataList As New List(Of ptData)
         Public ptList As New List(Of cv.Point)
-        Public ptDataList As New List(Of ptData)
-        Dim feat As New Feature_Basics
-        Dim delaunay As New Delaunay_Basics
-        Public Sub New()
-            OptionParent.FindSlider("Min Distance").Value = 30 ' space the points out quite a bit.
-            desc = "Track points using the steadycam image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                feat.Run(src)
-                ptList = feat.features
-            End If
-
-            ptDataList.Clear()
-            ptDataList.Add(New ptData(New cv.Point2f, 0))
-            For i = 0 To ptList.Count - 1
-                ptDataList.Add(New ptData(ptList(i), i + 1))
-            Next
-
-            If task.heartBeatLT Then dst3.SetTo(0)
-
-            dst1 = task.steadyCam.dst3.Clone
-            delaunay.inputPoints.Clear()
-            For Each ptD In ptDataList
-                ptD.pt = validatePoint(WarpAffine_Basics.WarpPoint(New cv.Point2f(ptD.pt.X, ptD.pt.Y), task.steadyCam.M))
-                Circle(dst1, ptD.pt, task.DotSize * 3, cv.Scalar.All(ptD.index), -1, cv.LineTypes.Link8)
-                delaunay.inputPoints.Add(ptD.pt)
-            Next
-
-            delaunay.Run(emptyMat)
-            dst2 = delaunay.dst2
-        End Sub
-    End Class
-
-
-
-
-    Public Class Match_Point : Inherits TaskParent
-        Public ptList As New List(Of cv.Point)
-        Public ptDataList As New List(Of ptData)
-        Dim feat As New Feature_Basics
-        Dim match As New Match_Basics
-        Const distance As Integer = 30
-        Public Sub New()
-            OptionParent.FindSlider("Min Distance").Value = distance ' space the points out quite a bit.
-            desc = "Track the features of an image with Match_Basics."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            If ptDataList.Count < 3 Then
-                feat.Run(src)
-                labels(2) = feat.labels(2)
-                dst1 = src.Clone
-                ptList = feat.features
-
-                ptDataList.Clear()
-                Dim half = distance \ 2
-                For i = 0 To Math.Min(ptList.Count, 10) - 1
-                    Dim ptD = New ptData(ptList(i), i + 1)
-                    ptD.centerRect = ValidateRect(New cv.Rect(ptD.pt.X - half, ptD.pt.Y - half, distance, distance))
-                    ptD.rect = ValidateRect(New cv.Rect(ptD.pt.X - distance, ptD.pt.Y - distance, distance * 2, distance * 2))
-                    ptDataList.Add(ptD)
-                Next
-            End If
-
-            Dim invalidList As New List(Of Boolean)
-            For Each ptd In ptDataList
-                match.template = dst1(ptd.centerRect)
-                match.Run(src(ptd.rect))
-
-                Dim invalid As Boolean = False
-                If match.correlation >= task.fOptions.MatchCorrSlider.Value / 100 Then ptd.age += 1 Else invalid = True
-                ptd.pt = validatePoint(New cv.Point(ptd.rect.TopLeft.X + match.newCenter.X, ptd.rect.TopLeft.Y + match.newCenter.Y))
-                invalidList.Add(invalid)
-            Next
-
-            dst3 = task.color.Clone
-            For i = invalidList.Count - 1 To 0 Step -1
-                If invalidList(i) Then
-                    ptDataList.RemoveAt(i)
-                Else
-                    Dim ptd = ptDataList(i)
-                    Circle(dst3, ptd.pt, task.DotSize * 3, task.highlight, -1, task.lineType)
-                    SetTrueText(CStr(ptd.age), ptd.pt, 3)
-                End If
-            Next
-            labels(3) = CStr(ptDataList.Count) + " points were found and retained."
-        End Sub
-    End Class
-
-
-
-
-    Public Class Match_PtData : Inherits TaskParent
-        Public ptDataList As New List(Of ptData)
         Dim feat As New Feature_Basics
         Dim match As New Match_Basics
         Dim entropy As New Entropy_Rectangle
-        Const distance As Integer = 30
+        Const distance As Integer = 32
         Const topN As Integer = 10
         Public Sub New()
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
             OptionParent.FindSlider("Min Distance").Value = distance
-            desc = "Cursor.ai: Keep the top 10 Feature_Basics points by centerRect entropy; drop when MatchCorrSlider correlation fails."
-            labels = {"", "", "Retained feature points on src", ""}
+            desc = "Keep the top 10 Feature_Basics points by centerRect entropy; drop when MatchCorrSlider correlation fails."
         End Sub
-        Private Function buildPtData(pt As cv.Point, index As Integer, gray As cv.Mat) As ptData
-            Dim half = distance \ 2
-            Dim ptD = New ptData(pt, index) With { .centerRect = ValidateRect(New cv.Rect(pt.X - half, pt.Y - half, distance, distance)), 
-                                                   .rect = ValidateRect(New cv.Rect(pt.X - distance, pt.Y - distance, distance * 2, distance * 2))}
-            entropy.Run(gray(ptD.centerRect))
-            ptD.entropy = entropy.entropyVal
-            ptD.template = gray(ptD.centerRect).Clone
-            Return ptD
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray = If(src.Channels <> 1, task.gray, src)
+            If src.Channels <> 1 Then src = task.gray
             Dim threshold = task.fOptions.MatchCorrSlider.Value / 100.0F
 
-            For i = ptDataList.Count - 1 To 0 Step -1
-                Dim ptd = ptDataList(i)
-                If ptd.template Is Nothing OrElse ptd.rect.Width < ptd.template.Width OrElse ptd.rect.Height < ptd.template.Height Then
-                    ptDataList.RemoveAt(i)
-                    Continue For
-                End If
-                match.template = ptd.template
-                match.Run(gray(ptd.rect))
-                ptd.correlation = match.correlation
-                If match.correlation < threshold Then
-                    ptDataList.RemoveAt(i)
-                    Continue For
-                End If
-                ptd.age += 1
-                ptd.pt = validatePoint(New cv.Point(ptd.rect.X + match.newCenter.X, ptd.rect.Y + match.newCenter.Y))
-                Dim half = distance \ 2
-                ptd.centerRect = ValidateRect(New cv.Rect(ptd.pt.X - half, ptd.pt.Y - half, distance, distance))
-                ptd.rect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
-            Next
-
-            If ptDataList.Count < topN Then
+            If ptDataList.Count < 3 Then
                 feat.Run(src)
+                labels(2) = feat.labels(2)
+                ptList = feat.features
+
                 Dim sorted As New SortedList(Of Single, ptData)(New compareAllowIdenticalSingleInverted)
-                For Each pt In feat.features
+                For i = 0 To ptList.Count - 1
+                    Dim ptD = New ptData(ptList(i), i + 1, src, distance)
+                    entropy.Run(ptD.template)
+                    sorted.Add(entropy.entropyVal, ptD)
+                Next
+
+                ptDataList.Clear()
+                For i = 0 To sorted.Values.Count - 1
                     Dim tooClose As Boolean = False
-                    For Each existing In ptDataList
-                        If existing.pt.DistanceTo(pt) < distance Then
+                    Dim ptd = sorted.Values(i)
+                    For j = 0 To ptDataList.Count - 1
+                        If ptd.pt = ptDataList(j).pt Then Continue For
+                        If ptd.pt.DistanceTo(ptDataList(j).pt) < distance Then
                             tooClose = True
                             Exit For
                         End If
                     Next
-                    If tooClose Then Continue For
-                    Dim ptD = buildPtData(pt, 0, gray)
-                    sorted.Add(ptD.entropy, ptD)
-                Next
-                For Each ptD In sorted.Values
+                    If tooClose = False Then ptDataList.Add(ptd)
                     If ptDataList.Count >= topN Then Exit For
-                    ptD.index = ptDataList.Count + 1
-                    ptDataList.Add(ptD)
+                Next
+            Else
+                Dim index As Integer = 1
+                For Each ptd In ptDataList
+                    match.template = ptd.template
+                    match.Run(src(ptd.rect))
+
+                    ptd.correlation = match.correlation
+                    If match.correlation < threshold Then
+                        ptd.valid = False
+                        Continue For
+                    End If
+                    ptd.index = index
+                    index += 1
+                    ptd.age += 1
+                    ptd.pt = validatePoint(ptd.rect.TopLeft + match.newCenter)
+                    'ptd.centerRect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
+                    'ptd.rect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
+                    'ptd.template = src(ptd.centerRect)
+                Next
+
+                dst2 = task.color.Clone
+                For Each ptd In ptDataList
+                    If ptd.valid Then
+                        Circle(dst2, ptd.pt, task.DotSize * 3, task.highlight, -1, task.lineType)
+                        SetTrueText(CStr(ptd.age), ptd.pt, 2)
+                    End If
+                Next
+
+                For i = ptDataList.Count - 1 To 0 Step -1
+                    If ptDataList(i).valid = False Then ptDataList.RemoveAt(i)
                 Next
             End If
 
-            dst2 = src.Clone
+            dst3.SetTo(0)
             For Each ptd In ptDataList
-                Circle(dst2, ptd.pt, task.DotSize * 3, task.highlight, -1, task.lineType)
-                SetTrueText(CStr(ptd.age), ptd.pt, 2)
+                Circle(dst2, ptd.pt, task.DotSize, black, -1, task.lineType)
             Next
-            labels(2) = CStr(ptDataList.Count) + " points retained  corr threshold=" + threshold.ToString(fmt2)
+
+            strOut = "0"
+            If ptDataList.Count > 0 Then strOut = CStr(ptDataList(0).age)
+            labels(2) = CStr(ptDataList.Count) + " points with age " + strOut + " corr threshold=" + threshold.ToString(fmt2)
         End Sub
     End Class
 

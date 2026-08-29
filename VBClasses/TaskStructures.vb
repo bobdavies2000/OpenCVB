@@ -373,9 +373,12 @@ Namespace VBClasses
             Public entropy As Single
             Public correlation As Single
             Public template As cv.Mat
-            Public Sub New(_pt As cv.Point, _index As Integer)
+            Public Sub New(_pt As cv.Point, _index As Integer, gray As cv.Mat, distance As Integer)
                 pt = New cv.Point(_pt.X, _pt.Y)
                 index = _index
+                centerRect = ValidateRect(New cv.Rect(pt.X - distance \ 4, pt.Y - distance \ 4, distance \ 2, distance \ 2))
+                rect = ValidateRect(New cv.Rect(pt.X - distance, pt.Y - distance, distance * 2, distance * 2))
+                template = gray(centerRect).Clone
             End Sub
         End Class
 

@@ -469,9 +469,7 @@ Match_DrawRect
 Match_Features
 Match_Lines
 Match_LinesKNN
-Match_Point
 Match_Points
-Match_PtData
 Match_Quadrants
 Match_RedC
 MatchShapes_Basics
