@@ -907,7 +907,6 @@ Namespace VBClasses
                     match.template = ptd.template
                     match.Run(src(ptd.rect))
 
-                    ptd.correlation = match.correlation
                     If match.correlation < threshold Then
                         ptd.valid = False
                         Continue For
@@ -916,9 +915,6 @@ Namespace VBClasses
                     index += 1
                     ptd.age += 1
                     ptd.pt = validatePoint(ptd.rect.TopLeft + match.newCenter)
-                    'ptd.centerRect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
-                    'ptd.rect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
-                    'ptd.template = src(ptd.centerRect)
                 Next
 
                 dst2 = task.color.Clone
