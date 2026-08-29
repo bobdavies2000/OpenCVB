@@ -922,11 +922,6 @@ Namespace VBClasses
                 Next
             End If
 
-            dst3.SetTo(0)
-            For Each ptd In ptDataList
-                Circle(dst2, ptd.pt, task.DotSize, black, -1, task.lineType)
-            Next
-
             strOut = "0"
             If ptDataList.Count > 0 Then strOut = CStr(ptDataList(0).age)
             labels(2) = CStr(ptDataList.Count) + " points with age " + strOut + " corr threshold=" + threshold.ToString(fmt2)
