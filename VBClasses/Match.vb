@@ -865,7 +865,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim entropy As New Entropy_Rectangle
         Const distance As Integer = 32
-        Const topN As Integer = 10
+        Const topN As Integer = 25
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
             OptionParent.FindSlider("Min Distance").Value = distance
@@ -877,34 +877,26 @@ Namespace VBClasses
 
             If ptDataList.Count < 3 Then
                 feat.Run(src)
+                dst1 = src.Clone
                 labels(2) = feat.labels(2)
                 ptList = feat.features
 
                 Dim sorted As New SortedList(Of Single, ptData)(New compareAllowIdenticalSingleInverted)
                 For i = 0 To ptList.Count - 1
-                    Dim ptD = New ptData(ptList(i), i + 1, src, distance)
-                    entropy.Run(ptD.template)
+                    Dim ptD = New ptData(ptList(i), i + 1, distance)
+                    entropy.Run(dst1(ptD.centerRect))
                     sorted.Add(entropy.entropyVal, ptD)
                 Next
 
                 ptDataList.Clear()
                 For i = 0 To sorted.Values.Count - 1
-                    Dim tooClose As Boolean = False
-                    Dim ptd = sorted.Values(i)
-                    For j = 0 To ptDataList.Count - 1
-                        If ptd.pt = ptDataList(j).pt Then Continue For
-                        If ptd.pt.DistanceTo(ptDataList(j).pt) < distance Then
-                            tooClose = True
-                            Exit For
-                        End If
-                    Next
-                    If tooClose = False Then ptDataList.Add(ptd)
+                    ptDataList.Add(sorted.Values(i))
                     If ptDataList.Count >= topN Then Exit For
                 Next
             Else
                 Dim index As Integer = 1
                 For Each ptd In ptDataList
-                    match.template = ptd.template
+                    match.template = dst1(ptd.centerRect)
                     match.Run(src(ptd.rect))
 
                     If match.correlation < threshold Then
