@@ -4,7 +4,7 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -57,14 +57,14 @@ Namespace VBClasses
             Next
 
             rcIndexMap.SetTo(0)
-            rcIndexMap.SetTo(0)
+            rcMapIDs.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData)
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)
                 rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rcMapIDs(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
             dst2 = Palettize(rcIndexMap, 0)

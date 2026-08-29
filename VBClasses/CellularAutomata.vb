@@ -250,7 +250,7 @@ Namespace VBClasses
             ruleSlider = OptionParent.FindSlider("Current Rule")
             desc = "Run through all 256 combinations of outcomes"
         End Sub
-        Private Function createOutcome(val As Integer) As String
+        Private Shared Function createOutcome(val As Integer) As String
             Dim outstr As String = ""
             For i = 0 To 8 - 1
                 outstr = CStr(val Mod 2) + outstr
