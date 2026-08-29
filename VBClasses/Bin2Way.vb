@@ -244,7 +244,7 @@ Namespace VBClasses
         Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)
-        Dim rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Dim IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
                 redCs(i) = New RedC_Basics
@@ -275,14 +275,14 @@ Namespace VBClasses
             rclist.Clear()
             rclist.Add(New rcData)
             dst3.SetTo(0)
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
             For Each rc In newList.Values
                 rc.mapID = rclist.Count + 1
                 rclist.Add(rc)
-                rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
-            dst3 = Palettize(rcMap)
+            dst3 = Palettize(IndexMap)
 
             If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
         End Sub

@@ -62,7 +62,7 @@ Namespace VBClasses
     Public Class Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -98,7 +98,7 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData)
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
@@ -116,7 +116,7 @@ Namespace VBClasses
                         rc.index = rcList.Count
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                        IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     End If
                 End If
             Next
@@ -328,7 +328,7 @@ Namespace VBClasses
     Public Class Flood_OriginalNew : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -363,7 +363,7 @@ Namespace VBClasses
             Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
             dst2.SetTo(0)
             For Each r In rects
                 ' skip the cells that are just one gridRect.
@@ -380,7 +380,7 @@ Namespace VBClasses
 
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                        IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
                     End If
                 End If
             Next
@@ -391,7 +391,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                'strOut = Utility_Basics.selectCell(rcMap, rcList)
+                'strOut = Utility_Basics.selectCell(IndexMap, rcList)
                 'SetTrueText(strOut, 3)
             End If
 
@@ -507,11 +507,11 @@ Namespace VBClasses
 
             Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
             redC.Run(dst1)
-            dst2 = Palettize(redC.rcMap, 0)
+            dst2 = Palettize(redC.IndexMap, 0)
             labels(2) = redC.labels(2)
 
             redC.Run(Not dst1)
-            dst3 = Palettize(redC.rcMap, 0)
+            dst3 = Palettize(redC.IndexMap, 0)
             labels(3) = redC.labels(2)
         End Sub
     End Class

@@ -29,7 +29,7 @@ Namespace VBClasses
                 Next
             End If
 
-            Dim clickIndex = redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = redC.IndexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
             task.clickPoint = task.rcD.maxDist
@@ -67,7 +67,7 @@ Namespace VBClasses
                     lostCell = False
                 End If
 
-                Dim clickIndex As Integer = redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                Dim clickIndex As Integer = redC.IndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
                 If task.rcD IsNot Nothing Then
                     Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
@@ -106,7 +106,7 @@ Namespace VBClasses
             Static rclast As rcData = task.rcD
             If task.rcD Is Nothing Or rclast Is Nothing Then Exit Sub
 
-            Dim clickIndex = redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = redC.IndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
 
             knn.trainInput.Clear()

@@ -4,9 +4,10 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
-        Public flood As New Flood_Basics
+        Dim flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -37,14 +38,15 @@ Namespace VBClasses
             dst2 = flood.dst2
             rcList.Clear()
             rcList.Add(New rcData)
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
+            rcMapIDs = flood.dst1
             For i = 0 To flood.rectList.Count - 1
                 Dim index = flood.indexList(i)
                 Dim r = flood.rectList(i)
 
                 Dim rc As New rcData(flood.mask(r), r, index) With {.index = rcList.Count}
-                rc.mapID = flood.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcMap(r).SetTo(rc.index, rc.mask)
+                rc.mapID = rcMapIDs.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                IndexMap(r).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
@@ -52,8 +54,8 @@ Namespace VBClasses
             For i = 1 To rcListLast.Count - 1
                 Dim rcLast = rcListLast(i)
                 Dim pt = rcLast.maxDStable
-                If pt.X < 0 OrElse pt.Y < 0 OrElse pt.X >= rcMap.Width OrElse pt.Y >= rcMap.Height Then Continue For
-                Dim idx = CInt(rcMap.Get(Of Single)(pt.Y, pt.X))
+                If pt.X < 0 OrElse pt.Y < 0 OrElse pt.X >= IndexMap.Width OrElse pt.Y >= IndexMap.Height Then Continue For
+                Dim idx = CInt(IndexMap.Get(Of Single)(pt.Y, pt.X))
                 If idx <= 0 OrElse idx >= rcList.Count OrElse assigned(idx) Then Continue For
                 rcList(idx).maxDStable = pt
                 rcList(idx).age = rcLast.age + 1
@@ -63,7 +65,7 @@ Namespace VBClasses
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            Dim clickIndex As Integer = IndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
             SetTrueText(displayCell(rcList, clickIndex), 1)
 
             If task.rcD IsNot Nothing Then
@@ -92,7 +94,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_BasicsOld : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim rcListLast As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -109,7 +111,7 @@ Namespace VBClasses
             Return task.rcD.displayCell()
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
+            Dim rcMapLast As cv.Mat = IndexMap.Clone
             Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
             rcListLast = New List(Of rcData)(rcList)
 
@@ -121,16 +123,16 @@ Namespace VBClasses
 
             color8u.Run(task.gray)
 
-            rcMap = color8u.dst2.Clone + 1
+            IndexMap = color8u.dst2.Clone + 1
             Dim rect As cv.Rect
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim floodMap = rcMap.Clone
+            Dim floodMap = IndexMap.Clone
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted) From {{0, New rcData}}
             For y = 0 To floodMap.Height - 1
                 For x = 0 To floodMap.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index As Integer = sortList.Count
-                        Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                        Dim mapID As Integer = IndexMap.Get(Of Single)(y, x)
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8) ' Or FloodFillFlags.MaskOnly
                         Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count > CInt(src.Total * 0.001) Then
@@ -141,7 +143,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = Palettize(IndexMap, 0)
 
             rcIndexMap.SetTo(0)
             rcList.Clear()
@@ -155,8 +157,8 @@ Namespace VBClasses
             Next
 
             For Each rc In rcList
-                Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim mapIDCurr = IndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim mapIDLast = rcMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 Dim indexLast = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
 
                 If indexLast < rcListLast.Count Then
@@ -182,7 +184,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_BasicsList : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim rcListLast As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -199,7 +201,7 @@ Namespace VBClasses
             Return task.rcD.displayCell()
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcMapLast As cv.Mat = rcMap.Clone
+            Dim rcMapLast As cv.Mat = IndexMap.Clone
             Dim rcIndexMapLast As cv.Mat = rcIndexMap.Clone
             rcListLast = New List(Of rcData)(rcList)
 
@@ -211,16 +213,16 @@ Namespace VBClasses
 
             color8u.Run(task.gray)
 
-            rcMap = color8u.dst2.Clone + 1
+            IndexMap = color8u.dst2.Clone + 1
             Dim rect As cv.Rect
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim floodMap = rcMap.Clone
+            Dim floodMap = IndexMap.Clone
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted) From {{0, New rcData}}
             For y = 0 To floodMap.Height - 1
                 For x = 0 To floodMap.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index As Integer = sortList.Count
-                        Dim mapID As Integer = rcMap.Get(Of Byte)(y, x)
+                        Dim mapID As Integer = IndexMap.Get(Of Byte)(y, x)
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8) ' Or FloodFillFlags.MaskOnly
                         Dim count = FloodFill(floodMap, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count > CInt(src.Total * 0.001) Then
@@ -231,7 +233,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = Palettize(IndexMap, 0)
 
             rcIndexMap.SetTo(0)
             rcList.Clear()
@@ -245,7 +247,7 @@ Namespace VBClasses
             Next
 
             For Each rc In rcList
-                Dim mapIDCurr = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim mapIDCurr = IndexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim mapIDLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim indexLast = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
 
@@ -487,13 +489,13 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.mouseClickFlag Then lastCenter = task.clickPoint
-            Dim index As Integer = redC.rcMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
+            Dim index As Integer = redC.IndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
 
             If index > 0 Then
                 rcD = redC.rcList(index)
             Else
                 Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
-                Dim myMapID As Integer = redC.rcMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
+                Dim myMapID As Integer = redC.IndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
                 For Each rc In redC.rcList
                     If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
                         rcD = rc
@@ -509,7 +511,7 @@ Namespace VBClasses
             Dim delta = task.gridWH / 2
             Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
             r = ValidateRect(r)
-            redC.rcMap(r).ConvertTo(tmp, MatType.CV_8U)
+            redC.IndexMap(r).ConvertTo(tmp, MatType.CV_8U)
             ' why did I need to add 1 to tmp?!!!
             CalcHist({tmp + 1}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
 
@@ -643,7 +645,7 @@ Namespace VBClasses
             ApplyColorMap(dst0, dst3, task.colorMapDepth)
             dst3.SetTo(0, task.noDepthMask)
 
-            Dim clickIndex As Integer = redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex As Integer = redC.IndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex > 0 AndAlso clickIndex < redC.rcList.Count Then
                 Dim rc = redC.rcList(clickIndex)
                 SetTrueText(rc.displayCell() + vbCrLf + "Mean depth = " + rc.depth.ToString(fmt2) + "m", 1)
@@ -755,7 +757,7 @@ Namespace VBClasses
     Public Class RedC_DepthMerge : Inherits TaskParent
         Public redC As New RedC_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -781,7 +783,7 @@ Namespace VBClasses
             Dim n = redC.rcList.Count
             If n <= 1 Then
                 rcList = New List(Of rcData)(redC.rcList)
-                rcMap = redC.rcMap
+                IndexMap = redC.IndexMap
                 dst3 = dst2.Clone
                 Exit Sub
             End If
@@ -797,9 +799,9 @@ Namespace VBClasses
             For i = 0 To n - 1
                 nabes(i) = New HashSet(Of Integer)
             Next
-            Dim w = redC.rcMap.Width, h = redC.rcMap.Height
+            Dim w = redC.IndexMap.Width, h = redC.IndexMap.Height
             Dim mapData(w * h - 1) As Single
-            redC.rcMap.GetArray(Of Single)(mapData)
+            redC.IndexMap.GetArray(Of Single)(mapData)
             For y = 0 To h - 1
                 Dim row = y * w
                 For x = 0 To w - 1
@@ -864,12 +866,12 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData)
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
             dst1.SetTo(0)
             For Each rc In sorted.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                IndexMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst1(rc.rect).SetTo(CByte(rc.index Mod 255), rc.mask)
             Next
             dst3 = Palettize(dst1, 0)
@@ -877,7 +879,7 @@ Namespace VBClasses
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            Dim clickIndex As Integer = IndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
             If clickIndex > 0 AndAlso clickIndex < rcList.Count Then
                 Dim rc = rcList(clickIndex)
                 Dim mm = cellDepthRange(rc)

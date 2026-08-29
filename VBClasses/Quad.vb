@@ -60,7 +60,7 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = redc.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = redc.IndexMap.Get(Of Single)(center.Y, center.X)
 
                 If index <= 0 Or index >= redc.rcList.Count Then
                     depthList1(i).Clear()
@@ -159,7 +159,7 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = hulls.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = hulls.IndexMap.Get(Of Single)(center.Y, center.X)
 
                 If index <= 0 Then
                     depthList(i).Clear()
@@ -241,7 +241,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim gRect = task.gridRects(i)
                 Dim center = New cv.Point(gRect.X + gRect.Width / 2, gRect.Y + gRect.Height / 2)
-                Dim index = redC.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = redC.IndexMap.Get(Of Single)(center.Y, center.X)
                 Dim depthMin As Double = 0, depthMax As Double = 0, minLoc As cv.Point, maxLoc As cv.Point
                 If index > 0 And index < redC.rcList.Count Then
                     MinMaxLoc(task.pcSplit(2)(gRect), depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))

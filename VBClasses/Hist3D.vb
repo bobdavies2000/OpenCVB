@@ -255,8 +255,8 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixels.Run(src)
-            dst2 = pixels.redC.rcMap
-            dst0 = pixels.redC.rcMap
+            dst2 = pixels.redC.IndexMap
+            dst0 = pixels.redC.IndexMap
 
             InRange(dst2, 0, 0, dst3)
             If pixels.pixelVector.Count = 0 Then Exit Sub

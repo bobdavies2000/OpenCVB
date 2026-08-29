@@ -813,7 +813,7 @@ Namespace VBClasses
 
     Public Class Match_ClickPoint : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Dim rcMap As New cv.Mat
+        Dim IndexMap As New cv.Mat
         Dim mapID As Byte = 0
         Dim maxDist As cv.Point
         Public Sub New()
@@ -826,9 +826,9 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.mouseClickFlag Then
-                mapID = redC.flood.dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                mapID = redC.rcMapIDs.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
                 maxDist = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
-                WarpAffine(redC.rcMap, rcMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(redC.IndexMap, IndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
@@ -836,7 +836,7 @@ Namespace VBClasses
             If task.rcD Is Nothing Then Exit Sub
 
             Dim pt = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
-            Dim mapIDaligned = rcMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim mapIDaligned = IndexMap.Get(Of Single)(pt.Y, pt.X)
             If mapIDaligned <> mapID Then
                 SetTrueText("Tracking the selected cell was lost", 1)
                 Exit Sub

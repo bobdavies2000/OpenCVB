@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public IndexMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -12,11 +12,11 @@ Namespace VBClasses
                 task.gOptions.showMyDst1.Checked = True
                 labels(3) = "Use the debugslider to display different cells."
             End If
-            desc = "Create an rcMap of the contours using the colors indicated by KMeans"
+            desc = "Create an IndexMap of the contours using the colors indicated by KMeans"
         End Sub
-        Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
+        Public Shared Function clickContour(IndexMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
-            Dim clickIndex = rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
+            Dim clickIndex = IndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex)
                 dst(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -37,17 +37,17 @@ Namespace VBClasses
             contours.Run(color8U.dst2.Clone)
 
             Dim rcListLast As New List(Of rcData)(rcList)
-            rcMap.SetTo(0)
+            IndexMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
                 rc.mapID = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                IndexMap(rc.rect).SetTo(rc.index, rc.mask)
                 If rc.pixels > pixelThreshold Then DrawContours(dst2, {rc.contour}, 0, white, task.lineWidth, task.lineType)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
 
-            task.color = clickContour(rcMap, rcList, color8U.dst2)
+            task.color = clickContour(IndexMap, rcList, color8U.dst2)
 
             If standalone And task.heartBeat Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
