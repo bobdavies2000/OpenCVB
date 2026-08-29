@@ -584,64 +584,6 @@ Namespace VBClasses
 
 
 
-    Public Class Match_CenterRect : Inherits TaskParent
-        Public match As New Match_Basics
-        Dim kalman As New Kalman_Basics
-        Public shiftXY As cv.Point2f
-        Public forceRecenter As Boolean
-        Public centerRect As cv.Rect
-        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public useKalman As Boolean = True
-        Public Sub New()
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
-            desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayOriginal
-
-            If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
-                forceRecenter = False
-
-                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
-                match.template = src(centerRect).Clone
-                shiftXY = New cv.Point2f(-shiftXY.X, -shiftXY.Y) ' return to zero, zero
-                If standaloneTest() Then dst3 = src.Clone
-            Else
-                match.Run(src)
-                If standaloneTest() Then
-                    dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
-                    Rectangle(dst2, centerRect, white, task.lineWidth)
-                    Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
-                End If
-
-                If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
-
-                shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
-
-                If useKalman Then
-                    kalman.kInput = {shiftXY.X, shiftXY.Y}
-                    kalman.Run(emptyMat)
-                    shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-                End If
-            End If
-
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
-
-            If standaloneTest() Then
-                ' Shift gray so content stays locked to the template frame; 
-                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
-                labels(3) = "Aligned gray; missing data is black."
-            End If
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Match_Quadrants : Inherits TaskParent
         Dim matchCenter As New Match_CenterRect
@@ -725,8 +667,8 @@ Namespace VBClasses
                 InvertAffineTransform(task.steadyCam.M, Minv)
                 dst2 = task.steadyCam.dst3
                 For Each pt In ptLast
-                    Dim ptAligned = GravityRGB_Basics.WarpPoint(pt, lastM)
-                    pt = GravityRGB_Basics.WarpPoint(ptAligned, Minv)
+                    Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, lastM)
+                    pt = WarpAffine_Basics.WarpPoint(ptAligned, Minv)
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Next
             End If
@@ -784,7 +726,7 @@ Namespace VBClasses
 
             If task.mouseClickFlag Then
                 mapID = redC.rcMapIDs.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-                maxDist = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+                maxDist = WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
                 WarpAffine(redC.rcIndexMap, rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
@@ -792,7 +734,7 @@ Namespace VBClasses
 
             If task.rcD Is Nothing Then Exit Sub
 
-            Dim pt = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+            Dim pt = WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
             Dim mapIDaligned = rcIndexMap.Get(Of Single)(pt.Y, pt.X)
             If mapIDaligned <> mapID Then
                 SetTrueText("Tracking the selected cell was lost", 1)
@@ -809,6 +751,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point2f)
         Dim knn As New KNN_Basics
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -822,13 +765,18 @@ Namespace VBClasses
             End If
 
             If task.heartBeatLT Then dst3.SetTo(0)
+            dst1 = task.steadyCam.dst3.Clone
+            For Each pt In ptList
+                pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
+                Circle(dst1, pt, task.DotSize * 3, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+            Next
 
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             knn.queries = New List(Of cv.Point2f)(ptList)
 
             CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In knn.queries
-                pt = GravityRGB_Basics.WarpPoint(pt, task.steadyCam.M)
+                pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
@@ -844,4 +792,241 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class Match_CenterRect : Inherits TaskParent
+        Public match As New Match_Basics
+        Dim kalman As New Kalman_Basics
+        Public shiftXY As cv.Point2f
+        Public forceRecenter As Boolean
+        Public centerRect As cv.Rect
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public useKalman As Boolean = True
+        Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
+            desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal
+
+            If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
+                forceRecenter = False
+
+                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
+                match.template = src(centerRect).Clone
+                shiftXY = New cv.Point2f(-shiftXY.X, -shiftXY.Y) ' return to zero, zero
+                If standaloneTest() Then dst3 = src.Clone
+            Else
+                match.Run(src)
+                If standaloneTest() Then
+                    dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
+                    Rectangle(dst2, centerRect, white, task.lineWidth)
+                    Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
+                End If
+
+                If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
+
+                shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
+
+                If useKalman Then
+                    kalman.kInput = {shiftXY.X, shiftXY.Y}
+                    kalman.Run(emptyMat)
+                    shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+                End If
+            End If
+
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            InvertAffineTransform(M, inverseM)
+
+            If standaloneTest() Then
+                ' Shift gray so content stays locked to the template frame; 
+                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
+                labels(3) = "Aligned gray; missing data is black."
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Match_Points : Inherits TaskParent
+        Public ptList As New List(Of cv.Point)
+        Public ptDataList As New List(Of ptData)
+        Dim feat As New Feature_Basics
+        Dim delaunay As New Delaunay_Basics
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = 30 ' space the points out quite a bit.
+            desc = "Track points using the steadycam image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                feat.Run(src)
+                ptList = feat.features
+            End If
+
+            ptDataList.Clear()
+            ptDataList.Add(New ptData(New cv.Point2f, 0))
+            For i = 0 To ptList.Count - 1
+                ptDataList.Add(New ptData(ptList(i), i + 1))
+            Next
+
+            If task.heartBeatLT Then dst3.SetTo(0)
+
+            dst1 = task.steadyCam.dst3.Clone
+            delaunay.inputPoints.Clear()
+            For Each ptD In ptDataList
+                ptD.pt = validatePoint(WarpAffine_Basics.WarpPoint(New cv.Point2f(ptD.pt.X, ptD.pt.Y), task.steadyCam.M))
+                Circle(dst1, ptD.pt, task.DotSize * 3, cv.Scalar.All(ptD.index), -1, cv.LineTypes.Link8)
+                delaunay.inputPoints.Add(ptD.pt)
+            Next
+
+            delaunay.Run(emptyMat)
+            dst2 = delaunay.dst2
+        End Sub
+    End Class
+
+
+
+
+    Public Class Match_Point : Inherits TaskParent
+        Public ptList As New List(Of cv.Point)
+        Public ptDataList As New List(Of ptData)
+        Dim feat As New Feature_Basics
+        Dim match As New Match_Basics
+        Const distance As Integer = 30
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = distance ' space the points out quite a bit.
+            desc = "Track the features of an image with Match_Basics."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            If ptDataList.Count < 3 Then
+                feat.Run(src)
+                labels(2) = feat.labels(2)
+                dst1 = src.Clone
+                ptList = feat.features
+
+                ptDataList.Clear()
+                Dim half = distance \ 2
+                For i = 0 To Math.Min(ptList.Count, 10) - 1
+                    Dim ptD = New ptData(ptList(i), i + 1)
+                    ptD.centerRect = ValidateRect(New cv.Rect(ptD.pt.X - half, ptD.pt.Y - half, distance, distance))
+                    ptD.rect = ValidateRect(New cv.Rect(ptD.pt.X - distance, ptD.pt.Y - distance, distance * 2, distance * 2))
+                    ptDataList.Add(ptD)
+                Next
+            End If
+
+            Dim invalidList As New List(Of Boolean)
+            For Each ptd In ptDataList
+                match.template = dst1(ptd.centerRect)
+                match.Run(src(ptd.rect))
+
+                Dim invalid As Boolean = False
+                If match.correlation >= task.fOptions.MatchCorrSlider.Value / 100 Then ptd.age += 1 Else invalid = True
+                ptd.pt = validatePoint(New cv.Point(ptd.rect.TopLeft.X + match.newCenter.X, ptd.rect.TopLeft.Y + match.newCenter.Y))
+                invalidList.Add(invalid)
+            Next
+
+            dst3 = task.color.Clone
+            For i = invalidList.Count - 1 To 0 Step -1
+                If invalidList(i) Then
+                    ptDataList.RemoveAt(i)
+                Else
+                    Dim ptd = ptDataList(i)
+                    Circle(dst3, ptd.pt, task.DotSize * 3, task.highlight, -1, task.lineType)
+                    SetTrueText(CStr(ptd.age), ptd.pt, 3)
+                End If
+            Next
+            labels(3) = CStr(ptDataList.Count) + " points were found and retained."
+        End Sub
+    End Class
+
+
+
+
+    Public Class Match_PtData : Inherits TaskParent
+        Public ptDataList As New List(Of ptData)
+        Dim feat As New Feature_Basics
+        Dim match As New Match_Basics
+        Dim entropy As New Entropy_Rectangle
+        Const distance As Integer = 30
+        Const topN As Integer = 10
+        Public Sub New()
+            OptionParent.FindSlider("Min Distance").Value = distance
+            desc = "Cursor.ai: Keep the top 10 Feature_Basics points by centerRect entropy; drop when MatchCorrSlider correlation fails."
+            labels = {"", "", "Retained feature points on src", ""}
+        End Sub
+        Private Function buildPtData(pt As cv.Point, index As Integer, gray As cv.Mat) As ptData
+            Dim half = distance \ 2
+            Dim ptD = New ptData(pt, index) With { .centerRect = ValidateRect(New cv.Rect(pt.X - half, pt.Y - half, distance, distance)), 
+                                                   .rect = ValidateRect(New cv.Rect(pt.X - distance, pt.Y - distance, distance * 2, distance * 2))}
+            entropy.Run(gray(ptD.centerRect))
+            ptD.entropy = entropy.entropyVal
+            ptD.template = gray(ptD.centerRect).Clone
+            Return ptD
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim gray = If(src.Channels <> 1, task.gray, src)
+            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100.0F
+
+            For i = ptDataList.Count - 1 To 0 Step -1
+                Dim ptd = ptDataList(i)
+                If ptd.template Is Nothing OrElse ptd.rect.Width < ptd.template.Width OrElse ptd.rect.Height < ptd.template.Height Then
+                    ptDataList.RemoveAt(i)
+                    Continue For
+                End If
+                match.template = ptd.template
+                match.Run(gray(ptd.rect))
+                ptd.correlation = match.correlation
+                If match.correlation < threshold Then
+                    ptDataList.RemoveAt(i)
+                    Continue For
+                End If
+                ptd.age += 1
+                ptd.pt = validatePoint(New cv.Point(ptd.rect.X + match.newCenter.X, ptd.rect.Y + match.newCenter.Y))
+                Dim half = distance \ 2
+                ptd.centerRect = ValidateRect(New cv.Rect(ptd.pt.X - half, ptd.pt.Y - half, distance, distance))
+                ptd.rect = ValidateRect(New cv.Rect(ptd.pt.X - distance, ptd.pt.Y - distance, distance * 2, distance * 2))
+            Next
+
+            If ptDataList.Count < topN Then
+                feat.Run(src)
+                Dim sorted As New SortedList(Of Single, ptData)(New compareAllowIdenticalSingleInverted)
+                For Each pt In feat.features
+                    Dim tooClose As Boolean = False
+                    For Each existing In ptDataList
+                        If existing.pt.DistanceTo(pt) < distance Then
+                            tooClose = True
+                            Exit For
+                        End If
+                    Next
+                    If tooClose Then Continue For
+                    Dim ptD = buildPtData(pt, 0, gray)
+                    sorted.Add(ptD.entropy, ptD)
+                Next
+                For Each ptD In sorted.Values
+                    If ptDataList.Count >= topN Then Exit For
+                    ptD.index = ptDataList.Count + 1
+                    ptDataList.Add(ptD)
+                Next
+            End If
+
+            dst2 = src.Clone
+            For Each ptd In ptDataList
+                Circle(dst2, ptd.pt, task.DotSize * 3, task.highlight, -1, task.lineType)
+                SetTrueText(CStr(ptd.age), ptd.pt, 2)
+            Next
+            labels(2) = CStr(ptDataList.Count) + " points retained  corr threshold=" + threshold.ToString(fmt2)
+        End Sub
+    End Class
+
 End Namespace

@@ -18,7 +18,7 @@ Namespace VBClasses
             Dim ptList As New List(Of cv.Point)
             Dim indices As New List(Of Integer)
             For Each r In sortRects.Values
-                Dim pt = lpData.validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
+                Dim pt = validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
                 Dim index = map.Get(Of Byte)(pt.Y, pt.X)
                 If index = 0 Or indices.Contains(index) Then
                     If index = ptList.Count Then index = ptList.Count + 1 Else index = ptList.Count
@@ -29,7 +29,7 @@ Namespace VBClasses
 
             map.SetTo(0)
             For Each r In sortRects.Values
-                Dim pt = lpData.validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
+                Dim pt = validatePoint(New cv.Point(r.X + r.Width \ 2, r.Y + r.Height \ 2))
                 Dim index = indices(ptList.IndexOf(pt))
                 Rectangle(map, r, Scalar.All(index), -1)
                 SetTrueText(CStr(index), pt, dstindex)
@@ -244,7 +244,6 @@ Namespace VBClasses
 
             Dim viewList As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
             mask.SetTo(0)
-            Dim lastCount As Integer = 0
             For i = 0 To points.Rows - 1
                 Dim pt = points.Get(Of cv.Point)(i, 0)
                 Dim count = FloodFill(view, mask, pt, 0, rect, 0, 0, 4 Or FloodFillFlags.MaskOnly Or (255 << 8))

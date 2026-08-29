@@ -132,8 +132,8 @@ Namespace VBClasses
                     Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                     If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
                    p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
-                        p1 = lpData.validatePoint(p1)
-                        p2 = lpData.validatePoint(p2)
+                        p1 = validatePoint(p1)
+                        p2 = validatePoint(p2)
                         Dim lp = New lpData(p1, p2)
                         If lp.rect.Width = 0 Then Continue For
                         lpSorted.Add(lp.length, lp)
@@ -960,7 +960,7 @@ Namespace VBClasses
             desc = "Create a map with the lp.rect field."
         End Sub
         Private Function fillTriangle(p1 As cv.Point) As Boolean
-            p1 = lpData.validatePoint(p1)
+            p1 = validatePoint(p1)
             Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
             If val > 0 Then
                 FloodFill(dst3, p1, 255)

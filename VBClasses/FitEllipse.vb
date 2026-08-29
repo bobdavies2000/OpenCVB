@@ -74,7 +74,7 @@ Namespace VBClasses
             Marshal.Copy(boxPtr, ellipses, 0, ellipses.Length)
 
             Dim angle = ellipses(0)
-            Dim center = lpData.validatePoint(New Point2f(ellipses(1), ellipses(2)))
+            Dim center = validatePoint(New Point2f(ellipses(1), ellipses(2)))
             Dim size As New Size2f(ellipses(3), ellipses(4))
             If Single.IsNaN(ellipses(3)) Or Single.IsNaN(ellipses(4)) Then Exit Sub ' one of the random points is the same
             If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub

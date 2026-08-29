@@ -161,15 +161,6 @@ Namespace VBClasses
 
             Public rect As cv.Rect
             Public slope As Single
-
-            Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
-                If CInt(pt.X) < 0 Then pt.X = 0
-                If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
-                If CInt(pt.Y) < 0 Then pt.Y = 0
-                If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
-
-                Return pt
-            End Function
             Public Shared Function computeAngle(p1 As cv.Point2f, p2 As cv.Point2f) As Single
                 Dim angleRadians As Double = Math.Atan2(p2.Y - p1.Y, p2.X - p1.X)
                 Dim angle = CType(angleRadians * RadToDeg, Single)
@@ -368,6 +359,24 @@ Namespace VBClasses
                 cDesc += "MaxDist cv.Point = " + maxDist.ToString + vbCrLf
                 Return cDesc
             End Function
+        End Class
+
+
+
+        Public Class ptData
+            Public age As Integer = 1
+            Public pt As cv.Point
+            Public index As Integer
+            Public centerRect As cv.Rect
+            Public rect As cv.Rect
+            Public valid As Boolean = True
+            Public entropy As Single
+            Public correlation As Single
+            Public template As cv.Mat
+            Public Sub New(_pt As cv.Point, _index As Integer)
+                pt = New cv.Point(_pt.X, _pt.Y)
+                index = _index
+            End Sub
         End Class
 
 

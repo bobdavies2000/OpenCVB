@@ -8,11 +8,6 @@ Namespace VBClasses
             labels = {"", "", "Original RGB", "RGB rotated with IMU gravity data"}
             desc = "Cursor.ai: Rotate the RGB image using the same IMU gravity data used by Cloud_Gravity."
         End Sub
-        Public Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
-            Dim xOut = M.Get(Of Double)(0, 0) * pt.X + M.Get(Of Double)(0, 1) * pt.Y + M.Get(Of Double)(0, 2)
-            Dim yOut = M.Get(Of Double)(1, 0) * pt.X + M.Get(Of Double)(1, 1) * pt.Y + M.Get(Of Double)(1, 2)
-            Return New Point2f(CSng(xOut), CSng(yOut))
-        End Function
         Public Shared Function rotateRGB(src As Mat, angle As Double) As cv.Mat
             If Math.Abs(angle) > 90 Then angle = angle Mod 90
             Dim center = New Point2f(src.Width / 2.0F, src.Height / 2.0F)
@@ -363,8 +358,8 @@ Namespace VBClasses
             If vert.lpList.Count > 0 Then
                 Dim lp = task.lines.lpList(0)
                 Line(dst2, lp.p1, lp.p2, white)
-                Dim p1 = GravityRGB_Basics.WarpPoint(lp.p1, M)
-                Dim p2 = GravityRGB_Basics.WarpPoint(lp.p2, M)
+                Dim p1 = WarpAffine_Basics.WarpPoint(lp.p1, M)
+                Dim p2 = WarpAffine_Basics.WarpPoint(lp.p2, M)
                 If p1.X <> p2.X Then
                     Dim dx = p2.X - p1.X
                     Dim dy = p2.Y - p1.Y

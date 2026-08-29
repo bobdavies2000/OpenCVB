@@ -111,6 +111,14 @@ Public Module vbc
         End If
         Return New List(Of cv.Point)
     End Function
+    Public Function validatePoint(pt As cv.Point2f) As cv.Point2f
+        If CInt(pt.X) < 0 Then pt.X = 0
+        If CInt(pt.X) >= task.color.Width Then pt.X = task.color.Width - 1
+        If CInt(pt.Y) < 0 Then pt.Y = 0
+        If CInt(pt.Y) >= task.color.Height Then pt.Y = task.color.Height - 1
+
+        Return pt
+    End Function
     Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0

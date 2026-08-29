@@ -8,6 +8,11 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Given a delta X and delta Y, use WarpAffine to reorient the image to the previous frame."
         End Sub
+        Public Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
+            Dim xOut = M.Get(Of Double)(0, 0) * pt.X + M.Get(Of Double)(0, 1) * pt.Y + M.Get(Of Double)(0, 2)
+            Dim yOut = M.Get(Of Double)(1, 0) * pt.X + M.Get(Of Double)(1, 1) * pt.Y + M.Get(Of Double)(1, 2)
+            Return New Point2f(CSng(xOut), CSng(yOut))
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 SetTrueText("When standalone, no baseline roll/pitch has been provided.", 1)

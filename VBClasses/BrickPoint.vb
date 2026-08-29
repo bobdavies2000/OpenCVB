@@ -424,8 +424,8 @@ Namespace VBClasses
             dst1.SetTo(0)
             Dim lineList As New HashSet(Of Single)
             For Each lp In lplist
-                Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.ptE1.Y), CInt(lp.ptE1.X)))
-                Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.ptE2.Y), CInt(lp.ptE2.X)))
+                Dim p1 = validatePoint(New cv.Point(CInt(lp.ptE1.Y), CInt(lp.ptE1.X)))
+                Dim p2 = validatePoint(New cv.Point(CInt(lp.ptE2.Y), CInt(lp.ptE2.X)))
                 Dim index1 = dst1.Get(Of Single)(p1.Y, p1.X)
                 Dim index2 = dst1.Get(Of Single)(p2.Y, p2.X)
                 If index1 = 0 And index2 = 0 Then
