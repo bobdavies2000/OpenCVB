@@ -740,21 +740,25 @@ Namespace VBClasses
 
 
     Public Class Match_Features : Inherits TaskParent
-        Dim feat As New Feature_Basics
+        Public ptList As New List(Of cv.Point2f)
         Dim knn As New KNN_Basics
         Public Sub New()
             desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(src)
+            If standalone Then
+                Static feat As New Feature_Basics
+                feat.Run(src)
+                ptList.Clear()
+                For Each pt In feat.features
+                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
+            End If
 
             If task.heartBeatLT Then dst3.SetTo(0)
 
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-            knn.queries.Clear()
-            For Each pt In feat.features
-                knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
-            Next
+            knn.queries = New List(Of cv.Point2f)(ptList)
 
             CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In knn.queries
@@ -781,6 +785,7 @@ Namespace VBClasses
 
     Public Class Match_RedC : Inherits TaskParent
         Dim redC As New RedC_Basics
+        Dim matchFeat As New Match_Features
         Public Sub New()
             desc = "Create a stable RedC output image."
         End Sub
@@ -789,7 +794,17 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            matchFeat.ptList.Clear()
+            For Each rc In redC.rcList
+                If rc.index = 0 Then Continue For
+                matchFeat.ptList.Add(rc.maxDStable)
+                If rc.index >= 10 Then Exit For
+            Next
+
+            matchFeat.Run(emptyMat)
+            dst3 = matchFeat.dst2
+
+            'WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
 
@@ -800,6 +815,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Dim rcMap As New cv.Mat
         Dim mapID As Byte = 0
+        Dim maxDist As cv.Point
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use the clickpoint to confirm the "
@@ -809,10 +825,13 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.mouseClickFlag Then mapID = redC.rcMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            If task.mouseClickFlag Then
+                mapID = redC.flood.dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                maxDist = GravityRGB_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+                WarpAffine(redC.rcMap, rcMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
 
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            WarpAffine(redC.rcMap, rcMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
             If task.rcD Is Nothing Then Exit Sub
 
@@ -822,7 +841,6 @@ Namespace VBClasses
                 SetTrueText("Tracking the selected cell was lost", 1)
                 Exit Sub
             End If
-
         End Sub
     End Class
 
