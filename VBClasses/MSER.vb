@@ -29,10 +29,10 @@ Namespace VBClasses
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
-        Public Shared Function RebuildRCMap(IndexMap As Mat, rclist As List(Of rcData)) As Mat
+        Public Shared Function RebuildRCMap(rcIndexMap As Mat, rclist As List(Of rcData)) As Mat
             Dim dst As New Mat(task.workRes, MatType.CV_8UC3, 0)
             For Each rc In rclist
-                IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 dst(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 If rc.mapID >= 255 Then Exit For
             Next
@@ -67,7 +67,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                Dim indexLast = redC.IndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = redC.rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast <> 0 And indexLast < redC.rcList.Count Then
                     Dim lrc = redC.rcList(indexLast)
                     matched.Add(indexLast)

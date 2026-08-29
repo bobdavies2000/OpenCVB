@@ -338,7 +338,7 @@ Namespace VBClasses
     '        dst2 = redC.dst2
     '        labels(2) = redC.labels(2)
 
-    '        corners.Run(redC.IndexMap)
+    '        corners.Run(redC.rcIndexMap)
 
     '        dst3 = task.color.Clone
     '        For Each pt In corners.nPoints

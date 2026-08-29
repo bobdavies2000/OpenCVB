@@ -352,7 +352,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
-        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}
             desc = "Cursor.ai: Fill convexity defect regions for each hull in RedC.rcList"
@@ -364,7 +364,7 @@ Namespace VBClasses
 
             Dim defectCount As Integer
             Dim filledDefects As Integer
-            IndexMap.SetTo(0)
+            rcIndexMap.SetTo(0)
             dst3.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
@@ -373,7 +373,7 @@ Namespace VBClasses
                     hulls.Add(hull.ToList)
                     Dim color = task.scalarColors(rc.mapID)
                     dst3(rc.rect).SetTo(color, rc.mask)
-                    DrawTour(IndexMap(rc.rect), hull.ToList, rc.index, -1)
+                    DrawTour(rcIndexMap(rc.rect), hull.ToList, rc.index, -1)
 
                     Dim defects As Vec4i() = Nothing
                     rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)

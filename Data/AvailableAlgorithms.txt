@@ -621,7 +621,6 @@ RedC_DepthMerge
 RedC_Features
 RedC_MergeCells
 RedC_NeighborHist
-RedC_TrackCellOld
 RedC_TrackHull
 RedCloud_Basics
 RedCloud_Core

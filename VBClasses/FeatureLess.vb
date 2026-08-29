@@ -830,13 +830,13 @@ Namespace VBClasses
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
         Public rcList As New List(Of rcData)
-        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap As Mat = IndexMap.Clone
+            Dim lastMap As Mat = rcIndexMap.Clone
             Dim rcLastList As New List(Of rcData)(rcList)
 
             clusters.Run(task.gray)
@@ -853,7 +853,7 @@ Namespace VBClasses
             Next
 
             rcList.Clear()
-            IndexMap.SetTo(0)
+            rcIndexMap.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim cIndex = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
@@ -889,13 +889,13 @@ Namespace VBClasses
                         rc.age = rcLastList(lastIndex).age + 1
                     End If
                 End If
-                IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 rcList.Add(rc)
             Next
 
-            dst3 = Palettize(IndexMap, 0)
+            dst3 = Palettize(rcIndexMap, 0)
 
-            ' strOut = Utility_Basics.selectCell(IndexMap, rcList)
+            ' strOut = Utility_Basics.selectCell(rcIndexMap, rcList)
             SetTrueText(strOut, 1)
         End Sub
     End Class

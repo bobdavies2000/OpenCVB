@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32S, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
@@ -56,7 +56,7 @@ Namespace VBClasses
                 End If
             Next
 
-            IndexMap.SetTo(0)
+            rcIndexMap.SetTo(0)
             rcIndexMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData)
@@ -64,10 +64,10 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 rcList.Add(rc)
                 rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-                IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next
 
-            dst2 = Palettize(IndexMap, 0)
+            dst2 = Palettize(rcIndexMap, 0)
             dst3 = fLess.dst2
 
             ' SetTrueText(RedC_BasicsOld.displayCell(rcIndexMap, rcList), 1)
@@ -83,7 +83,7 @@ Namespace VBClasses
     Public Class XR_RedColor_Basics : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public IndexMap As New Mat
+        Public rcIndexMap As New Mat
         Public runSelectCell As Boolean = True
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -93,19 +93,19 @@ Namespace VBClasses
             If src.Channels <> 1 Then color8u.Run(task.gray) Else color8u.Run(src)
             src = color8u.dst2 + 1
 
-            IndexMap = src.Clone
+            rcIndexMap = src.Clone
             rcList.Clear()
             Dim rect As cv.Rect
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             For Each r In task.gridRects
                 If mask(r).Get(Of Byte)(0, 0) = 0 Then
-                    Dim mapID As Integer = IndexMap(r).Get(Of Byte)(0, 0)
+                    Dim mapID As Integer = rcIndexMap(r).Get(Of Byte)(0, 0)
                     Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
-                    Dim count = FloodFill(IndexMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
-                    If count > 0 Then rcList.Add(New rcData(IndexMap(rect), rect, mapID))
+                    Dim count = FloodFill(rcIndexMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
+                    If count > 0 Then rcList.Add(New rcData(rcIndexMap(rect), rect, mapID))
                 End If
             Next
-            dst2 = Palettize(IndexMap)
+            dst2 = Palettize(rcIndexMap)
 
             If task.rcD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
 
@@ -115,7 +115,7 @@ Namespace VBClasses
                 rcIndex += 1
             Next
 
-            'strOut = Utility_Basics.selectCell(IndexMap, rcList)
+            'strOut = Utility_Basics.selectCell(rcIndexMap, rcList)
             'SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcIndex) + " cells were found."
@@ -129,7 +129,7 @@ Namespace VBClasses
         Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
-        Public IndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             cPtr = RedCloudLined_Open()
             desc = "Run the C++ RedCloud interface without a mask"
@@ -155,7 +155,7 @@ Namespace VBClasses
             rectData.GetArray(Of cv.Rect)(rects)
 
             Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcMapLast As Mat = IndexMap.Clone
+            Dim rcMapLast As Mat = rcIndexMap.Clone
 
             Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
@@ -176,7 +176,7 @@ Namespace VBClasses
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast As Integer = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast > 0 And indexLast < rcListLast.Count Then
-                    indexLast -= 1 ' index is 1 less than the IndexMap value
+                    indexLast -= 1 ' index is 1 less than the rcIndexMap value
                     r2 = rcListLast(indexLast).rect
                 Else
                     indexLast = -1
@@ -192,13 +192,13 @@ Namespace VBClasses
 
                 rc.mapID = rcList.Count + 1
                 rcList.Add(rc)
-                IndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             dst2.SetTo(0)
             For Each rc In rcList
-                InRange(IndexMap(rc.rect), rc.mapID, rc.mapID, rc.mask)
+                InRange(rcIndexMap(rc.rect), rc.mapID, rc.mapID, rc.mask)
                 rc.buildMaxDist(rc.mask)
                 dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
@@ -287,7 +287,7 @@ Namespace VBClasses
             Dim count As Integer
             dst1.SetTo(0)
             For Each brick As brickData In bricks.brickList
-                If CountNonZero(redC.IndexMap(brick.lRect)) And brick.rRect.Width > 0 Then
+                If CountNonZero(redC.rcIndexMap(brick.lRect)) And brick.rRect.Width > 0 Then
                     dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                     brick.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1
@@ -306,7 +306,7 @@ Namespace VBClasses
 
     Public Class XR_RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
-        Public IndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim redC As New RedC_Basics
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -318,7 +318,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             Dim defectCount As Integer
-            IndexMap.SetTo(0)
+            rcIndexMap.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
                 If rc.contour IsNot Nothing AndAlso rc.contour.Count >= 3 Then
@@ -329,11 +329,11 @@ Namespace VBClasses
                     Else
                         defectCount += 1
                     End If
-                    DrawTour(IndexMap(rc.rect), rc.hull, rc.mapID, -1)
+                    DrawTour(rcIndexMap(rc.rect), rc.hull, rc.mapID, -1)
                     rclist.Add(rc)
                 End If
             Next
-            dst3 = Palettize(IndexMap)
+            dst3 = Palettize(rcIndexMap)
             labels(3) = CStr(rclist.Count) + " hulls identified below.  " + CStr(defectCount) +
                         " hulls failed building the defect list."
         End Sub
@@ -361,7 +361,7 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index As Integer = redC.IndexMap.Get(Of Single)(center.Y, center.X) - 1
+                Dim index As Integer = redC.rcIndexMap.Get(Of Single)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
@@ -616,9 +616,9 @@ Namespace VBClasses
             If v > hi Then Return hi
             Return v
         End Function
-        Private Shared Function CellMaskFull(IndexMap As Mat, rc As rcData) As Mat
-            Dim m As New Mat(IndexMap.Size, MatType.CV_8U, 0)
-            Using roi = IndexMap(rc.rect)
+        Private Shared Function CellMaskFull(rcIndexMap As Mat, rc As rcData) As Mat
+            Dim m As New Mat(rcIndexMap.Size, MatType.CV_8U, 0)
+            Using roi = rcIndexMap(rc.rect)
                 Dim part As New Mat
                 InRange(roi, rc.mapID, rc.mapID, part)
                 Using part
@@ -631,8 +631,8 @@ Namespace VBClasses
             Dim k = GetStructuringElement(MorphShapes.Rect, New Size(3, 3))
             MorphologyEx(mask, mask, MorphTypes.Open, k)
         End Sub
-        Private Shared Function PickSubject(IndexMap As Mat, rcList As List(Of rcData)) As rcData
-            Dim total = IndexMap.Rows * IndexMap.Cols
+        Private Shared Function PickSubject(rcIndexMap As Mat, rcList As List(Of rcData)) As rcData
+            Dim total = rcIndexMap.Rows * rcIndexMap.Cols
             Dim minPx = CInt(total * 0.003)
             Dim maxPx = CInt(total * 0.62)
 
@@ -644,7 +644,7 @@ Namespace VBClasses
 
             Dim cx = task.workRes.Width \ 2
             Dim cy = task.workRes.Height \ 2
-            Dim idxCenter As Integer = IndexMap.Get(Of Single)(cy, cx) - 1
+            Dim idxCenter As Integer = rcIndexMap.Get(Of Single)(cy, cx) - 1
             If idxCenter >= 0 And idxCenter < rcList.Count Then
                 Dim rc0 = rcList(idxCenter)
                 If rc0.pixels >= minPx And rc0.pixels <= maxPx Then Return rc0
@@ -655,9 +655,9 @@ Namespace VBClasses
             Dim freq As New Dictionary(Of Integer, Integer)
             For dy = -4 To 4
                 For dx = -4 To 4
-                    Dim y = Clip(cy + dy, 0, IndexMap.Rows - 1)
-                    Dim x = Clip(cx + dx, 0, IndexMap.Cols - 1)
-                    Dim ix = IndexMap.Get(Of Single)(y, x)
+                    Dim y = Clip(cy + dy, 0, rcIndexMap.Rows - 1)
+                    Dim x = Clip(cx + dx, 0, rcIndexMap.Cols - 1)
+                    Dim ix = rcIndexMap.Get(Of Single)(y, x)
                     If ix <= 0 OrElse ix > rcList.Count Then Continue For
                     Dim rc = rcList(ix - 1)
                     If rc.pixels < minPx OrElse rc.pixels > maxPx Then Continue For
@@ -688,7 +688,7 @@ Namespace VBClasses
             Dim bgr = If(src IsNot Nothing And src.Channels() = 3, src, task.color)
             redC.Run(bgr)
 
-            Dim subject = PickSubject(redC.IndexMap, redC.rcList)
+            Dim subject = PickSubject(redC.rcIndexMap, redC.rcList)
             If subject Is Nothing Then
                 dst2 = bgr.Clone
                 labels(2) = "Could not auto-pick a subject; try clicking a RedColor cell or adjust scene."
@@ -696,7 +696,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim mask = CellMaskFull(redC.IndexMap, subject)
+            Dim mask = CellMaskFull(redC.rcIndexMap, subject)
             MorphClean(mask)
 
             dst2 = New Mat(bgr.Size(), MatType.CV_8UC3, New Scalar(245, 245, 245))
