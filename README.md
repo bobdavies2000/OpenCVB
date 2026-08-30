@@ -1,3 +1,41 @@
+**August 30, 2026 – CUDA Version, Structures, Contours, ApproxPoly, Cell Lines, and Tracking Feature Points.**
+
+-   There are over 1700 algorithms in various stages of development.
+    -   There are over 700 Core algorithms that are reused often
+        -   The number of core algorithms is going down as more are retired.
+    -   The jump in lines per algorithm (now 47) is due to longer core algorithms.
+        -   Recently added algorithms are showing more complexity and length.
+        -   Many of the retired core algorithms were short experiments.
+    -   There are over 40 algorithms that were built using Cursor.ai.
+        -   Cursor.ai algorithms often require additional manual work.
+-   NVIDIA CUDA support should be upgraded to version 13.3. Previously it was 12.3.
+    -   StereoLabs ZED camera support requires it.
+        -   Other camera can overlook this change.
+    -   Also, the NVIDIA 610.88 driver should be installed. Run nvidia-smi to check.
+-   TaskStructure.vb was reviewed. Duplicate and unused elements were removed..
+    -   All the contour algorithms now use the rcData structure (for RedC apps.)
+-   OpenCV’s FindContours locates edges, not gradations of color like reduction does.
+    -   But FindContours is often too aggressive in finding cells.
+    -   Some of the cells found with Contour_Basics are too large to be useful.
+    -   There is another problem: the boundaries often shift widely.
+-   RedC_Basics now has 2 contours for each cell: precise and ApproxPoly output.
+    -   ApproxPoly will provide a contour with considerably fewer points.
+    -   RedC_Basics shows both the precise and approximate contours.
+-   The RedC_CellLines integrates the Line_Basics lines with the RedC cells.
+    -   Lines present at the cell boundary imply physical shape for the cell.
+-   Tracking the motion of features is available in 2 algorithms in Match.vb.
+    -   Match_InverseM tracks points with a circle in the SteadyCam image.
+    -   Match_InverseMDelaunay tracks points with Delaunay regions.
+    -   Both identify features translating them into the SteadyCam image.
+    -   Features are reset on long-term heartbeats – some are typically lost
+    -   Features may be reset when too many points are lost. Example below.
+
+**![](media/3ab8fecd1e6a45366779c3c0265286f5.gif) Match_InverseMDelaunay :** *Features are found on the heartbeat or when there are fewer than 3 features successfully tracked. The feature’s color stays the same when it is successfully tracked. The lower right image contains all the tracked features but is in the steadyCam coordinates. The steadyCam image is key and despite the motion of the camera, the features are approximately in the same location in the lower right image. The map to find any feature is produced using Delaunay here but can also be a map that resembles the lower right.*
+
+**![](media/338fdfc736ee8b47136b0e914454bf9a.gif)**
+
+**Contour_Basics:** *The image in the lower left contains the typical cells built with RedC_Basics. The blue cell under the painting is not really depicting an edge in the middle of the wall. The edges of the blue region are not real but the result of gradual color changes. However, when clicking on the blue region, the entire wall is highlighted in the upper left. The white region shows real edges and removes the arbitrary cells edges normally shown in RedC_Basics output. Clicking on any of the cells in the wall with the painting highlights the entire wall.*
+
 **August 8, 2026 – Cameras, Cell Neighbors, XO/XR Change, Misc, Magnify, Line Matching.**
 
 -   There are over 1700 algorithms in various stages of development.

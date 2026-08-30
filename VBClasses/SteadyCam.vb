@@ -3,7 +3,8 @@ Namespace VBClasses
     Public Class SteadyCam_Basics_TA : Inherits TaskParent
         Dim match As New Match_CenterRect
         Public shiftXY As cv.Point
-        Public M As cv.Mat
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
             match.displayRequest = True
             desc = "Use Match_CenterRect to determine the offset due to camera motion."
@@ -16,6 +17,7 @@ Namespace VBClasses
             labels = match.labels
             shiftXY = match.shiftXY
             M = match.M
+            InvertAffineTransform(M, inverseM)
         End Sub
     End Class
 
@@ -132,70 +134,6 @@ Namespace VBClasses
             labels(3) = "angle=" + angle.ToString(fmt2) + " deg after shiftXY "
         End Sub
     End Class
-
-
-
-
-    'Public Class SteadyCam_Lines : Inherits TaskParent
-    '    Dim steady As New SteadyCam_Basics_TA
-    '    Dim refLine As lpData
-    '    Public rotateAngle As Double
-    '    Dim forceRecenter As Boolean
-    '    Dim matcher As New Line_Match
-    '    Public Sub New()
-    '        desc = "Shift task.lines.dst3 with SteadyCam_Basics, then rotate by longest-line angle delta vs previous."
-    '    End Sub
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        If task.lines.lpList.Count = 0 Then Exit Sub
-    '        If src.Channels <> 1 Then src = task.grayOriginal
-
-    '        steady.Run(src)
-    '        Dim linesImg = task.lines.dst3
-
-    '        ' Shift the current lines image left/right (and up/down) with SteadyCam_Basics.shiftXY.
-    '        Dim Mshift As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-    '        Mshift.Set(Of Double)(0, 0, 1) : Mshift.Set(Of Double)(0, 1, 0) : Mshift.Set(Of Double)(0, 2, steady.shiftXY.X)
-    '        Mshift.Set(Of Double)(1, 0, 0) : Mshift.Set(Of Double)(1, 1, 1) : Mshift.Set(Of Double)(1, 2, steady.shiftXY.Y)
-    '        WarpAffine(linesImg, dst1, Mshift, linesImg.Size, InterpolationFlags.Nearest, BorderTypes.Constant, Scalar.All(0))
-
-    '        Dim lp = task.lines.lpList(0) ' longest line
-    '        matcher.lp = lp
-    '        matcher.Run(src)
-    '        Line(task.color, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-
-    '        Dim indexLast = matcher.refreshCount.Count - 1
-    '        Dim resetNeeded = steady.forceRecenter Or forceRecenter Or matcher.refreshCount(indexLast) > 0
-    '        If task.heartBeatLT Or task.optionsChanged Or resetNeeded Then
-    '            forceRecenter = False
-    '            refLine = New lpData(lp.p1, lp.p2)
-    '            rotateAngle = 0
-    '            dst3 = dst1
-    '            labels(3) = "Reference longest line reset  shift=" + steady.shiftXY.ToString
-    '            Exit Sub
-    '        End If
-
-    '        ' Rotation needed so current longest line matches the previous reference angle.
-    '        rotateAngle = refLine.angle - lp.angle
-    '        If Math.Abs(rotateAngle) > 15 Then
-    '            steady.forceRecenter = True
-    '            forceRecenter = True
-    '        End If
-
-    '        Dim center = New Point2f(lp.ptCenter.X + steady.shiftXY.X, lp.ptCenter.Y + steady.shiftXY.Y)
-    '        Dim Mrot = GetRotationMatrix2D(center, -rotateAngle, 1.0)
-    '        WarpAffine(dst1, dst3, Mrot, dst1.Size, InterpolationFlags.Nearest, BorderTypes.Constant, Scalar.All(0))
-
-    '        dst2 = dst1.Clone
-
-    '        Dim lpNew = New lpData(New cv.Point(CInt(lp.p1.X + steady.shiftXY.X), CInt(lp.p1.Y + steady.shiftXY.Y)),
-    '                               New cv.Point(CInt(lp.p2.X + steady.shiftXY.X), CInt(lp.p2.Y + steady.shiftXY.Y)))
-    '        Line(dst2, lpNew.p1, lpNew.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-    '        labels(2) = steady.labels(2) + "  Rectangle shows the limits before forcing a reset."
-    '        labels(3) = "rotate=" + rotateAngle.ToString(fmt2) + " deg  shift=" + steady.shiftXY.ToString +
-    '                    "  lp.age=" + CStr(lp.age)
-    '    End Sub
-    'End Class
 
 
 

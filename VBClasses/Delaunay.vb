@@ -5,21 +5,21 @@ Namespace VBClasses
     Public Class Delaunay_Basics : Inherits TaskParent
         Public ptList As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
+        Public feat As New Feature_Basics
+        Public useFeatures As Boolean
         Dim subdiv As New Subdiv2D
         Public Sub New()
+            If standalone Then useFeatures = True
             dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
             desc = "Subdivide an image based on ptList."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                Static feat As New Feature_Basics
-                If task.heartBeatLT Then
-                    feat.Run(src)
-                    ptList.Clear()
-                    For Each pt In feat.features
-                        ptList.Add(New cv.Point2f(pt.X, pt.Y))
-                    Next
-                End If
+            If useFeatures Then
+                feat.Run(src)
+                ptList.Clear()
+                For Each pt In feat.features
+                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
             End If
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))

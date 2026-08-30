@@ -755,7 +755,6 @@ Namespace VBClasses
         Public forceRecenter As Boolean
         Public centerRect As cv.Rect
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public useKalman As Boolean = True
         Public Sub New()
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
@@ -794,10 +793,7 @@ Namespace VBClasses
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
 
-            InvertAffineTransform(M, inverseM)
-
             If standaloneTest() Then
-                ' Shift gray so content stays locked to the template frame; 
                 WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
                 labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
@@ -933,24 +929,161 @@ Namespace VBClasses
 
 
 
-    Public Class Match_InverseM : Inherits TaskParent
-        Public ptList As New List(Of cv.Point2f)
+    Public Class XR_Match_InverseMDelaunay : Inherits TaskParent
+        Dim ptList As New List(Of cv.Point)
+        Dim ptListLast As New List(Of cv.Point)
+        Dim indexList As New List(Of Integer)
         Public delaunay As New Delaunay_Basics
         Public Sub New()
+            delaunay.useFeatures = True
             desc = "Use the inverseM in SteadyCam_Basics to track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                Static feat As New Feature_Basics
-                feat.Run(src)
-                ptList.Clear()
-                For Each pt In feat.features
-                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
-                Next
-            End If
+            delaunay.Run(task.gray)
+            delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
 
+            ptList.Clear()
+            indexList.Clear()
+            Dim newPoints As New List(Of cv.Point)
+            For Each pt In ptListLast
+                Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
+                Dim index = dst1.Get(Of Byte)(ptAligned.Y, ptAligned.X)
+                If indexList.Contains(index) Then
+                    newPoints.Add(pt)
+                Else
+                    indexList.Add(index)
+                    ptList.Add(WarpAffine_Basics.WarpPoint(ptAligned, task.steadyCam.inverseM))
+                End If
+            Next
 
+            For Each pt In newPoints
+                ptList.Add(pt)
+                indexList.Add(indexList.Count)
+            Next
+
+            dst2 = task.color.Clone
+            For i = 0 To ptList.Count - 1
+                Circle(dst2, ptList(i), task.DotSize * 3, task.scalarColors(indexList(i)), -1, task.lineType)
+            Next
+
+            WarpAffine(dst1, dst3, task.steadyCam.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            ptListLast = New List(Of cv.Point)(delaunay.feat.features)
         End Sub
     End Class
 
+
+
+
+
+    Public Class Match_InverseMDelaunay : Inherits TaskParent
+        Dim indexList As New List(Of Integer)
+        Dim feat As New Feature_Basics
+        Dim ptList As New List(Of cv.Point)
+        Dim validList As New List(Of cv.Point)
+        Public delaunay As New Delaunay_Basics
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "SteadyCam map of features."
+            desc = "Use the inverseM in SteadyCam_Basics to track points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.gray)
+
+            If task.heartBeatLT Or validList.Count < 3 Then
+                dst1.SetTo(0)
+                ptList = New List(Of cv.Point)(feat.features)
+
+                delaunay.ptList.Clear()
+                For Each pt In ptList
+                    delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
+
+                delaunay.Run(emptyMat)
+                delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+
+                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+
+            validList.Clear()
+            indexList.Clear()
+            For Each pt In feat.features
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
+                Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
+                If index <> 0 Then
+                    validList.Add(pt)
+                    indexList.Add(index - 1)
+                End If
+            Next
+
+            dst2 = task.color.Clone
+            dst0.SetTo(0)
+            For i = 0 To validList.Count - 1
+                Circle(dst2, validList(i), task.DotSize * 5, task.scalarColors(indexList(i)), -1, task.lineType)
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.steadyCam.M))
+                Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
+            Next
+
+            dst3 = Palettize(dst0, 0)
+            If task.heartBeat Then
+                labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
+                            CStr(ptList.Count - validList.Count) + " were lost..."
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Match_InverseM : Inherits TaskParent
+        Dim indexList As New List(Of Integer)
+        Dim feat As New Feature_Basics
+        Dim ptList As New List(Of cv.Point)
+        Dim validList As New List(Of cv.Point)
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "SteadyCam map of features."
+            desc = "Use the inverseM in SteadyCam_Basics to track points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.grayOriginal)
+
+            If task.heartBeatLT Or validList.Count < 3 Then
+                dst1.SetTo(0)
+                Dim index = 1
+                ptList = New List(Of cv.Point)(feat.features)
+                For Each pt In ptList
+                    Circle(dst1, pt, task.DotSize * 5, cv.Scalar.All(index), -1, cv.LineTypes.Link8)
+                    index += 1
+                Next
+                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+
+            validList.Clear()
+            indexList.Clear()
+            For Each pt In feat.features
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
+                Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
+                If index <> 0 Then
+                    validList.Add(pt)
+                    indexList.Add(index - 1)
+                End If
+            Next
+
+            dst2 = task.color.Clone
+            dst0.SetTo(0)
+            For i = 0 To validList.Count - 1
+                Circle(dst2, validList(i), task.DotSize * 5, task.scalarColors(indexList(i)), -1, task.lineType)
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.steadyCam.M))
+                Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
+            Next
+
+            dst3 = Palettize(dst0, 0)
+            If task.heartBeat Then
+                labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
+                            CStr(ptList.Count - validList.Count) + " were lost..."
+            End If
+        End Sub
+    End Class
 End Namespace

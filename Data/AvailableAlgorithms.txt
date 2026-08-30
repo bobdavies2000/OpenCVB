@@ -468,6 +468,7 @@ Match_ClickPoint
 Match_DrawRect
 Match_Features
 Match_InverseM
+Match_InverseMDelaunay
 Match_Lines
 Match_LinesKNN
 Match_Points
