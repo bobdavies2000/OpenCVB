@@ -105,9 +105,9 @@ Namespace VBClasses
             If standalone Or task.cpu.displayObjectName = traceName Or displayRequest Then Return True
             Return False
         End Function
-        Public Shared Function Palettize(input As Mat, Optional first As Byte = 1) As Mat
-            If first = 0 Then
-                task.colorMap.Set(Of Vec3b)(0, 0, New Vec3b(0, 0, 0))
+        Public Shared Function Palettize(input As Mat, Optional firstEntry As Byte = 1) As Mat
+            If firstEntry = 0 Then
+                task.colorMap.Set(Of Vec3b)(0, 0, New Vec3b(0, 0, 0)) ' set the first entry to zero.
             Else
                 task.colorMap.Set(Of Vec3b)(0, 0, task.vecColors(0))
             End If

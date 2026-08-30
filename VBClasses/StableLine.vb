@@ -79,12 +79,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If features.Count > 0 Then
-                basics.facetGen.inputPoints = New List(Of Point2f)(features)
+                basics.facetGen.ptList = New List(Of Point2f)(features)
             Else
                 bPoint.Run(src)
-                basics.facetGen.inputPoints.Clear()
+                basics.facetGen.ptList.Clear()
                 For Each pt In bPoint.ptList
-                    basics.facetGen.inputPoints.Add(New Point2f(pt.X, pt.Y))
+                    basics.facetGen.ptList.Add(New Point2f(pt.X, pt.Y))
                 Next
             End If
             basics.Run(src)
@@ -118,11 +118,11 @@ Namespace VBClasses
             desc = "Track the line end points found in the BGR image and keep those that are stable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            basics.facetGen.inputPoints.Clear()
+            basics.facetGen.ptList.Clear()
             dst1 = src.Clone
             For Each lp In task.lines.lpList
-                basics.facetGen.inputPoints.Add(lp.p1)
-                basics.facetGen.inputPoints.Add(lp.p2)
+                basics.facetGen.ptList.Add(lp.p1)
+                basics.facetGen.ptList.Add(lp.p2)
                 Line(dst1, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
             basics.Run(src)
@@ -156,8 +156,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             fast.Run(src)
 
-            basics.facetGen.inputPoints.Clear()
-            basics.facetGen.inputPoints = New List(Of Point2f)(fast.features)
+            basics.facetGen.ptList.Clear()
+            basics.facetGen.ptList = New List(Of Point2f)(fast.features)
             basics.Run(src)
             dst3 = basics.dst3
             dst2 = basics.dst2

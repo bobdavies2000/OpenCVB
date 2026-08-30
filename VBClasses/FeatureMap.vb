@@ -29,7 +29,7 @@ Namespace VBClasses
             labels(3) = basics.labels(3)
             If basics.ptList.Count = 0 Then Exit Sub ' nothing to work on...
 
-            basics.facetGen.inputPoints = New List(Of Point2f)(basics.ptList)
+            basics.facetGen.ptList = New List(Of Point2f)(basics.ptList)
             basics.Run(src)
             dst2 = basics.dst2
 
@@ -65,13 +65,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             good.Run(src)
-            facetGen.inputPoints.Clear()
+            facetGen.ptList.Clear()
             For Each pt In good.feat.features
-                facetGen.inputPoints.Add(pt)
+                facetGen.ptList.Add(pt)
             Next
 
             facetGen.Run(src)
-            If facetGen.inputPoints.Count = 0 Then
+            If facetGen.ptList.Count = 0 Then
                 dst2.SetTo(0)
                 dst3.SetTo(0)
                 Exit Sub ' nothing to work on ...
@@ -79,7 +79,7 @@ Namespace VBClasses
 
             ptList.Clear()
             Dim generations As New List(Of Integer)
-            For Each pt In facetGen.inputPoints
+            For Each pt In facetGen.ptList
                 Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
                 If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
@@ -632,11 +632,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             good.Run(src)
             For Each pt In good.feat.features
-                facetGen.inputPoints.Add(pt)
+                facetGen.ptList.Add(pt)
             Next
 
             facetGen.Run(src)
-            If facetGen.inputPoints.Count = 0 Then
+            If facetGen.ptList.Count = 0 Then
                 dst2.SetTo(0)
                 dst3.SetTo(0)
                 Exit Sub ' nothing to work on ...
@@ -644,7 +644,7 @@ Namespace VBClasses
 
             ptList.Clear()
             Dim generations As New List(Of Integer)
-            For Each pt In facetGen.inputPoints
+            For Each pt In facetGen.ptList
                 Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
                 If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)

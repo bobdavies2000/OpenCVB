@@ -1,22 +1,29 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Delaunay_Basics : Inherits TaskParent
-        Public inputPoints As New List(Of Point2f)
+        Public ptList As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Dim subdiv As New Subdiv2D
         Public Sub New()
             dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
-            desc = "Subdivide an image based on the points provided."
+            desc = "Subdivide an image based on ptList."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat And standalone Then
-                Static random As New Random_Basics
-                random.Run(src)
-                inputPoints = New List(Of Point2f)(random.PointList)
+            If standalone Then
+                Static feat As New Feature_Basics
+                If task.heartBeatLT Then
+                    feat.Run(src)
+                    ptList.Clear()
+                    For Each pt In feat.features
+                        ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                    Next
+                End If
             End If
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-            subdiv.Insert(inputPoints)
+            subdiv.Insert(ptList)
 
             Dim facets = New Point2f()() {Nothing}
             subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
@@ -32,10 +39,9 @@ Namespace VBClasses
                 facetList.Add(nextFacet)
             Next
 
-            dst3.ConvertTo(dst1, MatType.CV_8U)
-            dst2 = Palettize(dst1)
+            dst2 = Palettize(dst3)
 
-            labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
+            labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
         End Sub
     End Class
 
@@ -167,7 +173,7 @@ Namespace VBClasses
                 inputPoints = New List(Of Point2f)(random.PointList)
             End If
 
-            facet.inputPoints = New List(Of Point2f)(inputPoints)
+            facet.ptList = New List(Of Point2f)(inputPoints)
             facet.Run(src)
             dst2 = facet.dst2
 
@@ -203,7 +209,7 @@ Namespace VBClasses
 
 
     Public Class Delaunay_Generations : Inherits TaskParent
-        Public inputPoints As New List(Of Point2f)
+        Public ptList As New List(Of Point2f)
         Public facet As New Delaunay_Basics
         Dim knn As New KNN_OneToOne
         Dim random As New Random_Basics
@@ -217,13 +223,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 If task.heartBeatLT Then random.Run(src)
-                inputPoints = New List(Of Point2f)(random.PointList)
+                ptList = New List(Of Point2f)(random.PointList)
             End If
 
-            knn.queries = New List(Of Point2f)(inputPoints)
+            knn.queries = New List(Of Point2f)(ptList)
             knn.Run(src)
 
-            facet.inputPoints = New List(Of Point2f)(inputPoints)
+            facet.ptList = New List(Of Point2f)(ptList)
             facet.Run(src)
             dst2 = facet.dst2
 
@@ -322,10 +328,10 @@ Namespace VBClasses
             desc = "Create a map for selecting lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            delaunay.inputPoints.Clear()
+            delaunay.ptList.Clear()
             For Each lp In task.lines.lpList
-                delaunay.inputPoints.Add(lp.p1)
-                delaunay.inputPoints.Add(lp.p2)
+                delaunay.ptList.Add(lp.p1)
+                delaunay.ptList.Add(lp.p2)
             Next
 
             delaunay.Run(src)

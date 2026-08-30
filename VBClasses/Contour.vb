@@ -319,11 +319,11 @@ Namespace VBClasses
             dst3 = contours.dst2
             labels(3) = contours.labels(2)
 
-            delaunay.inputPoints.Clear()
+            delaunay.ptList.Clear()
             Dim maxList As New List(Of Point2f)
             For Each contour In contours.tourList
                 maxList.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
-                delaunay.inputPoints.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
+                delaunay.ptList.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
 
             delaunay.Run(emptyMat)

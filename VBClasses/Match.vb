@@ -928,4 +928,29 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class Match_InverseM : Inherits TaskParent
+        Public ptList As New List(Of cv.Point2f)
+        Public delaunay As New Delaunay_Basics
+        Public Sub New()
+            desc = "Use the inverseM in SteadyCam_Basics to track points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                Static feat As New Feature_Basics
+                feat.Run(src)
+                ptList.Clear()
+                For Each pt In feat.features
+                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
+            End If
+
+
+        End Sub
+    End Class
+
 End Namespace
