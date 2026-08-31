@@ -990,7 +990,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.gray)
 
-            If task.heartBeatLT Or validList.Count < 3 Then
+            If validList.Count < 3 Then
                 dst1.SetTo(0)
                 ptList = New List(Of cv.Point)(feat.features)
 
@@ -1049,7 +1049,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.grayOriginal)
 
-            If task.heartBeatLT Or validList.Count < 3 Then
+            If validList.Count < 3 Then
                 dst1.SetTo(0)
                 Dim index = 1
                 ptList = New List(Of cv.Point)(feat.features)
@@ -1083,6 +1083,65 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
                             CStr(ptList.Count - validList.Count) + " were lost..."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Match_InverseMLines : Inherits TaskParent
+        Dim indexList As New List(Of Integer)
+        Dim lpList As New List(Of lpData)
+        Dim validList As New List(Of lpData)
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "SteadyCam map of features."
+            desc = "Use the inverseM in SteadyCam_Basics to track lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lineWidth = task.lineWidth * 5
+
+            If validList.Count < 3 Then
+                dst1.SetTo(0)
+                Dim index = 1
+                lpList = New List(Of lpData)(task.lines.lpList)
+                For Each lp In lpList
+                    Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index), lineWidth, cv.LineTypes.Link8)
+                    index += 1
+                Next
+                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+
+            validList.Clear()
+            indexList.Clear()
+            For Each lp In task.lines.lpList
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
+                Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
+                If index1 <> 0 And index2 <> 0 Then
+                    validList.Add(lp)
+                    indexList.Add(index1 - 1)
+                End If
+            Next
+
+            dst2 = task.color.Clone
+            dst0.SetTo(0)
+            For i = 0 To validList.Count - 1
+                Dim lp = validList(i)
+                Line(dst2, lp.p1, lp.p2, task.scalarColors(indexList(i)), task.lineWidth, cv.LineTypes.Link8)
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Line(dst0, p1, p2, cv.Scalar.All(indexList(i) + 1), lineWidth, cv.LineTypes.Link8)
+            Next
+
+            dst3 = Palettize(dst0, 0)
+            If task.heartBeat Then
+                labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
+                            CStr(lpList.Count - validList.Count) + " were lost..."
             End If
         End Sub
     End Class
