@@ -92,6 +92,7 @@ Indexer
 InPaint
 Interpolate
 Intrinsics
+InverseM
 Kalman
 Keyboard
 KeyColor

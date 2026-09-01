@@ -2487,7 +2487,7 @@ Namespace VBClasses
                 refreshCount.Add(1)
                 clipped.Run(src) ' why clipped lines?  So we can track it longer regardless of camera motion.
                 goodCorrelation = True
-                If standalone Then lp = clipped.lpList(0)
+                lp = clipped.lpList(0)
                 Dim sideSize = task.grid.nabeRectSide
                 Dim r1 = ValidateRect(New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize))
                 Dim r2 = ValidateRect(New cv.Rect(lp.p2.X - sideSize \ 2, lp.p2.Y - sideSize \ 2, sideSize, sideSize))
@@ -2516,6 +2516,48 @@ Namespace VBClasses
             Line(dst2, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
             If refreshCount.Count > 100 Then refreshCount.RemoveAt(0)
             labels(3) = "Had to refresh the longest line " + refreshCount.Average.ToString("0.0%") + " of the time"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_Match2 : Inherits TaskParent
+        Public lp As lpData
+        Dim match As New Match_Basics
+        Public Sub New()
+            desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            dst2 = task.color.Clone
+
+            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100
+
+            If lp Is Nothing Then
+                lp = task.lines.lpList(0)
+                match.template = src(lp.rect).Clone
+            Else
+                match.Run(src)
+                SetTrueText(match.correlation.ToString(fmt3), match.newRect.TopLeft)
+                If match.correlation >= threshold Then
+                    For Each lp1 In task.lines.lpList
+                        If lp.rect.IntersectsWith(lp1.rect) Then
+                            If Math.Abs(lp.angle - lp1.angle) < AngleThreshold Then
+                                lp = lp1
+                                Exit For
+                            End If
+                        End If
+                    Next
+                    labels(2) = "Correlation = " + match.correlation.ToString("0.000")
+                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.AntiAlias)
+                Else
+                    lp = Nothing
+                    labels(2) = "Low correlation.  Selecting line again..."
+                End If
+            End If
         End Sub
     End Class
 End Namespace
