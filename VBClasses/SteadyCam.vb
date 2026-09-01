@@ -33,7 +33,10 @@ Namespace VBClasses
         Public forceRecenter As Boolean
         Dim centerRect As cv.Rect
         Dim kalman As New Kalman_Basics
+        Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
             desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -67,9 +70,8 @@ Namespace VBClasses
                 shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
             End If
 
-            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
 
             If standaloneTest() Then
                 ' Shift gray so content stays locked to the template frame; 
@@ -88,7 +90,10 @@ Namespace VBClasses
 
     Public Class SteadyCam_Kalman : Inherits TaskParent
         Dim kalman As New Kalman_Basics
+        Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
             desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics_TA"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -96,9 +101,9 @@ Namespace VBClasses
             kalman.kInput = {shiftXY.X, shiftXY.Y}
             kalman.Run(emptyMat)
             shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-            Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
 
             ' Shift gray so content stays locked to the template frame; 
             WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))

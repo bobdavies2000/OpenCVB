@@ -789,8 +789,8 @@ Namespace VBClasses
                 End If
             End If
 
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
 
             If standaloneTest() Then
                 WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
