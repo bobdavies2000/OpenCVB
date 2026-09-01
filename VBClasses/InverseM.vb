@@ -221,14 +221,13 @@ Namespace VBClasses
 
 
 
-    Public Class InverseM_Longest : Inherits TaskParent
+    Public Class XR_InverseM_Longest : Inherits TaskParent
         Dim longest As New Line_Match2
         Dim lp As lpData
         Dim validLine As lpData
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of features."
+            labels(3) = "SteadyCam map of longest line."
             desc = "Use the inverseM in SteadyCam_Basics to track the longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -267,6 +266,67 @@ Namespace VBClasses
                     labels(2) = "Longest line was NOT found or could not be tracked."
                 End If
             End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class InverseM_Longest : Inherits TaskParent
+        Dim longest As lpData
+        Dim validLines As New List(Of lpData)
+        Dim match As New Match_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "SteadyCam map of longest line."
+            desc = "Use the inverseM in SteadyCam_Basics to track the longest line."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lineWidth = task.lineWidth * 5
+            dst2 = task.color.Clone
+            labels(2) = "Longest line was NOT found or could not be tracked."
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            If validLines.Count = 0 Then
+                longest = task.lines.lpList(0)
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
+                Dim lpSteady = New lpData(p1, p2)
+
+                dst1.SetTo(0)
+                Line(dst1, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
+
+                validLines = New List(Of lpData)({longest})
+                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+                match.template = src(longest.rect).Clone
+            Else
+                match.Run(src)
+                SetTrueText(match.correlation.ToString(fmt3), match.newRect.TopLeft)
+                If match.correlation < task.fOptions.MatchCorrSlider.Value / 100 Then
+
+                End If
+
+                validLines.Clear()
+                For Each lp In task.lines.lpList
+                    Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                    Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                    Dim index1 = dst1.Get(Of Byte)(p1.Y, p1.X)
+                    Dim index2 = dst1.Get(Of Byte)(p2.Y, p2.X)
+                    If index1 <> 0 And index2 <> 0 Then
+                        validLines.Add(lp)
+                        Exit For
+                    End If
+                Next
+            End If
+
+            If validLines.Count > 0 Then
+                dst1.SetTo(0)
+                Line(dst2, validLines(0).p1, validLines(0).p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+                Line(dst1, validLines(0).ptE1, validLines(0).ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
+            End If
+
+            dst3 = Palettize(dst1, 0)
+            labels(2) = CStr(validLines.Count) + " line((s) were coincident to the longest line"
         End Sub
     End Class
 End Namespace
