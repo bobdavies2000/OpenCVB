@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class InverseM_Basics : Inherits TaskParent
+    Public Class SteadyM_Basics : Inherits TaskParent
         Dim indexList As New List(Of Integer)
         Dim feat As New Feature_Basics
         Dim ptList As New List(Of cv.Point)
@@ -56,7 +56,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_InverseM_Delaunay : Inherits TaskParent
+    Public Class XR_SteadyM_Delaunay : Inherits TaskParent
         Dim ptList As New List(Of cv.Point)
         Dim ptListLast As New List(Of cv.Point)
         Dim indexList As New List(Of Integer)
@@ -102,7 +102,7 @@ Namespace VBClasses
 
 
 
-    Public Class InverseM_Delaunay : Inherits TaskParent
+    Public Class SteadyM_Delaunay : Inherits TaskParent
         Dim indexList As New List(Of Integer)
         Dim feat As New Feature_Basics
         Dim ptList As New List(Of cv.Point)
@@ -163,7 +163,7 @@ Namespace VBClasses
 
 
 
-    Public Class InverseM_Lines : Inherits TaskParent
+    Public Class SteadyM_Lines : Inherits TaskParent
         Dim indexList As New List(Of Integer)
         Dim lpList As New List(Of lpData)
         Dim validList As New List(Of lpData)
@@ -221,7 +221,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_InverseM_Longest : Inherits TaskParent
+    Public Class XR_SteadyM_Longest : Inherits TaskParent
         Dim longest As New Line_Match2
         Dim lp As lpData
         Dim validLine As lpData
@@ -272,12 +272,11 @@ Namespace VBClasses
 
 
 
-    Public Class InverseM_Longest : Inherits TaskParent
+    Public Class SteadyM_Longest : Inherits TaskParent
         Dim longest As lpData
-        Dim validLines As New List(Of lpData)
-        Dim match As New Match_Basics
+        Dim correlation As Double
+        Dim template As cv.Mat
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "SteadyCam map of longest line."
             desc = "Use the inverseM in SteadyCam_Basics to track the longest line."
         End Sub
@@ -287,46 +286,60 @@ Namespace VBClasses
             labels(2) = "Longest line was NOT found or could not be tracked."
             If task.lines.lpList.Count = 0 Then Exit Sub
 
-            If validLines.Count = 0 Then
+            If longest Is Nothing Then
                 longest = task.lines.lpList(0)
                 Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
                 Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
                 Dim lpSteady = New lpData(p1, p2)
 
-                dst1.SetTo(0)
-                Line(dst1, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
+                dst3.SetTo(0)
+                Line(dst3, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
 
-                validLines = New List(Of lpData)({longest})
                 Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
-                match.template = src(longest.rect).Clone
+                template = src(longest.rect).Clone
             Else
-                match.Run(src)
-                SetTrueText(match.correlation.ToString(fmt3), match.newRect.TopLeft)
-                If match.correlation < task.fOptions.MatchCorrSlider.Value / 100 Then
+                Dim result As New Mat()
+                Cv2.MatchTemplate(src(longest.rect), template, result, TemplateMatchModes.CCorrNormed)
 
+                correlation = result.Get(Of Double)(0, 0)
+                SetTrueText(correlation.ToString(fmt3), longest.rect.TopLeft)
+                If correlation >= task.fOptions.MatchCorrSlider.Value / 100 Then
+                    'Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+                    'Dim pt = New cv.Point(longest.rect.X + match.newCenter.X, longest.rect.Y + match.newCenter.Y)
+                    'shiftXY = validatePoint(New cv.Point2f(longest.ptCenter.X - pt.X, longest.ptCenter.Y - pt.Y))
+                    ''kalman.kInput = {shiftXY.X, shiftXY.Y}
+                    ''kalman.Run(emptyMat)
+                    ''shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+
+                    'M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, shiftXY.X)
+                    'M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, shiftXY.Y)
+                    'Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, M))
+                    'Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, M))
+
+                    'longest = New lpData(p1, p2)
+                    strOut = " confirms that line is still there"
+                Else
+                    longest = Nothing
+                    For Each lp In task.lines.lpList
+                        Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                        Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                        Dim index1 = dst3.Get(Of Byte)(p1.Y, p1.X)
+                        Dim index2 = dst3.Get(Of Byte)(p2.Y, p2.X)
+                        If index1 <> 0 And index2 <> 0 Then
+                            longest = lp
+                            Exit For
+                        End If
+                    Next
+                    strOut = " - reseting longest line"
                 End If
-
-                validLines.Clear()
-                For Each lp In task.lines.lpList
-                    Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                    Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                    Dim index1 = dst1.Get(Of Byte)(p1.Y, p1.X)
-                    Dim index2 = dst1.Get(Of Byte)(p2.Y, p2.X)
-                    If index1 <> 0 And index2 <> 0 Then
-                        validLines.Add(lp)
-                        Exit For
-                    End If
-                Next
+                labels(2) = "Correlation " + correlation.ToString(fmt3) + strOut
             End If
 
-            If validLines.Count > 0 Then
-                dst1.SetTo(0)
-                Line(dst2, validLines(0).p1, validLines(0).p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
-                Line(dst1, validLines(0).ptE1, validLines(0).ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
+            If longest IsNot Nothing Then
+                dst3.SetTo(0)
+                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+                Line(dst3, longest.ptE1, longest.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
             End If
-
-            dst3 = Palettize(dst1, 0)
-            labels(2) = CStr(validLines.Count) + " line((s) were coincident to the longest line"
         End Sub
     End Class
 End Namespace

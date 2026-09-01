@@ -265,10 +265,9 @@ Namespace VBClasses
 
                 If p2.X = p1.X Then
                     angle = 90
-                    Exit Sub
+                Else
+                    angle = computeAngle(p1, p2)
                 End If
-
-                angle = computeAngle(p1, p2)
 
                 Dim index1 = task.gridNabeMap.Get(Of Integer)(p1.Y, p1.X)
                 Dim index2 = task.gridNabeMap.Get(Of Integer)(p2.Y, p2.X)

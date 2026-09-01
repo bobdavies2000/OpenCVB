@@ -16,7 +16,7 @@ Namespace VBClasses
             Dim dst As New cv.Mat(sz, cv.MatType.CV_8U, 0)
             Dim x = (dst.Width - correlationMat.Width) / 2
             Dim y = (dst.Height - correlationMat.Height) / 2
-            Dim r = New cv.Rect(x, y, correlationMat.Width, correlationMat.Height)
+            Dim r = ValidateRect(New cv.Rect(x, y, correlationMat.Width, correlationMat.Height))
             ConvertScaleAbs(correlationMat, dst(r), 255, -minVal)
             Return dst
         End Function

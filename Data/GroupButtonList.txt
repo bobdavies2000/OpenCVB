@@ -92,7 +92,6 @@ Indexer
 InPaint
 Interpolate
 Intrinsics
-InverseM
 Kalman
 Keyboard
 KeyColor
@@ -174,6 +173,7 @@ StableGray
 StableLine
 StDev
 SteadyCam
+SteadyM
 Stitch
 Stripes
 Structured

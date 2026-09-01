@@ -375,10 +375,6 @@ Intrinsics_Basics
 Intrinsics_MapLeftToRight
 Intrinsics_TranslateLeftToRGB
 Intrinsics_TranslateRGBtoLeft
-InverseM_Basics
-InverseM_Delaunay
-InverseM_Lines
-InverseM_Longest
 Kalman_Basics
 Kalman_CVMat
 Kalman_ImageSmall
@@ -689,6 +685,10 @@ SteadyCam_FindLines
 SteadyCam_Kalman
 SteadyCam_LongestLine
 SteadyCam_WarpAffine
+SteadyM_Basics
+SteadyM_Delaunay
+SteadyM_Lines
+SteadyM_Longest
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX
