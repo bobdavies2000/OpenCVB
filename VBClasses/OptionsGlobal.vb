@@ -78,6 +78,7 @@ Public Class OptionsGlobal
         LineWidth.Value = vbc.task.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
+        vbc.task.steadyLineWidth = vbc.task.lineWidth * 3
 
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 

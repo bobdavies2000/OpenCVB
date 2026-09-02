@@ -163,64 +163,6 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyM_Lines : Inherits TaskParent
-        Dim indexList As New List(Of Integer)
-        Dim lpList As New List(Of lpData)
-        Dim validList As New List(Of lpData)
-        Public Sub New()
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of lines."
-            desc = "Use the inverseM in SteadyCam_Basics to track lines."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lineWidth = task.lineWidth * 5
-
-            If validList.Count < 3 Then
-                dst1.SetTo(0)
-                Dim index = 1
-                lpList = New List(Of lpData)(task.lines.lpList)
-                For Each lp In lpList
-                    Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index), lineWidth, cv.LineTypes.Link8)
-                    index += 1
-                Next
-                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            End If
-
-            validList.Clear()
-            indexList.Clear()
-            For Each lp In task.lines.lpList
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
-                Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
-                If index1 <> 0 And index2 <> 0 Then
-                    validList.Add(lp)
-                    indexList.Add(index1 - 1)
-                End If
-            Next
-
-            dst2 = task.color.Clone
-            dst0.SetTo(0)
-            For i = 0 To validList.Count - 1
-                Dim lp = validList(i)
-                Line(dst2, lp.p1, lp.p2, task.scalarColors(indexList(i)), task.lineWidth, cv.LineTypes.Link8)
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                Line(dst0, p1, p2, cv.Scalar.All(indexList(i) + 1), lineWidth, cv.LineTypes.Link8)
-            Next
-
-            dst3 = Palettize(dst0, 0)
-            If task.heartBeat Then
-                labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
-                        CStr(lpList.Count - validList.Count) + " were lost..."
-            End If
-        End Sub
-    End Class
-
-
-
-
     Public Class XR_SteadyM_Longest : Inherits TaskParent
         Dim longest As New Line_Match2
         Dim lp As lpData
@@ -311,6 +253,142 @@ Namespace VBClasses
             If retained.Count > 100 Then retained.RemoveAt(0)
             Dim avg = retained.Average
             labels(2) = "Longest line was found " + avg.ToString("#0%") + " of the time"
+        End Sub
+    End Class
+
+
+
+
+    Public Class SteadyM_LongestMatch : Inherits TaskParent
+        Dim longest As lpData
+        Dim template As cv.Mat
+        Dim match As New Match_Basics
+        Dim retained As New List(Of Integer)
+        Public Sub New()
+            labels(3) = "SteadyCam map of longest line."
+            desc = "Cursor.ai: Keep the saved longest line when longest.rect still matches the stored template above MatchCorrSlider."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.color.Clone
+            If src.Channels <> 1 Then src = task.gray
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            Dim threshold = task.fOptions.MatchCorrSlider.Value / 100.0F
+            If longest IsNot Nothing AndAlso template IsNot Nothing Then
+                Dim r = ValidateRect(longest.rect)
+                If r.Width >= template.Width And r.Height >= template.Height Then
+                    match.template = template
+                    match.Run(src(r))
+                    If match.correlation >= threshold Then
+                        retained.Add(1)
+                        Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link8)
+                        If retained.Count > 100 Then retained.RemoveAt(0)
+                        labels(2) = "corr=" + match.correlation.ToString(fmt3) +
+                                    "  keeping longest  found " + retained.Average.ToString("#0%") + " of the time"
+                        Exit Sub
+                    End If
+                End If
+            End If
+
+            If longest IsNot Nothing AndAlso SteadyM_Longest.checkLine(longest, dst3) Then
+                retained.Add(1)
+            Else
+                longest = Nothing
+            End If
+
+            If longest Is Nothing Then
+                retained.Add(0)
+                longest = task.lines.lpList(0)
+                template = src(ValidateRect(longest.rect)).Clone
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
+
+                Dim lpSteady = New lpData(p1, p2)
+                dst3.SetTo(0)
+                Line(dst3, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), task.lineWidth, cv.LineTypes.Link8)
+            End If
+
+            If longest IsNot Nothing Then
+                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link8)
+            End If
+
+            If retained.Count > 100 Then retained.RemoveAt(0)
+            Dim avg = retained.Average
+            labels(2) = "Longest line was found " + avg.ToString("#0%") + " of the time  corr threshold=" + threshold.ToString(fmt2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class SteadyM_Lines : Inherits TaskParent
+        Dim indexList As New List(Of Integer)
+        Dim lpList As New List(Of lpData)
+        Dim validList As New List(Of lpData)
+        Dim usedList As New List(Of Byte)
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "SteadyCam map of lines."
+            desc = "Use the inverseM in SteadyCam_Basics to track lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If validList.Count < task.lines.lpList.Count \ 10 Then
+                dst1.SetTo(0)
+                lpList = New List(Of lpData)(task.lines.lpList)
+                usedList.Clear()
+                For Each lp In lpList
+                    Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                    Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                    Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
+                    Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
+
+                    If index1 = index2 And index1 <> 0 Then
+                        Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index1), task.steadyLineWidth, cv.LineTypes.Link8)
+                        usedList.Add(index1)
+                    Else
+                        Dim index = 1
+                        While usedList.Contains(index)
+                            usedList.Add(index)
+                            index += 1
+                            If usedList.Count >= task.maxLineCount Then Exit While
+                        End While
+                        Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index), task.steadyLineWidth, cv.LineTypes.Link8)
+                        If index >= task.maxLineCount Then Exit For ' top X lines by length should be plenty
+                    End If
+                Next
+                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+
+            validList.Clear()
+            indexList.Clear()
+            For Each lp In task.lines.lpList
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
+                Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
+                If index1 <> 0 And index2 <> 0 Then
+                    validList.Add(lp)
+                    indexList.Add(index1 - 1)
+                End If
+            Next
+
+            dst2 = task.color.Clone
+            dst0.SetTo(0)
+            For i = 0 To validList.Count - 1
+                Dim lp = validList(i)
+                Line(dst2, lp.p1, lp.p2, task.scalarColors(indexList(i)), task.lineWidth, cv.LineTypes.Link8)
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Line(dst0, p1, p2, cv.Scalar.All(indexList(i) + 1), task.steadyLineWidth, cv.LineTypes.Link8)
+            Next
+
+            dst3 = Palettize(dst0, 0)
+            If task.heartBeat Then
+                labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
+                        CStr(lpList.Count - validList.Count) + " were lost..."
+            End If
         End Sub
     End Class
 End Namespace

@@ -689,6 +689,7 @@ SteadyM_Basics
 SteadyM_Delaunay
 SteadyM_Lines
 SteadyM_Longest
+SteadyM_LongestMatch
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX

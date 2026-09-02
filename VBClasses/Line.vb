@@ -6,7 +6,8 @@ Namespace VBClasses
         Public Sub New()
             labels(3) = "Age is shown for the top 10 longest lines."
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+            dst0 = dst1.Clone
+            dst3 = dst1.Clone
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
         Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
@@ -49,31 +50,32 @@ Namespace VBClasses
                 labels = basicsLSD.labels
             End If
 
-            dst1.SetTo(0)
-            dst3.SetTo(0)
+            Dim usedList As New List(Of Byte)
             For Each lp In lpList
-                lp.index = (lpList.IndexOf(lp) + 1) Mod 255
-                Line(dst1, lp.p1, lp.p2, lp.index, task.lineWidth)
-                Line(dst3, lp.p1, lp.p2, 255, task.lineWidth)
+                Dim previousIndex = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
+                    lp.index = previousIndex
+                    usedList.Add(lp.index)
+                End If
+            Next
+            labels(3) = CStr(usedList.Count) + " lines were able to keep the index from the previous iteration."
+
+            Dim indexNew = 1
+            dst1.SetTo(0)
+            For Each lp In lpList
+                If lp.index = 0 Then
+                    While usedList.Contains(indexNew)
+                        indexNew += 1
+                    End While
+                    lp.index = indexNew
+                    usedList.Add(indexNew)
+                End If
+
+                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
                 If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
-
-            If standalone Then
-                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-                If task.lines.lpList.Count > index Then
-                    Dim lp = task.lines.lpList(index)
-                    Line(dst3, lp.p1, lp.p2, white, task.lineWidth + 1)
-                    Rectangle(dst3, lp.rect, white, task.lineWidth)
-                    Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-                    Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-                    Dim r1 = task.gridNabeRects(index1)
-                    Dim r2 = task.gridNabeRects(index2)
-                    Rectangle(dst3, r1, white, task.lineWidth)
-                    Rectangle(dst3, r2, white, task.lineWidth)
-
-                    Dim testlp = New lpData(lp.p1, lp.p2)
-                End If
-            End If
+            dst0 = dst1.Clone()
+            dst3 = Palettize(dst0, 0)
         End Sub
     End Class
 
@@ -127,16 +129,17 @@ Namespace VBClasses
             Dim lpSorted As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
             For Each v In lines
                 If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
-               v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                   v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
                     Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                     Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                     If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
-                   p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                       p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
                         p1 = validatePoint(p1)
                         p2 = validatePoint(p2)
                         Dim lp = New lpData(p1, p2)
                         If lp.rect.Width = 0 Then Continue For
                         lpSorted.Add(lp.length, lp)
+                        If lpSorted.Count >= task.maxLineCount Then Exit For
                     End If
                 End If
             Next
