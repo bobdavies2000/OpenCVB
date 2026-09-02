@@ -11,29 +11,9 @@ Namespace VBClasses
             dst3 = dst1.Clone
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
-        Public Shared Function updateAgesAndLongest(inputList As List(Of lpData), lastList As List(Of lpData)) As Single
-            Static lpFind As New Line_FindClosest With {.lastList = inputList}
-            lpFind.lastList = lastList
-            For Each lp In inputList
-                lpFind.inputLine = lp
-                lpFind.Run(Nothing)
-                Dim lpLast = lpFind.closestLine
-                If lpLast IsNot Nothing Then
-                    Dim lpCurr = lp
-                    lpCurr.age = lpLast.age + 1
-                    If lpCurr.age >= 1000 Then lpCurr.age = 10
-                End If
-            Next
-
-            Dim lpAges As New List(Of Single)
-            For Each lp In inputList
-                lpAges.Add(lp.age)
-            Next
-
-            Return lpAges.Average
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
+            Dim lpLastList = New List(Of lpData)(lpList)
 
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
@@ -54,16 +34,19 @@ Namespace VBClasses
             Dim usedList As New List(Of Byte)
             For Each lp In lpList
                 Dim previousIndex = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                If previousIndex = 0 Then previousIndex = dst0.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                If previousIndex = 0 Then previousIndex = dst0.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
                     lp.index = previousIndex
-                    lp.age += 1
+                    lp.age = lpLastList(lp.index - 1).age + 1
+                    If lp.age >= 1000 Then lp.age = 10
                     usedList.Add(lp.index)
                 End If
             Next
-            labels(3) = CStr(usedList.Count) + " lines were able to keep the index from the previous iteration."
+            labels(3) = CStr(usedList.Count) + " line(s) were able to keep the index from the previous iteration."
 
             Dim indexNew = 1
-            If task.heartBeat Then dst1.SetTo(0)
+            dst1.SetTo(0)
             For Each lp In lpList
                 If lp.index = 0 Then
                     While usedList.Contains(indexNew)
@@ -73,12 +56,9 @@ Namespace VBClasses
                     usedList.Add(indexNew)
                 End If
 
-                If lp.age >= 1 Then
-                    Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
-                    SetTrueText(CStr(lp.age), lp.ptCenter, 3)
-                Else
-                    lp.age = 1
-                End If
+                If lp.age = 0 Then lp.age = 1
+                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
+                SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
 
             If standalone Then
@@ -110,10 +90,7 @@ Namespace VBClasses
             lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
-            averageAge = Line_Basics_TA.updateAgesAndLongest(core.lpList, lastList)
-
-            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines." +
-                        " Average age all lines = " + If(task.lines.lpList.Count > 0, averageAge.ToString(fmt1), "0")
+            labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines."
 
             dst3 = task.lines.dst3
             For Each lp In task.lines.lpList
@@ -1732,14 +1709,13 @@ Namespace VBClasses
 
             Dim lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableR.dst3)
-            Dim averageAge = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
             dst2.SetTo(0)
             For Each lp In linesRight.lpList
                 Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 SetTrueText(CStr(lp.age), New cv.Point(lp.ptCenter.X + 2, lp.ptCenter.Y + 2), 2)
             Next
-            labels(2) = CStr(lpList.Count) + " lines in the right image with average age = " + averageAge.ToString(fmt1)
+            labels(2) = CStr(lpList.Count) + " lines in the right image "
         End Sub
     End Class
 
@@ -2440,7 +2416,6 @@ Namespace VBClasses
 
             Dim lastList = New List(Of lpData)(linesLeft.lpList)
             linesLeft.Run(stableLR.dst2)
-            Dim averageAgeLeft = Line_Basics_TA.updateAgesAndLongest(linesLeft.lpList, lastList)
 
             dst2.SetTo(0)
             For Each lp In linesLeft.lpList
@@ -2451,7 +2426,6 @@ Namespace VBClasses
 
             lastList = New List(Of lpData)(linesRight.lpList)
             linesRight.Run(stableLR.dst3)
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
 
             dst3.SetTo(0)
             For Each lp In linesRight.lpList

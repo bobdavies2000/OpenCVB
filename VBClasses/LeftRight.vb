@@ -316,7 +316,6 @@ Namespace VBClasses
             Dim lastList = New List(Of lpData)(rightList)
             linesRight.Run(stableLR.dst3)
 
-            Dim averageAgeRight = Line_Basics_TA.updateAgesAndLongest(linesRight.lpList, lastList)
             dst3 = task.rightView.Clone
             rightList.Clear()
             For Each lp In linesRight.lpList
