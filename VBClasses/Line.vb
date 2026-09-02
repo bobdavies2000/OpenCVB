@@ -2,7 +2,6 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Impor
 Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public averageAge As Single
         Dim lpListStable As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -36,10 +35,9 @@ Namespace VBClasses
                         indexNew += 1
                     End While
                     lp.index = indexNew
+                    lp.age = 1
                     usedList.Add(indexNew)
                 End If
-
-                If lp.age = 0 Then lp.age = 1
             Next
 
             Return lpListStable
@@ -53,14 +51,12 @@ Namespace VBClasses
                 basicsFLD.Run(src)
                 dst2 = basicsFLD.dst2
                 lpList = basicsFLD.lpList
-                averageAge = basicsFLD.averageAge
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
                 basicsLSD.Run(src)
                 dst2 = basicsLSD.dst2
                 lpList = basicsLSD.lpList
-                averageAge = basicsLSD.averageAge
                 labels = basicsLSD.labels
             End If
 
@@ -93,7 +89,6 @@ Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public core As New Line_Core
-        Public averageAge As Single
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst0 = dst1.Clone

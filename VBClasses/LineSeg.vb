@@ -3,7 +3,6 @@ Namespace VBClasses
     Public Class LineSeg_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public core As New LineSeg_Core
-        Public averageAge As Single
         Public rect As cv.Rect
         Public Sub New()
             desc = "Run LSD (Line Segment Detector) with sobel input."
