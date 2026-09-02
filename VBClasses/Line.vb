@@ -4,6 +4,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public averageAge As Single
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Age is shown for the top 10 longest lines."
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst0 = dst1.Clone
@@ -55,13 +56,14 @@ Namespace VBClasses
                 Dim previousIndex = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
                     lp.index = previousIndex
+                    lp.age += 1
                     usedList.Add(lp.index)
                 End If
             Next
             labels(3) = CStr(usedList.Count) + " lines were able to keep the index from the previous iteration."
 
             Dim indexNew = 1
-            dst1.SetTo(0)
+            If task.heartBeat Then dst1.SetTo(0)
             For Each lp In lpList
                 If lp.index = 0 Then
                     While usedList.Contains(indexNew)
@@ -71,9 +73,21 @@ Namespace VBClasses
                     usedList.Add(indexNew)
                 End If
 
-                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
-                If lp.index < 10 Then SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+                If lp.age >= 1 Then
+                    Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
+                    SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+                Else
+                    lp.age = 1
+                End If
             Next
+
+            If standalone Then
+                If task.mouseClickFlag Then
+                    task.lpD = lpList(dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+                    strOut = task.lpD.lpDisplay
+                End If
+                SetTrueText(strOut, 1)
+            End If
             dst0 = dst1.Clone()
             dst3 = Palettize(dst0, 0)
         End Sub
@@ -139,12 +153,15 @@ Namespace VBClasses
                         Dim lp = New lpData(p1, p2)
                         If lp.rect.Width = 0 Then Continue For
                         lpSorted.Add(lp.length, lp)
-                        If lpSorted.Count >= task.maxLineCount Then Exit For
                     End If
                 End If
             Next
 
-            Dim lpList As New List(Of lpData)(lpSorted.Values)
+            Dim lpList As New List(Of lpData)
+            For Each lp In lpSorted.Values
+                lpList.Add(lp)
+                If lpList.Count >= task.maxLineCount Then Exit For
+            Next
             Return lpList
         End Function
         Public Shared Function lpFixup(lp As lpData, x As Integer, y As Integer) As lpData

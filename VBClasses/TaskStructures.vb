@@ -314,10 +314,10 @@ Namespace VBClasses
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
                 strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
                 strOut += "Angle = " + angle.ToString(fmt1) + vbCrLf
-                strOut += "Length (pixels) = " + task.lpD.length.ToString(fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+                strOut += "Length (pixels) = " + task.lpD.length.ToString(fmt1) + vbCrLf
 
-                strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-                strOut += "ptE1 = " + task.lpD.ptE1.ToString + ", ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
+                strOut += "p1 = " + task.lpD.p1.ToString + vbCrLf + "p2 = " + task.lpD.p2.ToString + vbCrLf
+                strOut += "ptE1 = " + task.lpD.ptE1.ToString + vbCrLf + "ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
                 strOut += "Slope = " + task.lpD.slope.ToString(fmt3) + vbCrLf
                 strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
                 Return strOut
