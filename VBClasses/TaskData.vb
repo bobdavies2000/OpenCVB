@@ -48,7 +48,6 @@ Namespace VBClasses
         Public cols As Integer
         Public captureRes As Size
 
-        ' Global Options 
         Public DotSize As Integer
         Public lineWidth As Integer
         Public lineType As LineTypes
@@ -79,7 +78,7 @@ Namespace VBClasses
         Public imuBasics As IMU_Basics_TA
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
-        Public maxLineCount As Integer = 3 ' this will isolate the top X longest lines in the image.
+        Public lineMaxCount As Integer = 50 ' this will isolate the top X longest lines in the image.
         Public steadyLineWidth As Integer
         Public steadyCam As SteadyCam_Basics_TA
 

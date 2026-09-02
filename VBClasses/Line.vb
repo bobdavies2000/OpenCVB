@@ -3,14 +3,47 @@ Namespace VBClasses
     Public Class Line_Basics_TA : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public averageAge As Single
+        Dim lpListStable As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Age is shown for the top 10 longest lines."
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst0 = dst1.Clone
-            dst3 = dst1.Clone
             desc = "Run FLD (Fast Line Detector) with sobel input."
         End Sub
+        Public Shared Function setAge(lpList As List(Of lpData), lpLastList As List(Of lpData), map As cv.Mat) As List(Of lpData)
+            Dim usedList As New List(Of Byte)
+            Dim lpListStable As New List(Of lpData)
+            For Each lp In lpList
+                Dim previousIndex = map.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
+                    lp.index = previousIndex
+                    If lp.index - 1 < lpLastList.Count Then
+                        lp.age = lpLastList(lp.index - 1).age + 1
+                        If lp.age >= 1000 Then lp.age = 10
+                        lpListStable.Add(lp)
+                        usedList.Add(lp.index)
+                    End If
+                End If
+            Next
+
+            Dim indexNew = 1
+            For Each lp In lpList
+                If lp.index = 0 Then
+                    While usedList.Contains(indexNew)
+                        indexNew += 1
+                    End While
+                    lp.index = indexNew
+                    usedList.Add(indexNew)
+                End If
+
+                If lp.age = 0 Then lp.age = 1
+            Next
+
+            Return lpListStable
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
             Dim lpLastList = New List(Of lpData)(lpList)
@@ -31,37 +64,17 @@ Namespace VBClasses
                 labels = basicsLSD.labels
             End If
 
-            Dim usedList As New List(Of Byte)
-            For Each lp In lpList
-                Dim previousIndex = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                If previousIndex = 0 Then previousIndex = dst0.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If previousIndex = 0 Then previousIndex = dst0.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
-                If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
-                    lp.index = previousIndex
-                    lp.age = lpLastList(lp.index - 1).age + 1
-                    If lp.age >= 1000 Then lp.age = 10
-                    usedList.Add(lp.index)
-                End If
-            Next
-            labels(3) = CStr(usedList.Count) + " line(s) were able to keep the index from the previous iteration."
+            lpListStable = setAge(lpList, lpLastList, dst0)
+            labels(3) = CStr(lpListStable.Count) + " line(s) were able to keep the index from the previous iteration."
 
-            Dim indexNew = 1
             dst1.SetTo(0)
             For Each lp In lpList
-                If lp.index = 0 Then
-                    While usedList.Contains(indexNew)
-                        indexNew += 1
-                    End While
-                    lp.index = indexNew
-                    usedList.Add(indexNew)
-                End If
-
-                If lp.age = 0 Then lp.age = 1
+                'If lp.age > 1 Or lpListStable.Count < 5 Then
                 Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
                 SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
 
-            If standalone Then
+            If standaloneTest() Then
                 If task.mouseClickFlag Then
                     task.lpD = lpList(dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
                     strOut = task.lpD.lpDisplay
@@ -82,22 +95,31 @@ Namespace VBClasses
         Public core As New Line_Core
         Public averageAge As Single
         Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            dst0 = dst1.Clone
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastList = New List(Of lpData)(lpList)
+            Dim lpLastList = New List(Of lpData)(lpList)
+
             core.Run(src)
             lpList = New List(Of lpData)(core.lpList)
             dst2 = core.dst2
 
             labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines."
 
-            dst3 = task.lines.dst3
-            For Each lp In task.lines.lpList
-                SetTrueText(CStr(lp.age), New cv.Point(CInt(lp.ptCenter.X + 2), CInt(lp.ptCenter.Y + 2)), 3)
+            Dim lpListStable = Line_Basics_TA.setAge(lpList, lpLastList, dst0)
+            labels(3) = CStr(lpListStable.Count) + " line(s) were able to keep the index from the previous iteration."
+
+            dst1.SetTo(0)
+            Dim retainedFlag = labels(3).Substring(0, 1) = "0"
+            For Each lp In lpList
+                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
+                SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
 
-            task.lines.lpList = New List(Of lpData)(lpList)
+            dst0 = dst1.Clone()
+            dst3 = Palettize(dst0, 0)
         End Sub
     End Class
 
@@ -137,7 +159,7 @@ Namespace VBClasses
             Dim lpList As New List(Of lpData)
             For Each lp In lpSorted.Values
                 lpList.Add(lp)
-                If lpList.Count >= task.maxLineCount Then Exit For
+                If lpList.Count >= task.lineMaxCount Then Exit For
             Next
             Return lpList
         End Function

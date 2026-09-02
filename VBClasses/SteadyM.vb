@@ -352,10 +352,10 @@ Namespace VBClasses
                         While usedList.Contains(index)
                             usedList.Add(index)
                             index += 1
-                            If usedList.Count >= task.maxLineCount Then Exit While
+                            If usedList.Count >= task.lineMaxCount Then Exit While
                         End While
                         Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index), task.steadyLineWidth, cv.LineTypes.Link8)
-                        If index >= task.maxLineCount Then Exit For ' top X lines by length should be plenty
+                        If index >= task.lineMaxCount Then Exit For ' top X lines by length should be plenty
                     End If
                 Next
                 WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
