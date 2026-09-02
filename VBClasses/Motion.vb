@@ -52,6 +52,7 @@ Namespace VBClasses
                 src.CopyTo(dst2)
                 labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: all of them."
             Else
+                dst3 = motionMask
                 labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
             End If
 

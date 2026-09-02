@@ -274,57 +274,43 @@ Namespace VBClasses
 
     Public Class SteadyM_Longest : Inherits TaskParent
         Dim longest As lpData
+        Dim retained As New List(Of Integer)
         Public Sub New()
             labels(3) = "SteadyCam map of longest line."
             desc = "Use the inverseM in SteadyCam_Basics to track the longest line."
         End Sub
+        Public Shared Function checkLine(lp As lpData, map As cv.Mat) As Boolean
+            If CountNonZero(task.motion.motionMask(lp.rect)) > 0 Then Return False ' motion near the line
+            Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
+            Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+            Dim index1 = map.Get(Of Byte)(p1.Y, p1.X)
+            Dim index2 = map.Get(Of Byte)(p2.Y, p2.X)
+            Return index1 <> 0 And index2 <> 0
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
-            Dim lineWidth = task.lineWidth * 5
             dst2 = task.color.Clone
-            labels(2) = "Longest line was NOT found or could not be tracked."
             If task.lines.lpList.Count = 0 Then Exit Sub
 
+            If longest IsNot Nothing AndAlso checkLine(longest, dst3) Then retained.Add(1) Else longest = Nothing
+
             If longest Is Nothing Then
+                retained.Add(0)
                 longest = task.lines.lpList(0)
                 Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
                 Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
+
                 Dim lpSteady = New lpData(p1, p2)
-
                 dst3.SetTo(0)
-                Line(dst3, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
-
-                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
-                labels(2) = "Reseting longest line"
-            Else
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
-                Dim index1 = dst3.Get(Of Byte)(p1.Y, p1.X)
-                Dim index2 = dst3.Get(Of Byte)(p2.Y, p2.X)
-                longest = New lpData(p1, p2)
-
-                If index1 = 0 Or index2 = 0 Then
-                    longest = Nothing
-                    For Each lp In task.lines.lpList
-                        p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                        p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                        index1 = dst3.Get(Of Byte)(p1.Y, p1.X)
-                        index2 = dst3.Get(Of Byte)(p2.Y, p2.X)
-                        If index1 <> 0 And index2 <> 0 Then
-                            longest = lp
-                            Exit For
-                        End If
-                    Next
-                    If longest Is Nothing Then labels(2) = "Reseting longest line"
-                End If
+                Line(dst3, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(128), task.lineWidth, cv.LineTypes.Link8)
             End If
 
             If longest IsNot Nothing Then
-                dst3.SetTo(0)
-                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
-                Line(dst3, longest.ptE1, longest.ptE2, cv.Scalar.All(128), lineWidth, cv.LineTypes.Link8)
+                Line(dst2, longest.p1, longest.p2, task.highlight, task.lineWidth + 1, cv.LineTypes.Link8)
             End If
+
+            If retained.Count > 100 Then retained.RemoveAt(0)
+            Dim avg = retained.Average
+            labels(2) = "Longest line was found " + avg.ToString("#0%") + " of the time"
         End Sub
     End Class
 End Namespace
