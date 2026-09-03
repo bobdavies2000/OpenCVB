@@ -323,71 +323,40 @@ Namespace VBClasses
 
 
     Public Class SteadyM_Lines : Inherits TaskParent
-        Dim indexList As New List(Of Integer)
         Dim lpList As New List(Of lpData)
         Dim validList As New List(Of lpData)
-        Dim usedList As New List(Of Byte)
         Public Sub New()
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of lines."
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            labels(3) = "SteadyCam map of lines.  It is updated when < X lines are found."
             desc = "Use the inverseM in SteadyCam_Basics to track lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If validList.Count < task.lines.lpList.Count \ 10 Then
-                dst1.SetTo(0)
+            If validList.Count < 5 Then
                 lpList = New List(Of lpData)(task.lines.lpList)
-                usedList.Clear()
-                For Each lp In lpList
-                    Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                    Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                    Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
-                    Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
-
-                    If index1 = index2 And index1 <> 0 Then
-                        Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index1), task.steadyLineWidth, cv.LineTypes.Link8)
-                        usedList.Add(index1)
-                    Else
-                        Dim index = 1
-                        While usedList.Contains(index)
-                            usedList.Add(index)
-                            index += 1
-                            If usedList.Count >= task.lineMaxCount Then Exit While
-                        End While
-                        Line(dst1, lp.p1, lp.p2, cv.Scalar.All(index), task.steadyLineWidth, cv.LineTypes.Link8)
-                        If index >= task.lineMaxCount Then Exit For ' top X lines by length should be plenty
-                    End If
-                Next
-                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(task.lines.dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             validList.Clear()
-            indexList.Clear()
             For Each lp In task.lines.lpList
                 Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
                 Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
                 Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
                 Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
-                If index1 <> 0 And index2 <> 0 Then
-                    validList.Add(lp)
-                    indexList.Add(index1 - 1)
-                End If
+                If index1 > 0 Or index2 > 0 Then validList.Add(lp)
             Next
 
             dst2 = task.color.Clone
-            dst0.SetTo(0)
-            For i = 0 To validList.Count - 1
-                Dim lp = validList(i)
-                Line(dst2, lp.p1, lp.p2, task.scalarColors(indexList(i)), task.lineWidth, cv.LineTypes.Link8)
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
-                Line(dst0, p1, p2, cv.Scalar.All(indexList(i) + 1), task.steadyLineWidth, cv.LineTypes.Link8)
+            dst1.SetTo(0)
+            For Each lp In validList
+                Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth + 2, cv.LineTypes.Link8)
+                Line(dst1, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth, task.lineType)
             Next
 
             dst3 = Palettize(dst0, 0)
             If task.heartBeat Then
                 labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
-                        CStr(lpList.Count - validList.Count) + " were lost..."
+                            CStr(lpList.Count - validList.Count) + " were lost..."
+                labels(1) = CStr(validList.Count) + " lines were found through the SteadyCam map."
             End If
         End Sub
     End Class

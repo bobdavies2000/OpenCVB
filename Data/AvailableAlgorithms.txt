@@ -686,7 +686,7 @@ SteadyCam_Kalman
 SteadyCam_LongestLine
 SteadyCam_WarpAffine
 SteadyM_Basics
-SteadyM_Delaunay
+SteadyM_DelaunayPoints
 SteadyM_Lines
 SteadyM_Longest
 SteadyM_LongestMatch
