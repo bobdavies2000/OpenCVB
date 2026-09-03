@@ -9,7 +9,7 @@ Namespace VBClasses
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "SteadyCam map of features."
-            desc = "Use the inverseM in SteadyCam_Basics to track points."
+            desc = "Use the M mat in SteadyCam_Basics to track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.grayOriginal)
@@ -102,7 +102,7 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyM_Delaunay : Inherits TaskParent
+    Public Class SteadyM_DelaunayPoints : Inherits TaskParent
         Dim indexList As New List(Of Integer)
         Dim feat As New Feature_Basics
         Dim ptList As New List(Of cv.Point)

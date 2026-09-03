@@ -169,15 +169,6 @@ Namespace VBClasses
             Next
             Return lpList
         End Function
-        Public Shared Function lpFixup(lp As lpData, x As Integer, y As Integer) As lpData
-            lp.p1.X += x
-            lp.p2.X += x
-
-            lp.p1.Y += y
-            lp.p2.Y += y
-
-            Return New lpData(lp.p1, lp.p2)
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
 
@@ -185,11 +176,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             dst2 = task.color.Clone
-            Dim x = (dst2.Width - src.Width) \ 2
-            Dim y = (dst2.Height - src.Height) \ 2
             For i = 0 To lpList.Count - 1
-                lpList(i) = lpFixup(lpList(i), x, y)
-
                 Line(dst1, lpList(i).p1, lpList(i).p2, lpList(i).index, task.lineWidth, LineTypes.AntiAlias)
                 Line(dst2, lpList(i).p1, lpList(i).p2, white, task.lineWidth, LineTypes.AntiAlias)
             Next
