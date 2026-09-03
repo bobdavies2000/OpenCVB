@@ -686,10 +686,11 @@ SteadyCam_Kalman
 SteadyCam_LongestLine
 SteadyCam_WarpAffine
 SteadyM_Basics
+SteadyM_Cells
+SteadyM_DelaunayLines
 SteadyM_DelaunayPoints
 SteadyM_Lines
-SteadyM_Longest
-SteadyM_LongestMatch
+SteadyM_RedCTest
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX

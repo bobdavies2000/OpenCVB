@@ -68,7 +68,6 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each lp In lpList
-                'If lp.age > 1 Or lpListStable.Count < 5 Then
                 Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
                 SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
@@ -76,7 +75,6 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst1.SetTo(0)
                 For Each lp In lpList
-                    'If lp.age > 1 Or lpListStable.Count < 5 Then
                     Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
                     SetTrueText(CStr(lp.age), lp.ptCenter, 3)
                 Next

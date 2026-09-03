@@ -12,7 +12,7 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "ApproxPoly results for each cell"
-            desc = "Create the rcData representation of the image."
+            desc = "Segment the image based on color."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
             Dim displayStr As String
@@ -54,7 +54,6 @@ Namespace VBClasses
             For i = 1 To rcListLast.Count - 1
                 Dim rcLast = rcListLast(i)
                 Dim pt = rcLast.maxDStable
-                If pt.X < 0 OrElse pt.Y < 0 OrElse pt.X >= rcIndexMap.Width OrElse pt.Y >= rcIndexMap.Height Then Continue For
                 Dim idx = CInt(rcIndexMap.Get(Of Single)(pt.Y, pt.X))
                 If idx <= 0 OrElse idx >= rcList.Count OrElse assigned(idx) Then Continue For
                 rcList(idx).maxDStable = pt
