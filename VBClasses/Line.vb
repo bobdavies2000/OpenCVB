@@ -14,9 +14,9 @@ Namespace VBClasses
             Dim usedList As New List(Of Byte)
             Dim lpListStable As New List(Of lpData)
             For Each lp In lpList
-                Dim previousIndex = map.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                Dim previousIndex = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.p1.Y, lp.p1.X)
                 If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
                     lp.index = previousIndex
                     If lp.index - 1 < lpLastList.Count Then
@@ -46,22 +46,25 @@ Namespace VBClasses
             If src.Channels <> 1 Or src.Type <> MatType.CV_8U Then src = task.gray.Clone
             Dim lpLastList = New List(Of lpData)(lpList)
 
+            dst2 = task.color.Clone
             If task.fOptions.LineCombo.Text = "Fast Line Detection" Then
                 Static basicsFLD As New Line_Basics
                 basicsFLD.Run(src)
-                dst2 = basicsFLD.dst2
                 lpList = basicsFLD.lpList
                 labels = basicsFLD.labels
             Else
                 Static basicsLSD As New LineSeg_Basics
                 basicsLSD.Run(src)
-                dst2 = basicsLSD.dst2
                 lpList = basicsLSD.lpList
                 labels = basicsLSD.labels
             End If
 
             lpListStable = setAge(lpList, lpLastList, dst0)
             labels(3) = CStr(lpListStable.Count) + " line(s) were able to keep the index from the previous iteration."
+
+            For Each lp In lpListStable
+                Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth, task.lineType)
+            Next
 
             dst1.SetTo(0)
             For Each lp In lpList
@@ -71,6 +74,12 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
+                dst1.SetTo(0)
+                For Each lp In lpList
+                    'If lp.age > 1 Or lpListStable.Count < 5 Then
+                    Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
+                    SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+                Next
                 If task.mouseClickFlag Then
                     task.lpD = lpList(dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
                     strOut = task.lpD.lpDisplay
@@ -91,34 +100,36 @@ Namespace VBClasses
         Public core As New Line_Core
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            dst0 = dst1.Clone
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lpLastList = New List(Of lpData)(lpList)
-
             core.Run(src)
             lpList = New List(Of lpData)(core.lpList)
-            dst2 = core.dst2
 
             labels(2) = "FLD found " + CStr(task.lines.lpList.Count) + " lines."
 
-            Dim lpListStable = Line_Basics_TA.setAge(lpList, lpLastList, dst0)
+            Dim lpListStable = Line_Basics_TA.setAge(lpList, lpLastList, dst1)
             labels(3) = CStr(lpListStable.Count) + " line(s) were able to keep the index from the previous iteration."
 
-            dst1.SetTo(0)
-            Dim retainedFlag = labels(3).Substring(0, 1) = "0"
-            For Each lp In lpList
-                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
-                SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+            dst2 = task.color.Clone
+            For Each lp In lpListStable
+                Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth + 1, task.lineType)
             Next
 
-            dst0 = dst1.Clone()
-            dst3 = Palettize(dst0, 0)
+            dst1.SetTo(0)
+            For Each lp In lpList
+                Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
+                If task.gOptions.DebugCheckBox.Checked Then
+                    SetTrueText(CStr(lp.age) + " - " + CStr(lp.index), lp.ptCenter, 3)
+                Else
+                    SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+                End If
+            Next
+
+            dst3 = Palettize(dst1, 0)
         End Sub
     End Class
-
-
 
 
 
