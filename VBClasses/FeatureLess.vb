@@ -787,33 +787,26 @@ Namespace VBClasses
                     Dim val2 = dst1.Get(Of Byte)(p2.Y, p2.X)
                     If val1 = 255 And val2 = 0 Then
                         ' line present?
-                        If CountNonZero(task.lines.dst3(r2)) Then
+                        If CountNonZero(task.lines.dst1(r2)) Then
                             task.lines.dst0(r2).CopyTo(dst1(r2))
                             InRange(dst3(r2), 0, 0, dst3(r2))
-                            dst3(r2).SetTo(0, task.lines.dst3(r2))
+                            dst3(r2).SetTo(0, task.lines.dst1(r2))
                         End If
                     End If
 
                     If val1 = 0 And val2 = 255 Then
                         ' line present?
-                        If CountNonZero(task.lines.dst3(r1)) Then
+                        If CountNonZero(task.lines.dst1(r1)) Then
                             task.lines.dst0(r1).CopyTo(dst1(r1))
                             InRange(dst3(r1), 0, 0, dst3(r1))
-                            dst3(r1).SetTo(0, task.lines.dst3(r1))
+                            dst3(r1).SetTo(0, task.lines.dst1(r1))
                         End If
                     End If
-
-                    'If val1 = 0 And val2 > 0 Then
-                    '    ' line present?
-                    '    If task.lines.dst3(r1).CountNonZero Then
-                    '        dst1(r2) = dst1(r2).InRange(0, 0)
-                    '    End If
-                    'End If
                 End If
             Next
 
             For Each lp In task.lines.lpList
-                Line(dst2, lp.p1, lp.p2, black, task.lineWidth)
+                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
             Next
             Dim count = task.gridRects.Count - fLess.brickList.Count
             labels(2) = "Current frame: " + CStr(count) + " grid squares had features"

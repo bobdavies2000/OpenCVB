@@ -39,7 +39,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_GravityRGB_RotateRGB : Inherits TaskParent
+    Public Class GravityRGB_RotateRGB : Inherits TaskParent
         Public bestAngle As Double
         Public angleOffset As Double
         Dim center As cv.Point2f
@@ -48,10 +48,10 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",
                   "AbsDiff of inverse vs original lines (jagged residual)"}
-            desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst3: rotateRGB, inverse WarpAffine, compare to original."
+            desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst1: rotateRGB, inverse WarpAffine, compare to original."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lines = task.lines.dst3
+            Dim lines = task.lines.dst1
 
             Dim reconstructed As New Mat
             Dim diff As New Mat
@@ -83,9 +83,9 @@ Namespace VBClasses
             Threshold(dst3, dst3, 0, 255, ThresholdTypes.Binary)
 
             strOut = "IMU verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg" + vbCrLf +
-                 "Corrected bestAngle = " + bestAngle.ToString(fmt3) + " deg" + vbCrLf +
-                 "angleOffset = " + angleOffset.ToString(fmt3) + " deg" + vbCrLf +
-                 "Jagged residual pixels = " + CStr(CountNonZero(dst3))
+                     "Corrected bestAngle = " + bestAngle.ToString(fmt3) + " deg" + vbCrLf +
+                     "angleOffset = " + angleOffset.ToString(fmt3) + " deg" + vbCrLf +
+                     "Jagged residual pixels = " + CStr(CountNonZero(dst3))
             SetTrueText(strOut, 1)
             labels(2) = "Best gravity angle = " + bestAngle.ToString("0.000") + " (offset " + angleOffset.ToString("0.000") + ")"
         End Sub

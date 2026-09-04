@@ -648,7 +648,6 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
         End Sub
@@ -657,9 +656,8 @@ Namespace VBClasses
             dst2 = lSeg.dst3
             labels(2) = lSeg.labels(2)
             labels(1) = task.lines.labels(2)
-            dst1 = task.lines.dst3
 
-            dst3 = dst1 And dst2
+            dst3 = task.lines.dst1 And dst2
 
             dst0.SetTo(0)
             lSeg.dst1.CopyTo(dst0, dst3)
@@ -683,7 +681,6 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare the results of the line segment detector and fast line detector."
         End Sub
@@ -692,10 +689,9 @@ Namespace VBClasses
             dst2 = lSeg.dst3
             labels(2) = lSeg.labels(2)
 
-            dst1 = task.lines.dst3
             labels(1) = task.lines.labels(2)
 
-            dst3 = dst1 And dst2
+            dst3 = task.lines.dst1 And dst2
 
             dst0.SetTo(0)
             lSeg.dst1.CopyTo(dst0, dst3)

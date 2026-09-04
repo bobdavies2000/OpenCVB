@@ -560,7 +560,6 @@ Namespace VBClasses
     Public Class XR_LineTrack_SearchX : Inherits TaskParent
         Dim lastImage As Mat
         Dim searchCount As Integer = 9
-        Dim addw As New AddWeighted_Basics
         Public Sub New()
             dst1 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -579,7 +578,7 @@ Namespace VBClasses
             SetTrueText(strOut, 2)
             If task.heartBeatLT = False Then Exit Sub
 
-            dst3 = task.lines.dst3
+            dst3 = task.lines.dst1
             If task.firstPass Then lastImage = dst3.Clone
 
             Dim countList As New List(Of (count As Integer, index As Integer))
@@ -617,7 +616,7 @@ Namespace VBClasses
                                                 0.25, 0, dst2)
             End If
 
-            lastImage = task.lines.dst3.Clone
+            lastImage = task.lines.dst1.Clone
         End Sub
     End Class
 

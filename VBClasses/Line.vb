@@ -2109,14 +2109,15 @@ Namespace VBClasses
             Next
 
             dst2.SetTo(0)
-            For Each index In interList.Values(0)
-                If index = 0 Then Continue For
-                Dim lp = lpList(index)
-                Line(dst2, lp.p1, lp.p2, If(lp.rightImage, white, task.highlight), task.lineWidth)
-            Next
-
-            labels(2) = CStr(lpList.Count) + " lines found and as many as " +
-                        CStr(interList.Values(0).Count) + " are parallel.  white is right image, left yellow."
+            If interList.Count > 0 Then
+                For Each index In interList.Values(0)
+                    If index = 0 Then Continue For
+                    Dim lp = lpList(index)
+                    Line(dst2, lp.p1, lp.p2, If(lp.rightImage, white, task.highlight), task.lineWidth)
+                Next
+                labels(2) = CStr(lpList.Count) + " lines found and as many as " +
+                                CStr(interList.Values(0).Count) + " are parallel.  white is right image, left yellow."
+            End If
         End Sub
     End Class
 

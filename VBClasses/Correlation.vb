@@ -291,19 +291,18 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             SetTrueText("Correlation = " + correlation.ToString(fmt2), 3)
-            If task.heartBeatLT = False Then Exit Sub
 
-            Static lastImage As Mat = task.lines.dst3.Clone
+            Static lastImage As Mat = task.lines.dst1.Clone
 
-            dst2 = task.lines.dst3.Clone
+            dst2 = task.lines.dst1.Clone
 
             Dim correlationMat As New Mat
-            MatchTemplate(task.lines.dst3, lastImage, correlationMat, TemplateMatchModes.CCoeffNormed)
+            MatchTemplate(task.lines.dst1, lastImage, correlationMat, TemplateMatchModes.CCoeffNormed)
 
             correlation = correlationMat.Get(Of Single)(0, 0)
 
             dst2.SetTo(128, lastImage)
-            lastImage = task.lines.dst3.Clone
+            lastImage = task.lines.dst1.Clone
         End Sub
     End Class
 End Namespace

@@ -208,7 +208,7 @@ Namespace VBClasses
             If standalone Then setLargeGridSize()
             dst3 = New Mat(dst3.Size, MatType.CV_32F, 0)
             labels(3) = "High entropy = busy, detailed, noisy. Low entropy = smooth"
-            desc = "What is the entropy for each cell using the task.lines.dst3 as input"
+            desc = "What is the entropy for each cell using the task.gray as input"
         End Sub
         Public Shared Sub setLargeGridSize()
             Dim val As Integer = task.workRes.Width / 10
