@@ -419,7 +419,7 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyM_Cells : Inherits TaskParent
+    Public Class XR_SteadyM_Cells : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -436,7 +436,7 @@ Namespace VBClasses
                     rc.index = previousIndex
                     If rc.index - 1 < rcLastList.Count Then
                         rc.age = rcLastList(rc.index - 1).age + 1
-                        If rc.age >= 1000 Then rc.age = 10
+                        If rc.age >= 1000 Then rc.age = 100
                         rcListStable.Add(rc)
                         usedList.Add(rc.index)
                     End If
@@ -492,7 +492,10 @@ Namespace VBClasses
 
     Public Class SteadyM_RedCTest : Inherits TaskParent
         Dim redC As New RedC_Basics
+        Dim rcIndexMap As cv.Mat
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Display the raw RedC rcIndexMap"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -500,7 +503,17 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            dst3 = Palettize(redC.rcIndexMap, 0)
+            If task.heartBeatLT Then rcIndexMap = redC.rcIndexMap.Clone
+
+            dst1.SetTo(0)
+            For Each rc In redC.rcList
+                Dim val1 = rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim val2 = redC.rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                If val1 = val2 Then dst1(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+            dst3 = Palettize(dst1, 0)
+
+            SetTrueText(task.rcD.displayCell, 1)
         End Sub
     End Class
 

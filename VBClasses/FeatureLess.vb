@@ -1124,7 +1124,7 @@ Namespace VBClasses
                 Dim lastIndex = lastImage.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
                 If lastIndex >= 0 And lastIndex < lastList.Count Then
                     rc.age += 1
-                    If rc.age >= 1000 Then rc.age = 10
+                    If rc.age >= 1000 Then rc.age = 100
                 End If
             Next
 

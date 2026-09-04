@@ -183,7 +183,7 @@ Namespace VBClasses
                 End If
                 If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
-                    If rc.age >= 1000 Then rc.age = 2
+                    If rc.age >= 1000 Then rc.age = 100
                     count += 1
                 End If
 
