@@ -513,7 +513,7 @@ Namespace VBClasses
             Next
             dst3 = Palettize(dst1, 0)
 
-            SetTrueText(task.rcD.displayCell, 1)
+            If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
         End Sub
     End Class
 

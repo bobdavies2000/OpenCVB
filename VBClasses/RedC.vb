@@ -1,32 +1,37 @@
-Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports OpenCvSharp.Cv2
-Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
-        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "ApproxPoly results for each cell"
+            labels(3) = "rcIndexMap version of cells.  Age is shown for the largest cells."
             desc = "Segment the image based on color."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
-            Dim displayStr As String
-            If clickIndex <= 0 Then
-                displayStr = "There is no cell defined for that point."
-            Else
-                task.rcD = rclist(clickIndex)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                displayStr = task.rcD.displayCell
-            End If
+            Dim displayStr As String = "There is no cell defined for that point."
+            For Each rc In rclist
+                If rc.index = clickIndex Then
+                    task.rcD = rc
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    displayStr = task.rcD.displayCell
+                End If
+            Next
             Return displayStr
+        End Function
+        Private Shared Function rcIndexFind(rclistLast As List(Of rcData), rcIndex As Integer) As rcData
+            For Each rc In rclistLast
+                If rc.index = rcIndex Then Return rclistLast(rclistLast.IndexOf(rc))
+            Next
+            Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcIndexMapLast = rcIndexMap.Clone
+            Dim rcMapIDsLast = flood.dst1
 
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
@@ -37,35 +42,51 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst2
             rcList.Clear()
-            rcList.Add(New rcData)
-            rcIndexMap.SetTo(0)
-            rcMapIDs = flood.dst1
+            Dim usedList As New List(Of Single)
+            Dim reusedIndex As Integer
             For i = 0 To flood.rectList.Count - 1
-                Dim index = flood.indexList(i)
+                Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
+                Dim rc As New rcData(flood.mask(r), r, floodVal)
+                rc.mapID = flood.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-                Dim rc As New rcData(flood.mask(r), r, index) With {.index = rcList.Count}
-                rc.mapID = rcMapIDs.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcIndexMap(r).SetTo(rc.index, rc.mask)
+                Dim oldMapID = rcMapIDsLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.mapID = oldMapID Then
+                    Dim previousIndex = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                    If usedList.Contains(previousIndex) = False And previousIndex <> 0 Then
+                        rc.index = previousIndex
+                        usedList.Add(rc.index)
+                        reusedIndex += 1
+                    End If
+                End If
                 rcList.Add(rc)
             Next
 
-            Dim assigned(rcList.Count - 1) As Boolean
-            For i = 1 To rcListLast.Count - 1
-                Dim rcLast = rcListLast(i)
-                Dim pt = rcLast.maxDStable
-                Dim idx = CInt(rcIndexMap.Get(Of Single)(pt.Y, pt.X))
-                If idx <= 0 OrElse idx >= rcList.Count OrElse assigned(idx) Then Continue For
-                rcList(idx).maxDStable = pt
-                rcList(idx).age = rcLast.age + 1
-                If rcList(idx).age >= 1000 Then rcList(idx).age = 10
-                assigned(idx) = True
+            Dim nextIndex As Integer
+            rcIndexMap.SetTo(0)
+            For i = rcList.Count - 1 To 0 Step -1
+                Dim rc = rcList(i)
+                If rc.index = 0 Then
+                    While usedList.Contains(nextIndex)
+                        nextIndex += 1
+                    End While
+
+                    rc.index = nextIndex
+                    usedList.Add(nextIndex)
+                    rc.age = 1
+                Else
+                    Dim rclast = rcIndexFind(rcListLast, rc.index)
+                    If rclast IsNot Nothing Then
+                        rc.age = rclast.age + 1
+                        If rc.age >= 1000 Then rc.age = 100
+                    Else
+                        rc.age = 1
+                    End If
+                End If
+                rcIndexMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
             Next
 
-            Static clickPoint As cv.Point
-            If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcIndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
-            SetTrueText(displayCell(rcList, clickIndex), 1)
+            SetTrueText(displayCell(rcList, rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             If task.rcD IsNot Nothing Then
                 SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
@@ -74,15 +95,13 @@ Namespace VBClasses
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            For i = 1 To rcList.Count - 1
-                dst1(rcList(i).rect).SetTo(rcList(i).mapID, rcList(i).maskApprox)
-                If rcList(i).index <= 10 Then SetTrueText(CStr(rcList(i).age), rcList(i).maxDStable, 3)
+            For i = 0 To Math.Min(rcList.Count, 10) - 1
+                SetTrueText(CStr(rcList(i).age), rcList(i).maxDStable, 3)
             Next
 
-            dst3 = Palettize(dst1, 0)
-            dst1.SetTo(0)
+            dst3 = Palettize(rcIndexMap)
 
-            labels(2) = CStr(rcList.Count) + " cells were found."
+            labels(2) = CStr(rcList.Count) + " cells were found and " + CStr(reusedIndex) + " were able to reuse the index."
         End Sub
     End Class
 
