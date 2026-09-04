@@ -217,33 +217,19 @@ Namespace VBClasses
                 If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
             Next
 
-            Dim index As Integer
-            If task.mouseClickFlag Then
-                index = dst0.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            Else
-                index = dst0.Get(Of Integer)(lastCenter.Y, lastCenter.X)
-                For Each rc In redC.rcList
-                    If rc.rect.IntersectsWith(lastRect) And rc.mapID = lastMapID Then
-                        index = rc.index
-                        Exit For ' find the largest
-                    End If
-                Next
-            End If
-
-            Dim rcD = redC.rcList(index)
+            SetTrueText(RedC_Basics.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             dst3.SetTo(0)
-            task.color(rcD.rect).SetTo(white, rcD.mask)
-            FillPoly(dst3(rcD.rect), {rcD.hull}, task.scalarColors(rcD.mapID + 1))
-            dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
-            Rectangle(dst2, rcD.rect, task.highlight, task.lineWidth)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            FillPoly(dst3(task.rcD.rect), {task.rcD.hull}, task.scalarColors(task.rcD.mapID + 1))
+            dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.mapID), task.rcD.mask)
+            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
-            SetTrueText(rcD.displayCell() + vbCrLf, 1)
+            SetTrueText(task.rcD.displayCell() + vbCrLf, 1)
 
-            task.rcD = rcD
-            lastCenter = Utility_Basics.ComputeHullCentroid(rcD.hull.ToArray, rcD)
-            lastMapID = rcD.mapID
-            lastRect = rcD.rect
+            lastCenter = Utility_Basics.ComputeHullCentroid(task.rcD.hull.ToArray, task.rcD)
+            lastMapID = task.rcD.mapID
+            lastRect = task.rcD.rect
         End Sub
     End Class
 
@@ -473,7 +459,6 @@ Namespace VBClasses
             dst0.SetTo(0)
             Dim depthCount As Integer
             For Each rc In redC.rcList
-                If rc.index = 0 Then Continue For
                 Dim depth8u = CByte(Math.Min(255, rc.depth * 255.0 / task.MaxZmeters))
                 dst0(rc.rect).SetTo(depth8u, rc.mask)
                 depthCount += 1
@@ -482,17 +467,14 @@ Namespace VBClasses
             ApplyColorMap(dst0, dst3, task.colorMapDepth)
             dst3.SetTo(0, task.noDepthMask)
 
-            Dim clickIndex As Integer = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 AndAlso clickIndex < redC.rcList.Count Then
-                Dim rc = redC.rcList(clickIndex)
-                SetTrueText(rc.displayCell() + vbCrLf + "Mean depth = " + rc.depth.ToString(fmt2) + "m", 1)
-                task.color(rc.rect).SetTo(white, rc.mask)
-                dst2(rc.rect).SetTo(task.highlight, rc.mask)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-            End If
+            SetTrueText(RedC_Basics.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
-            labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" +
-                    task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
+            SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            dst2(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
+            Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
+
+            labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" + task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
         End Sub
     End Class
 
@@ -569,7 +551,6 @@ Namespace VBClasses
             Dim histArray(bins) As Single
             dst3 = dst2.Clone
             For Each rc In redC.rcList
-                If rc.index = 0 Then Continue For
                 Dim tmp = task.lines.dst1(rc.rect).Clone
                 CalcHist({tmp}, {0}, rc.mask, histogram, 1, {bins}, ranges)
                 histogram.GetArray(Of Single)(histArray)
@@ -593,11 +574,10 @@ Namespace VBClasses
 
     Public Class RedC_DepthMerge : Inherits TaskParent
         Public redC As New RedC_Basics
-        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            labels(3) = "rcIndexMap version of cells"
             desc = "Cursor.ai: Merge neighboring RedC color cells when their min/max depths overlap."
         End Sub
         Private Shared Function cellDepthRange(rc As rcData) As mmData
@@ -615,21 +595,21 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst2 = redC.dst2
+            dst3 = redC.dst3
             labels(2) = redC.labels(2)
-
+            labels(3) = redC.labels(3)
             Dim n = redC.rcList.Count
-            If n <= 1 Then
-                rcList = New List(Of rcData)(redC.rcList)
-                rcIndexMap = redC.rcIndexMap
-                dst3 = dst2.Clone
-                Exit Sub
-            End If
+            If n = 0 Then Exit Sub
+
+            rcIndexMap = redC.rcIndexMap
+            dst3 = dst2.Clone
+            Exit Sub
 
             Dim minZ(n - 1) As Single, maxZ(n - 1) As Single
             For i = 1 To n - 1
-                Dim mm = cellDepthRange(redC.rcList(i))
-                minZ(i) = CSng(mm.minVal)
-                maxZ(i) = CSng(mm.maxVal)
+                Dim mmZ = cellDepthRange(redC.rcList(i))
+                minZ(i) = CSng(mmZ.minVal)
+                maxZ(i) = CSng(mmZ.maxVal)
             Next
 
             Dim nabes(n - 1) As HashSet(Of Integer)
@@ -701,34 +681,16 @@ Namespace VBClasses
                 If merged.pixels > 0 Then sorted.Add(merged.pixels, merged)
             Next
 
-            rcList.Clear()
-            rcList.Add(New rcData)
-            rcIndexMap.SetTo(0)
-            dst1.SetTo(0)
-            For Each rc In sorted.Values
-                rc.index = rcList.Count
-                rcList.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst1(rc.rect).SetTo(CByte(rc.index Mod 255), rc.mask)
-            Next
-            dst3 = Palettize(dst1, 0)
-            dst1.SetTo(0)
+            Dim mm = cellDepthRange(task.rcD)
+            strOut = RedC_Basics.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            SetTrueText(strOut + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m" + vbCrLf +
+                        "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
+                        mm.maxVal.ToString(fmt2) + "m", 1)
 
-            Static clickPoint As cv.Point
-            If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcIndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
-            If clickIndex > 0 AndAlso clickIndex < rcList.Count Then
-                Dim rc = rcList(clickIndex)
-                Dim mm = cellDepthRange(rc)
-                SetTrueText(RedC_Basics.displayCell(rcList, clickIndex) +
-                            "Mean depth = " + rc.depth.ToString(fmt2) + "m" + vbCrLf +
-                            "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
-                            mm.maxVal.ToString(fmt2) + "m", 1)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                Circle(dst3, rc.maxDist, task.DotSize + 1, white, -1)
-            End If
+            Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
+            Circle(dst3, task.rcD.maxDist, task.DotSize + 1, white, -1)
 
-            labels(3) = CStr(rcList.Count) + " cells after merging neighbors of " +
+            labels(3) = CStr(redC.rcList.Count) + " cells after merging neighbors of " +
                     CStr(n) + " color cells with overlapping depth"
         End Sub
     End Class

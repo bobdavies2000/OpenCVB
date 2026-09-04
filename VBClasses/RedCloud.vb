@@ -14,6 +14,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+
             If task.quarterBeat Then
                 reduction.Run(task.gray)
                 dst1 = reduction.dst2
@@ -21,9 +22,6 @@ Namespace VBClasses
 
             redCore.Run(src)
             labels(3) = redCore.labels(3)
-
-            Dim rcListLast As New List(Of rcData)(rcList)
-            Dim rcMapLast As Mat = rcIndexMap.Clone
 
             rcList.Clear()
             rcIndexMap.SetTo(0)
@@ -33,8 +31,6 @@ Namespace VBClasses
             Dim matchAverage As Single
             Dim blackVec As New Vec3b
             For Each rc In redCore.rcList
-                ' rc = Utility_Basics.rcDataMatch(rc)
-
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
                 rc.mapID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)

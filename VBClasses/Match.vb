@@ -694,7 +694,6 @@ Namespace VBClasses
 
             matchFeat.ptList.Clear()
             For Each rc In redC.rcList
-                If rc.index = 0 Then Continue For
                 matchFeat.ptList.Add(rc.maxDStable)
                 If rc.index >= 10 Then Exit For
             Next
