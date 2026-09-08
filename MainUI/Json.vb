@@ -20,8 +20,10 @@ Namespace MainApp
             Public Reserved As UIntPtr
         End Structure
 
-        <DllImport("setupapi.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
-        Private Shared Function SetupDiGetClassDevs(ByVal ClassGuid As IntPtr, ByVal Enumerator As String, ByVal hwndParent As IntPtr, ByVal Flags As UInteger) As IntPtr
+        <DllImport("setupapi.dll", CharSet:=CharSet.Unicode, SetLastError:=True)>
+        Private Shared Function SetupDiGetClassDevs(ByVal ClassGuid As IntPtr,
+            <MarshalAs(UnmanagedType.LPWStr)> ByVal Enumerator As String,
+            ByVal hwndParent As IntPtr, ByVal Flags As UInteger) As IntPtr
         End Function
 
         <DllImport("setupapi.dll", SetLastError:=True)>
@@ -45,7 +47,7 @@ Namespace MainApp
         Private Shared Function OakDNextDevice() As IntPtr
         End Function
 
-        Private jsonFileName As String
+        Private ReadOnly jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
         End Sub
@@ -131,7 +133,7 @@ Namespace MainApp
             Return Settings
         End Function
         ''' <summary>Enumerate PnP device names using SetupAPI (no WMI). Returns same style list as before for camera detection.</summary>
-        Public Function USBenumeration() As List(Of String)
+        Public Shared Function USBenumeration() As List(Of String)
             Static usblist As New List(Of String)
             If usblist.Count > 0 Then Return usblist
 
@@ -183,7 +185,7 @@ Namespace MainApp
                             name.StartsWith("PCI-to-PCI") Or name.StartsWith("Network Controller") Or name.StartsWith("ATAPI ") Or
                             name.Contains("Gen Intel(R) ") Then
                         Else
-                            Debug.WriteLine(name) ' looking for new cameras
+                            '  Debug.WriteLine(name) ' enable this to look for new cameras
                         End If
                     End If
                     devInfo.cbSize = CUInt(Marshal.SizeOf(GetType(SP_DEVINFO_DATA)))

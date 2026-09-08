@@ -4,7 +4,10 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lpListStable As New List(Of lpData)
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then
+                task.gOptions.showMyDst1.Checked = True
+                task.fOptions.FeatureSizeSlider.Value = 20
+            End If
             labels(3) = "Age is shown for the top 10 longest lines."
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst0 = dst1.Clone
@@ -13,6 +16,7 @@ Namespace VBClasses
         Public Shared Function setAge(lpList As List(Of lpData), lpLastList As List(Of lpData), map As cv.Mat) As List(Of lpData)
             Dim usedList As New List(Of Byte)
             Dim lpListStable As New List(Of lpData)
+
             For Each lp In lpList
                 Dim previousIndex = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If previousIndex = 0 Then
@@ -103,7 +107,11 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public core As New Line_Core
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If standalone Then
+                task.gOptions.showMyDst1.Checked = True
+                task.fOptions.FeatureSizeSlider.Value = 20
+            End If
+
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
