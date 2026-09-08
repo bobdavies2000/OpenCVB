@@ -8,7 +8,7 @@ Namespace VBClasses
             labels(3) = "Age is shown for the top 10 longest lines."
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst0 = dst1.Clone
-            desc = "Run FLD (Fast Line Detector) with sobel input."
+            desc = "Run FLD (Fast Line Detector) or LSD (Line Segment Detector) with grayscale input."
         End Sub
         Public Shared Function setAge(lpList As List(Of lpData), lpLastList As List(Of lpData), map As cv.Mat) As List(Of lpData)
             Dim usedList As New List(Of Byte)
@@ -26,7 +26,7 @@ Namespace VBClasses
                     lp.index = previousIndex
                     If lp.index - 1 < lpLastList.Count Then
                         lp.age = lpLastList(lp.index - 1).age + 1
-                        If lp.age >= 1000 Then lp.age = 10
+                        If lp.age >= 1000 Then lp.age = 100
                         lpListStable.Add(lp)
                         usedList.Add(lp.index)
                     End If
@@ -65,7 +65,8 @@ Namespace VBClasses
             End If
 
             lpListStable = setAge(lpList, lpLastList, dst0)
-            labels(3) = CStr(lpListStable.Count) + " line(s) were able to keep the index from the previous iteration."
+            labels(3) = CStr(lpListStable.Count) + " lines were retained their index.  Age is displayed.  Better if fewer lines."
+            labels(2) += "  Use Feature Samples slider in fOptions to reduce the number of lines."
 
             For Each lp In lpListStable
                 Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth, task.lineType)
@@ -91,7 +92,6 @@ Namespace VBClasses
             End If
             dst0 = dst1.Clone()
             dst3 = Palettize(dst0, 0)
-            dst0.SetTo(0)
         End Sub
     End Class
 

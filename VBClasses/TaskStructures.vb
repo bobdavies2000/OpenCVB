@@ -311,7 +311,7 @@ Namespace VBClasses
             End Operator
 
             Public Function lpDisplay() As String
-                Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+                Dim strOut = "Index = " + CStr(index) + vbCrLf
                 strOut += "Age = " + CStr(age) + vbCrLf
                 strOut += "Angle = " + angle.ToString(fmt1) + vbCrLf
                 strOut += "Length (pixels) = " + length.ToString(fmt1) + vbCrLf
