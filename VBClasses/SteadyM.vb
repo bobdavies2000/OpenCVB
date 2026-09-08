@@ -434,8 +434,8 @@ Namespace VBClasses
                 Dim previousIndex = map.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
                     rc.index = previousIndex
-                    If rc.index - 1 < rcLastList.Count Then
-                        rc.age = rcLastList(rc.index - 1).age + 1
+                    If rc.index < rcLastList.Count Then
+                        rc.age = rcLastList(rc.index).age + 1
                         If rc.age >= 1000 Then rc.age = 100
                         rcListStable.Add(rc)
                         usedList.Add(rc.index)

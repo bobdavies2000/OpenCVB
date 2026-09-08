@@ -173,7 +173,7 @@ Namespace VBClasses
             Dim grayScale As Scalar = cv.Scalar.All(128)
             Rectangle(dst2, task.brickD.lRect, grayScale, task.lineWidth, task.lineType)
             Rectangle(dst3, task.brickD.rRect, grayScale, task.lineWidth, task.lineType)
-            labels(2) = "The correlation coefficient at " + task.brickD.rect.TopLeft.ToString + " is " + corr.ToString(fmt3)
+            labels(2) = "The correlation coefficient at " + task.brickD.rect.ToString + " is " + corr.ToString(fmt3)
         End Sub
     End Class
 

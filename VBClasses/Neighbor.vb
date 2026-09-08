@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Public nabs As New List(Of Integer)
+        Public nabes As New List(Of Integer)
         Public Sub New()
             desc = "Find all the neighbors with CalcHist and the neighborMask"
         End Sub
@@ -18,25 +18,21 @@ Namespace VBClasses
                 Dim histogram As New Mat
                 Dim bins = redC.rcList.Count
                 Dim ranges = {New Rangef(0, bins + 1)}
-                CalcHist({redC.rcIndexMap(rc.rect)}, {0}, rc.neighborMask, histogram, 1, {bins}, ranges)
+                CalcHist({redC.rcIndexMap(rc.rect)}, {0}, New cv.Mat, histogram, 1, {bins}, ranges)
 
                 Dim histArray(bins) As Single
                 histogram.GetArray(Of Single)(histArray)
+                nabes.clear
                 For i = 1 To bins - 1
-                    If histArray(i) > 0 Then nabs.Add(i)
+                    If histArray(i) > 0 Then nabes.Add(i)
                 Next
 
                 strOut = ""
-                For Each index In nabs
-                    strOut += "cell " + CStr(index) + " is a neighbor"
+                For Each index In nabes
+                    strOut += "cell " + CStr(index) + " is a neighbor" + vbCrLf
                 Next
                 SetTrueText(strOut, 3)
             End If
         End Sub
     End Class
-
-
-
-
-
 End Namespace

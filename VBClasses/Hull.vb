@@ -284,7 +284,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Contour is in white and hull is highlighted."
-            desc = "Compare the hull to the contour of a contour cell"
+            desc = "Compare the hull to the contour of a cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -307,6 +307,7 @@ Namespace VBClasses
             Dim defects As Vec4i() = Nothing
             rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
             If defects.Length = 0 Then Exit Sub
+            If rc.contour.Count = 0 Then Exit Sub
 
             Dim lastV As Integer = -1
             Dim tour As New List(Of cv.Point)

@@ -468,10 +468,14 @@ Namespace VBClasses
                 hammingList.Add(h)
             Next
 
+            ' Dim lpListStable = Line_Basics_TA.setAge(lpList, lpPrev, dst0)
+
             For k = 0 To lpList.Count - 1
+
                 Dim c = task.scalarColors((k + 1) Mod 255)
                 Line(dst2, lpList(k).p1, lpList(k).p2, c, task.lineWidth + 2, task.lineType)
                 Line(dst3, lpPrevMatched(k).p1, lpPrevMatched(k).p2, c, task.lineWidth + 2, task.lineType)
+                SetTrueText(CStr(lpList(k).age), lpList(k).ptCenter, 3)
             Next
 
             currDesc.CopyTo(descPrev)

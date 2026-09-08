@@ -8,6 +8,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.grayOriginal
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             If task.lines.lpList(0).age <= 1 Then
                 dst2 = src.Clone
@@ -119,6 +120,7 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.color.Clone
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             Dim lpCurr = task.lines.lpList(0)
             If lpCurr.length <= 0 Then
@@ -198,6 +200,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             Dim g = Unit2D(task.lpGravity.ptE1, task.lpGravity.ptE2)
             Dim l = Unit2D(task.lines.lpList(0).ptE1, task.lines.lpList(0).ptE2)

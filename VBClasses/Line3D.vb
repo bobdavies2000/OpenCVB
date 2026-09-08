@@ -115,6 +115,7 @@ Namespace VBClasses
             desc = "Build the 3D lines found in Line_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
             selectLine.Run(src)
             dst2 = selectLine.dst2
             labels(2) = selectLine.labels(2)
@@ -224,6 +225,8 @@ Namespace VBClasses
             desc = "Select a line using the debug slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
             If lp Is Nothing Then lp = task.lines.lpList(0)
 
             If task.firstPass = False Then
@@ -356,6 +359,8 @@ Namespace VBClasses
             desc = "Use the debug slider in Global Options to select which line to test."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Exit Sub
+            If task.lines.lpList.Count = 0 Then Exit Sub
             If task.heartBeatLT Then dst1.SetTo(0)
             Selection.Run(emptyMat)
             Dim lp = Selection.lp
@@ -405,3 +410,4 @@ Namespace VBClasses
         End Sub
     End Class
 End Namespace
+

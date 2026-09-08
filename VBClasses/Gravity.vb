@@ -238,6 +238,7 @@ Namespace VBClasses
             Dim graySrc = If(src.Channels = 1, src, task.gray)
             If graySrc.Empty Then Exit Sub
             If task.optionsChanged Or task.firstPass Then ResetState()
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             Dim lpCurr = task.lines.lpList(0)
             Dim lpGravity = task.lpGravity

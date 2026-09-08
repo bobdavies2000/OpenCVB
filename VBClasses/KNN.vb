@@ -421,18 +421,19 @@ Namespace VBClasses
             trainInput.Clear()
             queries.Clear()
             For Each r In task.gridRects
-                Dim val = fLess.dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = fLess.dst2.Get(Of Byte)(r.Y, r.X)
                 If val > 0 Then
-                    trainInput.Add(New Vec3f(r.TopLeft.X, r.TopLeft.Y, Mean(task.gray(r))(0)))
+                    trainInput.Add(New Vec3f(r.X, r.Y, Mean(task.gray(r))(0)))
                     clusters.Add(val)
                 Else
                     For y = 0 To r.Height - 1
                         For x = 0 To r.Width - 1
-                            queries.Add(New Vec3f(r.TopLeft.X + x, r.TopLeft.Y + y, Mean(task.gray(r))(0)))
+                            queries.Add(New Vec3f(r.X + x, r.Y + y, Mean(task.gray(r))(0)))
                         Next
                     Next
                 End If
             Next
+            If trainInput.Count = 0 Then Exit Sub
 
             Dim dimension = 3
             knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
@@ -517,6 +518,8 @@ Namespace VBClasses
                     End If
                 Next
             End If
+            If queries.Count = 0 Then Exit Sub
+            If trainInput.Count = 0 Then Exit Sub
 
             Dim dimension = 3
             knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)

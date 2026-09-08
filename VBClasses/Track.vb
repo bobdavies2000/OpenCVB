@@ -128,8 +128,9 @@ Namespace VBClasses
             knn.queries.Add(New Point2f(rclast.maxDist.X, rclast.maxDist.Y))
             knn.Run(emptyMat)
 
-            For i = 0 To knn.result.Length - 1
-                Dim rc = redC.rcList(indexList(knn.result(0, i)))
+            For i = 0 To knn.queries.Count - 1
+                Dim index = indexList(knn.result(0, i))
+                Dim rc = RedC_Basics.rcIndexFind(redC.rcList, index)
                 Circle(dst2, rc.maxDist, task.DotSize + 1, task.highlight, -1)
                 SetTrueText(CStr(knn.result(0, i)), rc.maxDist)
                 SetTrueText(CStr(knn.result(0, i)), rc.maxDist, 3)

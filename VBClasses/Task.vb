@@ -114,6 +114,7 @@ Namespace VBClasses
             task.bins2D = {task.workRes.Height, task.workRes.Width}
 
             task.IMU_FrameTime = task.IMU_AlphaFilter = 0.5
+            task.lineMaxCount = task.fOptions.FeatureSizeSlider.Value
 
             ' run any task algorithms here
             task.grid.Run(task.color)

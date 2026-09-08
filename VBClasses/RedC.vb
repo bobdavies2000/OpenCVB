@@ -22,7 +22,7 @@ Namespace VBClasses
             Next
             Return displayStr
         End Function
-        Private Shared Function rcIndexFind(rclistLast As List(Of rcData), rcIndex As Integer) As rcData
+        Public Shared Function rcIndexFind(rclistLast As List(Of rcData), rcIndex As Integer) As rcData
             For Each rc In rclistLast
                 If rc.index = rcIndex Then Return rclistLast(rclistLast.IndexOf(rc))
             Next
@@ -296,77 +296,6 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_Basics
-        Dim lastCenter As cv.Point
-        Public rcD As rcData
-        Public neighbors As New List(Of Integer)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use a histogram to find the neighbors."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then dst1.SetTo(0)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            If task.mouseClickFlag Then lastCenter = task.clickPoint
-            Dim index As Integer = redC.rcIndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
-
-            If index > 0 Then
-                rcD = redC.rcList(index)
-            Else
-                Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
-                Dim myMapID As Integer = redC.rcIndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
-                For Each rc In redC.rcList
-                    If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
-                        rcD = rc
-                        Exit For
-                    End If
-                Next
-                If rcD Is Nothing Then rcD = redC.rcList(1)
-            End If
-            SetTrueText(rcD.displayCell() + vbCrLf, 1)
-
-            Dim histogram As New Mat, tmp As New cv.Mat
-            Dim ranges() As Rangef = New Rangef() {New Rangef(0, redC.rcList.Count + 1)}
-            Dim delta = task.gridWH / 2
-            Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
-            r = ValidateRect(r)
-            redC.rcIndexMap(r).ConvertTo(tmp, MatType.CV_8U)
-            ' why did I need to add 1 to tmp?!!!
-            CalcHist({tmp + 1}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
-
-            Dim histArray(histogram.Rows - 1) As Single
-            histogram.GetArray(Of Single)(histArray)
-
-            neighbors.Clear()
-
-            For i = 1 To histArray.Length - 1
-                If histArray(i) > 0 Then neighbors.Add(i)
-            Next
-
-            dst3.SetTo(0)
-            For i = 0 To neighbors.Count - 1
-                Dim rc = redC.rcList(neighbors(i))
-                dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
-            Next
-
-            dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
-            Rectangle(dst3, r, task.highlight, task.lineWidth)
-            Rectangle(dst2, r, task.highlight, task.lineWidth)
-            labels(3) = CStr(neighbors.Count) + " neighbors were present."
-
-            lastCenter = rcD.maxDStable
-            Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
-        End Sub
-    End Class
-
-
-
-
-
 
     Public Class RedC_MergeCells : Inherits TaskParent
         Dim nabe As New RedC_NeighborHist
@@ -390,7 +319,7 @@ Namespace VBClasses
             labels(2) = nabe.labels(2)
 
             mergeList.Clear()
-            Dim rcD = nabe.rcD
+            Dim rcD = task.rcD
             If rcD Is Nothing OrElse nabe.redC.rcList.Count <= 1 Then
                 dst3 = nabe.dst3
                 labels(3) = "No selected cell to merge."
@@ -399,9 +328,7 @@ Namespace VBClasses
 
             Dim depth0 = cellDepth(rcD)
             mergeList.Add(rcD)
-            For Each idx In nabe.neighbors
-                If idx = rcD.index OrElse idx <= 0 OrElse idx >= nabe.redC.rcList.Count Then Continue For
-                Dim rc = nabe.redC.rcList(idx)
+            For Each rc In nabe.neighbors
                 Dim depth = cellDepth(rc)
                 If depth0 > 0 AndAlso depth > 0 AndAlso Math.Abs(depth - depth0) <= task.depthDiffMeters Then
                     mergeList.Add(rc)
@@ -541,6 +468,8 @@ Namespace VBClasses
             desc = "Find any lines connected to a cell contour."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -788,4 +717,114 @@ Namespace VBClasses
     End Class
 
 
+
+
+
+
+    Public Class XR_RedC_NeighborHist : Inherits TaskParent
+        Public redC As New RedC_Basics
+        Dim lastCenter As cv.Point
+        Public rcD As rcData
+        Public neighbors As New List(Of rcData)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Use a histogram to find the neighbors.  Not working..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcListLast = New List(Of rcData)(redC.rcList)
+
+            If task.heartBeatLT Then dst1.SetTo(0)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            If task.mouseClickFlag Then lastCenter = task.clickPoint
+            Dim index As Integer = redC.rcIndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
+
+            If index >= 0 Then
+                rcD = RedC_Basics.rcIndexFind(rcListLast, index)
+            Else
+                Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
+                Dim myMapID As Integer = redC.rcMapIDs.Get(Of Single)(lastCenter.Y, lastCenter.X)
+                For Each rc In redC.rcList
+                    If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
+                        rcD = rc
+                        Exit For
+                    End If
+                Next
+            End If
+            If rcD Is Nothing Then rcD = redC.rcList(0)
+            SetTrueText(rcD.displayCell() + vbCrLf, 1)
+
+            Dim histogram As New Mat, tmp As New cv.Mat
+            Dim ranges() As Rangef = New Rangef() {New Rangef(0, redC.rcList.Count + 1)}
+            Dim delta = task.gridWH / 2
+            Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
+            r = ValidateRect(r)
+            CalcHist({redC.rcIndexMap(r)}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
+
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+
+            neighbors.Clear()
+
+            For i = 1 To histArray.Length - 1
+                If histArray(i) > 0 Then neighbors.Add(redC.rcList(i))
+            Next
+
+            dst3.SetTo(0)
+            For i = 0 To neighbors.Count - 1
+                dst3(neighbors(i).rect).SetTo(task.scalarColors(neighbors(i).mapID), neighbors(i).mask)
+            Next
+
+            dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
+            Rectangle(dst3, r, task.highlight, task.lineWidth)
+            Rectangle(dst2, r, task.highlight, task.lineWidth)
+            labels(3) = CStr(neighbors.Count) + " neighbors were present."
+
+            lastCenter = rcD.maxDStable
+            Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_NeighborHist : Inherits TaskParent
+        Public redC As New RedC_Basics
+        Public neighbors As New List(Of rcData)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Use rect intersections to find the neighbors."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcListLast = New List(Of rcData)(redC.rcList)
+
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            If redC.rcList.Count = 0 Then Exit Sub
+            If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
+
+            Dim index As Integer = redC.rcIndexMap.Get(Of Single)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
+
+            neighbors.Clear()
+            For Each rc In redC.rcList
+                If task.rcD.rect.IntersectsWith(rc.rect) Then neighbors.Add(rc)
+            Next
+            SetTrueText(task.rcD.displayCell() + vbCrLf, 1)
+
+            dst3.SetTo(0)
+            For i = 0 To neighbors.Count - 1
+                dst3(neighbors(i).rect).SetTo(task.scalarColors(neighbors(i).mapID), neighbors(i).mask)
+            Next
+
+            dst3(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
+            Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
+            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            labels(3) = CStr(neighbors.Count) + " neighbors were present."
+        End Sub
+    End Class
 End Namespace

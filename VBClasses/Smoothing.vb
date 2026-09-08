@@ -13,9 +13,10 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.rcD IsNot Nothing Then
+                Dim neighborMask As New cv.Mat
                 Dim rc = task.rcD
                 dst3.SetTo(0)
-                dst3(rc.rect).SetTo(255, rc.neighborMask)
+                dst3(rc.rect).SetTo(255, neighborMask)
                 Rectangle(dst3, rc.rect, cv.Scalar.All(255), task.lineWidth)
             End If
         End Sub

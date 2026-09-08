@@ -312,13 +312,13 @@ Namespace VBClasses
 
             Public Function lpDisplay() As String
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-                strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
+                strOut += "Age = " + CStr(age) + vbCrLf
                 strOut += "Angle = " + angle.ToString(fmt1) + vbCrLf
-                strOut += "Length (pixels) = " + task.lpD.length.ToString(fmt1) + vbCrLf
+                strOut += "Length (pixels) = " + length.ToString(fmt1) + vbCrLf
 
-                strOut += "p1 = " + task.lpD.p1.ToString + vbCrLf + "p2 = " + task.lpD.p2.ToString + vbCrLf
-                strOut += "ptE1 = " + task.lpD.ptE1.ToString + vbCrLf + "ptE2 = " + task.lpD.ptE2.ToString + vbCrLf + vbCrLf
-                strOut += "Slope = " + task.lpD.slope.ToString(fmt3) + vbCrLf
+                strOut += "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
+                strOut += "ptE1 = " + ptE1.ToString + vbCrLf + "ptE2 = " + ptE2.ToString + vbCrLf + vbCrLf
+                strOut += "Slope = " + slope.ToString(fmt3) + vbCrLf
                 strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
                 Return strOut
             End Function
@@ -393,7 +393,6 @@ Namespace VBClasses
             Public maskApprox As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
-            Public neighborMask As cv.Mat
             Public pixels As Integer
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Sub New()
@@ -416,13 +415,6 @@ Namespace VBClasses
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
-
-                If contour.Count > 0 Then
-                    hull = ConvexHull(contour.ToArray, True).ToList
-                    neighborMask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
-                    DrawContours(neighborMask, {hull}, 0, cv.Scalar.All(255), -1, task.lineType)
-                    neighborMask.SetTo(0, mask)
-                End If
             End Sub
             Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
                 ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle to verify that the rectangle is essential.

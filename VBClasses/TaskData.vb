@@ -78,7 +78,7 @@ Namespace VBClasses
         Public imuBasics As IMU_Basics_TA
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
-        Public lineMaxCount As Integer = 20 ' this will isolate the top X longest lines in the image.
+        Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
         Public steadyLineWidth As Integer
         Public steadyCam As SteadyCam_Basics_TA
 

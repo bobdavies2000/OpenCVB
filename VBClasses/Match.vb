@@ -26,6 +26,8 @@ Namespace VBClasses
                 Exit Sub
             End If
 
+            If template.Size <> src.Size Then Exit Sub
+
             correlationMat = New cv.Mat
             MatchTemplate(template, src, correlationMat, TemplateMatchModes.CCoeffNormed)
             mm = GetMinMax(correlationMat)
@@ -370,6 +372,8 @@ Namespace VBClasses
             desc = "Match a gRect's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
             If standalone Then
                 gridIndex = task.gridMap.Get(Of Integer)(task.lines.lpList(0).p1.Y, task.lines.lpList(0).p1.X)
             End If
@@ -493,6 +497,7 @@ Namespace VBClasses
             For Each lp In lplist
                 queries.Add(New Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
+            If queries.Count = 0 Then Exit Sub
             If task.optionsChanged Then trainInput = New List(Of Vec4f)(queries)
 
             Dim dimension = 4
@@ -609,7 +614,7 @@ Namespace VBClasses
 
                 If matchCenter.forceRecenter Then forceRecenter = True
                 If task.firstPass = False Then
-                    dst2(quads(i)) = matchCenter.dst2.Clone
+                    dst2(quads(i)) = matchCenter.dst2(quads(i)).Clone
                     Rectangle(dst2(quads(i)), matchCenter.centerRect, white, task.lineWidth)
                     Circle(dst2(quads(i)), matchCenter.match.newCenter, task.DotSize, black, -1, task.lineType)
 
@@ -732,7 +737,7 @@ Namespace VBClasses
 
             If task.rcD Is Nothing Then Exit Sub
 
-            Dim pt = WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+            Dim pt = validatePoint(WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M))
             Dim mapIDaligned = rcIndexMap.Get(Of Single)(pt.Y, pt.X)
             If mapIDaligned <> mapID Then
                 SetTrueText("Tracking the selected cell was lost", 1)

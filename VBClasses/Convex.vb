@@ -170,14 +170,16 @@ Namespace VBClasses
 
             Dim defects As Vec4i() = Nothing
             c = checkDefects(c, defects)
-            If defects.Length > 0 Then
-                rc.contour = betterContour(c, defects)
-            Else
-                rc.contour = c
-                SetTrueText("Convexity defects skipped - contour was self-intersecting.", 3)
-            End If
+            If c.Count > 0 Then
+                If defects.Length > 0 Then
+                    rc.contour = betterContour(c, defects)
+                Else
+                    rc.contour = c
+                    SetTrueText("Convexity defects skipped - contour was self-intersecting.", 3)
+                End If
 
-            DrawTour(dst2, rc.contour, Scalar.Red)
+                DrawTour(dst2, rc.contour, Scalar.Red)
+            End If
         End Sub
     End Class
 

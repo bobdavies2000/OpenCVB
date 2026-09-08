@@ -65,6 +65,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
             knn.ptListQuery.Clear()
             For Each lp In task.lines.lpList
@@ -110,10 +111,13 @@ Namespace VBClasses
             For Each pt In edges.ptList
                 knn.ptListQuery.Add(pt)
             Next
+            If knn.ptListQuery.Count = 0 Then Exit Sub
             knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
+            If knn.ptListTrain.Count = 0 Then Exit Sub
 
             knn.Run(emptyMat)
-
+            If knn.result Is Nothing Then Exit Sub
+            If knn.result.GetLength(0) < 2 Or knn.result.GetLength(0) Mod 2 <> 0 Then Exit Sub
             dst3.SetTo(0)
             For i = 0 To knn.result.GetLength(0) - 1
                 Dim p1 = knn.ptListTrain(knn.result(i, 0))

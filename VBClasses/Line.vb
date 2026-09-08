@@ -15,8 +15,13 @@ Namespace VBClasses
             Dim lpListStable As New List(Of lpData)
             For Each lp In lpList
                 Dim previousIndex = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
-                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                If previousIndex = 0 Then previousIndex = map.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                If previousIndex = 0 Then
+                    Dim previousIndexP1 = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                    Dim previousIndexP2 = map.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+                    If previousIndexP1 > 0 Then
+                        If previousIndexP1 = previousIndexP2 Then previousIndex = previousIndexP1
+                    End If
+                End If
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
                     lp.index = previousIndex
                     If lp.index - 1 < lpLastList.Count Then
@@ -72,7 +77,7 @@ Namespace VBClasses
                 SetTrueText(CStr(lp.age), lp.ptCenter, 3)
             Next
 
-            If standaloneTest() Then
+            If standaloneTest() AndAlso lpList.Count > 0 Then
                 dst1.SetTo(0)
                 For Each lp In lpList
                     Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
@@ -86,6 +91,7 @@ Namespace VBClasses
             End If
             dst0 = dst1.Clone()
             dst3 = Palettize(dst0, 0)
+            dst0.SetTo(0)
         End Sub
     End Class
 
@@ -97,6 +103,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public core As New Line_Core
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Run FLD (Fast Line Detector) With sobel input."
         End Sub
@@ -116,7 +123,8 @@ Namespace VBClasses
             Next
 
             dst1.SetTo(0)
-            For Each lp In lpList
+            For i = lpList.Count - 1 To 0 Step -1
+                Dim lp = lpList(i)
                 Line(dst1, lp.p1, lp.p2, lp.index, task.steadyLineWidth)
                 If task.gOptions.DebugCheckBox.Checked Then
                     SetTrueText(CStr(lp.age) + " - " + CStr(lp.index), lp.ptCenter, 3)
@@ -126,6 +134,18 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst1, 0)
+            If standalone Then
+                Dim index = task.gOptions.DebugSlider.Value
+                For Each lp In lpList
+                    If index < lpList.Count Then
+                        If lp.index = index Then
+                            SetTrueText(lp.lpDisplay, 1)
+                            Rectangle(dst3, lp.rect, task.highlight, task.lineWidth)
+                            Exit For
+                        End If
+                    End If
+                Next
+            End If
         End Sub
     End Class
 
@@ -2338,6 +2358,7 @@ Namespace VBClasses
             desc = "Use 2 methods to match the selected line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
             If task.heartBeatLT Or lp Is Nothing Or matcher.goodCorrelation = False Then
                 resetCount.Add(1)
                 lp = task.lines.lpList(0)
@@ -2389,7 +2410,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For i = 0 To lpList.Count - 2
                 Dim lp1 = lpList(i)
-                For j = i To 10 '  task.lines.lpList.Count - 1
+                For j = i + 1 To Math.Min(task.lines.lpList.Count, 10) - 1 '  task.lines.lpList.Count - 1
                     Dim lp2 = task.lines.lpList(j)
                     Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
                     If intersectionPoint <> newPoint Then
@@ -2495,6 +2516,7 @@ Namespace VBClasses
                 refreshCount.Add(1)
                 clipped.Run(src) ' why clipped lines?  So we can track it longer regardless of camera motion.
                 goodCorrelation = True
+                If clipped.lpList.Count = 0 Then Exit Sub
                 lp = clipped.lpList(0)
                 Dim sideSize = task.grid.nabeRectSide
                 Dim r1 = ValidateRect(New cv.Rect(lp.p1.X - sideSize \ 2, lp.p1.Y - sideSize \ 2, sideSize, sideSize))

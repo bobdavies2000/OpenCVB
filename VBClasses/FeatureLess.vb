@@ -210,7 +210,7 @@ Namespace VBClasses
 
             'Dim index As Integer = 1
             'For Each r In task.gridRects
-            '    Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+            '    Dim val = dst2.Get(Of Byte)(r.Y, r.X)
             '    If val = 255 Then
             '        Dim floodCount = dst2.FloodFill(r.TopLeft, index)
             '        index += 1
@@ -252,7 +252,7 @@ Namespace VBClasses
             Next
 
             For Each r In fLessRaw.brickList
-                Dim val = task.motion.motionMask.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
                 If val = 0 Then
                     If ptList.Contains(r.TopLeft) = False Then
                         newList.Add(r)
@@ -264,7 +264,7 @@ Namespace VBClasses
             fLessNot.Clear()
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 0 Then fLessNot.Add(r)
+                If dst2.Get(Of Byte)(r.Y, r.X) = 0 Then fLessNot.Add(r)
             Next
 
             If newList.Count > 0 Then rectList = New List(Of cv.Rect)(newList)
@@ -849,11 +849,11 @@ Namespace VBClasses
             rcIndexMap.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                Dim cIndex = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim cIndex = dst2.Get(Of Byte)(r.Y, r.X)
                 If cIndex = 0 Then Continue For
 
-                clusterX(cIndex).Add(r.TopLeft.X)
-                clusterY(cIndex).Add(r.TopLeft.Y)
+                clusterX(cIndex).Add(r.X)
+                clusterY(cIndex).Add(r.Y)
             Next
 
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -912,7 +912,7 @@ Namespace VBClasses
             floodPoints.Clear()
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
-                Dim val = dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X)
+                Dim val = dst2.Get(Of Byte)(r.Y, r.X)
                 If val = 255 Then
                     Dim floodCount = FloodFill(dst2, r.TopLeft, floodPoints.Count + 1)
                     floodPoints.Add(r.TopLeft)
@@ -986,8 +986,8 @@ Namespace VBClasses
                     colorDepth.Add(flat(index + 1))
                 End If
                 flat(index + 2) = edgeCount
-                'flat(index + 3) = CSng(r.TopLeft.X)
-                'flat(index + 4) = CSng(r.TopLeft.Y)
+                'flat(index + 3) = CSng(r.X)
+                'flat(index + 4) = CSng(r.Y)
                 index += inputVariableCount
             Next
 
@@ -1070,7 +1070,7 @@ Namespace VBClasses
             idList.Clear()
             rcList.Clear()
             For Each r In task.gridRects
-                If dst2.Get(Of Byte)(r.TopLeft.Y, r.TopLeft.X) = 255 Then
+                If dst2.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                     Dim Count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
                     Dim rc = New rcData(mask(rect), rect, index)

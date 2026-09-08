@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class StableLine_BasicsOld : Inherits TaskParent
+    Public Class StableLine_Basics : Inherits TaskParent
         Public lp As lpData
         Public lpLast As lpData
         Public Sub New()
@@ -44,6 +44,7 @@ Namespace VBClasses
             Return angleDegrees
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.lines.lpList.Count = 0 Then Exit Sub
             If standalone Then lp = task.lines.lpList(0)
             If lpLast Is Nothing Then lpLast = lp
 

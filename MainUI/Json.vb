@@ -108,7 +108,7 @@ Namespace MainApp
 
             Dim index = cameraNames.IndexOf(Settings.cameraName)
             If index >= 0 Then
-                If Settings.cameraPresent(index) = False Then index = -1
+                If Settings.cameraPresent(index) = False Then index = -1 Else Settings.cameraFound = True
             End If
             If index < 0 Then
                 Settings.cameraFound = False

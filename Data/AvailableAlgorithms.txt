@@ -677,7 +677,7 @@ StableGray_RGBMin
 StableGray_RGBMinMaxCompare
 StableGray_Right
 StableGray_ToggleMinMax
-StableLine_BasicsOld
+StableLine_Basics
 StDev_Highest
 StDev_Range
 SteadyCam_Basics_TA

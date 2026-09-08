@@ -339,19 +339,20 @@ Namespace VBClasses
             labels(2) = delaunay.labels(2)
 
             Dim facetList As New List(Of Integer)
-            Dim ptList As New List(Of Integer)
+            Dim indexList As New List(Of Integer)
             For Each lp In task.lines.lpList
                 facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X))
                 facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X))
 
-                ptList.Add(lp.index)
-                ptList.Add(lp.index)
+                indexList.Add(lp.index - 1)
+                indexList.Add(lp.index - 1)
             Next
 
             Dim facet = delaunay.dst1.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim facetIndex = facetList.IndexOf(facet)
-            If facetIndex = -1 Or facetIndex >= ptList.Count Then facetIndex = 0
-            task.lpD = task.lines.lpList(ptList(facetIndex \ 2))
+            If facetIndex >= indexList.Count Then facetIndex = 0
+            If task.lines.lpList.Count = 0 Then Exit Sub
+            task.lpD = task.lines.lpList(indexList(facetIndex \ 2))
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
             Static saveID As Integer = p1GridIndex
