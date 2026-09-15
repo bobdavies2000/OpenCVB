@@ -192,6 +192,7 @@ Feature_Delaunay
 Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
+Feature_LeftRightAKaze
 Feature_PointsPath
 Feature_StableVisual
 Feature_Tracker

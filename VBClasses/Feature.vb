@@ -11,7 +11,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             dst2 = src.Clone
-            dst3 = src.Clone
 
             If src.Channels <> 1 Then src = task.gray
 
@@ -96,8 +95,12 @@ Namespace VBClasses
 
             features = New List(Of cv.Point)(ptNext)
 
+            dst3.SetTo(0)
             For Each pt In features
-                If lastFeatures.Contains(pt) Then Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                If lastFeatures.Contains(pt) Then
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+                End If
             Next
 
             If features.Count = 0 Then features = New List(Of cv.Point)(ptNext)
@@ -316,7 +319,7 @@ Namespace VBClasses
 
     Public Class Feature_Delaunay : Inherits TaskParent
         Dim delaunay As New Delaunay_Contours
-        Public feat As New Feature_Bricks
+        Public feat As New Feature_Basics
         Dim options As New Options_Features
         Public Sub New()
             OptionParent.FindSlider("Min Distance").Value = 10
@@ -1059,6 +1062,149 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             brisk.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Feature_LeftRightAKaze : Inherits TaskParent
+        Implements IDisposable
+        Dim akaze As XFeatures2D.AKAZE
+        Dim matcher As BFMatcher
+        Public features As New List(Of cv.Point)
+        Public lastFeatures As New List(Of cv.Point)
+        Public Sub New()
+            task.gOptions.showMyDst1.Checked = True
+            akaze = XFeatures2D.AKAZE.Create()
+            matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
+            labels(0) = "Left view - highlights are the best points in the left view."
+            labels(1) = "Right view - highlights are the best points in the right view."
+            desc = "Cursor.ai: Find AKAZE features in the left image and match each to the nearest feature in the right image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim leftKp As KeyPoint() = Nothing
+            Dim rightKp As KeyPoint() = Nothing
+            Dim leftDesc As New Mat()
+            Dim rightDesc As New Mat()
+            akaze.DetectAndCompute(task.leftView, Nothing, leftKp, leftDesc)
+            akaze.DetectAndCompute(task.rightView, Nothing, rightKp, rightDesc)
+
+            If task.leftView.Channels() = 1 Then
+                CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+            Else
+                dst2 = task.leftView.Clone
+            End If
+            If leftKp IsNot Nothing Then
+                For Each kp In leftKp
+                    Circle(dst2, kp.Pt, task.DotSize, task.highlight, -1, task.lineType)
+                Next
+            End If
+
+            features.Clear()
+            lastFeatures.Clear()
+            If Not leftDesc.Empty() AndAlso Not rightDesc.Empty() AndAlso
+               leftKp IsNot Nothing AndAlso leftKp.Length > 0 AndAlso
+               rightKp IsNot Nothing AndAlso rightKp.Length > 0 Then
+
+                Dim knn = matcher.KnnMatch(leftDesc, rightDesc, k:=2)
+                Dim matches = FeatureMatch_Basics.getMatches(knn)
+                Dim filtered As New List(Of DMatch)
+                For Each m In matches
+                    Dim pLeft = leftKp(m.QueryIdx).Pt
+                    Dim pRight = rightKp(m.TrainIdx).Pt
+                    If Math.Abs(pLeft.Y - pRight.Y) <= 2 Then filtered.Add(m)
+                Next
+
+                If task.rightView.Channels() = 1 Then
+                    CvtColor(task.leftView, dst3, ColorConversionCodes.GRAY2BGR)
+                    CvtColor(task.rightView, dst1, ColorConversionCodes.GRAY2BGR)
+                Else
+                    dst3 = task.leftView.Clone
+                End If
+                FeatureMatch_Basics.DisplayMatches(dst3, filtered, leftKp, rightKp, features, lastFeatures)
+
+                labels(2) = CStr(leftKp.Length) + " AKAZE features in the left image"
+                labels(3) = CStr(filtered.Count) + " matching points in the right image are RED.  Yellow points are from left image. "
+
+                For Each pt In features
+                    Circle(dst1, pt, task.DotSize, task.highlight, -1)
+                Next
+
+                For Each pt In lastFeatures
+                    Circle(task.color, pt, task.DotSize, task.highlight, -1)
+                Next
+            End If
+
+            leftDesc.Dispose()
+            rightDesc.Dispose()
+        End Sub
+        Protected Overrides Sub Finalize()
+            If akaze IsNot Nothing Then akaze.Dispose()
+            If matcher IsNot Nothing Then matcher.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Feature_LeftRight : Inherits TaskParent
+        Implements IDisposable
+        Dim featLeft As New Feature_Basics
+        Dim featRight As New Feature_Basics
+        Public Sub New()
+            task.gOptions.showMyDst1.Checked = True
+            task.fOptions.FeatureSizeSlider.Value = 200
+            desc = "Find features in the left image and match each to the nearest feature in the right image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            featLeft.Run(task.gray)
+            labels(2) = featLeft.labels(2)
+            CvtColor(task.gray, dst2, cv.ColorConversionCodes.GRAY2BGR)
+
+            Dim leftY As New List(Of Integer)
+            Dim ptLeft As New List(Of List(Of cv.Point))
+            For i = 0 To featLeft.features.Count - 1
+                Dim pt = featLeft.features(i)
+                If leftY.Contains(pt.Y) = False Then
+                    leftY.Add(pt.Y)
+                    ptLeft.Add(New List(Of cv.Point)({pt}))
+                Else
+                    Dim index = leftY.IndexOf(pt.Y)
+                    ptLeft(index).Add(pt)
+                End If
+
+                Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                Circle(task.color, pt, task.DotSize, task.highlight, -1)
+            Next
+
+            featRight.Run(task.rightView)
+            labels(3) = featRight.labels(2)
+            CvtColor(task.rightView, dst1, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.rightView, dst3, cv.ColorConversionCodes.GRAY2BGR)
+            If task.drawRect.X <> 0 Then
+                For Each pt In featRight.features
+                    If task.drawRect.Contains(pt) Then
+                        Dim index = leftY.IndexOf(pt.Y)
+                        If index >= 0 Then
+                            Dim bestDistance As Single = Single.MaxValue
+                            Dim bestpt = New cv.Point
+                            For Each ptL In ptLeft(index)
+                                Dim nextDist = ptL.DistanceTo(pt)
+                                If nextDist < bestDistance Then
+                                    bestDistance = nextDist
+                                    bestpt = ptL
+                                End If
+                            Next
+                            Line(dst2, pt, bestpt, task.highlight, task.lineWidth)
+                        End If
+                        Circle(dst1, pt, task.DotSize, task.highlight, -1)
+                        Circle(dst3, pt, task.DotSize, task.highlight, -1)
+                    End If
+                Next
+            End If
         End Sub
     End Class
 End Namespace
