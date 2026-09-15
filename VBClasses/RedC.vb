@@ -14,10 +14,11 @@ Namespace VBClasses
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
             Dim displayStr As String = "There is no cell defined for that point."
             For Each rc In rclist
-                If rc.index = clickIndex Then
+                If rc.index = clickIndex Or clickIndex < 0 Then
                     task.rcD = rc
                     task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     displayStr = task.rcD.displayCell
+                    Exit For
                 End If
             Next
             Return displayStr
@@ -42,7 +43,7 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst2
             rcList.Clear()
-            Dim usedList As New List(Of Single)
+            Dim usedList As New List(Of Single)({0})
             Dim reusedIndex As Integer
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
@@ -99,7 +100,7 @@ Namespace VBClasses
                 SetTrueText(CStr(rcList(i).age), rcList(i).maxDStable, 3)
             Next
 
-            dst3 = Palettize(rcIndexMap)
+            dst3 = Palettize(rcIndexMap, 0)
 
             labels(2) = CStr(rcList.Count) + " cells were found and " + CStr(reusedIndex) + " were able to reuse the index."
         End Sub
