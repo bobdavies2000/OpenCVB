@@ -1069,6 +1069,91 @@ Namespace VBClasses
 
 
 
+    Public Class Feature_LeftRight : Inherits TaskParent
+        Dim featLeft As New Feature_Basics
+        Dim featRight As New Feature_Basics
+        Public features As New List(Of cv.Point)
+        Public lastFeatures As New List(Of cv.Point)
+        Public Sub New()
+            task.gOptions.showMyDst0.Checked = True
+            task.gOptions.showMyDst1.Checked = True
+            labels(0) = "Left view - highlights are the best points in the left view."
+            labels(1) = "Right view - highlights are the best points in the right view."
+            desc = "Cursor.ai: Find Feature_Basics points in the left image and match each to the nearest feature in the right image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            featLeft.Run(task.leftView)
+            featRight.Run(task.rightView)
+            If featLeft.features.Count = 0 Or featRight.features.Count = 0 Then Exit Sub
+
+            If task.leftView.Channels() = 1 Then
+                CvtColor(task.leftView, dst2, ColorConversionCodes.GRAY2BGR)
+            Else
+                dst2 = task.leftView.Clone
+            End If
+            For Each pt In featLeft.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            features.Clear()
+            lastFeatures.Clear()
+            Dim leftKp(featLeft.features.Count - 1) As KeyPoint
+            Dim rightKp(featRight.features.Count - 1) As KeyPoint
+            For i = 0 To featLeft.features.Count - 1
+                Dim pt = featLeft.features(i)
+                leftKp(i) = New KeyPoint(pt.X, pt.Y, 1)
+            Next
+            For i = 0 To featRight.features.Count - 1
+                Dim pt = featRight.features(i)
+                rightKp(i) = New KeyPoint(pt.X, pt.Y, 1)
+            Next
+
+            Dim maxDx = CSng(task.leftView.Width) * 0.2F
+            Dim filtered As New List(Of DMatch)
+            For i = 0 To featLeft.features.Count - 1
+                Dim pLeft = featLeft.features(i)
+                Dim bestJ = -1
+                Dim bestDist As Single = Single.MaxValue
+                For j = 0 To featRight.features.Count - 1
+                    Dim pRight = featRight.features(j)
+                    If Math.Abs(pLeft.Y - pRight.Y) > 2 Then Continue For
+                    If Math.Abs(pLeft.X - pRight.X) > maxDx Then Continue For
+                    If pLeft.X < pRight.X Then Continue For ' left cannot be to the right.
+                    Dim dist = CSng(pLeft.DistanceTo(pRight))
+                    If dist < bestDist Then
+                        bestDist = dist
+                        bestJ = j
+                    End If
+                Next
+                If bestJ >= 0 Then filtered.Add(New DMatch(i, bestJ, bestDist))
+            Next
+
+            If task.rightView.Channels() = 1 Then
+                CvtColor(task.leftView, dst3, ColorConversionCodes.GRAY2BGR)
+                CvtColor(task.rightView, dst1, ColorConversionCodes.GRAY2BGR)
+            Else
+                dst3 = task.leftView.Clone
+            End If
+            FeatureMatch_Basics.DisplayMatches(dst3, filtered, leftKp, rightKp, features, lastFeatures)
+
+            labels(2) = CStr(featLeft.features.Count) + " Feature_Basics points in the left image"
+            labels(3) = CStr(filtered.Count) + " matching points.  Red dots are from the right image.  Yellow points are from left image. "
+
+            For Each pt In features
+                Circle(dst1, pt, task.DotSize + 1, task.highlight, -1)
+            Next
+
+            dst0 = task.color.Clone
+            For Each pt In lastFeatures
+                Circle(dst0, pt, task.DotSize, task.highlight, -1)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
     Public Class Feature_LeftRightAKaze : Inherits TaskParent
         Implements IDisposable
         Dim akaze As XFeatures2D.AKAZE
@@ -1076,6 +1161,7 @@ Namespace VBClasses
         Public features As New List(Of cv.Point)
         Public lastFeatures As New List(Of cv.Point)
         Public Sub New()
+            task.gOptions.showMyDst0.Checked = True
             task.gOptions.showMyDst1.Checked = True
             akaze = XFeatures2D.AKAZE.Create()
             matcher = New BFMatcher(NormTypes.Hamming, crossCheck:=False)
@@ -1132,8 +1218,9 @@ Namespace VBClasses
                     Circle(dst1, pt, task.DotSize, task.highlight, -1)
                 Next
 
+                dst0 = task.color.Clone
                 For Each pt In lastFeatures
-                    Circle(task.color, pt, task.DotSize, task.highlight, -1)
+                    Circle(dst0, pt, task.DotSize, task.highlight, -1)
                 Next
             End If
 
