@@ -8,6 +8,13 @@ Namespace VBClasses
         Public Sub New()
             desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
         End Sub
+        Public Shared Function ToCvPoints(features As List(Of cv.Point)) As List(Of cv.Point)
+            Dim pts As New List(Of cv.Point)
+            For Each pt In features
+                pts.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+            Next
+            Return pts
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             dst2 = src.Clone
@@ -350,6 +357,85 @@ Namespace VBClasses
 
 
 
+    Public Class Feature_DelaunayRC : Inherits TaskParent
+        Dim featDel As New Feature_Delaunay
+        Dim delaunay As New Delaunay_Basics
+        Public rcList As New List(Of rcData)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public Sub New()
+            delaunay.useFeatures = False
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            featDel.Run(src)
+            dst3 = featDel.dst3
+            labels(3) = featDel.labels(3)
+
+            delaunay.ptList.Clear()
+            For Each pt In featDel.feat.features
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+            If delaunay.ptList.Count = 0 Then
+                rcList.Clear()
+                rcIndexMap.SetTo(0)
+                Exit Sub
+            End If
+            delaunay.Run(src)
+
+            rcIndexMap.SetTo(0)
+            rcList.Clear()
+            Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            For Each facet In delaunay.facetList
+                If facet.Count < 3 Then Continue For
+
+                cellMask.SetTo(0)
+                FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
+                If CountNonZero(cellMask) = 0 Then Continue For
+
+                Dim nz As New Mat
+                FindNonZero(cellMask, nz)
+                Dim rect = ValidateRect(BoundingRect(nz))
+
+                Dim rc As New rcData(cellMask(rect), rect, 255)
+                If rc.pixels = 0 Then Continue For
+                rc.index = rcList.Count + 1
+                rc.mapID = rc.index
+                rcList.Add(rc)
+                rcIndexMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+            Next
+
+            dst2 = Palettize(rcIndexMap)
+            For Each pt In featDel.feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(2) = CStr(rcList.Count) + " rcData cells from Feature_Delaunay"
+
+            Dim clickIndex = CInt(rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            Dim selected As rcData = Nothing
+            For Each rc In rcList
+                If rc.index = clickIndex Then
+                    selected = rc
+                    Exit For
+                End If
+            Next
+
+            If selected IsNot Nothing Then
+                task.rcD = selected
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                strOut = task.rcD.displayCell
+                SetTrueText(strOut, 1)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
 
     ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
     Public Class XR_Feature_NoMotionTest : Inherits TaskParent
@@ -472,7 +558,7 @@ Namespace VBClasses
                 shiTomasi.Run(task.leftView)
                 Dim _cvtInline As New Mat
                 CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
-                dst2.SetTo(Scalar.white, _cvtInline)
+                dst2.SetTo(Scalar.White, _cvtInline)
 
                 shiTomasi.Run(task.rightView)
                 CvtColor(shiTomasi.dst3, _cvtInline, ColorConversionCodes.BGR2GRAY)
@@ -569,7 +655,7 @@ Namespace VBClasses
                     Dim pt = newFeatures(i)
                     features.Add(pt)
                     If gens(i) < task.fOptions.FrameHistoryCount.Value Then
-                        Circle(dst2, pt, task.DotSize + 2, Scalar.red, -1, task.lineType)
+                        Circle(dst2, pt, task.DotSize + 2, Scalar.Red, -1, task.lineType)
                     Else
                         whiteCount += 1
                         Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -1062,6 +1148,51 @@ Namespace VBClasses
         End Sub
         Protected Overrides Sub Finalize()
             brisk.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Feature_CheckAll : Inherits TaskParent
+        Dim featAgast As New Feature_Basics
+        Dim featAkaze As New Feature_Basics
+        Public ptList As New List(Of cv.Point)
+        Public Sub New()
+            desc = "Cursor.ai: Run Feature_Basics with AGAST and AKAZE and keep points found in both."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim saveMethod = task.fOptions.FeatureMethod.SelectedItem
+            Dim saveChanged = task.optionsChanged
+
+            task.fOptions.FeatureMethod.SelectedItem = "AGAST"
+            featAgast.Run(src)
+            Dim agastPts = Feature_Basics.ToCvPoints(featAgast.features)
+
+            task.fOptions.FeatureMethod.SelectedItem = "AKAZE"
+            featAkaze.Run(src)
+            Dim akazePts = Feature_Basics.ToCvPoints(featAkaze.features)
+
+            If saveMethod IsNot Nothing Then task.fOptions.FeatureMethod.SelectedItem = saveMethod
+            task.optionsChanged = saveChanged
+
+            Dim akazeSet As New HashSet(Of cv.Point)(akazePts)
+
+            ptList.Clear()
+            For Each pt In agastPts
+                If akazeSet.Contains(pt) Then
+                    If ptList.Contains(pt) = False Then ptList.Add(pt)
+                End If
+            Next
+
+            dst2 = If(src.Channels() = 1, task.color.Clone, src.Clone)
+            For Each pt In ptList
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            labels(2) = CStr(ptList.Count) + " points found in both AGAST and AKAZE"
+            labels(3) = "AGAST " + CStr(agastPts.Count) + ", AKAZE " + CStr(akazePts.Count)
         End Sub
     End Class
 

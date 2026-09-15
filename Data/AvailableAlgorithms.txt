@@ -188,7 +188,9 @@ ExPhoto_Inpaint
 Feature_Basics
 Feature_Bricks
 Feature_BRISK
+Feature_CheckAll
 Feature_Delaunay
+Feature_DelaunayRC
 Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
