@@ -357,84 +357,6 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_DelaunayRC : Inherits TaskParent
-        Dim featDel As New Feature_Delaunay
-        Dim delaunay As New Delaunay_Basics
-        Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public Sub New()
-            delaunay.useFeatures = False
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            featDel.Run(src)
-            dst3 = featDel.dst3
-            labels(3) = featDel.labels(3)
-
-            delaunay.ptList.Clear()
-            For Each pt In featDel.feat.features
-                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
-            Next
-            If delaunay.ptList.Count = 0 Then
-                rcList.Clear()
-                rcIndexMap.SetTo(0)
-                Exit Sub
-            End If
-            delaunay.Run(src)
-
-            rcIndexMap.SetTo(0)
-            rcList.Clear()
-            Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
-            For Each facet In delaunay.facetList
-                If facet.Count < 3 Then Continue For
-
-                cellMask.SetTo(0)
-                FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
-                If CountNonZero(cellMask) = 0 Then Continue For
-
-                Dim nz As New Mat
-                FindNonZero(cellMask, nz)
-                Dim rect = ValidateRect(BoundingRect(nz))
-
-                Dim rc As New rcData(cellMask(rect), rect, 255)
-                If rc.pixels = 0 Then Continue For
-                rc.index = rcList.Count + 1
-                rc.mapID = rc.index
-                rcList.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
-            Next
-
-            dst2 = Palettize(rcIndexMap)
-            For Each pt In featDel.feat.features
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-            labels(2) = CStr(rcList.Count) + " rcData cells from Feature_Delaunay"
-
-            Dim clickIndex = CInt(rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
-            Dim selected As rcData = Nothing
-            For Each rc In rcList
-                If rc.index = clickIndex Then
-                    selected = rc
-                    Exit For
-                End If
-            Next
-
-            If selected IsNot Nothing Then
-                task.rcD = selected
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
-                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                strOut = task.rcD.displayCell
-                SetTrueText(strOut, 1)
-            End If
-        End Sub
-    End Class
-
-
-
-
 
 
     ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
@@ -1361,6 +1283,127 @@ Namespace VBClasses
         Protected Overrides Sub Finalize()
             If akaze IsNot Nothing Then akaze.Dispose()
             If matcher IsNot Nothing Then matcher.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Feature_DelaunayRC : Inherits TaskParent
+        Dim featDel As New Feature_Delaunay
+        Dim delaunay As New Delaunay_Basics
+        Public rcList As New List(Of rcData)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public Sub New()
+            delaunay.useFeatures = False
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            featDel.Run(src)
+            dst3 = featDel.dst3
+            labels(3) = featDel.labels(3)
+
+            delaunay.ptList.Clear()
+            For Each pt In featDel.feat.features
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+            If delaunay.ptList.Count = 0 Then
+                rcList.Clear()
+                rcIndexMap.SetTo(0)
+                Exit Sub
+            End If
+            delaunay.Run(src)
+
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcIndexMapLast = rcIndexMap.Clone
+            Dim usedList As New List(Of Single)
+            Dim reusedIndex As Integer
+
+            rcIndexMap.SetTo(0)
+            rcList.Clear()
+            Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            For i = 0 To delaunay.facetList.Count - 1
+                Dim facet = delaunay.facetList(i)
+                If facet.Count < 3 Then Continue For
+
+                cellMask.SetTo(0)
+                FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
+                If CountNonZero(cellMask) = 0 Then Continue For
+
+                Dim nz As New Mat
+                FindNonZero(cellMask, nz)
+                Dim rect = ValidateRect(BoundingRect(nz))
+
+                Dim rc As New rcData(cellMask(rect), rect, 255)
+                If rc.pixels = 0 Then Continue For
+
+                Dim prevPt = rc.maxDist
+                If i < delaunay.ptList.Count Then
+                    Dim p = delaunay.ptList(i)
+                    prevPt = New cv.Point(CInt(p.X), CInt(p.Y))
+                End If
+                If prevPt.X < 0 Then prevPt.X = 0
+                If prevPt.Y < 0 Then prevPt.Y = 0
+                If prevPt.X >= rcIndexMapLast.Width Then prevPt.X = rcIndexMapLast.Width - 1
+                If prevPt.Y >= rcIndexMapLast.Height Then prevPt.Y = rcIndexMapLast.Height - 1
+
+                Dim previousIndex = rcIndexMapLast.Get(Of Single)(prevPt.Y, prevPt.X)
+                If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
+                    rc.index = previousIndex
+                    usedList.Add(rc.index)
+                    reusedIndex += 1
+                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
+                    If rcLast IsNot Nothing Then
+                        rc.age = rcLast.age + 1
+                        If rc.age >= 1000 Then rc.age = 100
+                    Else
+                        rc.age = 1
+                    End If
+                End If
+                rcList.Add(rc)
+            Next
+
+            Dim nextIndex As Integer = 1
+            For Each rc In rcList
+                If rc.index = 0 Then
+                    While usedList.Contains(nextIndex) Or nextIndex Mod 255 = 0
+                        nextIndex += 1
+                    End While
+                    rc.index = nextIndex
+                    usedList.Add(nextIndex)
+                    rc.age = 1
+                End If
+                rc.mapID = rc.index
+                rcIndexMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+            Next
+
+            dst2 = Palettize(rcIndexMap)
+            For Each pt In featDel.feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(2) = CStr(rcList.Count) + " rcData cells from Feature_Delaunay, " +
+                        CStr(reusedIndex) + " kept the same color"
+
+            Dim clickIndex = CInt(rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            Dim selected As rcData = Nothing
+            For Each rc In rcList
+                If rc.index = clickIndex Then
+                    selected = rc
+                    Exit For
+                End If
+            Next
+
+            If selected IsNot Nothing Then
+                task.rcD = selected
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                strOut = task.rcD.displayCell
+                SetTrueText(strOut, 1)
+            End If
         End Sub
     End Class
 End Namespace
