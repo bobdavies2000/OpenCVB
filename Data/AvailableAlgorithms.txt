@@ -150,6 +150,7 @@ Edge_Basics_TA
 Edge_BinarizedReduction
 Edge_Canny
 Edge_CannyAccum
+Edge_CannyDilated
 Edge_CannyHistory
 Edge_ColorGap_VB
 Edge_Deriche_CPP
@@ -215,6 +216,7 @@ FeatureLess_LeftRight
 FeatureLess_Lines
 FeatureLess_NotImages
 FeatureLess_Overlap
+FeatureLess_RedC
 FeatureLess_ReductionTest
 FeatureLess_Stabilized
 FeatureLess_ToList

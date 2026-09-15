@@ -1523,6 +1523,31 @@ Namespace VBClasses
 
 
 
+
+    Public Class FeatureLess_RedC : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim redC As New RedC_Basics
+        Dim addw As New AddWeighted_Basics
+        Public Sub New()
+            labels = {"", "", "RedC_Basics output", "AddWeighted of RedC_Basics and FeatureLess_Basics"}
+            desc = "Cursor.ai: Run FeatureLess_Basics and RedC_Basics, then blend them with AddWeighted."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            addw.src2 = fLess.dst2
+            addw.Run(dst2)
+            dst3 = addw.dst2
+            labels(3) = addw.labels(2)
+        End Sub
+    End Class
+
+
+
+
     Public Class FeatureLess_BrickList : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Dim index As Integer

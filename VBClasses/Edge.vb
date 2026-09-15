@@ -1555,6 +1555,26 @@ Namespace VBClasses
 
 
 
+    Public Class Edge_CannyDilated : Inherits TaskParent
+        Dim canny As New Edge_Canny
+        Dim dilate As New Dilate_Basics
+        Public Sub New()
+            labels = {"", "", "Canny edges after dilation", "Edge_Canny output"}
+            desc = "Cursor.ai: Run Edge_Canny then dilate dst2."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            canny.Run(src)
+            dst3 = canny.dst2
+            dilate.Run(canny.dst2)
+            dst2 = dilate.dst2
+            labels(2) = dilate.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
 
 
     Public Class XR_Edge_SobelLR : Inherits TaskParent
