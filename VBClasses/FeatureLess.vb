@@ -1223,48 +1223,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_DepthFull : Inherits TaskParent
-        Public brickList As New List(Of cv.Rect)
-        Public Sub New()
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless gridrects that also have depth."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            labels(3) = task.edges.labels(2)
-
-            dst1.SetTo(0)
-            brickList.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
-                If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
-                If CountNonZero(task.depthmask(r)) = 0 Then Continue For
-                dst1(r).SetTo(255)
-
-                brickList.Add(r)
-            Next
-            Dim countRects = brickList.Count
-
-            Dim index = 1
-            Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            For Each r In brickList
-                Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-                If val = 255 Then
-                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                    Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    index += 1
-                End If
-            Next
-
-            dst2 = Palettize(dst1, 0)
-
-            labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
-        End Sub
-    End Class
-
-
-
-
 
 
     Public Class FeatureLess_XLines : Inherits TaskParent
@@ -1672,6 +1630,98 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst0)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_DepthFull : Inherits TaskParent
+        Public brickList As New List(Of cv.Rect)
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            desc = "Identify featureless gridrects that also have depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            labels(3) = task.edges.labels(2)
+
+            dst1.SetTo(0)
+            brickList.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+                If CountNonZero(task.depthmask(r)) = 0 Then Continue For
+                dst1(r).SetTo(255)
+
+                brickList.Add(r)
+            Next
+            Dim countRects = brickList.Count
+
+            Dim index = 1
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
+            For Each r In brickList
+                Dim val = dst1.Get(Of Byte)(r.Y, r.X)
+                If val = 255 Then
+                    Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                    Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    index += 1
+                End If
+            Next
+
+            dst2 = Palettize(dst1, 0)
+
+            labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_DepthAndNoEdges : Inherits TaskParent
+        Dim brickList As New List(Of Integer)
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            desc = "Identify featureless gridrects that also have depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            labels(3) = task.edges.labels(2)
+
+            dst1.SetTo(0)
+            brickList.Clear()
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+                If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+                If CountNonZero(task.depthmask(r)) = 0 Then Continue For
+                dst1(r).SetTo(255)
+
+                brickList.Add(i)
+            Next
+            Dim countRects = brickList.Count
+
+            Dim index = 1
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
+            rcList.Clear()
+            For Each i In brickList
+                Dim r = task.gridRects(i)
+                Dim val = dst1.Get(Of Byte)(r.Y, r.X)
+                If val = 255 Then
+                    Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                    Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    If count > 0 Then
+                        rcList.Add(New rcData(mask, rect, index))
+                        index += 1
+                    End If
+                End If
+            Next
+
+            dst2 = Palettize(dst1, 0)
+
+            labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
         End Sub
     End Class
 End Namespace

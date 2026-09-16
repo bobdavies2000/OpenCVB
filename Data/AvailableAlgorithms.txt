@@ -208,6 +208,7 @@ FeatureLess_CalcHist
 FeatureLess_Cells
 FeatureLess_ClusterFlood
 FeatureLess_Correlation
+FeatureLess_DepthAndNoEdges
 FeatureLess_DepthFull
 FeatureLess_FeatureLines
 FeatureLess_Features
@@ -626,6 +627,7 @@ RedC_Basics
 RedC_CellLines
 RedC_Depth
 RedC_DepthMerge
+RedC_FeatureLess1
 RedC_Features
 RedC_MergeCells
 RedC_NeighborHist

@@ -828,4 +828,65 @@ Namespace VBClasses
             labels(3) = CStr(neighbors.Count) + " neighbors were present."
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedC_FeatureLess1 : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Dim fLess As New FeatureLess_DepthAndNoEdges
+        Public merged As New rcData
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Cursor.ai: Merge RedC cells under the largest FeatureLess_ToList cell using CalcHist on rcIndexMap."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            fLess.Run(src)
+            dst3 = dst2.Clone
+
+            If fLess.rcList.Count = 0 OrElse redC.rcList.Count = 0 Then
+                labels(3) = "No FeatureLess or RedC cells to merge."
+                Exit Sub
+            End If
+
+            Dim flRc = fLess.rcList(0)
+            Dim histogram As New Mat
+            Dim ranges() As Rangef = {New Rangef(0, 256)}
+            CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, flRc.mask, histogram, 1, {256}, ranges)
+            Dim histArray(histogram.Rows - 1) As Single
+            histogram.GetArray(Of Single)(histArray)
+
+            Dim members As New List(Of rcData)
+            For Each rc In redC.rcList
+                Dim bin = rc.index Mod 255
+                If bin > 0 AndAlso bin < histArray.Length AndAlso histArray(bin) > 0 Then members.Add(rc)
+            Next
+
+            If members.Count = 0 Then
+                labels(3) = "No RedC cells under the largest FeatureLess cell."
+                Exit Sub
+            End If
+
+            Dim unionRect = members(0).rect
+            Dim fullMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            For Each rc In members
+                unionRect = unionRect.Union(rc.rect)
+                fullMask(rc.rect).SetTo(255, rc.mask)
+            Next
+            unionRect = ValidateRect(unionRect)
+            merged = New rcData(fullMask(unionRect), unionRect, 255)
+
+            dst3(merged.rect).SetTo(task.highlight, merged.mask)
+            Rectangle(dst3, merged.rect, task.highlight, task.lineWidth)
+            Circle(dst3, merged.maxDist, task.DotSize + 1, white, -1)
+
+            labels(3) = CStr(members.Count) + " RedC cells merged from the largest FeatureLess cell"
+            SetTrueText(merged.displayCell, 1)
+        End Sub
+    End Class
 End Namespace
