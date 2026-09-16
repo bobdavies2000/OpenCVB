@@ -641,8 +641,8 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Stabilized : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_Stabilized : Inherits TaskParent
+        Dim fLess As New FeatureLess_Core
         Dim diff As New Diff_Simple
         Public Sub New()
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
@@ -675,7 +675,7 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_Lines : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New XR_FeatureLess_DepthFull
         Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
         Public lpList As New List(Of lpData)
         Public Sub New()
@@ -757,8 +757,8 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_NotImages : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_NotImages : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public Sub New()
             labels(3) = "All regions in the image with features."
             desc = "Provide masks for both the featureless and non-featureless regions."
@@ -785,7 +785,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_FeaturesOld : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public Sub New()
             desc = "Isolate features in the not of the featureless regions."
         End Sub
@@ -814,8 +814,8 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_FeatureLines : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_FeatureLines : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public Sub New()
             desc = "Use lines to further divide featureless from features."
         End Sub
@@ -869,7 +869,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_ToList : Inherits TaskParent
-        Dim clusters As New FeatureLess_ClusterFlood
+        Dim clusters As New XR_FeatureLess_ClusterFlood
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
         Public rcList As New List(Of rcData)
@@ -948,8 +948,8 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_ClusterFlood : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_ClusterFlood : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public floodPoints As New List(Of cv.Point)
         Public Sub New()
             desc = "Identify the clusters in the FeatureLess_DepthFull output"
@@ -1099,8 +1099,8 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Features : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_Features : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public featureList As New List(Of Single)
         Public idList As New List(Of Single)
         Public inputVariableCount As Integer = 5
@@ -1145,7 +1145,7 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_IndexKNN : Inherits TaskParent
-        Dim feat As New FeatureLess_Features
+        Dim feat As New XR_FeatureLess_Features
         Dim knn As New KNN_IndividualQuery
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -1204,7 +1204,7 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_ClustersHist2D : Inherits TaskParent
-        Public fLess As New FeatureLess_DepthFull
+        Public fLess As New XR_FeatureLess_DepthFull
         Public histArray(task.histogramBins * task.histogramBins - 1) As Single
         Public features As New Mat
         Public bpArray() As Single
@@ -1687,7 +1687,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_DepthFull : Inherits TaskParent
+    Public Class XR_FeatureLess_DepthFull : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)

@@ -59,11 +59,11 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_Original : Inherits TaskParent
+    Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public fLess As New FeatureLess_DepthFull
+        Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -139,7 +139,7 @@ Namespace VBClasses
 
 
     Public Class Flood_OriginalDemo : Inherits TaskParent
-        Dim flood As New Flood_Original
+        Dim flood As New XR_Flood_Original
         Public Sub New()
             labels(3) = "Edge_Canny output"
             desc = "Use color to connect FCS cells - visualize the data mostly."
@@ -297,8 +297,8 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_FeatureLess : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_Flood_FeatureLess : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_DepthFull
         Dim redC As New RedC_Basics
         Dim edges As New Edge_Basics_TA
         Public Sub New()
@@ -325,11 +325,11 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_OriginalNew : Inherits TaskParent
+    Public Class XR_Flood_OriginalNew : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public fLess As New FeatureLess_DepthFull
+        Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

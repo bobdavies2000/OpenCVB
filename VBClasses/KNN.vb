@@ -404,9 +404,9 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_Grid : Inherits TaskParent
+    Public Class XR_KNN_Grid : Inherits TaskParent
         Dim knn As New KNN_Minimal
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New XR_FeatureLess_DepthFull
         Public trainInput As New List(Of Point3f)
         Public queries As New List(Of Point3f)
         Public Sub New()
