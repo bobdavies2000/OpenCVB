@@ -835,7 +835,7 @@ Namespace VBClasses
 
     Public Class RedC_FeatureLess1 : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Dim fLess As New FeatureLess_DepthAndNoEdges
+        Dim fLess As New FeatureLess_Core
         Public merged As New rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

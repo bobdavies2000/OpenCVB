@@ -880,12 +880,12 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Brick_Variability : Inherits TaskParent
+    Public Class Brick_Variability : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New FeatureLess_Core
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -909,22 +909,22 @@ Namespace VBClasses
 
             If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
 
-            If task.heartBeat Then
-                Static lastDepthList = New List(Of Single)(depthList)
-                depthJumpers.Clear()
-                For i = 0 To depthList.Count - 1
-                    Dim r = task.gridRects(i)
-                    Dim val = fLess.dst2.Get(Of Byte)(r.Y, r.X)
-                    If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
-                        Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
-                        If diff > options.meters Then
-                            dst3(task.gridRects(i)).SetTo(255)
-                            depthJumpers.Add(i)
-                        End If
+            Static lastDepthList = New List(Of Single)(depthList)
+            depthJumpers.Clear()
+            For i = 0 To depthList.Count - 1
+                Dim r = task.gridRects(i)
+                Dim val = fLess.dst2.Get(Of Byte)(r.Y, r.X)
+                If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
+                    Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
+                    If diff > options.meters Then
+                        dst3(task.gridRects(i)).SetTo(255)
+                        depthJumpers.Add(i)
                     End If
-                Next
+                End If
+            Next
 
-                lastDepthList = New List(Of Single)(depthList)
+            lastDepthList = New List(Of Single)(depthList)
+            If task.heartBeat Then
                 labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + options.meters.ToString(fmt3) + " meters"
             End If
         End Sub
@@ -933,11 +933,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Brick_Ranges : Inherits TaskParent
+    Public Class Brick_Ranges : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New FeatureLess_Core
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -975,9 +975,9 @@ Namespace VBClasses
 
     Public Class Brick_Features : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim fLess As New FeatureLess_DepthFull
+        Dim fLess As New FeatureLess_Core
         Public Sub New()
-            desc = "Use FeatureLess_DepthFull to identify bricks with good contrast."
+            desc = "Use FeatureLess_Core to identify bricks with good contrast."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.grayOriginal
@@ -985,7 +985,7 @@ Namespace VBClasses
 
             bricks.Run(src)
 
-            dst2 = src.Clone
+            CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
             dst2.SetTo(0, fLess.dst1)
             labels(2) = fLess.labels(2)
 

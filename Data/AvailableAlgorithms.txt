@@ -30,6 +30,8 @@ Blur_Motion
 Brick_Basics
 Brick_Features
 Brick_LeftRight
+Brick_Ranges
+Brick_Variability
 BrickPoint_Basics
 BrickPoint_Core
 Brightness_Basics
@@ -207,8 +209,8 @@ FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells
 FeatureLess_ClusterFlood
+FeatureLess_Core
 FeatureLess_Correlation
-FeatureLess_DepthAndNoEdges
 FeatureLess_DepthFull
 FeatureLess_FeatureLines
 FeatureLess_Features
