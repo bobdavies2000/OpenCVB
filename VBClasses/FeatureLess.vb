@@ -275,35 +275,35 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
-        Public fLessRaw As New FeatureLess_DepthFull
-        Public rectList As New List(Of cv.Rect)
+        Public fLess As New FeatureLess_Core
+        Public rcList As New List(Of rcData)
         Public fLessNot As New List(Of cv.Rect)
         Public ptList As New HashSet(Of cv.Point)
         Public Sub New()
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLessRaw.Run(src)
+            fLess.Run(src)
             If task.optionsChanged Then
-                dst2 = fLessRaw.dst3.Clone
-                rectList = New List(Of cv.Rect)(fLessRaw.brickList)
+                dst2 = fLess.dst3.Clone
+                rcList = New List(Of rcData)(fLess.rcList)
             End If
 
             ptList.Clear()
-            Dim newList As New List(Of cv.Rect)
+            Dim newList As New List(Of rcData)
             ' remove any grid rects that had motion.
-            For Each r In rectList
-                Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
-                If val <> 0 Then dst2(r).SetTo(0) Else newList.Add(r)
-                ptList.Add(r.TopLeft)
+            For Each rc In rcList
+                Dim val = task.motion.motionMask.Get(Of Byte)(rc.rect.Y, rc.rect.X)
+                If val <> 0 Then dst2(rc.rect).SetTo(0) Else newList.Add(rc)
+                ptList.Add(rc.rect.TopLeft)
             Next
 
-            For Each r In fLessRaw.brickList
-                Dim val = task.motion.motionMask.Get(Of Byte)(r.Y, r.X)
+            For Each rc In fLess.rcList
+                Dim val = task.motion.motionMask.Get(Of Byte)(rc.rect.Y, rc.rect.X)
                 If val = 0 Then
-                    If ptList.Contains(r.TopLeft) = False Then
-                        newList.Add(r)
-                        dst2(r).SetTo(255)
+                    If ptList.Contains(rc.rect.TopLeft) = False Then
+                        newList.Add(rc)
+                        dst2(rc.rect).SetTo(255)
                     End If
                 End If
             Next
@@ -314,9 +314,9 @@ Namespace VBClasses
                 If dst2.Get(Of Byte)(r.Y, r.X) = 0 Then fLessNot.Add(r)
             Next
 
-            If newList.Count > 0 Then rectList = New List(Of cv.Rect)(newList)
+            If newList.Count > 0 Then rcList = New List(Of rcData)(newList)
 
-            labels(2) = fLessRaw.labels(2)
+            labels(2) = fLess.labels(2)
         End Sub
     End Class
 
@@ -619,18 +619,21 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_LeftRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_DepthFull
+    Public Class XR_FeatureLess_LeftRight : Inherits TaskParent
+        Dim fLessL As New FeatureLess_Core
+        Dim fLessR As New FeatureLess_Core
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
             desc = "Find the featureless regions of the left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.leftView)
-            dst2 = fLess.dst2.Clone
+            fLessL.Run(task.leftView)
+            dst2 = fLessL.dst2
+            labels(2) = fLessL.labels(2)
 
-            fLess.Run(task.rightView)
-            dst3 = fLess.dst2.Clone
+            fLessR.Run(task.rightView)
+            dst3 = fLessR.dst2
+            labels(3) = fLessR.labels(2)
         End Sub
     End Class
 

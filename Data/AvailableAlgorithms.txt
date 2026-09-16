@@ -160,7 +160,6 @@ Edge_DiffX_CPP
 Edge_DiffY_CPP
 Edge_DiffZ_CPP
 Edge_EndPoints
-Edge_Featureless
 Edge_Laplacian
 Edge_LeftRight
 Edge_RedEdges
@@ -507,7 +506,6 @@ Motion_CloudGrid
 Motion_CloudPixel
 Motion_Correlation
 Motion_CorrelationToLast
-Motion_Featureless
 Motion_Left
 Motion_Right
 Motion_Throttle

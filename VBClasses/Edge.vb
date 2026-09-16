@@ -1482,8 +1482,8 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Featureless : Inherits TaskParent
-        Public fLess As New FeatureLess_DepthFull
+    Public Class XR_Edge_Featureless : Inherits TaskParent
+        Public fLess As New FeatureLess_Core
         Public sceneMotionDetected As Boolean
         Public rectCountThreshold As Integer
         Public Sub New()
@@ -1498,7 +1498,7 @@ Namespace VBClasses
 
             strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
                  "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +
-                 "Current gridrect count = " + CStr(fLess.brickList.Count)
+                 "Current rcList (region) count = " + CStr(fLess.rcList.Count)
 
             SetTrueText(strOut, 3)
         End Sub

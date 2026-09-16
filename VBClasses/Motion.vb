@@ -523,8 +523,8 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Featureless : Inherits TaskParent
-        Dim edges As New Edge_Featureless
+    Public Class XR_Motion_Featureless : Inherits TaskParent
+        Dim edges As New XR_Edge_Featureless
         Dim plotdots As New PlotTime_FixedScale
         Public Sub New()
             plotdots.plotCount = 1
@@ -540,7 +540,7 @@ Namespace VBClasses
             labels(2) = edges.labels(2)
 
             plotdots.maxScale = task.gridRects.Count
-            plotdots.plotData(0) = edges.fLess.brickList.Count
+            plotdots.plotData(0) = edges.fLess.rcList.Count
             plotdots.Run(src)
             dst3 = plotdots.dst2
             labels(3) = plotdots.labels(2)
