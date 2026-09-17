@@ -918,9 +918,9 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, 256)}
             Dim groupCount As Integer
             Dim histogram As New Mat
-            For Each flRc In fLess.fList
-                CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, histMask, histogram, 1, {256}, ranges)
-                Dim histArray(histogram.Rows - 1) As Single
+            Dim histArray(histogram.Rows - 1) As Single
+            For Each rcF In fLess.fList
+                CalcHist({redC.rcIndexMap(rcF.rect)}, {0}, rcF.mask, histogram, 1, {256}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 Dim bestBin As Integer
@@ -931,7 +931,6 @@ Namespace VBClasses
                         bestBin = i
                     End If
                 Next
-                If bestCount = 0 Then Continue For
 
                 Dim members As New List(Of rcData)
                 Dim bestRc As rcData = Nothing
