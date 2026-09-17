@@ -458,7 +458,7 @@ Namespace VBClasses
             desc = "Create a histogram of green and red."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ranges = New Rangef() {New Rangef(0, 255), New Rangef(0, 255)}
+            ranges = New Rangef() {New Rangef(0, 256), New Rangef(0, 256)}
             CalcHist({src}, {1, 2}, New Mat, histogram, 1, {task.histogramBins, task.histogramBins}, ranges)
 
             Dim test As New Mat

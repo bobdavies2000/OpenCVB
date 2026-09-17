@@ -698,7 +698,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_Lines : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
+        Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -1674,7 +1674,7 @@ Namespace VBClasses
             dst1 = fLess.dst3
             dst2 = color8u.dst3
 
-            Dim ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
+            Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
             histMapList.Clear()
             For i = 0 To fLess.regions.Count - 1
                 Dim r = fLess.regions.Values(i)

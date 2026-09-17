@@ -917,17 +917,8 @@ Namespace VBClasses
 
             Dim ranges() As Rangef = {New Rangef(0, 256)}
             Dim groupCount As Integer
+            Dim histogram As New Mat
             For Each flRc In fLess.fList
-                If flRc.pixels = 0 Then Continue For
-
-                Dim histMask = flRc.mask
-                If histMask.Width <> flRc.rect.Width OrElse histMask.Height <> flRc.rect.Height Then
-                    histMask = New Mat
-                    InRange(fLess.dst1(flRc.rect), flRc.index Mod 255, flRc.index Mod 255, histMask)
-                End If
-                If CountNonZero(histMask) = 0 Then Continue For
-
-                Dim histogram As New Mat
                 CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, histMask, histogram, 1, {256}, ranges)
                 Dim histArray(histogram.Rows - 1) As Single
                 histogram.GetArray(Of Single)(histArray)

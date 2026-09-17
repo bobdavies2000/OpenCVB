@@ -532,7 +532,7 @@ Namespace VBClasses
     ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
     Public Class XR_BackProject_FullOld : Inherits TaskParent
         Public classCount As Integer
-        Public ranges() As Rangef = New Rangef() {New Rangef(0, 255)}
+        Public ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
         Public Sub New()
             task.gOptions.setHistogramBins(10)
             labels = {"", "", "CV_8U format of the backprojection", "dst2 presented with a palette"}

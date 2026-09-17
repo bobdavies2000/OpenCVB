@@ -63,7 +63,7 @@ Namespace VBClasses
 
             Dim mm = GetMinMax(src)
             Dim ranges() = New Rangef() {New Rangef(mm.minVal, mm.maxVal)}
-            If mm.minVal = mm.maxVal Then ranges = New Rangef() {New Rangef(0, 255)}
+            If mm.minVal = mm.maxVal Then ranges = New Rangef() {New Rangef(0, 256)}
 
             If standalone Then
                 If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
@@ -150,7 +150,7 @@ Namespace VBClasses
 
             dst1 = task.gray.Clone
             Dim dimensions() = New Integer() {task.histogramBins}
-            Dim ranges() = New Rangef() {New Rangef(0, 255)}
+            Dim ranges() = New Rangef() {New Rangef(0, 256)}
             Dim hist As New Mat
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
