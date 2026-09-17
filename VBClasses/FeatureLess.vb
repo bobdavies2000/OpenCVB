@@ -78,13 +78,15 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Core : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public fList As New List(Of rcData)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             labels(3) = task.edges.labels(2)
+            Dim lastMap = dst1.Clone
+            Dim rcListLast = New List(Of rcData)(fList)
 
             dst1.SetTo(0)
             Dim brickList As New List(Of Integer)
@@ -98,23 +100,43 @@ Namespace VBClasses
             Next
             Dim countRects = brickList.Count
 
-            Dim index = 1
+            Dim nextIndex = 1
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            rcList.Clear()
+            Dim usedList As New List(Of Integer)
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For Each i In brickList
                 Dim r = task.gridRects(i)
                 Dim val = dst1.Get(Of Byte)(r.Y, r.X)
                 If val = 255 Then
-                    Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
-                    Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count > 0 Then
-                        rcList.Add(New rcData(mask, rect, index))
-                        index += 1
+                    Dim prevIndex = lastMap.Get(Of Byte)(r.Y, r.X)
+                    If prevIndex = 0 OrElse usedList.Contains(prevIndex) Then
+                        While usedList.Contains(nextIndex) OrElse nextIndex Mod 255 = 0
+                            nextIndex += 1
+                        End While
+                        prevIndex = nextIndex
                     End If
+                    usedList.Add(prevIndex)
+
+                    Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                    Dim count = FloodFill(dst1, mask, r.TopLeft, prevIndex, rect, 0, 0, flags)
+                    Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count, .index = prevIndex, .mapID = prevIndex}
+                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, prevIndex)
+                    If rcLast IsNot Nothing Then
+                        rc.age = rcLast.age + 1
+                        If rc.age >= 1000 Then rc.age = 100
+                    Else
+                        rc.age = 1
+                    End If
+                    newList.Add(count, rc)
                 End If
             Next
 
+            fList = New List(Of rcData)(newList.Values)
+
+            For Each rc In fList
+                SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)
+            Next
             dst2 = Palettize(dst1, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
@@ -286,7 +308,7 @@ Namespace VBClasses
             fLess.Run(src)
             If task.optionsChanged Then
                 dst2 = fLess.dst3.Clone
-                rcList = New List(Of rcData)(fLess.rcList)
+                rcList = New List(Of rcData)(fLess.fList)
             End If
 
             ptList.Clear()
@@ -298,7 +320,7 @@ Namespace VBClasses
                 ptList.Add(rc.rect.TopLeft)
             Next
 
-            For Each rc In fLess.rcList
+            For Each rc In fLess.fList
                 Dim val = task.motion.motionMask.Get(Of Byte)(rc.rect.Y, rc.rect.X)
                 If val = 0 Then
                     If ptList.Contains(rc.rect.TopLeft) = False Then

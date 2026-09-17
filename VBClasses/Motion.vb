@@ -540,7 +540,7 @@ Namespace VBClasses
             labels(2) = edges.labels(2)
 
             plotdots.maxScale = task.gridRects.Count
-            plotdots.plotData(0) = edges.fLess.rcList.Count
+            plotdots.plotData(0) = edges.fLess.fList.Count
             plotdots.Run(src)
             dst3 = plotdots.dst2
             labels(3) = plotdots.labels(2)

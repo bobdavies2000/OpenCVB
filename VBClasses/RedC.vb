@@ -849,12 +849,12 @@ Namespace VBClasses
             fLess.Run(src)
             dst3 = dst2.Clone
 
-            If fLess.rcList.Count = 0 OrElse redC.rcList.Count = 0 Then
+            If fLess.fList.Count = 0 OrElse redC.rcList.Count = 0 Then
                 labels(3) = "No FeatureLess or RedC cells to merge."
                 Exit Sub
             End If
 
-            Dim flRc = fLess.rcList(0)
+            Dim flRc = fLess.fList(0)
             Dim histogram As New Mat
             Dim ranges() As Rangef = {New Rangef(0, 256)}
             CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, flRc.mask, histogram, 1, {256}, ranges)
@@ -887,6 +887,86 @@ Namespace VBClasses
 
             labels(3) = CStr(members.Count) + " RedC cells merged from the largest FeatureLess cell"
             SetTrueText(merged.displayCell, 1)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedC_FeatureLess2 : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Dim fLess As New FeatureLess_Core
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Cursor.ai: Combine RedC cells under each FeatureLess_Core region using CalcHist on rcIndexMap."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            fLess.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            dst3 = dst2.Clone
+
+            If fLess.fList.Count = 0 OrElse redC.rcList.Count = 0 Then
+                labels(3) = "No FeatureLess or RedC cells to merge."
+                Exit Sub
+            End If
+
+            Dim ranges() As Rangef = {New Rangef(0, 256)}
+            Dim groupCount As Integer
+            For Each flRc In fLess.fList
+                If flRc.pixels = 0 Then Continue For
+
+                Dim histMask = flRc.mask
+                If histMask.Width <> flRc.rect.Width OrElse histMask.Height <> flRc.rect.Height Then
+                    histMask = New Mat
+                    InRange(fLess.dst1(flRc.rect), flRc.index Mod 255, flRc.index Mod 255, histMask)
+                End If
+                If CountNonZero(histMask) = 0 Then Continue For
+
+                Dim histogram As New Mat
+                CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, histMask, histogram, 1, {256}, ranges)
+                Dim histArray(histogram.Rows - 1) As Single
+                histogram.GetArray(Of Single)(histArray)
+
+                Dim bestBin As Integer
+                Dim bestCount As Single
+                For i = 1 To histArray.Length - 1
+                    If histArray(i) > bestCount Then
+                        bestCount = histArray(i)
+                        bestBin = i
+                    End If
+                Next
+                If bestCount = 0 Then Continue For
+
+                Dim members As New List(Of rcData)
+                Dim bestRc As rcData = Nothing
+                For Each rc In redC.rcList
+                    Dim bin = rc.index Mod 255
+                    If bin > 0 AndAlso bin < histArray.Length AndAlso histArray(bin) > 0 Then
+                        members.Add(rc)
+                        If bin = bestBin Then bestRc = rc
+                    End If
+                Next
+                If members.Count = 0 Then Continue For
+                If bestRc Is Nothing Then bestRc = members(0)
+
+                Dim color = task.scalarColors(bestRc.index Mod 255)
+                For Each rc In members
+                    dst3(rc.rect).SetTo(color, rc.mask)
+                Next
+                groupCount += 1
+            Next
+
+            For Each rc In fLess.fList
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
+            Next
+
+            dst1 = fLess.dst2
+            labels(3) = CStr(groupCount) + " FeatureLess regions combined RedC cells using CalcHist"
         End Sub
     End Class
 End Namespace
