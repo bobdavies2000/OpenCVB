@@ -43,66 +43,32 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst2
             rcList.Clear()
-            Dim usedList As New List(Of Single)({0})
-            Dim reusedIndex As Integer
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
-                Dim rc As New rcData(flood.mask(r), r, floodVal)
-                rc.mapID = flood.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-
-                Dim oldMapID = rcMapIDsLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.mapID = oldMapID Then
-                    Dim previousIndex = rcIndexMapLast.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                    If usedList.Contains(previousIndex) = False And previousIndex <> 0 Then
-                        rc.index = previousIndex
-                        usedList.Add(rc.index)
-                        reusedIndex += 1
-                    End If
-                End If
+                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256)
+                rc.mapID = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                rc.index = i + 1
                 rcList.Add(rc)
             Next
 
-            Dim nextIndex As Integer
             rcIndexMap.SetTo(0)
             For i = rcList.Count - 1 To 0 Step -1
                 Dim rc = rcList(i)
-                If rc.index = 0 Then
-                    While usedList.Contains(nextIndex)
-                        nextIndex += 1
-                    End While
-
-                    rc.index = nextIndex
-                    usedList.Add(nextIndex)
-                    rc.age = 1
-                Else
-                    Dim rclast = rcIndexFind(rcListLast, rc.index)
-                    If rclast IsNot Nothing Then
-                        rc.age = rclast.age + 1
-                        If rc.age >= 1000 Then rc.age = 100
-                    Else
-                        rc.age = 1
-                    End If
-                End If
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcIndexMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
             Next
 
             SetTrueText(displayCell(rcList, rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             If task.rcD IsNot Nothing Then
-                SetTrueText(CStr(task.rcD.age), task.rcD.maxDist)
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
                 Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
-                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
-
-            For i = 0 To Math.Min(rcList.Count, 10) - 1
-                SetTrueText(CStr(rcList(i).age), rcList(i).maxDStable, 3)
-            Next
 
             dst3 = Palettize(rcIndexMap, 0)
 
-            labels(2) = CStr(rcList.Count) + " cells were found and " + CStr(reusedIndex) + " were able to reuse the index."
+            labels(2) = CStr(rcList.Count) + " cells were found "
         End Sub
     End Class
 
@@ -906,7 +872,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             fLess.Run(src)
-            dst2 = redC.dst2
+            dst2 = redC.dst2.Clone
             labels(2) = redC.labels(2)
             dst3 = dst2.Clone
 
@@ -915,61 +881,56 @@ Namespace VBClasses
                 Exit Sub
             End If
 
+            Dim rcListNew As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
             Dim histogram As New Mat
             Dim histArray(histogram.Rows - 1) As Single
             Dim newMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            Dim rcListNew As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For Each rcF In fLess.fList
                 CalcHist({redC.rcIndexMap(rcF.rect)}, {0}, rcF.mask, histogram, 1, {redC.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
-                Dim rcNew As rcData = Nothing
+                Dim rcNew = rcF
+                newMask.SetTo(0)
+                If rcNew.pixels = 64 Then Dim k = 0
+                Dim merged As Boolean = False
                 For i = 1 To histArray.Length - 1
                     If histArray(i) > 0 Then
-                        Dim rcHist = RedC_Basics.rcIndexFind(redC.rcList, i)
-                        If rcNew Is Nothing Then
-                            rcNew = rcHist
-                        Else
-                            Dim newRect = rcNew.rect.Union(rcHist.rect)
-                            newMask(newRect).SetTo(0)
-                            newMask(rcNew.rect).SetTo(255, rcNew.mask)
-                            newMask(rcHist.rect).SetTo(255, rcHist.mask)
-                            rcNew.mask = newMask(newRect).Clone
-                            rcNew.rect = newRect
-                            Dim pixels = CountNonZero(rcNew.mask)
-                            rcNew.pixels = pixels
-                            rcListNew.Add(pixels, rcNew)
-                            redC.rcIndexMap(rcHist.rect).SetTo(0, rcHist.mask)
-                        End If
+                        Dim rcHist = redC.rcList(i - 1)
+                        Dim newRect = rcNew.rect.Union(rcHist.rect)
+                        newMask(rcNew.rect).SetTo(255, rcNew.mask)
+                        newMask(rcHist.rect).SetTo(255, rcHist.mask)
+                        rcNew.mask = newMask(newRect).Clone
+                        rcNew.rect = newRect
+                        rcNew.pixels = CountNonZero(rcNew.mask)
+                        redC.rcIndexMap(rcHist.rect).SetTo(0, rcHist.mask)
+                        redC.rcList(i - 1).pixels = 0
+                        merged = True
                     End If
                 Next
-                If rcListNew.Count > 0 Then
-                    cv.Cv2.ImShow("new mask", rcNew.mask)
-                    Exit For
-                End If
+                If merged Then rcListNew.Add(rcNew.pixels, rcNew)
             Next
 
-            'For Each rc In redC.rcList
-            '    rcListNew.Add(rc.pixels, rc)
-            'Next
+            For Each rc In redC.rcList
+                If rc.pixels > 0 Then rcListNew.Add(rc.pixels, rc)
+            Next
 
             rcIndexMap.SetTo(0)
             rcList.Clear()
-            For i = rcListNew.Count - 1 To 0 Step -1
-                Dim rc = rcListNew.Values(i)
-                rc.index = i
-                rcIndexMap(rc.rect).SetTo(i, rc.mask)
+            For Each rc In rcListNew.Values
+                rc.index = rcList.Count + 1
+                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
             dst3 = Palettize(rcIndexMap, 0)
 
+            dst1 = fLess.dst2
             For Each rc In fLess.fList
+                DrawContours(dst1(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
             Next
 
-            dst1 = fLess.dst2
         End Sub
     End Class
 End Namespace

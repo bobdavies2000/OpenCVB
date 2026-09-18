@@ -13,11 +13,13 @@ Namespace VBClasses
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(src)
-                dst1 = color8u.dst2.Clone
+                dst1 = color8u.dst2.clone
             Else
                 dst1 = src.Clone
             End If
-            dst2 = Palettize(dst1)
+
+            dst1.ConvertTo(dst1, cv.MatType.CV_32S)
+            dst2 = Palettize(dst1, 0)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -28,7 +30,7 @@ Namespace VBClasses
                     If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
                         Dim index = sortList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(src, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= 10 Then
                             sortList.Add(count, ValidateRect(rect))
                             sortIndexList.Add(count, index)
