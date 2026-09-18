@@ -7,49 +7,38 @@ Namespace VBClasses
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-            labels(3) = "FloodFill mask"
-            desc = "Cursor.ai: FloodFill the input and list regions sorted by pixel count."
+            desc = "FloodFill the input and create a list of rect's sorted by pixel count."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(src)
-                src = color8u.dst2
+                dst1 = color8u.dst2.Clone
+            Else
+                dst1 = src.Clone
             End If
-            dst1 = src.Clone
-            dst2 = Palettize(src)
+            dst2 = Palettize(dst1)
 
-            Dim sortList As New SortedList(Of Integer, (count As Integer, rect As cv.Rect, index As Integer))(
-                                           New compareAllowIdenticalIntegerInverted)
+            Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+            Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             Dim rect As cv.Rect
-            Dim index As Integer = 1
-
             mask.SetTo(0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                        Dim index = sortList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(src, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= 10 Then
-                            sortList.Add(count, (count, ValidateRect(rect), index))
-                            index += 1
-                            If index >= 255 Then index = 1
+                            sortList.Add(count, ValidateRect(rect))
+                            sortIndexList.Add(count, index)
                         End If
                     End If
                 Next
             Next
 
-            rectList.Clear()
-            indexList.Clear()
-            For Each item In sortList.Values
-                If item.count >= 10 Then
-                    rectList.Add(item.rect)
-                    indexList.Add(item.index)
-                End If
-            Next
-
+            rectList = New List(Of cv.Rect)(sortList.Values)
+            indexList = New List(Of Integer)(sortIndexList.Values)
             labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
         End Sub
     End Class
