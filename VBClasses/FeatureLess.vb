@@ -137,6 +137,9 @@ Namespace VBClasses
             For Each rc In fList
                 SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)
             Next
+
+            SetTrueText(fList(0).displayCell, 1)
+
             dst2 = Palettize(dst1, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"

@@ -892,7 +892,6 @@ Namespace VBClasses
 
                 Dim rcNew = rcF
                 newMask.SetTo(0)
-                If rcNew.pixels = 64 Then Dim k = 0
                 Dim merged As Boolean = False
                 For i = 1 To histArray.Length - 1
                     If histArray(i) > 0 Then
@@ -930,7 +929,6 @@ Namespace VBClasses
                 DrawContours(dst1(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
             Next
-
         End Sub
     End Class
 End Namespace

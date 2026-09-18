@@ -18,7 +18,6 @@ Module Startup
 
         splash.Close()
         splash.Dispose()
-        splash = Nothing
         Try
             Application.Run(mainForm)
         Catch ex As Exception
