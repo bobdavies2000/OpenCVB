@@ -518,6 +518,7 @@ Namespace VBClasses
         Dim fLess As New FeatureLess_Core
         Public minCellSize As Integer = 100
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst0.Checked = True
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "FloodFill the input and create a list of rect's sorted by pixel count."
         End Sub
@@ -530,9 +531,10 @@ Namespace VBClasses
                 dst1 = src.Clone
             End If
 
-            fLess.Run(dst1)
+            dst0 = Palettize(dst1, 0)
+            fLess.Run(dst1.Clone)
 
-            dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+            dst1.ConvertTo(dst1, cv.MatType.CV_32S)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -540,7 +542,7 @@ Namespace VBClasses
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then ' Performance benefits from this statement but check it again...
+                    If mask.Get(Of Integer)(y, x) = 0 Then ' Performance benefits from this statement but check it again...
                         Dim index = sortList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
@@ -564,8 +566,10 @@ Namespace VBClasses
             Dim histArray(histogram.Rows - 1) As Single
             rectList.Clear()
             fillList.Clear()
+            dst1.SetTo(0)
             For Each rcF In fLess.fList
                 CalcHist({mask(rcF.rect)}, {0}, rcF.mask, histogram, 1, {sortList.Count}, ranges)
+                cv.Cv2.ImShow("rcf.mask", rcF.mask)
                 histogram.GetArray(Of Single)(histArray)
 
                 Dim fillChar As Integer = -1
@@ -579,21 +583,16 @@ Namespace VBClasses
                             newRect = newRect.Union(rList(i))
                             InRange(mask(rList(i)), iList(i), iList(i), tmp)
                         End If
-                        mask(rList(i)).SetTo(fillChar, tmp)
+                        dst1(rList(i)).SetTo(fillChar, tmp)
                         iList(i) = -1
                     End If
                 Next
 
                 If fillChar > 0 Then
-                    InRange(mask(newRect), fillChar, fillChar, tmp)
-                    mask(newRect).SetTo(fillChar, tmp)
+                    InRange(dst1(newRect), fillChar, fillChar, tmp)
+                    dst1(newRect).SetTo(fillChar, tmp)
                     rectList.Add(newRect)
                     fillList.Add(fillChar)
-
-                    If rectList.Count = task.gOptions.DebugSlider.Value Then
-                        cv.Cv2.ImShow("tmp", tmp)
-                        cv.Cv2.ImShow("mask(newRect)", mask(newRect))
-                    End If
                 End If
             Next
 
@@ -604,7 +603,7 @@ Namespace VBClasses
             '    End If
             'Next
 
-            dst3 = Palettize(mask, 0)
+            dst3 = Palettize(dst1, 0)
 
             For Each rc In fLess.fList
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
@@ -668,6 +667,7 @@ Namespace VBClasses
             rectList.Clear()
             fillList.Clear()
             Dim tmp As New cv.Mat
+            dst1.SetTo(0)
             For Each rcF In fLess.fList
                 Dim newRect = New cv.Rect(0, 0, 0, 0)
                 Dim fillChar As Integer = -1
@@ -678,25 +678,21 @@ Namespace VBClasses
                             newRect = r
                             fillChar = iList(i)
                             iList(i) = -1
+                            InRange(mask(newRect), iList(i), iList(i), tmp)
                         Else
                             newRect = newRect.Union(r)
                             InRange(mask(newRect), iList(i), iList(i), tmp)
-                            mask(newRect).SetTo(fillChar, tmp)
                             iList(i) = -1
                         End If
+                        dst1(newRect).SetTo(fillChar, tmp)
                     End If
                 Next
 
                 If fillChar > 0 Then
-                    InRange(mask(newRect), fillChar, fillChar, tmp)
-                    mask(newRect).SetTo(fillChar, tmp)
+                    InRange(dst1(newRect), fillChar, fillChar, tmp)
+                    dst1(newRect).SetTo(fillChar, tmp)
                     rectList.Add(newRect)
                     fillList.Add(fillChar)
-
-                    If rectList.Count = task.gOptions.DebugSlider.Value Then
-                        cv.Cv2.ImShow("tmp", tmp)
-                        cv.Cv2.ImShow("mask(newRect)", mask(newRect))
-                    End If
                 End If
             Next
 
@@ -707,7 +703,7 @@ Namespace VBClasses
             '    End If
             'Next
 
-            dst3 = Palettize(mask, 0)
+            dst3 = Palettize(dst1, 0)
 
             For Each rc In fLess.fList
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
