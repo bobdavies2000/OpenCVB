@@ -129,7 +129,6 @@ Namespace VBClasses
                         rc.age = 1
                     End If
                     newList.Add(count, rc)
-                    Exit For
                 End If
             Next
 

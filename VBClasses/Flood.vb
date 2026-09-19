@@ -52,6 +52,7 @@ Namespace VBClasses
 
 
 
+
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
@@ -513,102 +514,81 @@ Namespace VBClasses
 
 
     Public Class Flood_CellMerge : Inherits TaskParent
-        Public rectList As New List(Of cv.Rect)
-        Public fillChars As New List(Of Integer)
+        Public rectMats As New List(Of (cv.Rect, cv.Mat))
+        Dim color8U As New Color8U_Basics
         Dim fLess As New FeatureLess_Core
-        Public minCellSize As Integer = 100
+        Dim minCellSize As Integer = 100
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst0.Checked = True
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "FloodFill the input and create a list of rect's sorted by pixel count."
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(src)
-                dst1 = color8u.dst2.Clone
-            Else
-                dst1 = src.Clone
-            End If
+            color8U.Run(src)
+            fLess.Run(color8U.dst2)
+            dst2 = color8U.dst3.Clone
 
-            dst0 = Palettize(dst1, 0)
-            fLess.Run(dst1.Clone)
-
-            dst1.ConvertTo(dst1, cv.MatType.CV_32S)
-
-            Dim sortList As New SortedList(Of Integer, (cv.Rect, Integer))(New compareAllowIdenticalIntegerInverted)
-            Dim rect As cv.Rect
+            color8U.dst2.ConvertTo(dst0, cv.MatType.CV_32S)
+            Dim labelMap As New Mat(dst2.Size, MatType.CV_32F, 0)
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            For y = 0 To src.Height - 1
-                For x = 0 To src.Width - 1
-                    If mask.Get(Of Integer)(y, x) = 0 Then ' Performance benefits from this statement but check it again...
-                        Dim index = sortList.Count + 1
-                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
-                        If count >= minCellSize Then sortList.Add(count, (ValidateRect(rect), index))
-                    End If
-                Next
-            Next
-            labels(2) = CStr(sortList.Count) + " flood regions found in the original"
-            dst2 = Palettize(mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)), 0)
-
-            Dim rects = New List(Of cv.Rect)
-            Dim indexList As New List(Of Integer)
-            For Each kv In sortList.Values
-                rects.Add(kv.Item1)
-                indexList.Add(kv.Item2)
-            Next
-
-            Dim tmp As New cv.Mat
-            Dim newRect As cv.Rect
-            Dim ranges() As Rangef = {New Rangef(0, sortList.Count)}
-            Dim histogram As New Mat
-            Dim histArray(histogram.Rows - 1) As Single
-            rectList.Clear()
-            fillChars.Clear()
-            dst1.SetTo(0)
-            For Each rcF In fLess.fList
-                CalcHist({mask(rcF.rect)}, {0}, rcF.mask, histogram, 1, {sortList.Count}, ranges)
-                histogram.GetArray(Of Single)(histArray)
-
-                Dim fillChar As Integer = -1
-                For i = 1 To histArray.Length - 1
-                    If histArray(i) > minCellSize And indexList(i) > 0 Then
-                        If fillChar < 0 Then
-                            newRect = rects(i)
-                            fillChar = indexList(i)
-                            InRange(mask(rects(i)), fillChar, fillChar, tmp)
-                        Else
-                            newRect = newRect.Union(rects(i))
-                            InRange(mask(rects(i)), indexList(i), indexList(i), tmp)
+            Dim rect As cv.Rect
+            Dim floodMats As New List(Of (cv.Rect, cv.Mat))
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim flags = FloodFillFlags.FixedRange Or (1 << 8)
+                        Dim count = FloodFill(dst0, mask, New cv.Point(x, y), -1, rect, 0, 0, flags)
+                        If rect.Width <= 0 Or rect.Height <= 0 Then Continue For
+                        rect = ValidateRect(rect)
+                        Dim filled As New Mat
+                        InRange(dst0(rect), -1, -1, filled)
+                        dst0(rect).SetTo(-2, filled)
+                        If count >= minCellSize Then
+                            Dim index = floodMats.Count + 1
+                            labelMap(rect).SetTo(index, filled)
+                            floodMats.Add((rect, filled.Clone))
                         End If
-                        dst1(rects(i)).SetTo(fillChar, tmp)
-                        indexList(i) = -1
                     End If
                 Next
+            Next
 
-                If fillChar > 0 Then
-                    InRange(dst1(newRect), fillChar, fillChar, tmp)
-                    dst1(newRect).SetTo(fillChar, tmp)
-                    rectList.Add(newRect)
-                    fillChars.Add(fillChar)
+            Dim binCount = fLess.fList.Count + 1
+            Dim ranges() As Rangef = {New Rangef(0, Math.Max(binCount, 1))}
+            Dim histogram As New Mat
+            Dim histArray(Math.Max(binCount, 1) - 1) As Single
+
+            rectMats.Clear()
+            dst1.SetTo(0)
+            Dim nonMergeIndex = fLess.fList.Count + 1
+            For Each tuple In floodMats
+                rect = tuple.Item1
+                mask = tuple.Item2
+                CalcHist({fLess.dst1(rect)}, {0}, mask, histogram, 1, {binCount}, ranges)
+                histogram.GetArray(Of Single)(histArray)
+                Dim histList = histArray.ToList
+                histList(0) = 0
+                If histList.Max > 0 Then
+                    Dim index = histList.IndexOf(histList.Max)
+                    dst1(rect).SetTo(index, mask)
+                Else
+                    'dst1(rect).SetTo(nonMergeIndex, mask)
+                    'nonMergeIndex += 1
                 End If
             Next
 
-            'For i = 0 To rList.Count - 1
-            '    If iList(i) > 0 Then
-            '        rectList.Add(rList(i))
-            '        fillChars.Add(iList(i))
-            '    End If
+            'dst1.SetTo(0)
+            'For i = 0 To rectMats.Count - 1
+            '    dst1(rectMats(i).Item1).SetTo((i + 1) Mod 255, rectMats(i).Item2)
+            '    dst2(rectMats(i).Item1).SetTo(task.scalarColors((i + 1) Mod 255), rectMats(i).Item2)
             'Next
 
             dst3 = Palettize(dst1, 0)
-
             For Each rc In fLess.fList
-                DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
+                If rc.contour Is Nothing OrElse rc.contour.Count < 2 Then Continue For
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
-
-            labels(3) = CStr(rectList.Count) + " flood regions found after merging using featureless data."
+            labels(2) = CStr(floodMats.Count) + " floodMats merged into " + CStr(rectMats.Count) + " featureless regions"
+            labels(3) = CStr(rectMats.Count) + " CalcHist merges from " + CStr(fLess.fList.Count) + " featureless cells"
         End Sub
     End Class
 End Namespace
