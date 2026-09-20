@@ -37,14 +37,8 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst3
 
-            rcList.Clear()
-            rcIndexMap.SetTo(0)
-            For Each tuple In flood.rectMats
-                Dim rc = New rcData(tuple.Item2, tuple.Item1, 255)
-                rcList.Add(rc)
-
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-            Next
+            ' rcList = New List(Of rcData)(flood.rcList)
+            'rcIndexMap = flood.rcIndexMap.Clone
 
             dst3 = Palettize(rcIndexMap)
 

@@ -579,17 +579,14 @@ Namespace VBClasses
                 End If
 
                 histogram.GetArray(Of Single)(histArray)
-                Dim fillIndex = 1
-                Dim maxVal = histArray(1)
-                For i = 2 To histArray.Length - 1
-                    If histArray(i) > maxVal Then
-                        maxVal = histArray(i)
-                        fillIndex = i
+                Dim histList = histArray.ToList
+                Dim fillIndex = histList.IndexOf(histList.Max)
+                For i = 1 To fLess.fList.Count - 1
+                    If histList(i) > 0 Then
+                        rects(i) = rects(i).Union(fRect)
+                        dst1(fRect).SetTo(fillIndex, fMask)
                     End If
                 Next
-                If maxVal = 0 Then Continue For
-
-                dst1(fRect).SetTo(fillIndex, fMask)
             Next
 
             rectMats.Clear()
