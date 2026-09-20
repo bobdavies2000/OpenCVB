@@ -403,7 +403,7 @@ Namespace VBClasses
                 maskApprox = mask.Clone
                 pixels = CountNonZero(mask)
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If pixels > 0 Then
+                If contour.Count > 0 Then
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                     Dim epsilon = 0.01 * ArcLength(contour, True)
                     approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList

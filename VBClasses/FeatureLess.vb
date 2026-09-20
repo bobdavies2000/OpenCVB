@@ -106,8 +106,7 @@ Namespace VBClasses
             fList.Clear()
             For Each i In brickList
                 Dim r = task.gridRects(i)
-                Dim val = dst1.Get(Of Byte)(r.Y, r.X)
-                If val = 255 Then
+                If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim prevIndex = lastMap.Get(Of Byte)(r.Y, r.X)
                     If prevIndex = 0 OrElse usedList.Contains(prevIndex) Then
                         While usedList.Contains(nextIndex) OrElse nextIndex Mod 255 = 0

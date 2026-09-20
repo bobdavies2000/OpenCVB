@@ -1,5 +1,86 @@
 Imports System.Runtime.InteropServices : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class RedC_BasicsNew : Inherits TaskParent
+        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcList As New List(Of rcData) ' includes cloud data.
+        Dim flood As New Flood_CellMerge
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            labels(3) = "rcIndexMap version of cells.  Age is shown for the largest cells."
+            desc = "Segment the image based on color."
+        End Sub
+        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
+            Dim displayStr As String = "There is no cell defined for that point."
+            For Each rc In rclist
+                If rc.index = clickIndex Or clickIndex < 0 Then
+                    task.rcD = rc
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    displayStr = task.rcD.displayCell
+                    Exit For
+                End If
+            Next
+            Return displayStr
+        End Function
+        Public Shared Function rcIndexFind(rclist As List(Of rcData), rcIndex As Integer) As rcData
+            For Each rc In rclist
+                If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
+            Next
+            Return Nothing
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcIndexMapLast = rcIndexMap.Clone
+            Dim rcMapIDsLast = flood.dst1
+
+            flood.Run(src)
+            dst2 = flood.dst3
+
+            rcList.Clear()
+            rcIndexMap.SetTo(0)
+            For Each tuple In flood.rectMats
+                Dim rc = New rcData(tuple.Item2, tuple.Item1, 255)
+                rcList.Add(rc)
+
+                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            dst3 = Palettize(rcIndexMap)
+
+            'rcList.Clear()
+            'For i = 0 To flood.rectList.Count - 1
+            '    Dim floodVal = flood.indexList(i)
+            '    Dim r = flood.rectList(i)
+            '    Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256)
+            '    rc.mapID = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            '    rc.index = i + 1
+            '    rcList.Add(rc)
+            'Next
+
+            'rcIndexMap.SetTo(0)
+            'For i = rcList.Count - 1 To 0 Step -1
+            '    Dim rc = rcList(i)
+            '    rcIndexMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
+            'Next
+
+            'SetTrueText(displayCell(rcList, rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+
+            'If task.rcD IsNot Nothing Then
+            '    Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+            '    Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+            '    ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            'End If
+
+            'dst3 = Palettize(rcIndexMap, 0)
+
+            'labels(2) = CStr(rcList.Count) + " cells were found "
+        End Sub
+    End Class
+
+
+
+
     Public Class RedC_Basics : Inherits TaskParent
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -929,6 +1010,81 @@ Namespace VBClasses
                 DrawContours(dst1(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
             Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_CellMerge1 : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Dim flood As New Flood_CellMerge
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            labels(3) = "rcIndexMap from Flood_CellMerge dst3 labels"
+            desc = "Cursor.ai: Build rcList and rcIndexMap from the Flood_CellMerge dst3 output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            flood.Run(src)
+            dst1 = flood.dst2
+            dst2 = flood.dst3
+
+            Dim labelMap = flood.dst1
+            Dim mm = GetMinMax(labelMap)
+            rcList.Clear()
+            rcIndexMap.SetTo(0)
+            For label = 1 To CInt(mm.maxVal)
+                Dim cellMask As New Mat
+                InRange(labelMap, label, label, cellMask)
+                If CountNonZero(cellMask) = 0 Then Continue For
+                Dim nz As New Mat
+                FindNonZero(cellMask, nz)
+                If nz.Rows = 0 Then Continue For
+                Dim r = ValidateRect(BoundingRect(nz))
+                Dim rc As New rcData(cellMask(r), r, 255)
+                If rc.pixels = 0 Then Continue For
+                rc.mapID = label
+                rc.index = rcList.Count + 1
+                rcList.Add(rc)
+                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            dst3 = Palettize(rcIndexMap, 0)
+            SetTrueText(RedC_Basics.displayCell(rcList, rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            If task.rcD IsNot Nothing Then
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+            End If
+            labels(2) = flood.labels(3)
+            labels(3) = CStr(rcList.Count) + " cells built from Flood_CellMerge"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_CellMerge : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Dim flood As New Flood_CellMerge
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Build rcList and rcIndexMap from the Flood_CellMerge output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            flood.Run(src)
+
+            redC.Run(flood.dst1)
+            dst2 = Palettize(redC.rcIndexMap, 0)
+            labels(2) = redC.labels(2)
+            rcList = redC.rcList
+            rcIndexMap = redC.rcIndexMap
         End Sub
     End Class
 End Namespace
