@@ -591,9 +591,8 @@ Namespace VBClasses
 
             rectMats.Clear()
             Dim nextMask As New cv.Mat
-            For i = 0 To rects.Length - 1
+            For i = 0 To fLess.fList.Count + notMergedIndex - 1
                 Dim r = ValidateRect(rects(i))
-                If r.Width = 0 Then Continue For
                 InRange(dst1(r), i, i, nextMask)
                 rectMats.Add((r, nextMask.Clone))
             Next
