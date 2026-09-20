@@ -104,7 +104,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
             Dim usedList As New List(Of Integer)
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            fList.Clear()
             For Each i In brickList
                 Dim r = task.gridRects(i)
                 Dim val = dst1.Get(Of Byte)(r.Y, r.X)
@@ -128,11 +128,9 @@ Namespace VBClasses
                     Else
                         rc.age = 1
                     End If
-                    newList.Add(count, rc)
+                    fList.Add(rc)
                 End If
             Next
-
-            fList = New List(Of rcData)(newList.Values)
 
             For Each rc In fList
                 SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)

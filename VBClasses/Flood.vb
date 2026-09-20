@@ -517,13 +517,14 @@ Namespace VBClasses
         Public rectMats As New List(Of (cv.Rect, cv.Mat))
         Dim color8U As New Color8U_Basics
         Dim fLess As New FeatureLess_Core
-        Dim minCellSize As Integer = 100
+        Dim minCellSize As Integer = dst2.Total * 0.0005
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
+            labels(2) = color8U.labels(2)
             fLess.Run(color8U.dst2)
             dst2 = color8U.dst3.Clone
 
@@ -556,8 +557,12 @@ Namespace VBClasses
             Dim histogram As New Mat
             Dim histArray(Math.Max(binCount, 1) - 1) As Single
 
-            rectMats.Clear()
             dst1.SetTo(0)
+            Dim rects(fLess.fList.Count) As cv.Rect
+            For i = 0 To fLess.fList.Count - 1
+                rects(i) = fLess.fList(i).rect
+            Next
+
             Dim nonMergeIndex = fLess.fList.Count + 1
             For Each tuple In floodMats
                 rect = tuple.Item1
@@ -565,9 +570,13 @@ Namespace VBClasses
                 CalcHist({fLess.dst1(rect)}, {0}, mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
                 Dim histList = histArray.ToList
-                histList(0) = 0
-                If histList.Max > 0 Then
-                    Dim index = histList.IndexOf(histList.Max)
+                Dim fillIndex = histList.IndexOf(histList.Max)
+                For Each index In histList
+                    If index > 0 Then
+                        Dim rectMat = floodMats(index)
+                        rect = rectMat.Item1
+                        mask = rectMat.Item2
+                    rects(index) = rects(index).Union(rect)
                     dst1(rect).SetTo(index, mask)
                 Else
                     'dst1(rect).SetTo(nonMergeIndex, mask)
@@ -575,11 +584,13 @@ Namespace VBClasses
                 End If
             Next
 
-            'dst1.SetTo(0)
-            'For i = 0 To rectMats.Count - 1
-            '    dst1(rectMats(i).Item1).SetTo((i + 1) Mod 255, rectMats(i).Item2)
-            '    dst2(rectMats(i).Item1).SetTo(task.scalarColors((i + 1) Mod 255), rectMats(i).Item2)
-            'Next
+            rectMats.Clear()
+            Dim nextMask As New cv.Mat
+            For i = 0 To rects.Length - 1
+                Dim r = rects(i)
+                InRange(dst1(rect), i, i, nextMask)
+                rectMats.Add((rect, nextMask))
+            Next
 
             dst3 = Palettize(dst1, 0)
             For Each rc In fLess.fList
@@ -587,8 +598,7 @@ Namespace VBClasses
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
                 DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
-            labels(2) = CStr(floodMats.Count) + " floodMats merged into " + CStr(rectMats.Count) + " featureless regions"
-            labels(3) = CStr(rectMats.Count) + " CalcHist merges from " + CStr(fLess.fList.Count) + " featureless cells"
+            labels(3) = CStr(floodMats.Count) + " floodMats merged into " + CStr(rectMats.Count) + " featureless regions"
         End Sub
     End Class
 End Namespace
