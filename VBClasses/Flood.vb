@@ -563,25 +563,25 @@ Namespace VBClasses
                 rects(i) = fLess.fList(i).rect
             Next
 
-            Dim nonMergeIndex = fLess.fList.Count + 1
             For Each tuple In floodMats
                 rect = tuple.Item1
                 mask = tuple.Item2
                 CalcHist({fLess.dst1(rect)}, {0}, mask, histogram, 1, {binCount}, ranges)
+                histogram.Set(Of Single)(0, 0, 0)
+                If CountNonZero(histogram) = 0 Then Continue For
+
                 histogram.GetArray(Of Single)(histArray)
                 Dim histList = histArray.ToList
                 Dim fillIndex = histList.IndexOf(histList.Max)
-                For Each index In histList
-                    If index > 0 Then
-                        Dim rectMat = floodMats(index)
-                        rect = rectMat.Item1
-                        mask = rectMat.Item2
-                    rects(index) = rects(index).Union(rect)
-                    dst1(rect).SetTo(index, mask)
-                Else
-                    'dst1(rect).SetTo(nonMergeIndex, mask)
-                    'nonMergeIndex += 1
-                End If
+                For i = 0 To histList.Count - 1
+                    Dim histCount = histList(i)
+                    If histCount > 0 Then
+                        rect = floodMats(i).Item1
+                        mask = floodMats(i).Item2
+                        rects(i) = rects(i).Union(rect)
+                        dst1(rect).SetTo(fillIndex, mask)
+                    End If
+                Next
             Next
 
             rectMats.Clear()

@@ -93,7 +93,6 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
-                If CountNonZero(task.depthmask(r)) = 0 Then Continue For
                 dst1(r).SetTo(255)
 
                 brickList.Add(i)
@@ -136,7 +135,8 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)
             Next
 
-            SetTrueText(fList(0).displayCell, 1)
+            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            SetTrueText(fList(clickIndex).displayCell, 1)
 
             dst2 = Palettize(dst1, 0)
 
