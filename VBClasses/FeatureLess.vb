@@ -134,8 +134,8 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)
             Next
 
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            SetTrueText(fList(clickIndex).displayCell, 1)
+            'Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            'SetTrueText(fList(clickIndex).displayCell, 1)
 
             dst2 = Palettize(dst1, 0)
 
