@@ -109,7 +109,7 @@ Namespace VBClasses
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim prevIndex = lastMap.Get(Of Byte)(r.Y, r.X)
                     If prevIndex = 0 OrElse usedList.Contains(prevIndex) Then
-                        While usedList.Contains(nextIndex) OrElse nextIndex Mod 255 = 0
+                        While usedList.Contains(nextIndex) OrElse nextIndex Mod 256 = 0
                             nextIndex += 1
                         End While
                         prevIndex = nextIndex
