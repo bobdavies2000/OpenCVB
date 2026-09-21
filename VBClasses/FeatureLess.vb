@@ -84,7 +84,6 @@ Namespace VBClasses
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            labels(3) = task.edges.labels(2)
             Dim lastMap = dst1.Clone
             Dim rcListLast = New List(Of rcData)(fList)
 
@@ -93,6 +92,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+                If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
                 dst1(r).SetTo(255)
 
                 brickList.Add(i)
@@ -134,12 +134,9 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.rect.TopLeft, 2)
             Next
 
-            'Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            'SetTrueText(fList(clickIndex).displayCell, 1)
-
             dst2 = Palettize(dst1, 0)
 
-            labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
+            labels(2) = CStr(fList.Count) + " featureless regions found with " + CStr(brickList.Count) + " featureless grid bricks"
         End Sub
     End Class
 
