@@ -515,12 +515,108 @@ Namespace VBClasses
 
     Public Class Flood_CellMerge : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim color8U As New Color8U_Basics
-        Dim fLess As New FeatureLess_Core
-        Dim minCellSize As Integer = dst2.Total * 0.0005
+        Dim rectMats As New Flood_RectMats
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            'rectMats.Run(src)
+
+            'Dim binCount = 256
+            'Dim ranges() As Rangef = {New Rangef(0, binCount)}
+            'Dim histogram As New Mat
+            'Dim histArray() As Single = Nothing
+
+            'Dim notMergedIndex As Integer
+            'dst1.SetTo(0)
+            'Dim rectMatsAssigned(rectMats.rectList.Count - 1) As Integer
+            'For flIndex = 0 To rectMats.rectList.Count - 1
+            '    Dim Tuple = rectMats.rectList(flIndex)
+            '    Dim fRect = Tuple.Item1
+            '    Dim fMask = Tuple.Item2
+
+            '    If fMask.Width <> fRect.Width Or fMask.Height <> fRect.Height Then Continue For
+            '    CalcHist({calcInput(fRect)}, {0}, fMask, histogram, 1, {binCount}, ranges)
+            '    histogram.Set(Of Single)(0, 0, 0)
+            '    If CountNonZero(histogram) = 0 Then
+            '        '    rects(notMergedIndex) = fRect
+            '        notMergedIndex += 1
+            '        Continue For
+            '    End If
+
+            '    histogram.GetArray(Of Single)(histArray)
+            '    Dim histList = histArray.ToList
+            '    Dim fillIndex = histList.IndexOf(histList.Max)
+            '    For i = 1 To rectMatsAssigned.Length - 1
+            '        If histList(i) > 0 Then
+            '            If rectMatsAssigned(i) <> 0 Then
+            '                fillIndex = i
+            '                Exit For
+            '            End If
+            '        End If
+            '    Next
+
+            '    For i = 1 To fLess.fList.Count - 1
+            '        If histList(i) > 0 Then
+            '            rects(fillIndex) = rects(fillIndex).Union(fRect)
+            '            dst1(fRect).SetTo(fillIndex, fMask)
+            '        End If
+            '    Next
+
+            '    For i = 1 To histList.Count - 1
+            '        If histList(i) > 0 Then rectMatsAssigned(i) = fillIndex
+            '    Next
+            'Next
+
+            'rcList.Clear()
+            'Dim nextMask As New cv.Mat
+            'For i = 0 To fLess.fList.Count - 1
+            '    Dim r = ValidateRect(rects(i))
+            '    InRange(dst1(r), i, i, nextMask)
+            '    Dim rc = New rcData(nextMask, r, 255) With {.age = ages(i)}
+            '    rcList.Add(rc)
+            '    If rc.contour.Count > 0 Then DrawContours(dst1(rc.rect), {rc.contour}, 0, i, -1)
+            'Next
+
+            'dst3 = Palettize(dst1, 0)
+            'For i = 0 To rcList.Count - 1
+            '    Dim rc = rcList(i)
+            '    rc.index = i + 1
+            '    If task.gOptions.DebugSlider.Value = rc.index Then
+            '        dst3(rc.rect).SetTo(white, rc.mask)
+            '        Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+            '    End If
+            '    SetTrueText(CStr(rc.age), rc.maxDist, 3)
+            '    rcList(i) = rc
+            'Next
+
+            'If standaloneTest() Then
+            '    For Each rc In fLess.fList
+            '        If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
+            '        DrawContours(task.color(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+            '        DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+            '    Next
+            'End If
+            'labels(3) = CStr(rectMats.Count) + " cells merged into " + CStr(rcList.Count) + ".  There are " + CStr(notMergedIndex) +
+            '            " existing cells that were not merged."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Flood_RectMats : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Dim minCellSize As Integer = dst2.Total * 0.0005
+        Dim fLess As New FeatureLess_Core
+        Public rectList As New List(Of (cv.Rect, cv.Mat))
+        Dim rects(255) As cv.Rect
+        Dim ages(255) As Integer
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Build a list of cv.rects and cv.mats for each floodfill region in the Color8U input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then
@@ -528,23 +624,21 @@ Namespace VBClasses
                 src = color8U.dst2.Clone
                 labels(2) = color8U.labels(2)
             End If
+
             fLess.Run(src)
             dst2 = color8U.dst3.Clone
 
-            color8U.dst2.ConvertTo(dst0, cv.MatType.CV_32S)
-            Dim mask As New Mat(New Size(dst0.Width + 2, dst0.Height + 2), MatType.CV_8U, 0)
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, (cv.Rect, cv.Mat))(New compareAllowIdenticalIntegerInverted)
-            For y = 0 To dst0.Height - 1
-                For x = 0 To dst0.Width - 1
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim flags = FloodFillFlags.FixedRange Or (1 << 8)
-                        Dim count = FloodFill(dst0, mask, New cv.Point(x, y), -1, rect, 0, 0, flags)
+                        Dim flags = FloodFillFlags.FixedRange Or ((sortList.Count + 1) << 8)
+                        Dim count = FloodFill(color8U.dst2, mask, New cv.Point(x, y), sortList.Count + 1, rect, 0, 0, flags)
                         If rect.Width <= 0 Or rect.Height <= 0 Then Continue For
                         rect = ValidateRect(rect)
                         Dim filled As New Mat
-                        InRange(dst0(rect), -1, -1, filled)
-                        dst0(rect).SetTo(-2, filled)
                         If count >= minCellSize Then
                             Dim index = sortList.Count + 1
                             sortList.Add(CountNonZero(filled), (rect, filled.Clone))
@@ -552,102 +646,25 @@ Namespace VBClasses
                     End If
                 Next
             Next
-            Dim floodMats As New List(Of (cv.Rect, cv.Mat))(sortList.Values)
+            rectList = New List(Of (cv.Rect, cv.Mat))(sortList.Values)
 
-            Dim binCount = 256
-            Dim ranges() As Rangef = {New Rangef(0, binCount)}
-            Dim histogram As New Mat
-            Dim histArray() As Single = Nothing
-
-            Dim rects(binCount - 1) As cv.Rect
-            Dim ages(binCount - 1) As Integer
-            Dim calcInput = fLess.dst1.Clone
+            dst1 = fLess.dst1.Clone
             For i = 0 To fLess.fList.Count - 1
                 Dim rc = fLess.fList(i)
-                calcInput(rc.rect).SetTo(i + 1, rc.mask)
+                dst1(rc.rect).SetTo(i + 1, rc.mask)
                 ages(i + 1) = If(rc.age > ages(i + 1), rc.age, ages(i))
                 rects(i + 1) = rc.rect
             Next
 
-            Dim notMergedIndex As Integer
-            dst1.SetTo(0)
-            Dim floodMatsAssigned(floodMats.Count - 1) As Integer
-            For flIndex = 0 To floodMats.Count - 1
-                Dim Tuple = floodMats(flIndex)
-                Dim fRect = Tuple.Item1
-                Dim fMask = Tuple.Item2
-
-                If fMask.Width <> fRect.Width Or fMask.Height <> fRect.Height Then Continue For
-                CalcHist({calcInput(fRect)}, {0}, fMask, histogram, 1, {binCount}, ranges)
-                histogram.Set(Of Single)(0, 0, 0)
-                If CountNonZero(histogram) = 0 Then
-                    '    rects(notMergedIndex) = fRect
-                    notMergedIndex += 1
-                    Continue For
-                End If
-
-                histogram.GetArray(Of Single)(histArray)
-                Dim histList = histArray.ToList
-                Dim fillIndex = histList.IndexOf(histList.Max)
-                For i = 1 To floodMatsAssigned.Length - 1
-                    If histList(i) > 0 Then
-                        If floodMatsAssigned(i) <> 0 Then
-                            fillIndex = i
-                            Exit For
-                        End If
-                    End If
-                Next
-
-
-
-                'If fLess.fList(fillIndex).rect.TopLeft = New cv.Point(168, 94) Then Dim k = 0
-
-
-
-
-                For i = 1 To fLess.fList.Count - 1
-                    If histList(i) > 0 Then
-                        rects(fillIndex) = rects(fillIndex).Union(fRect)
-                        dst1(fRect).SetTo(fillIndex, fMask)
-                    End If
-                Next
-
-                For i = 1 To histList.Count - 1
-                    If histList(i) > 0 Then floodMatsAssigned(i) = fillIndex
-                Next
+            dst3 = Palettize(color8U.dst2, 0)
+            dst1 = Palettize(dst1, 0)
+            For Each rc In fLess.fList
+                If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
+                DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
-
-            rcList.Clear()
-            Dim nextMask As New cv.Mat
-            For i = 0 To fLess.fList.Count - 1
-                Dim r = ValidateRect(rects(i))
-                InRange(dst1(r), i, i, nextMask)
-                Dim rc = New rcData(nextMask, r, 255) With {.age = ages(i)}
-                rcList.Add(rc)
-                If rc.contour.Count > 0 Then DrawContours(dst1(rc.rect), {rc.contour}, 0, i, -1)
-            Next
-
-            dst3 = Palettize(dst1, 0)
-            For i = 0 To rcList.Count - 1
-                Dim rc = rcList(i)
-                rc.index = i + 1
-                If task.gOptions.DebugSlider.Value = rc.index Then
-                    dst3(rc.rect).SetTo(white, rc.mask)
-                    Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                End If
-                SetTrueText(CStr(rc.age), rc.maxDist, 3)
-                rcList(i) = rc
-            Next
-
-            If standaloneTest() Then
-                For Each rc In fLess.fList
-                    If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
-                    DrawContours(task.color(rc.rect), {rc.contour}, 0, white, task.lineWidth)
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
-                Next
-            End If
-            labels(3) = CStr(floodMats.Count) + " cells merged into " + CStr(rcList.Count) + ".  There are " + CStr(notMergedIndex) +
-                        " existing cells that were not merged."
+            labels(1) = fLess.labels(2)
+            labels(3) = CStr(rectList.Count) + " cells from dst2 but each with a unique index.  Cannot exceed 255!"
+            If rectList.Count > 255 Then MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
         End Sub
     End Class
 End Namespace
