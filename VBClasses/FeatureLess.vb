@@ -35,17 +35,55 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(nextList.Values)
 
+            Dim usedList As New List(Of Integer)
+            Dim nextFree As Integer = 1
+            For Each rcPrev In rcLastList
+                If rcPrev.index >= nextFree Then nextFree = rcPrev.index + 1
+            Next
+            If nextFree > 255 Then nextFree = 1
+
             For Each rc In rcList
+                Dim floodIndex = rc.index
+                InRange(dst1(rc.rect), floodIndex, floodIndex, rc.mask)
+                If CountNonZero(rc.mask) > 0 Then rc.maxDist = rc.buildMaxDist(rc.mask)
+
                 Dim prevIndex = lastIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If prevIndex > 0 And prevIndex < rcLastList.Count Then
-                    rc.index = prevIndex
-                    rc.age = rcLastList(prevIndex).age + 1
+
+                Dim rcLast As rcData = Nothing
+                If prevIndex > 0 Then
+                    For Each rcPrev In rcLastList
+                        If rcPrev.index = prevIndex Then
+                            rcLast = rcPrev
+                            Exit For
+                        End If
+                    Next
                 End If
+
+                If rcLast IsNot Nothing AndAlso rc.rect.IntersectsWith(rcLast.rect) AndAlso
+                   usedList.Contains(prevIndex) = False Then
+                    rc.index = prevIndex
+                    rc.age = rcLast.age + 1
+                    If rc.age >= 1000 Then rc.age = 100
+                Else
+                    While usedList.Contains(nextFree) Or nextFree > 255
+                        nextFree += 1
+                        If nextFree > 255 Then nextFree = 1
+                        If usedList.Count >= 255 Then Exit While
+                    End While
+                    rc.index = nextFree
+                    nextFree += 1
+                End If
+                usedList.Add(rc.index)
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
 
+            If standaloneTest() Then
+                For Each rc In rcList
+                    SetTrueText(CStr(rc.age), rc.maxDist)
+                Next
+            End If
             labels(2) = CStr(rcList.Count) + " featureless regions found"
         End Sub
     End Class
