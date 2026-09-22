@@ -1498,7 +1498,7 @@ Namespace VBClasses
 
             strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
                  "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +
-                 "Current rcList (region) count = " + CStr(fLess.fList.Count)
+                 "Current rcList (region) count = " + CStr(fLess.rcList.Count)
 
             SetTrueText(strOut, 3)
         End Sub

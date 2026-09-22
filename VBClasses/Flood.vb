@@ -521,85 +521,79 @@ Namespace VBClasses
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            'rectMats.Run(src)
+            rectMats.Run(src)
 
-            'Dim binCount = 256
-            'Dim ranges() As Rangef = {New Rangef(0, binCount)}
-            'Dim histogram As New Mat
-            'Dim histArray() As Single = Nothing
+            Dim binCount = 256
+            Dim ranges() As Rangef = {New Rangef(0, binCount)}
+            Dim histogram As New Mat
+            Dim histArray() As Single = Nothing
 
-            'Dim notMergedIndex As Integer
-            'dst1.SetTo(0)
-            'Dim rectMatsAssigned(rectMats.rectList.Count - 1) As Integer
-            'For flIndex = 0 To rectMats.rectList.Count - 1
-            '    Dim Tuple = rectMats.rectList(flIndex)
-            '    Dim fRect = Tuple.Item1
-            '    Dim fMask = Tuple.Item2
+            Dim notMergedIndex As Integer
+            dst1.SetTo(0)
+            Dim rectMatsAssigned(rectMats.rectList.Count - 1) As Integer
+            Dim rects = rectMats.rects
+            For flIndex = 0 To rectMats.rectList.Count - 1
+                Dim Tuple = rectMats.rectList(flIndex)
+                Dim fRect = Tuple.Item1
+                Dim fMask = Tuple.Item2
 
-            '    If fMask.Width <> fRect.Width Or fMask.Height <> fRect.Height Then Continue For
-            '    CalcHist({calcInput(fRect)}, {0}, fMask, histogram, 1, {binCount}, ranges)
-            '    histogram.Set(Of Single)(0, 0, 0)
-            '    If CountNonZero(histogram) = 0 Then
-            '        '    rects(notMergedIndex) = fRect
-            '        notMergedIndex += 1
-            '        Continue For
-            '    End If
+                If fMask.Width <> fRect.Width Or fMask.Height <> fRect.Height Then Continue For
+                CalcHist({rectMats.dst1(fRect)}, {0}, fMask, histogram, 1, {binCount}, ranges)
+                histogram.Set(Of Single)(0, 0, 0)
+                If CountNonZero(histogram) = 0 Then
+                    '    rects(notMergedIndex) = fRect
+                    notMergedIndex += 1
+                    Continue For
+                End If
 
-            '    histogram.GetArray(Of Single)(histArray)
-            '    Dim histList = histArray.ToList
-            '    Dim fillIndex = histList.IndexOf(histList.Max)
-            '    For i = 1 To rectMatsAssigned.Length - 1
-            '        If histList(i) > 0 Then
-            '            If rectMatsAssigned(i) <> 0 Then
-            '                fillIndex = i
-            '                Exit For
-            '            End If
-            '        End If
-            '    Next
+                histogram.GetArray(Of Single)(histArray)
+                Dim histList = histArray.ToList
+                Dim fillIndex = histList.IndexOf(histList.Max)
+                For i = 1 To rectMatsAssigned.Length - 1
+                    If histList(i) > 0 Then
+                        If rectMatsAssigned(i) <> 0 Then
+                            fillIndex = i
+                            Exit For
+                        End If
+                    End If
+                Next
 
-            '    For i = 1 To fLess.fList.Count - 1
-            '        If histList(i) > 0 Then
-            '            rects(fillIndex) = rects(fillIndex).Union(fRect)
-            '            dst1(fRect).SetTo(fillIndex, fMask)
-            '        End If
-            '    Next
+                For i = 1 To rectMats.fLess.rcList.Count - 1
+                    If histList(i) > 0 Then
+                        rects(fillIndex) = rects(fillIndex).Union(fRect)
+                        dst1(fRect).SetTo(fillIndex, fMask)
+                    End If
+                Next
 
-            '    For i = 1 To histList.Count - 1
-            '        If histList(i) > 0 Then rectMatsAssigned(i) = fillIndex
-            '    Next
-            'Next
+                For i = 1 To histList.Count - 1
+                    If histList(i) > 0 Then rectMatsAssigned(i) = fillIndex
+                Next
+            Next
 
-            'rcList.Clear()
-            'Dim nextMask As New cv.Mat
-            'For i = 0 To fLess.fList.Count - 1
-            '    Dim r = ValidateRect(rects(i))
-            '    InRange(dst1(r), i, i, nextMask)
-            '    Dim rc = New rcData(nextMask, r, 255) With {.age = ages(i)}
-            '    rcList.Add(rc)
-            '    If rc.contour.Count > 0 Then DrawContours(dst1(rc.rect), {rc.contour}, 0, i, -1)
-            'Next
+            rcList.Clear()
+            Dim nextMask As New cv.Mat
+            For i = 0 To rectMats.fLess.rcList.Count - 1
+                Dim r = ValidateRect(rects(i))
+                InRange(dst1(r), i, i, nextMask)
+                Dim rc = New rcData(nextMask, r, 255) With {.age = rectMats.ages(i)}
+                rcList.Add(rc)
+                If rc.contour.Count > 0 Then DrawContours(dst1(rc.rect), {rc.contour}, 0, i, -1)
+            Next
 
-            'dst3 = Palettize(dst1, 0)
-            'For i = 0 To rcList.Count - 1
-            '    Dim rc = rcList(i)
-            '    rc.index = i + 1
-            '    If task.gOptions.DebugSlider.Value = rc.index Then
-            '        dst3(rc.rect).SetTo(white, rc.mask)
-            '        Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-            '    End If
-            '    SetTrueText(CStr(rc.age), rc.maxDist, 3)
-            '    rcList(i) = rc
-            'Next
+            dst3 = Palettize(dst1, 0)
+            For i = 0 To rcList.Count - 1
+                Dim rc = rcList(i)
+                rc.index = i + 1
+                If task.gOptions.DebugSlider.Value = rc.index Then
+                    dst3(rc.rect).SetTo(white, rc.mask)
+                    Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+                End If
+                SetTrueText(CStr(rc.age), rc.maxDist, 3)
+                rcList(i) = rc
+            Next
 
-            'If standaloneTest() Then
-            '    For Each rc In fLess.fList
-            '        If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
-            '        DrawContours(task.color(rc.rect), {rc.contour}, 0, white, task.lineWidth)
-            '        DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
-            '    Next
-            'End If
-            'labels(3) = CStr(rectMats.Count) + " cells merged into " + CStr(rcList.Count) + ".  There are " + CStr(notMergedIndex) +
-            '            " existing cells that were not merged."
+            labels(3) = CStr(rectMats.rectList.Count) + " cells merged into " + CStr(rcList.Count) + ".  There are " + CStr(notMergedIndex) +
+                        " existing cells that were not merged."
         End Sub
     End Class
 
@@ -610,10 +604,10 @@ Namespace VBClasses
     Public Class Flood_RectMats : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Dim minCellSize As Integer = dst2.Total * 0.0005
-        Dim fLess As New FeatureLess_Core
+        Public fLess As New FeatureLess_Core
         Public rectList As New List(Of (cv.Rect, cv.Mat))
-        Dim rects(255) As cv.Rect
-        Dim ages(255) As Integer
+        Public rects(255) As cv.Rect
+        Public ages(255) As Integer
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build a list of cv.rects and cv.mats for each floodfill region in the Color8U input."
@@ -649,17 +643,17 @@ Namespace VBClasses
             rectList = New List(Of (cv.Rect, cv.Mat))(sortList.Values)
 
             dst1 = fLess.dst1.Clone
-            For i = 0 To fLess.fList.Count - 1
-                Dim rc = fLess.fList(i)
+            For i = 0 To fLess.rcList.Count - 1
+                Dim rc = fLess.rcList(i)
                 dst1(rc.rect).SetTo(i + 1, rc.mask)
                 ages(i + 1) = If(rc.age > ages(i + 1), rc.age, ages(i))
                 rects(i + 1) = rc.rect
             Next
 
             dst3 = Palettize(color8U.dst2, 0)
-            dst1 = Palettize(dst1, 0)
-            For Each rc In fLess.fList
+            For Each rc In fLess.rcList
                 If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
+                DrawContours(dst1(rc.rect), {rc.contour}, 0, white, task.lineWidth)
                 DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
             labels(1) = fLess.labels(2)

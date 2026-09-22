@@ -890,12 +890,12 @@ Namespace VBClasses
             fLess.Run(src)
             dst3 = dst2.Clone
 
-            If fLess.fList.Count = 0 OrElse redC.rcList.Count = 0 Then
+            If fLess.rcList.Count = 0 OrElse redC.rcList.Count = 0 Then
                 labels(3) = "No FeatureLess or RedC cells to merge."
                 Exit Sub
             End If
 
-            Dim flRc = fLess.fList(0)
+            Dim flRc = fLess.rcList(0)
             Dim histogram As New Mat
             Dim ranges() As Rangef = {New Rangef(0, 256)}
             CalcHist({redC.rcIndexMap(flRc.rect)}, {0}, flRc.mask, histogram, 1, {256}, ranges)
@@ -951,7 +951,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
             dst3 = dst2.Clone
 
-            If fLess.fList.Count = 0 OrElse redC.rcList.Count = 0 Then
+            If fLess.rcList.Count = 0 OrElse redC.rcList.Count = 0 Then
                 labels(3) = "No FeatureLess or RedC cells to merge."
                 Exit Sub
             End If
@@ -961,7 +961,7 @@ Namespace VBClasses
             Dim histogram As New Mat
             Dim histArray(histogram.Rows - 1) As Single
             Dim newMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each rcF In fLess.fList
+            For Each rcF In fLess.rcList
                 CalcHist({redC.rcIndexMap(rcF.rect)}, {0}, rcF.mask, histogram, 1, {redC.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
@@ -1000,7 +1000,7 @@ Namespace VBClasses
             dst3 = Palettize(rcIndexMap, 0)
 
             dst1 = fLess.dst2
-            For Each rc In fLess.fList
+            For Each rc In fLess.rcList
                 DrawContours(dst1(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
             Next

@@ -232,20 +232,24 @@ Namespace MainApp
             MagnifyTimer.Enabled = True
         End Sub
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
-            If vbc.task.mouseMagnifyEndPoint <> New cv.Point Then
-                Dim pt = vbc.task.mouseMagnifyStartPoint
-                Dim w = Math.Abs(pt.X - vbc.task.mouseMagnifyEndPoint.X)
-                Dim h = Math.Abs(pt.Y - vbc.task.mouseMagnifyEndPoint.Y)
+            If task.mouseMagnifyEndPoint <> New cv.Point Then
+                Dim pt = task.mouseMagnifyStartPoint
+                Dim w = Math.Abs(pt.X - task.mouseMagnifyEndPoint.X)
+                Dim h = Math.Abs(pt.Y - task.mouseMagnifyEndPoint.Y)
                 Dim r = New cv.Rect(pt.X, pt.Y, w, h)
-                Dim input = cvext.BitmapConverter.ToMat(pics(vbc.task.mouseMagnifyPicTag).Image)
+                Dim input = cvext.BitmapConverter.ToMat(pics(task.mouseMagnifyPicTag).Image)
                 r = validateRect(r, input.Width, input.Height)
                 If r.Width < 5 Or r.Height < 5 Then Exit Sub
                 Dim img As New cv.Mat
                 If magnification = 0 Then magnification = 5
-                cv.Cv2.Resize(input(r), img, New cv.Size(vbc.task.drawRect.Width * magnification,
-                                                         vbc.task.drawRect.Height * magnification))
-                cv.Cv2.ImShow("Magnifier " + CStr(magnification) + "X", img)
-                vbc.task.mouseMagnifyEndPoint = New cv.Point
+                If task.drawRect.Width > 0 Or task.drawRect.Height > 0 Then
+                    cv.Cv2.Resize(input(r), img, New cv.Size(task.drawRect.Width * magnification,
+                                                         task.drawRect.Height * magnification))
+                    cv.Cv2.ImShow("Magnifier " + CStr(magnification) + "X", img)
+                Else
+                    MsgBox("Drawrect has zero width or height.  Try again.")
+                End If
+                task.mouseMagnifyEndPoint = New cv.Point
             End If
         End Sub
         Private Sub Magnify5X_Click(sender As Object, e As EventArgs) Handles Magnify5X.Click
