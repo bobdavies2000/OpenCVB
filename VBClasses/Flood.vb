@@ -534,7 +534,7 @@ Namespace VBClasses
             color8U.dst2.ConvertTo(dst0, cv.MatType.CV_32S)
             Dim mask As New Mat(New Size(dst0.Width + 2, dst0.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
-            Dim floodMats As New List(Of (cv.Rect, cv.Mat))
+            Dim sortList As New SortedList(Of Integer, (cv.Rect, cv.Mat))(New compareAllowIdenticalIntegerInverted)
             For y = 0 To dst0.Height - 1
                 For x = 0 To dst0.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
@@ -546,12 +546,13 @@ Namespace VBClasses
                         InRange(dst0(rect), -1, -1, filled)
                         dst0(rect).SetTo(-2, filled)
                         If count >= minCellSize Then
-                            Dim index = floodMats.Count + 1
-                            floodMats.Add((rect, filled.Clone))
+                            Dim index = sortList.Count + 1
+                            sortList.Add(CountNonZero(filled), (rect, filled.Clone))
                         End If
                     End If
                 Next
             Next
+            Dim floodMats As New List(Of (cv.Rect, cv.Mat))(sortList.Values)
 
             Dim binCount = 256
             Dim ranges() As Rangef = {New Rangef(0, binCount)}
@@ -570,26 +571,49 @@ Namespace VBClasses
 
             Dim notMergedIndex As Integer
             dst1.SetTo(0)
-            For Each tuple In floodMats
-                Dim fRect = tuple.Item1
-                Dim fMask = tuple.Item2
+            Dim floodMatsAssigned(floodMats.Count - 1) As Integer
+            For flIndex = 0 To floodMats.Count - 1
+                Dim Tuple = floodMats(flIndex)
+                Dim fRect = Tuple.Item1
+                Dim fMask = Tuple.Item2
+
                 If fMask.Width <> fRect.Width Or fMask.Height <> fRect.Height Then Continue For
                 CalcHist({calcInput(fRect)}, {0}, fMask, histogram, 1, {binCount}, ranges)
                 histogram.Set(Of Single)(0, 0, 0)
-                'If CountNonZero(histogram) = 0 Then
-                '    rects(notMergedIndex) = fRect
-                '    notMergedIndex += 1
-                '    Continue For
-                'End If
+                If CountNonZero(histogram) = 0 Then
+                    '    rects(notMergedIndex) = fRect
+                    notMergedIndex += 1
+                    Continue For
+                End If
 
                 histogram.GetArray(Of Single)(histArray)
                 Dim histList = histArray.ToList
                 Dim fillIndex = histList.IndexOf(histList.Max)
+                For i = 1 To floodMatsAssigned.Length - 1
+                    If histList(i) > 0 Then
+                        If floodMatsAssigned(i) <> 0 Then
+                            fillIndex = i
+                            Exit For
+                        End If
+                    End If
+                Next
+
+
+
+                'If fLess.fList(fillIndex).rect.TopLeft = New cv.Point(168, 94) Then Dim k = 0
+
+
+
+
                 For i = 1 To fLess.fList.Count - 1
                     If histList(i) > 0 Then
                         rects(fillIndex) = rects(fillIndex).Union(fRect)
                         dst1(fRect).SetTo(fillIndex, fMask)
                     End If
+                Next
+
+                For i = 1 To histList.Count - 1
+                    If histList(i) > 0 Then floodMatsAssigned(i) = fillIndex
                 Next
             Next
 
