@@ -9,8 +9,8 @@ Namespace VBClasses
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = dst1.Clone
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim lastIndex = dst1.Clone
+            Dim rcLastList = New List(Of rcData)(rcList)
 
             dst1.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
@@ -24,7 +24,6 @@ Namespace VBClasses
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
             Dim nextList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
-            Dim overFlow As Integer = rcListLast.Count + 1
             For Each r In task.gridRects
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(dst1, mask, r.TopLeft, nextList.Count + 1, rect, 0, 0, flags)
@@ -36,34 +35,14 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(nextList.Values)
 
-            'Dim usedList As New List(Of Integer)
-            'For i = 0 To rcList.Count - 1
-            '    Dim rc = rcList(i)
-            '    Dim rcLast As rcData = Nothing
-            '    Dim prevIndex = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            '    If prevIndex = 0 Or prevIndex >= rcListLast.Count Then prevIndex = rc.index Else rcLast = rcListLast(prevIndex)
-            '    If usedList.Contains(prevIndex) Then
-            '        prevIndex = overFlow
-            '        overFlow += 1
-            '    End If
-            '    If rcLast IsNot Nothing Then
-            '        rc.age = rcLast.age + 1
-            '        If rc.age >= 1000 Then rc.age = 100
-            '    End If
-
-            '    rc.index = prevIndex
-
-            '    For j = i + 1 To rcList.Count - 1
-            '        If rc.index = rcList(j).index Then
-            '            InRange(dst1(rcList(j).rect), rcList(j).index, rcList(j).index, rcList(j).mask)
-            '            rcList(j).index = overFlow
-            '            overFlow += 1
-            '        End If
-            '    Next
-            '    dst1(rc.rect).SetTo(rc.index, rc.mask)
-            '    rcList(i) = rc
-            '    usedList.Add(rc.index)
-            'Next
+            For Each rc In rcList
+                Dim prevIndex = lastIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If prevIndex > 0 And prevIndex < rcLastList.Count Then
+                    rc.index = prevIndex
+                    rc.age = rcLastList(prevIndex).age + 1
+                End If
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
+            Next
 
             dst2 = Palettize(dst1, 0)
 

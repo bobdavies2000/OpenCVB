@@ -409,7 +409,7 @@ Namespace VBClasses
                     approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
                     mask.SetTo(0)
                     maskApprox.SetTo(0)
-                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    ' DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                     DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 End If
                 pixels = CountNonZero(mask)
