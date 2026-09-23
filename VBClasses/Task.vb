@@ -87,7 +87,7 @@ Namespace VBClasses
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             task.cpu.displayObjectName = settings.algorithm
             AlgorithmTestAllCount += 1
-
+            task.minCellSize = task.workRes.Width * task.workRes.Height * 0.0005
             Select Case task.Settings.cameraName
                 Case "StereoLabs ZED 2/2i"
                     task.fOptions.ColorDiffSlider.Value = 10

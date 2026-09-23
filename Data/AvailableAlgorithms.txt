@@ -208,6 +208,7 @@ FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells
 FeatureLess_Core
+FeatureLess_CoreOld
 FeatureLess_Correlation
 FeatureLess_IndexKNN
 FeatureLess_Lines
@@ -243,10 +244,12 @@ FitLine_BasicsOld
 FitLine_Conventional
 Flood_Basics
 Flood_CellMerge
+Flood_CellMergeOld
 Flood_Edges
 Flood_OriginalDemo
 Flood_OriginalMask
 Flood_RectMats
+Flood_RectMatsOld
 Font_Basics
 Font_FlowText
 Foreground_Basics_TA

@@ -51,6 +51,7 @@ Namespace VBClasses
         Public DotSize As Integer
         Public lineWidth As Integer
         Public lineType As LineTypes
+        Public minCellSize As Integer
         Public histogramBins As Integer
         Public MaxZmeters As Single
         Public highlight As Scalar

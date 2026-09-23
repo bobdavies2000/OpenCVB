@@ -403,14 +403,12 @@ Namespace VBClasses
                 maskApprox = mask.Clone
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count > 0 Then
-                    DrawContours(mask.Clone, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                     pixels = CountNonZero(mask)
-                    Dim epsilon = 0.01 * ArcLength(contour, True)
-                    approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
-                    mask.SetTo(0)
-                    maskApprox.SetTo(0)
-                    ' DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                    DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    ' Dim epsilon = 0.01 * ArcLength(contour, True)
+                    'approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
+                    'maskApprox.SetTo(0)
+                    'DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 Else
                     pixels = CountNonZero(mask)
                 End If
@@ -418,7 +416,7 @@ Namespace VBClasses
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
             End Sub
-            Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
+            Public Function buildMaxDist(mask As cv.Mat) As cv.Point
                 Dim tmpMask = mask.Clone
 
                 ' Rectangle is definitely needed.  Test it again to verify that the rectangle is essential.
