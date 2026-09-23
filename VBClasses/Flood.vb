@@ -626,25 +626,23 @@ Namespace VBClasses
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
-            Dim sortList As New SortedList(Of Integer, (cv.Rect, cv.Mat))(New compareAllowIdenticalInteger)
+            rectList.Clear()
             dst1 = color8U.dst2.Clone
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = sortList.Count + 1
+                        Dim index = rectList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or ((index) << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count = 0 Or rect.Width <= 0 Or rect.Height <= 0 Then Continue For
                         rect = ValidateRect(rect)
                         If count >= minCellSize Then
                             InRange(dst1(rect), index, index, filled)
-                            sortList.Add(CountNonZero(filled), (rect, filled.Clone))
+                            rectList.Add((rect, filled.Clone))
                         End If
                     End If
                 Next
             Next
-
-            rectList = New List(Of (cv.Rect, cv.Mat))(sortList.Values)
 
             dst1.SetTo(0)
             For i = 0 To rectList.Count - 1
@@ -654,7 +652,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
             For Each rc In fLess.rcList
                 If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
-                DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
             labels(1) = fLess.labels(2)
             labels(3) = CStr(rectList.Count) + " cells from dst2 but each with a unique index.  Cannot exceed 255!"
@@ -674,7 +672,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             rectMats.Run(src)
-            dst2 = rectMats.dst3
+            dst2 = rectMats.dst2
             labels(2) = rectMats.labels(3)
 
             Dim binCount = 256
@@ -684,6 +682,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             rcList = New List(Of rcData)(rectMats.fLess.rcList)
+            Dim consumed(binCount) As Boolean
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
@@ -691,18 +690,29 @@ Namespace VBClasses
                 histogram.GetArray(Of Single)(histArray)
 
                 For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > 0 Then
+                    If histArray(j) > 0 And consumed(j) = False Then
                         Dim tupleRect = rectMats.rectList(j - 1).Item1
                         Dim tupleMask = rectMats.rectList(j - 1).Item2
                         rc.rect = rc.rect.Union(tupleRect)
                         dst1(tupleRect).SetTo(rc.index, tupleMask)
+                        consumed(j) = True
                     End If
                 Next
 
                 InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
-                ' rc.maxDist = rc.buildMaxDist(rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
                 rcList(i) = rc
+            Next
+
+            ' this cleans up any small holes in the resulting cells.  Skip if performance is a problem.
+            For Each rc In rcList
+                Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
+                If contour.Count < 3 Then Continue For
+                rc.contour = contour
+                DrawContours(rc.mask, {rc.contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                rc.pixels = CountNonZero(rc.mask)
+
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             dst3 = Palettize(dst1, 0)

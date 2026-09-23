@@ -401,16 +401,18 @@ Namespace VBClasses
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
                 maskApprox = mask.Clone
-                pixels = CountNonZero(mask)
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count > 0 Then
-                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    DrawContours(mask.Clone, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                    pixels = CountNonZero(mask)
                     Dim epsilon = 0.01 * ArcLength(contour, True)
                     approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
                     mask.SetTo(0)
                     maskApprox.SetTo(0)
                     ' DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                     DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                Else
+                    pixels = CountNonZero(mask)
                 End If
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
