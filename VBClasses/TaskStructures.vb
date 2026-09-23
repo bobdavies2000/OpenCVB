@@ -418,7 +418,6 @@ Namespace VBClasses
             End Sub
             Public Function buildMaxDist(ByVal mask As cv.Mat) As cv.Point
                 Dim tmpMask = mask.Clone
-                Threshold(tmpMask, tmpMask, 0, 255, cv.ThresholdTypes.Binary)
 
                 ' Rectangle is definitely needed.  Test it again to verify that the rectangle is essential.
                 Rectangle(tmpMask, New cv.Rect(0, 0, tmpMask.Width, tmpMask.Height), cv.Scalar.All(0), 1)
