@@ -2,7 +2,7 @@ Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureLess_Core : Inherits TaskParent
+    Public Class FeatureLess_CoreOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -91,7 +91,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_CoreOld : Inherits TaskParent
+    Public Class FeatureLess_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -108,11 +108,11 @@ Namespace VBClasses
 
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             For Each r In task.gridRects
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
-                    Dim index = sortList.Count * 3 + 1
+                    Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                     If count = 0 Or rect.Width = 0 Or rect.Height = 0 Then Continue For
                     Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count, .index = index}
@@ -122,6 +122,13 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(sortList.Values)
             dst2 = Palettize(dst1, 0)
+
+            Dim rcIndex As Integer
+            For Each rc In rcList
+                rcIndex += 1
+                rc.index = rcIndex
+                SetTrueText(CStr(rc.index), rc.maxDist)
+            Next
 
             labels(2) = CStr(rcList.Count) + " featureless regions found"
         End Sub

@@ -390,7 +390,7 @@ Namespace VBClasses
             Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
-            Public maskApprox As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
+            Public maskApprox As New cv.Mat
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
             Public pixels As Integer
