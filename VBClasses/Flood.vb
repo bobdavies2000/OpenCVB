@@ -568,7 +568,7 @@ Namespace VBClasses
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
             labels(1) = fLess.labels(2)
-            labels(3) = CStr(rectList.Count) + " cells from dst2 but each with a unique index.  Cannot exceed 255!"
+            labels(3) = CStr(rectList.Count) + " color input cells.  A warning will appear if more than 255 cells."
             If rectList.Count > 255 Then MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
         End Sub
     End Class
@@ -696,7 +696,7 @@ Namespace VBClasses
                 DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
             labels(1) = fLess.labels(2)
-            labels(3) = CStr(rectList.Count) + " cells from dst2 but each with a unique index.  Cannot exceed 255!"
+            labels(3) = CStr(rectList.Count) + " color input cells.  A warning will appear if more than 255 input cells."
             If rectList.Count > 255 Then MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
         End Sub
     End Class
@@ -758,7 +758,7 @@ Namespace VBClasses
 
             dst3 = Palettize(dst1, 0)
 
-            labels(3) = CStr(rectMats.rectList.Count) + " cells merged into " + CStr(rcList.Count)
+            labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count) + " featureless regions."
         End Sub
     End Class
 End Namespace
