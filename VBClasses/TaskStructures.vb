@@ -400,7 +400,7 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
-                maskApprox = mask.Clone
+                'maskApprox = mask.Clone
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count > 0 Then
                     DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)

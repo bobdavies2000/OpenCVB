@@ -667,23 +667,25 @@ Namespace VBClasses
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
-            rectList.Clear()
+            Dim sortList As New SortedList(Of Integer, (cv.Rect, cv.Mat))(New compareAllowIdenticalIntegerInverted)
             dst1 = color8U.dst2.Clone
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = rectList.Count + 1
+                        Dim index = sortList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or ((index) << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count = 0 Or rect.Width <= 0 Or rect.Height <= 0 Then Continue For
                         rect = ValidateRect(rect)
                         If count >= minCellSize Then
                             InRange(dst1(rect), index, index, filled)
-                            rectList.Add((rect, filled.Clone))
+                            sortList.Add(CountNonZero(filled), (rect, filled.Clone))
                         End If
                     End If
                 Next
             Next
+
+            rectList = New List(Of (cv.Rect, cv.Mat))(sortList.Values)
 
             dst1.SetTo(0)
             For i = 0 To rectList.Count - 1
@@ -708,6 +710,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Dim rectMats As New Flood_RectMats
         Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
@@ -723,12 +726,23 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim consumed(binCount) As Integer
+            Dim consumed(binCount - 1) As Integer
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.Set(Of Single)(0, 0, 0)
                 histogram.GetArray(Of Single)(histArray)
+
+                Dim allConsumed As Boolean = True
+                Dim rcListConsumer As Integer = 0
+                For j = 1 To histArray.Length - 1
+                    If histArray(j) > 0 And rcListConsumer = 0 Then rcListConsumer = consumed(j)
+                    If histArray(j) > 0 And consumed(j) = 0 Then
+                        allConsumed = False
+                        Exit For
+                    End If
+                Next
+                If allConsumed Then Continue For
 
                 For j = 1 To rectMats.rectList.Count - 1
                     If histArray(j) > 0 And consumed(j) = 0 Then
@@ -757,6 +771,17 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst1, 0)
+
+            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If clickIndex > 0 Then
+                For Each rc In rcList
+                    If rc.index = clickIndex Then
+                        Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+                        SetTrueText(rc.displayCell, 1)
+                        Exit For
+                    End If
+                Next
+            End If
 
             labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count) + " featureless regions."
         End Sub
