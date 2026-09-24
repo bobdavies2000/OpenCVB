@@ -735,6 +735,13 @@ Namespace VBClasses
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
+
+
+                If task.gOptions.DebugSlider.Value = i Then Dim k = 0
+
+
+
+
                 Dim rcListConsumer As Integer = -1
                 For j = 1 To rectMats.rectList.Count - 1
                     If histArray(j) > 0 And consumed(j) Then
@@ -755,7 +762,7 @@ Namespace VBClasses
                         removeList.Add(i)
                         Continue For
                     End If
-                    rcListConsumer = i
+                    rcListConsumer = i 
                 End If
 
                 rc = rcList(rcListConsumer)
@@ -792,6 +799,7 @@ Namespace VBClasses
                 sortList.Add(CountNonZero(rc.mask), rc)
             Next
 
+            rcList = New List(Of rcData)(sortList.Values)
             dst3 = Palettize(dst1, 0)
 
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -811,9 +819,10 @@ Namespace VBClasses
     Public Class flood_FillMask : Inherits TaskParent
         Public rc As rcData
         Public Sub New()
-            desc = "create a contour for the mask provided and return the mask and rect."
+            desc = "create a contour that fills in the gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim saveRect = rc.rect
             Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
             If contour.Count < 3 Then Exit Sub
 
@@ -827,7 +836,7 @@ Namespace VBClasses
 
             FloodFill(rc.mask, mask, pt, rc.index, rc.rect, 0, 0, flags)
             rc = New rcData(mask(rc.rect), rc.rect, 255) With {.pixels = CountNonZero(rc.mask)}
+            rc.rect = New cv.Rect(saveRect.X + rc.rect.X, saveRect.Y + rc.rect.Y, rc.rect.Width, rc.rect.Height)
         End Sub
     End Class
-
 End Namespace
