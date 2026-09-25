@@ -407,13 +407,11 @@ Namespace VBClasses
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
             End Sub
             Public Function buildMaxDist(mask As cv.Mat) As cv.Point
-                Dim tmpMask = mask.Clone
-
                 ' Rectangle is definitely needed.  Test it again to verify that the rectangle is essential.
-                Rectangle(tmpMask, New cv.Rect(0, 0, tmpMask.Width, tmpMask.Height), cv.Scalar.All(0), 1)
+                Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
 
                 Dim distance32f As New cv.Mat
-                DistanceTransform(tmpMask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+                DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
                 Dim mm As mmData = GetMinMax(distance32f)
                 Dim maxDist As cv.Point
                 maxDist.X = mm.maxLoc.X + rect.X

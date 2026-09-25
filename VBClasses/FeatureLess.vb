@@ -115,25 +115,27 @@ Namespace VBClasses
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count = 0 Or rect.Width = 0 Or rect.Height = 0 Then Continue For
-                    rc = New rcData(mask(rect), rect, 255) With {.pixels = count}
+                    If count <= task.gridWH * task.gridWH * 4 Or rect.Width = 0 Or rect.Height = 0 Then
+                        dst1(rect).SetTo(0, dst1(rect))
+                        Continue For
+                    End If
+                    rc = New rcData(dst1(rect), rect, index) With {.pixels = count, .index = index}
                     sortList.Add(rc.pixels, rc)
                 End If
             Next
 
+            rcList.Clear()
             Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
-            sortList.Add(0, New rcData(dst0, New cv.Rect(0, 0, dst0.Width, dst0.Height), 255) With {.pixels = 0, .index = 0})
-
-            rcList = New List(Of rcData)(sortList.Values)
-            dst2 = Palettize(dst1, 0)
-
-            For i = 0 To rcList.Count - 1
-                rc = rcList(i)
-                rc.index = i
+            rcList.Add(New rcData(dst0, New cv.Rect(0, 0, dst0.Width, dst0.Height), 255) With {.pixels = 0, .index = 0})
+            dst1.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
-                If rc.index > 0 Then SetTrueText(CStr(rc.index), rc.maxDist)
-                rcList(i) = rc
+                SetTrueText(CStr(rc.index), rc.maxDist)
+                rcList.Add(rc)
             Next
+
+            dst2 = Palettize(dst1, 0)
 
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             rc = rcList(clickIndex)
