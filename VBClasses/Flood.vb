@@ -12,7 +12,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(src)
-                dst1 = color8u.dst2.clone
+                dst1 = color8u.dst2.Clone
             Else
                 dst1 = src.Clone
             End If
@@ -576,75 +576,6 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_CellMergeOld : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Dim rectMats As New Flood_RectMats
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            rectMats.Run(src)
-            dst2 = rectMats.dst2
-            labels(2) = rectMats.labels(3)
-
-            Dim binCount = 256
-            Dim ranges() As Rangef = {New Rangef(0, binCount)}
-            Dim histogram As New Mat
-            Dim histArray() As Single = Nothing
-
-            dst1.SetTo(0)
-            rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim consumed(binCount) As Integer
-            For i = 0 To rcList.Count - 1
-                Dim rc = rcList(i)
-                CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
-                histogram.Set(Of Single)(0, 0, 0)
-                histogram.GetArray(Of Single)(histArray)
-
-                For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > task.minCellSize Then
-                        Dim tupleRect = rectMats.rectList(j - 1).Item1
-                        Dim tupleMask = rectMats.rectList(j - 1).Item2
-                        rc.rect = rc.rect.Union(tupleRect)
-                        rc.index = i + 1
-                        dst1(tupleRect).SetTo(rc.index, tupleMask)
-                        consumed(j) = i
-                    End If
-                Next
-
-                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
-                rc.pixels = CountNonZero(rc.mask)
-                rcList(i) = rc
-            Next
-
-            ' this cleans up any small holes in the resulting cells.  Skip if performance is a problem.
-            For Each rc In rcList
-                Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
-                If contour.Count < 3 Then Continue For
-                rc.contour = contour
-                DrawContours(rc.mask, {rc.contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                rc.pixels = CountNonZero(rc.mask)
-
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-
-            dst3 = Palettize(dst1, 0)
-
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                Dim rcTest = rcList(clickIndex - 1)
-                Rectangle(dst3, rcTest.rect, task.highlight, task.lineWidth)
-            End If
-
-
-            labels(3) = CStr(rectMats.rectList.Count) + " cells merged into " + CStr(rcList.Count)
-        End Sub
-    End Class
-
-
-
-
     Public Class Flood_RectMats : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public fLess As New FeatureLess_Core
@@ -709,7 +640,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_CellMerge : Inherits TaskParent
+    Public Class Flood_CellMergeOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim rectMats As New Flood_RectMats
         Dim rcFill As New flood_FillMask
@@ -718,20 +649,19 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
-        Private Sub mergeTuples(rc As rcData, histarray() As Single, consumed() As Integer)
+        Private Sub mergeTuples(rc As rcData, histarray() As Single, rcOwner() As Integer)
             For i = 1 To rectMats.rectList.Count - 1
                 If histarray(i) > task.minCellSize Then
                     Dim tupleRect = rectMats.rectList(i - 1).Item1
                     Dim tupleMask = rectMats.rectList(i - 1).Item2
                     If tupleRect.IntersectsWith(rc.rect) Then
-                        rc.rect = rc.rect.Union(tupleRect)
+                        rc.rect = ValidateRect(rc.rect.Union(tupleRect))
                         dst1(tupleRect).SetTo(rc.index, tupleMask)
-                        consumed(i) = rc.index
+                        rcOwner(i) = rc.index
                     End If
                 End If
             Next
         End Sub
-
         Public Overrides Sub RunAlg(src As cv.Mat)
             rectMats.Run(src)
             dst2 = rectMats.dst2
@@ -742,9 +672,9 @@ Namespace VBClasses
             Dim histogram As New Mat
             Dim histArray() As Single = Nothing
 
-            dst1.SetTo(0)
+            dst1 = rectMats.fLess.dst1
             rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim consumed() As Integer = Enumerable.Repeat(-1, 256).ToArray()
+            Dim rcOwner() As Integer = Enumerable.Repeat(-1, 256).ToArray()
             For Each rc In rcList
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
@@ -752,16 +682,16 @@ Namespace VBClasses
 
                 Dim alreadyUsed As Boolean = False
                 For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > task.minCellSize And consumed(j) >= 0 Then
+                    If histArray(j) > task.minCellSize And rcOwner(j) >= 0 Then
                         Dim rcSkip = rc
                         rcSkip.pixels = 0
                         alreadyUsed = True
 
-                        rc = rcList(consumed(j))
-                        'rc.rect = rcSkip.rect.Union(rcSkip.rect)
-                        'dst1(rc.rect).SetTo(rc.index, rcSkip.mask)
+                        rc = rcList(rcOwner(j))
+                        'rc.rect = ValidateRect(rcSkip.rect.Union(rcSkip.rect))
+                        'dst1(rcSkip.rect).SetTo(rc.index, rcSkip.mask)
 
-                        mergeTuples(rc, histArray, consumed)
+                        mergeTuples(rc, histArray, rcOwner)
                         Exit For
                     End If
                 Next
@@ -769,7 +699,7 @@ Namespace VBClasses
                 If alreadyUsed = False Then
                     Dim allConsumed As Boolean = True
                     For j = 1 To rectMats.rectList.Count - 1
-                        If histArray(j) > task.minCellSize And consumed(j) = -1 Then
+                        If histArray(j) > task.minCellSize And rcOwner(j) = -1 Then
                             allConsumed = False
                             Exit For
                         End If
@@ -780,7 +710,7 @@ Namespace VBClasses
                     End If
 
                     For j = 1 To rectMats.rectList.Count - 1
-                        If histArray(j) > task.minCellSize Then mergeTuples(rc, histArray, consumed)
+                        If histArray(j) > task.minCellSize Then mergeTuples(rc, histArray, rcOwner)
                     Next
                 End If
 
@@ -827,17 +757,162 @@ Namespace VBClasses
             desc = "create a contour that fills in the gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim saveRect = rc.rect
-            Dim mask As New Mat(New Size(rc.mask.Width + 2, rc.mask.Height + 2), MatType.CV_8U, 0)
+            'Dim saveRect = rc.rect
+            Dim mask As New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
             dst1.SetTo(0)
             rc.mask.CopyTo(dst1(rc.rect))
-            Dim pt = New cv.Point(rc.maxDist.X - saveRect.X, rc.maxDist.Y - saveRect.Y)
-            Dim count = FloodFill(dst1(rc.rect), mask, pt, 255, rc.rect, 0, 0, FloodFillFlags.FixedRange Or ((255) << 8))
+            ' Dim pt = New cv.Point(rc.maxDist.X - saveRect.X, rc.maxDist.Y - saveRect.Y)
+            Dim count = FloodFill(dst1, mask, rc.maxDist, 255, rc.rect, 0, 0, FloodFillFlags.FixedRange Or ((255) << 8))
 
             rc = New rcData(mask(rc.rect), rc.rect, 255)
-            rc.rect.X += saveRect.X
-            rc.rect.Y += saveRect.Y
-            rc.maxDist = New cv.Point(rc.maxDist.X + saveRect.X, rc.maxDist.Y + saveRect.Y)
+            'rc.rect.X += saveRect.X
+            'rc.rect.Y += saveRect.Y
+            'rc.maxDist = New cv.Point(rc.maxDist.X + saveRect.X, rc.maxDist.Y + saveRect.Y)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Flood_RectMatsNew : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Public fLess As New FeatureLess_Core
+        Public rectList As New List(Of (cv.Rect, cv.Mat))
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Build a list of cv.rects and cv.mats for each floodfill region in the Color8U input."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                color8U.Run(src)
+                src = color8U.dst2.Clone
+                labels(2) = color8U.labels(2)
+            End If
+
+            fLess.Run(src)
+            dst2 = color8U.dst3.Clone
+
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim rect As cv.Rect
+            Dim filled As New cv.Mat
+            Dim sortList As New SortedList(Of Integer, (cv.Rect, cv.Mat))(New compareAllowIdenticalInteger)
+            dst1 = color8U.dst2.Clone
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index = sortList.Count + 1
+                        Dim flags = FloodFillFlags.FixedRange Or ((index) << 8)
+                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        If count = 0 Or rect.Width <= 0 Or rect.Height <= 0 Then Continue For
+                        rect = ValidateRect(rect)
+                        If count >= task.minCellSize Then
+                            InRange(dst1(rect), index, index, filled)
+                            sortList.Add(CountNonZero(filled), (rect, filled.Clone))
+                        End If
+                    End If
+                Next
+            Next
+
+            rectList = New List(Of (cv.Rect, cv.Mat))(sortList.Values)
+
+            dst3 = Palettize(dst1, 0)
+            For Each rc In fLess.rcList
+                If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+            Next
+
+            If standaloneTest() Then
+                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                If clickIndex > 0 Then
+                    Dim tuple = rectList(clickIndex - 1)
+                    Rectangle(dst2, tuple.Item1, task.highlight, task.lineWidth)
+                    dst2(tuple.Item1).SetTo(white, tuple.Item2)
+                    SetTrueText(CStr(clickIndex), tuple.Item1.TopLeft)
+                End If
+            End If
+
+            labels(1) = fLess.labels(2)
+            labels(3) = CStr(rectList.Count) + " color input cells.  A warning will appear if more than 255 input cells."
+            If rectList.Count > 255 Then MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
+        End Sub
+    End Class
+
+
+
+    Public Class Flood_CellMerge : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim rectMats As New Flood_RectMatsNew
+        Dim rcFill As New flood_FillMask
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
+        End Sub
+        Private Sub mergeTuples(rc As rcData, histarray() As Single, rcOwner() As Integer)
+            For i = 1 To rectMats.rectList.Count - 1
+                If histarray(i) > task.minCellSize Then
+                    Dim tupleRect = rectMats.rectList(i - 1).Item1
+                    Dim tupleMask = rectMats.rectList(i - 1).Item2
+                    If tupleRect.IntersectsWith(rc.rect) Then
+                        rc.rect = ValidateRect(rc.rect.Union(tupleRect))
+                        dst1(tupleRect).SetTo(rc.index, tupleMask)
+                        rcOwner(i) = rc.index
+                    End If
+                End If
+            Next
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            rectMats.Run(src)
+            dst2 = rectMats.dst2
+            labels(2) = rectMats.labels(3)
+
+            Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
+            Dim histogram As New Mat
+            Dim histArray() As Single = Nothing
+
+            rcList = New List(Of rcData)(rectMats.fLess.rcList)
+            Dim rcOwner() As Integer = Enumerable.Repeat(-1, rectMats.rectList.Count).ToArray()
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count - 1}, ranges)
+                histogram.GetArray(Of Single)(histArray)
+
+                For j = 0 To histArray.Length - 1
+                    If histArray(j) > task.minCellSize Then rcOwner(j) = rc.index
+                Next
+            Next
+
+            dst1 = rectMats.fLess.dst1
+            For i = 0 To rectMats.rectList.Count - 1
+                Dim tupleRect = rectMats.rectList(i).Item1
+                Dim tupleMask = rectMats.rectList(i).Item2
+                dst1(tupleRect).SetTo(rcOwner(i), tupleMask)
+            Next
+
+            'Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            'dst1.SetTo(0)
+            'For Each rc In rcList
+            '    rcFill.rc = rc
+            '    rcFill.Run(Nothing)
+
+            '    rcFill.rc.index = sortList.Count + 1
+
+            '    dst1(rcFill.rc.rect).SetTo(rcFill.rc.index, rcFill.rc.mask)
+            '    sortList.Add(CountNonZero(rc.mask), rcFill.rc)
+            'Next
+
+            'rcList = New List(Of rcData)(sortList.Values)
+
+            dst3 = Palettize(dst1, 0)
+
+            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If clickIndex > 0 Then
+                Dim rc = rcList(clickIndex - 1)
+                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
+                SetTrueText(rc.displayCell, 1)
+            End If
+
+            labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count) + " featureless regions."
         End Sub
     End Class
 End Namespace

@@ -108,27 +108,37 @@ Namespace VBClasses
 
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            Dim rc As rcData
             For Each r In task.gridRects
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                     If count = 0 Or rect.Width = 0 Or rect.Height = 0 Then Continue For
-                    Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count, .index = index}
+                    rc = New rcData(mask(rect), rect, 255) With {.pixels = count}
                     sortList.Add(rc.pixels, rc)
                 End If
             Next
 
+            Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
+            sortList.Add(0, New rcData(dst0, New cv.Rect(0, 0, dst0.Width, dst0.Height), 255) With {.pixels = 0, .index = 0})
+
             rcList = New List(Of rcData)(sortList.Values)
             dst2 = Palettize(dst1, 0)
 
-            Dim rcIndex As Integer
-            For Each rc In rcList
-                rcIndex += 1
-                rc.index = rcIndex
-                SetTrueText(CStr(rc.index), rc.maxDist)
+            For i = 0 To rcList.Count - 1
+                rc = rcList(i)
+                rc.index = i
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                If rc.index > 0 Then SetTrueText(CStr(rc.index), rc.maxDist)
+                rcList(i) = rc
             Next
+
+            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            rc = rcList(clickIndex)
+            Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+            SetTrueText(rc.displayCell, 3)
 
             labels(2) = CStr(rcList.Count) + " featureless regions found"
         End Sub
