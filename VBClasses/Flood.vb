@@ -718,13 +718,19 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
-        'Private Function mergeTuples(rc As rcData, tupleIndex As Integer, consumed() As Integer) As rcData
-        '    Dim tupleRect = rectMats.rectList(tupleIndex).Item1
-        '    Dim tupleMask = rectMats.rectList(tupleIndex).Item2
-        '    rc.rect = rc.rect.Union(tupleRect)
-        '    'dst1(tupleRect).SetTo(rcListConsumer + 1, tupleMask)
-        '    'consumed(j) = rcListConsumer
-        'End Function
+        Private Sub mergeTuples(rc As rcData, histarray() As Single, consumed() As Integer)
+            For i = 1 To rectMats.rectList.Count - 1
+                If histarray(i) > task.minCellSize Then
+                    Dim tupleRect = rectMats.rectList(i - 1).Item1
+                    Dim tupleMask = rectMats.rectList(i - 1).Item2
+                    If tupleRect.IntersectsWith(rc.rect) Then
+                        rc.rect = rc.rect.Union(tupleRect)
+                        dst1(tupleRect).SetTo(rc.index, tupleMask)
+                        consumed(i) = rc.index
+                    End If
+                End If
+            Next
+        End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             rectMats.Run(src)
@@ -742,29 +748,25 @@ Namespace VBClasses
             For Each rc In rcList
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
-                If task.gOptions.DebugSlider.Value = rc.index Then Dim k = 0
+                ' If task.gOptions.DebugSlider.Value = rc.index Then Dim k = 0
 
-                Dim rcListConsumer As Integer = -1
+                Dim alreadyUsed As Boolean = False
                 For j = 1 To rectMats.rectList.Count - 1
                     If histArray(j) > task.minCellSize And consumed(j) >= 0 Then
-                        ' 1) don't want rc entry anymore - everything will be in rclist(rcListConsumer.
-                        ' 2) should process all the tuples in histarry.
-                        ' 3) 
-                        rc.pixels = 0
-                        rcListConsumer = consumed(j)
+                        Dim rcSkip = rc
+                        rcSkip.pixels = 0
+                        alreadyUsed = True
+
                         rc = rcList(consumed(j))
-                        Dim tupleRect = rectMats.rectList(j - 1).Item1
-                        Dim tupleMask = rectMats.rectList(j - 1).Item2
-                        If tupleRect.IntersectsWith(rc.rect) Then
-                            rc.rect = rc.rect.Union(tupleRect)
-                            dst1(tupleRect).SetTo(rc.index, tupleMask)
-                            consumed(j) = rc.index
-                        End If
+                        'rc.rect = rcSkip.rect.Union(rcSkip.rect)
+                        'dst1(rc.rect).SetTo(rc.index, rcSkip.mask)
+
+                        mergeTuples(rc, histArray, consumed)
                         Exit For
                     End If
                 Next
 
-                If rcListConsumer = -1 Then
+                If alreadyUsed = False Then
                     Dim allConsumed As Boolean = True
                     For j = 1 To rectMats.rectList.Count - 1
                         If histArray(j) > task.minCellSize And consumed(j) = -1 Then
@@ -778,15 +780,7 @@ Namespace VBClasses
                     End If
 
                     For j = 1 To rectMats.rectList.Count - 1
-                        If histArray(j) > task.minCellSize Then
-                            Dim tupleRect = rectMats.rectList(j - 1).Item1
-                            Dim tupleMask = rectMats.rectList(j - 1).Item2
-                            If tupleRect.IntersectsWith(rc.rect) Then
-                                rc.rect = rc.rect.Union(tupleRect)
-                                dst1(tupleRect).SetTo(rc.index, tupleMask)
-                                consumed(j) = rc.index
-                            End If
-                        End If
+                        If histArray(j) > task.minCellSize Then mergeTuples(rc, histArray, consumed)
                     Next
                 End If
 
