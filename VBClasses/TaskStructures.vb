@@ -390,7 +390,7 @@ Namespace VBClasses
             Public lpList As New List(Of Integer) ' index into task.lines.lplist
             Public mapID As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
-            Public maskApprox As New cv.Mat
+            Public maskApprox As cv.Mat
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
             Public pixels As Integer
@@ -400,18 +400,8 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
-                'maskApprox = mask.Clone
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If contour.Count > 0 Then
-                    DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                    pixels = CountNonZero(mask)
-                    ' Dim epsilon = 0.01 * ArcLength(contour, True)
-                    'approxPoly = ApproxPolyDP(contour.ToArray, epsilon, True).ToList
-                    'maskApprox.SetTo(0)
-                    'DrawContours(maskApprox, {approxPoly}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                Else
-                    pixels = CountNonZero(mask)
-                End If
+                If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))

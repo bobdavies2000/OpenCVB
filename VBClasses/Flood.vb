@@ -734,17 +734,11 @@ Namespace VBClasses
                 Dim rc = rcList(i)
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
-
-
-
                 If task.gOptions.DebugSlider.Value = i Then Dim k = 0
-
-
-
 
                 Dim rcListConsumer As Integer = -1
                 For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > 0 And consumed(j) Then
+                    If histArray(j) > task.minCellSize And consumed(j) Then
                         rcListConsumer = consumed(j)
                         Exit For
                     End If
@@ -753,7 +747,7 @@ Namespace VBClasses
                 If rcListConsumer = -1 Then
                     Dim allConsumed As Boolean = True
                     For j = 1 To rectMats.rectList.Count - 1
-                        If histArray(j) > 0 And consumed(j) = -1 Then
+                        If histArray(j) > task.minCellSize And consumed(j) = -1 Then
                             allConsumed = False
                             Exit For
                         End If
@@ -762,13 +756,13 @@ Namespace VBClasses
                         removeList.Add(i)
                         Continue For
                     End If
-                    rcListConsumer = i 
+                    rcListConsumer = i
                 End If
 
                 rc = rcList(rcListConsumer)
 
                 For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > 1 Then
+                    If histArray(j) > task.minCellSize Then
                         Dim tupleRect = rectMats.rectList(j - 1).Item1
                         Dim tupleMask = rectMats.rectList(j - 1).Item2
                         If tupleRect.IntersectsWith(rc.rect) Then
@@ -781,6 +775,7 @@ Namespace VBClasses
 
                 InRange(dst1(rc.rect), rcListConsumer + 1, rcListConsumer + 1, rc.mask)
                 rcList(rcListConsumer) = rc
+                If rc.index = 3 Then Exit For
             Next
 
             For i = removeList.Count - 1 To 0 Step -1
@@ -788,15 +783,16 @@ Namespace VBClasses
             Next
 
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            ' dst1.SetTo(0)
+            dst1.SetTo(0)
             For Each rc In rcList
-                rc.index = sortList.Count + 1
                 rcFill.rc = rc
                 rcFill.Run(Nothing)
-                rc = rcFill.rc
 
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
-                sortList.Add(CountNonZero(rc.mask), rc)
+                rcFill.rc.index = sortList.Count + 1
+
+                dst1(rcFill.rc.rect).SetTo(rcFill.rc.index, rcFill.rc.mask)
+                sortList.Add(CountNonZero(rc.mask), rcFill.rc)
+                If rc.index = 3 Then Exit For
             Next
 
             rcList = New List(Of rcData)(sortList.Values)
@@ -819,24 +815,21 @@ Namespace VBClasses
     Public Class flood_FillMask : Inherits TaskParent
         Public rc As rcData
         Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "create a contour that fills in the gaps."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim saveRect = rc.rect
-            Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
-            If contour.Count < 3 Then Exit Sub
-
-            rc.contour = contour
-            DrawContours(rc.mask, {rc.contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-
             Dim mask As New Mat(New Size(rc.mask.Width + 2, rc.mask.Height + 2), MatType.CV_8U, 0)
+            dst1.SetTo(0)
+            rc.mask.CopyTo(dst1(rc.rect))
+            Dim pt = New cv.Point(rc.maxDist.X - saveRect.X, rc.maxDist.Y - saveRect.Y)
+            Dim count = FloodFill(dst1(rc.rect), mask, pt, 255, rc.rect, 0, 0, FloodFillFlags.FixedRange Or ((255) << 8))
 
-            Dim flags = FloodFillFlags.FixedRange Or ((rc.index) << 8)
-            Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
-
-            FloodFill(rc.mask, mask, pt, rc.index, rc.rect, 0, 0, flags)
-            rc = New rcData(mask(rc.rect), rc.rect, 255) With {.pixels = CountNonZero(rc.mask)}
-            rc.rect = New cv.Rect(saveRect.X + rc.rect.X, saveRect.Y + rc.rect.Y, rc.rect.Width, rc.rect.Height)
+            rc = New rcData(mask(rc.rect), rc.rect, 255)
+            rc.rect.X += saveRect.X
+            rc.rect.Y += saveRect.Y
+            rc.maxDist = New cv.Point(rc.maxDist.X + saveRect.X, rc.maxDist.Y + saveRect.Y)
         End Sub
     End Class
 End Namespace
