@@ -687,15 +687,17 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
             For Each rc In fLess.rcList
                 If rc.contour Is Nothing OrElse rc.contour.Count < 3 Then Continue For
-                DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, white, task.lineWidth)
             Next
 
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                Dim tuple = rectList(clickIndex - 1)
-                Rectangle(dst2, tuple.Item1, task.highlight, task.lineWidth)
-                dst2(tuple.Item1).SetTo(white, tuple.Item2)
-                SetTrueText(CStr(clickIndex), tuple.Item1.TopLeft)
+            If standaloneTest() Then
+                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                If clickIndex > 0 Then
+                    Dim tuple = rectList(clickIndex - 1)
+                    Rectangle(dst2, tuple.Item1, task.highlight, task.lineWidth)
+                    dst2(tuple.Item1).SetTo(white, tuple.Item2)
+                    SetTrueText(CStr(clickIndex), tuple.Item1.TopLeft)
+                End If
             End If
 
             labels(1) = fLess.labels(2)
@@ -716,9 +718,17 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
+        'Private Function mergeTuples(rc As rcData, tupleIndex As Integer, consumed() As Integer) As rcData
+        '    Dim tupleRect = rectMats.rectList(tupleIndex).Item1
+        '    Dim tupleMask = rectMats.rectList(tupleIndex).Item2
+        '    rc.rect = rc.rect.Union(tupleRect)
+        '    'dst1(tupleRect).SetTo(rcListConsumer + 1, tupleMask)
+        '    'consumed(j) = rcListConsumer
+        'End Function
+
         Public Overrides Sub RunAlg(src As cv.Mat)
             rectMats.Run(src)
-            dst2 = rectMats.dst3
+            dst2 = rectMats.dst2
             labels(2) = rectMats.labels(3)
 
             Dim binCount = 256
@@ -729,17 +739,27 @@ Namespace VBClasses
             dst1.SetTo(0)
             rcList = New List(Of rcData)(rectMats.fLess.rcList)
             Dim consumed() As Integer = Enumerable.Repeat(-1, 256).ToArray()
-            Dim removeList As New List(Of Integer)
-            For i = 0 To rcList.Count - 1
-                Dim rc = rcList(i)
+            For Each rc In rcList
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {binCount}, ranges)
                 histogram.GetArray(Of Single)(histArray)
-                If task.gOptions.DebugSlider.Value = i Then Dim k = 0
+                If task.gOptions.DebugSlider.Value = rc.index Then Dim k = 0
 
                 Dim rcListConsumer As Integer = -1
                 For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > task.minCellSize And consumed(j) Then
+                    If histArray(j) > task.minCellSize And consumed(j) >= 0 Then
+                        ' 1) don't want rc entry anymore - everything will be in rclist(rcListConsumer.
+                        ' 2) should process all the tuples in histarry.
+                        ' 3) 
+                        rc.pixels = 0
                         rcListConsumer = consumed(j)
+                        rc = rcList(consumed(j))
+                        Dim tupleRect = rectMats.rectList(j - 1).Item1
+                        Dim tupleMask = rectMats.rectList(j - 1).Item2
+                        If tupleRect.IntersectsWith(rc.rect) Then
+                            rc.rect = rc.rect.Union(tupleRect)
+                            dst1(tupleRect).SetTo(rc.index, tupleMask)
+                            consumed(j) = rc.index
+                        End If
                         Exit For
                     End If
                 Next
@@ -753,33 +773,28 @@ Namespace VBClasses
                         End If
                     Next
                     If allConsumed Then
-                        removeList.Add(i)
+                        rc.pixels = 0
                         Continue For
                     End If
-                    rcListConsumer = i
+
+                    For j = 1 To rectMats.rectList.Count - 1
+                        If histArray(j) > task.minCellSize Then
+                            Dim tupleRect = rectMats.rectList(j - 1).Item1
+                            Dim tupleMask = rectMats.rectList(j - 1).Item2
+                            If tupleRect.IntersectsWith(rc.rect) Then
+                                rc.rect = rc.rect.Union(tupleRect)
+                                dst1(tupleRect).SetTo(rc.index, tupleMask)
+                                consumed(j) = rc.index
+                            End If
+                        End If
+                    Next
                 End If
 
-                rc = rcList(rcListConsumer)
-
-                For j = 1 To rectMats.rectList.Count - 1
-                    If histArray(j) > task.minCellSize Then
-                        Dim tupleRect = rectMats.rectList(j - 1).Item1
-                        Dim tupleMask = rectMats.rectList(j - 1).Item2
-                        If tupleRect.IntersectsWith(rc.rect) Then
-                            rc.rect = rc.rect.Union(tupleRect)
-                            dst1(tupleRect).SetTo(rcListConsumer + 1, tupleMask)
-                            consumed(j) = rcListConsumer
-                        End If
-                    End If
-                Next
-
-                InRange(dst1(rc.rect), rcListConsumer + 1, rcListConsumer + 1, rc.mask)
-                rcList(rcListConsumer) = rc
-                If rc.index = 3 Then Exit For
+                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
             Next
 
-            For i = removeList.Count - 1 To 0 Step -1
-                rcList.RemoveAt(i)
+            For i = rcList.Count - 1 To 0 Step -1
+                If rcList(i).pixels = 0 Then rcList.RemoveAt(i)
             Next
 
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -792,7 +807,6 @@ Namespace VBClasses
 
                 dst1(rcFill.rc.rect).SetTo(rcFill.rc.index, rcFill.rc.mask)
                 sortList.Add(CountNonZero(rc.mask), rcFill.rc)
-                If rc.index = 3 Then Exit For
             Next
 
             rcList = New List(Of rcData)(sortList.Values)
