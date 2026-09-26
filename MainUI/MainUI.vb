@@ -242,12 +242,10 @@ Namespace MainApp
                 If r.Width < 5 Or r.Height < 5 Then Exit Sub
                 Dim img As New cv.Mat
                 If magnification = 0 Then magnification = 5
-                If task.drawRect.Width > 0 Or task.drawRect.Height > 0 Then
+                If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
                     cv.Cv2.Resize(input(r), img, New cv.Size(task.drawRect.Width * magnification,
                                                          task.drawRect.Height * magnification))
                     cv.Cv2.ImShow("Magnifier " + CStr(magnification) + "X", img)
-                Else
-                    MsgBox("Drawrect has zero width or height.  Try again.")
                 End If
                 task.mouseMagnifyEndPoint = New cv.Point
             End If

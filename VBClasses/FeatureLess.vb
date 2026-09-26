@@ -115,8 +115,8 @@ Namespace VBClasses
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count <= task.gridWH * task.gridWH * 4 Then
-                        dst1(rect).SetTo(0, dst1(rect))
+                    If count = 0 Then
+                        ' dst1(rect).SetTo(0, dst1(rect))
                         Continue For
                     End If
                     rc = New rcData(dst1(rect), rect, index) With {.pixels = count, .index = index}
