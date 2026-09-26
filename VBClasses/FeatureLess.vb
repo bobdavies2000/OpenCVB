@@ -108,14 +108,14 @@ Namespace VBClasses
 
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
             For Each r In task.gridRects
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count <= task.gridWH * task.gridWH * 4 Or rect.Width = 0 Or rect.Height = 0 Then
+                    If count <= task.gridWH * task.gridWH * 4 Then
                         dst1(rect).SetTo(0, dst1(rect))
                         Continue For
                     End If
