@@ -384,11 +384,9 @@ Namespace VBClasses
 
             dst3 = Palettize(dst1, 0)
 
-
             If standaloneTest() Then
                 Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
                 Dim rc = rectList(clickIndex)
-                InRange(dst1(rc.rect), rc.index, rc.index, dst0(rc.rect))
                 Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
                 dst2(rc.rect).SetTo(white, rc.mask)
                 SetTrueText(CStr(clickIndex), rc.maxDist)
@@ -412,7 +410,7 @@ Namespace VBClasses
         Dim rectMats As New Flood_RectMats
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -438,13 +436,17 @@ Namespace VBClasses
                 CalcHist({rectMats.dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count - 1}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
+                ' There is a mystery here.  Why histarray - 1? And why is val needed.
+                ' Leftover mapIDs may explain the need for the val conditional.
+                ' A cleaner solution that makes sense should be out there but this works.
                 Dim val = rectMats.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcOwner(val) = rc.index
+                If val < rcOwner.Length Then rcOwner(val) = rc.index
                 For i = 1 To histArray.Length - 1
                     If rectMats.rectList(i).rect.IntersectsWith(rc.rect) Then
                         If histArray(i - 1) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
                     End If
                 Next
+
                 SetTrueText(CStr(rc.index), rc.maxDist, 2)
             Next
 
@@ -461,11 +463,15 @@ Namespace VBClasses
                 Next
             Next
 
+            ' Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
                 InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
-                rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
-                If rc.contour.Count > 0 Then DrawContours(rc.mask, {rc.contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                'Dim flags = FloodFillFlags.FixedRange Or ((rc.index) << 8)
+                'Dim count = FloodFill(dst1, mask, rc.maxDist, rc.index, rc.rect, 0, 0, flags)
+                'If count > 0 Then rc = New rcData(dst1(rc.rect), rc.rect, 255) With {.index = rc.index}
+                ' rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
+                ' If rc.contour.Count > 0 Then DrawContours(rc.mask, {rc.contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
             Next
 
             dst3 = Palettize(dst1, 0)
@@ -474,7 +480,8 @@ Namespace VBClasses
             If clickIndex > 0 Then
                 rc = rcList(clickIndex)
                 Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                task.color(rc.rect).SetTo(white, rc.mask)
+                ' task.color(rc.rect).SetTo(white, rc.mask)
+                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(rc.displayCell, 1)
             End If
             labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
