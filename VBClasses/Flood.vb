@@ -442,9 +442,7 @@ Namespace VBClasses
                 Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rcOwner(val) = 0 Then rcOwner(val) = rc.index
                 For i = 1 To histArray.Length - 1
-                    If rectMats.rectList(i).rect.IntersectsWith(rc.rect) Then
-                        If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
-                    End If
+                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
                 Next
 
                 SetTrueText(CStr(rc.index), rc.maxDist, 2)
@@ -463,6 +461,11 @@ Namespace VBClasses
                 Next
             Next
 
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
+            Next
+
             Rectangle(dst2, rcList(0).rect, task.highlight, task.lineWidth)
 
             dst3 = Palettize(dst1, 0)
@@ -472,7 +475,7 @@ Namespace VBClasses
                 rc = rcList(clickIndex)
                 Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
                 Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                ' task.color(rc.rect).SetTo(white, rc.mask)
+                task.color(rc.rect).SetTo(white, rc.mask)
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(rc.displayCell, 1)
             End If

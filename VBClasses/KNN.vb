@@ -609,7 +609,7 @@ Namespace VBClasses
 
 
     Public Class KNN_DimensionN : Inherits TaskParent
-        Dim knn As New KNN_Minimal
+        Public knn As New KNN_Minimal
         Public trainInput As New List(Of Single)
         Public queries As New List(Of Single)
         Public Sub New()

@@ -408,17 +408,11 @@ Namespace VBClasses
         Public mat(3) As Mat
         Public lineSeparators = True ' if they want lines or not...
         Public quadrant As Integer = 0
-        Dim quads(3) As cv.Rect
         Dim nSize As New cv.Size(dst2.Width / 2, dst2.Height / 2)
         Public Sub New()
             For i = 0 To mat.Length - 1
                 mat(i) = dst2.Clone
             Next
-
-            quads(0) = New cv.Rect(0, 0, nSize.Width, nSize.Height)
-            quads(1) = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
-            quads(2) = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-            quads(3) = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
 
             labels(2) = "Combining 4 images into one"
             labels(3) = "Click any quadrant at left to view it below"
@@ -444,7 +438,11 @@ Namespace VBClasses
 
             dst2 = New Mat(dst2.Size(), mat(0).Type)
             For i = 0 To 3
-                If mat(i).Size <> quads(i).Size Then Resize(mat(i), dst2(quads(i)), nSize) Else dst2(quads(i)) = mat(i)
+                If mat(i).Size <> task.quads(i).Size Then
+                    Resize(mat(i), dst2(task.quads(i)), nSize)
+                Else
+                    dst2(task.quads(i)) = mat(i)
+                End If
             Next
             If lineSeparators Then
                 Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)

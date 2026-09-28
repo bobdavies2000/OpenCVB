@@ -208,10 +208,12 @@ FeatureLess_BasicsOld
 FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells
-FeatureLess_CoreOld
+FeatureLess_Core
 FeatureLess_Correlation
 FeatureLess_IndexKNN
 FeatureLess_Lines
+FeatureLess_Ordered
+FeatureLess_OrderKnn
 FeatureLess_Overlap
 FeatureLess_RedC
 FeatureLess_ReductionTest

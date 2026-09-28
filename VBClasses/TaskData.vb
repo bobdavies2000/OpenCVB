@@ -126,6 +126,8 @@ Namespace VBClasses
         Public gridWH As Integer ' grid width and height.
         Public gridROIclicked As Integer
         Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
+        Public quads(3) As cv.Rect
+
 
         Public lowResColor As New Mat
         Public lowResDepth As New Mat

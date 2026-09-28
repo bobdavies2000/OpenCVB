@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Windows
 Imports System.Windows.Forms.Design.AxImporter
 Imports jsonShared
 Imports OpenCvSharp
@@ -95,8 +96,13 @@ Namespace VBClasses
                     task.fOptions.ColorDiffSlider.Value = 30
                 Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                 Case "Oak-3D camera", "Oak-4D camera"
-
             End Select
+
+            Dim w As Integer = task.workRes.Width / 2, h As Integer = task.workRes.Height / 2
+            task.quads(0) = New cv.Rect(0, 0, w, h)
+            task.quads(1) = New cv.Rect(w, 0, w, h)
+            task.quads(2) = New cv.Rect(0, h, w, h)
+            task.quads(3) = New cv.Rect(w, h, w, h)
         End Sub
         Public Sub RunAlgorithm()
             If task.allOptions.titlesAdded Then

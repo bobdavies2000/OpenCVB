@@ -26,9 +26,11 @@ Namespace VBClasses
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If count = 0 Then Continue For
-                    rc = New rcData(dst1(rect), rect, index) With {.pixels = count, .index = index}
-                    sortList.Add(rc.pixels, rc)
+                    If rect.Width > task.gridWH And rect.Height > task.gridWH Then
+                        If count = 0 Then Continue For
+                        rc = New rcData(dst1(rect), rect, index) With {.pixels = count, .index = index}
+                        sortList.Add(rc.pixels, rc)
+                    End If
                 End If
             Next
 
@@ -48,6 +50,7 @@ Namespace VBClasses
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             rc = rcList(clickIndex)
             Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+            Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(rc.displayCell, 3)
 
             labels(2) = CStr(rcList.Count) + " featureless regions found"
@@ -58,7 +61,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_CoreOld : Inherits TaskParent
+    Public Class FeatureLess_Core : Inherits TaskParent
         Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -140,7 +143,7 @@ Namespace VBClasses
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
             End If
-            labels(2) = CStr(rcList.Count) + " featureless regions found"
+            labels(2) = CStr(rcList.Count) + " featureless regions found with max index = " + CStr(nextFree - 1)
         End Sub
     End Class
 
@@ -1825,4 +1828,103 @@ Namespace VBClasses
             labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
         End Sub
     End Class
+
+
+
+
+
+    Public Class FeatureLess_OrderKnn : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim knn As New KNN_Minimal
+        Dim dimension As Integer = 6
+        Public Sub New()
+            desc = "Try to keep the featureless region index consistent from frame to frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                Static fLess As New FeatureLess_Basics
+                fLess.Run(task.gray)
+                dst2 = fLess.dst2
+                labels(2) = fLess.labels(2)
+
+                rcList = fLess.rcList
+            End If
+
+            Static queries As New List(Of Single)
+            Dim trainInput = New List(Of Single)(queries)
+            queries.Clear()
+            For Each rc In rcList
+                For i As Single = 0 To task.quads.Length - 1
+                    If rc.rect.IntersectsWith(task.quads(i)) Then queries.Add(i) Else queries.Add(0)
+                Next
+                queries.Add(rc.pixels)
+                queries.Add(rc.rect.X)
+            Next
+
+            If task.firstPass Then
+                trainInput = New List(Of Single)(queries)
+                task.clickPoint = rcList(1).maxDist
+            End If
+
+            knn.queryMat = Mat.FromPixelData(queries.Count \ dimension, dimension, MatType.CV_32F, queries.ToArray)
+            knn.trainMat = Mat.FromPixelData(trainInput.Count \ dimension, dimension, MatType.CV_32F, trainInput.ToArray)
+            knn.Run(emptyMat)
+
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                rc.index = knn.result(rc.index, 0)
+                SetTrueText(CStr(rc.index), rc.maxDist)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_Ordered : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public lastMap As New cv.Mat
+        Dim maxDLast(255) As cv.Point
+        Dim myLabels As New List(Of Byte)
+        Public Sub New()
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+            desc = "Try to keep the featureless region index consistent from frame to frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static fLess As New FeatureLess_Basics
+            lastMap = dst1.Clone
+            fLess.Run(task.gray)
+            dst2 = fLess.dst2
+            dst1 = fLess.dst1
+            labels(2) = fLess.labels(2)
+            rcList = fLess.rcList
+
+            myLabels.Clear()
+            For Each rc In rcList
+                Dim lastIndex = lastMap.Get(Of Byte)(maxDLast(rc.index).Y, maxDLast(rc.index).X)
+                Dim currIndex = dst1.Get(Of Byte)(maxDLast(rc.index).Y, maxDLast(rc.index).X)
+
+                If lastIndex = 255 Then
+                    myLabels.Add(rc.index)
+                Else
+                    If currIndex <> lastIndex Then
+                        myLabels.Add(0)
+                        dst1(rc.rect).SetTo(0, rc.mask)
+                    Else
+                        myLabels.Add(rc.index)
+                    End If
+                    maxDLast(rc.index) = rc.maxDist
+                End If
+
+                If rc.index <> 0 Then SetTrueText(CStr(rc.index), rc.maxDist)
+            Next
+            For i = myLabels.Count To 255
+                myLabels.Add(0)
+                maxDLast(i) = newPoint
+            Next
+            LUT(dst1, Mat.FromPixelData(1, 256, MatType.CV_8U, myLabels.ToArray), dst3)
+        End Sub
+    End Class
+
 End Namespace
