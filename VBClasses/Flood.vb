@@ -375,7 +375,7 @@ Namespace VBClasses
                         If count >= task.minCellSize Then
                             Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
                             dst0(rc.rect).SetTo(index, rc.mask)
-                            dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, rc.index)
+                            ' dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, rc.index)
                             rectList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -385,11 +385,11 @@ Namespace VBClasses
             Next
 
             ' guarantees the CalcHist in Flood_CellMerge will work properly.
-            For i = 1 To rectList.Count - 1
-                Dim rc1 = rectList(i)
-                Dim index = dst0.Get(Of Byte)(rc1.maxDist.Y, rc1.maxDist.X)
-                If i <> index Then dst0(rc1.rect).SetTo(index, rc1.mask)
-            Next
+            'For i = 1 To rectList.Count - 1
+            '    Dim rc1 = rectList(i)
+            '    Dim index = dst0.Get(Of Byte)(rc1.maxDist.Y, rc1.maxDist.X)
+            '    If i <> index Then dst0(rc1.rect).SetTo(index, rc1.mask)
+            'Next
 
             dst3 = Palettize(dst0, 0)
 
@@ -435,7 +435,7 @@ Namespace VBClasses
                 Next
             End If
 
-            Dim ranges() As Rangef = {New Rangef(-1, rectMats.rectList.Count)}
+            Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
             Dim histogram As New Mat
 
             rcList = New List(Of rcData)(rectMats.fLess.rcList)
@@ -444,7 +444,7 @@ Namespace VBClasses
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
 
-                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count - 1}, ranges)
+                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
