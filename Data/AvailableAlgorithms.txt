@@ -204,10 +204,10 @@ Feature_WarpAlign
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_BasicsOld
 FeatureLess_BrickList
 FeatureLess_CalcHist
 FeatureLess_Cells
-FeatureLess_Core
 FeatureLess_CoreOld
 FeatureLess_Correlation
 FeatureLess_IndexKNN
@@ -622,7 +622,6 @@ RedC_CellMerge1
 RedC_Depth
 RedC_DepthMerge
 RedC_FeatureLess1
-RedC_FeatureLess2
 RedC_Features
 RedC_MergeCells
 RedC_NeighborHist

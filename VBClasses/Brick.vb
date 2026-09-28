@@ -885,7 +885,7 @@ Namespace VBClasses
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Core
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -937,7 +937,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Core
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -975,7 +975,7 @@ Namespace VBClasses
 
     Public Class Brick_Features : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim fLess As New FeatureLess_Core
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Use FeatureLess_Core to identify bricks with good contrast."
         End Sub

@@ -1483,7 +1483,7 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_Featureless : Inherits TaskParent
-        Public fLess As New FeatureLess_Core
+        Public fLess As New FeatureLess_Basics
         Public sceneMotionDetected As Boolean
         Public rectCountThreshold As Integer
         Public Sub New()

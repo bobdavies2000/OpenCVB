@@ -342,8 +342,8 @@ Namespace VBClasses
 
     Public Class Flood_RectMats : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Public fLess As New FeatureLess_Core
-        Public rectList As New List(Of rcDataOld)
+        Public fLess As New FeatureLess_Basics
+        Public rectList As New List(Of rcData)
         Public Sub New()
             dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -363,7 +363,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
             rectList.Clear()
-            rectList.Add(New rcDataOld)
+            rectList.Add(New rcData)
             dst1 = color8U.dst2.Clone
             dst0.SetTo(0)
             For y = 0 To dst2.Height - 1
@@ -373,7 +373,7 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcDataOld(dst1(rect), rect, index) With {.index = index}
+                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
                             dst0(rc.rect).SetTo(index, rc.mask)
                             rectList.Add(rc)
                         Else
@@ -406,7 +406,7 @@ Namespace VBClasses
 
 
     Public Class Flood_CellMerge : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Dim rectMats As New Flood_RectMats
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -418,7 +418,7 @@ Namespace VBClasses
             dst2 = rectMats.dst2.Clone
             labels(2) = rectMats.labels(3)
 
-            Dim rc As rcDataOld
+            Dim rc As rcData
             If standaloneTest() Then
                 For Each rc In rectMats.fLess.rcList
                     If rc.index = 0 Then Continue For
@@ -430,7 +430,7 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
             Dim histogram As New Mat
 
-            rcList = New List(Of rcDataOld)(rectMats.fLess.rcList)
+            rcList = New List(Of rcData)(rectMats.fLess.rcList)
             Dim rcOwner(rectMats.rectList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
             For Each rc In rcList

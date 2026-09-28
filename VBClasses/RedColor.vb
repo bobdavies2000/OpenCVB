@@ -5,10 +5,10 @@ Namespace VBClasses
         Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
+            labels(3) = "The output of FeatureLess_BasicsOld.  Note that cell colors match the RedColor output."
             desc = "Use the FeatureLess regions to improve the RedColor output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -721,10 +721,10 @@ Namespace VBClasses
 
     Public Class XR_RedColor_FeatureLess : Inherits TaskParent
         Public redC As New RedC_Basics
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use the output of the FeatureLess_Basics as input the RedColor_Basics."
+            desc = "Use the output of the FeatureLess_BasicsOld as input the RedColor_Basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)

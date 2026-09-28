@@ -876,7 +876,7 @@ Namespace VBClasses
 
     Public Class RedC_FeatureLess1 : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Dim fLess As New FeatureLess_Core
+        Dim fLess As New FeatureLess_Basics
         Public merged As New rcDataOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -930,84 +930,6 @@ Namespace VBClasses
             SetTrueText(merged.displayCell, 1)
         End Sub
     End Class
-
-
-
-
-
-    Public Class RedC_FeatureLess2 : Inherits TaskParent
-        Dim redC As New RedC_Basics
-        Dim fLess As New FeatureLess_Core
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcList As New List(Of rcDataOld)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Cursor.ai: Combine RedC cells under each FeatureLess_Core region using CalcHist on rcIndexMap."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            fLess.Run(src)
-            dst2 = redC.dst2.Clone
-            labels(2) = redC.labels(2)
-            dst3 = dst2.Clone
-
-            If fLess.rcList.Count = 0 OrElse redC.rcList.Count = 0 Then
-                labels(3) = "No FeatureLess or RedC cells to merge."
-                Exit Sub
-            End If
-
-            Dim rcListNew As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
-            Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
-            Dim histogram As New Mat
-            Dim histArray(histogram.Rows - 1) As Single
-            Dim newMask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each rcF In fLess.rcList
-                CalcHist({redC.rcIndexMap(rcF.rect)}, {0}, rcF.mask, histogram, 1, {redC.rcList.Count}, ranges)
-                histogram.GetArray(Of Single)(histArray)
-
-                Dim rcNew = rcF
-                newMask.SetTo(0)
-                Dim merged As Boolean = False
-                For i = 1 To histArray.Length - 1
-                    If histArray(i) > 0 Then
-                        Dim rcHist = redC.rcList(i - 1)
-                        Dim newRect = rcNew.rect.Union(rcHist.rect)
-                        newMask(rcNew.rect).SetTo(255, rcNew.mask)
-                        newMask(rcHist.rect).SetTo(255, rcHist.mask)
-                        rcNew.mask = newMask(newRect).Clone
-                        rcNew.rect = newRect
-                        rcNew.pixels = CountNonZero(rcNew.mask)
-                        redC.rcIndexMap(rcHist.rect).SetTo(0, rcHist.mask)
-                        redC.rcList(i - 1).pixels = 0
-                        merged = True
-                    End If
-                Next
-                If merged Then rcListNew.Add(rcNew.pixels, rcNew)
-            Next
-
-            For Each rc In redC.rcList
-                If rc.pixels > 0 Then rcListNew.Add(rc.pixels, rc)
-            Next
-
-            rcIndexMap.SetTo(0)
-            rcList.Clear()
-            For Each rc In rcListNew.Values
-                rc.index = rcList.Count + 1
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
-                rcList.Add(rc)
-            Next
-
-            dst3 = Palettize(rcIndexMap, 0)
-
-            dst1 = fLess.dst2
-            For Each rc In fLess.rcList
-                DrawContours(dst1(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-                DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-            Next
-        End Sub
-    End Class
-
-
 
 
 
