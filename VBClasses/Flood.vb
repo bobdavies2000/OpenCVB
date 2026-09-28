@@ -363,27 +363,35 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
             rectList.Clear()
+            rectList.Add(New rcData)
             dst1 = color8U.dst2.Clone
             dst0.SetTo(0)
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = rectList.Count
-                        Dim flags = FloodFillFlags.FixedRange Or ((index) << 8)
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            InRange(dst1(rect), index, index, filled)
-                            Dim rc = New rcData(filled, rect, 255) With {.index = index}
-                            dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, index)
+                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
+                            dst0(rc.rect).SetTo(index, rc.mask)
+                            dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, rc.index)
                             rectList.Add(rc)
                         Else
-                            mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
+                            If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
             Next
 
-            dst3 = Palettize(dst1, 0)
+            ' guarantees the CalcHist in Flood_CellMerge will work properly.
+            For i = 1 To rectList.Count - 1
+                Dim rc1 = rectList(i)
+                Dim index = dst0.Get(Of Byte)(rc1.maxDist.Y, rc1.maxDist.X)
+                If i <> index Then dst0(rc1.rect).SetTo(index, rc1.mask)
+            Next
+
+            dst3 = Palettize(dst0, 0)
 
             If standaloneTest() Then
                 Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -401,96 +409,6 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-    Public Class Flood_CellMergeOld : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Dim rectMats As New Flood_RectMats
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            rectMats.Run(src)
-            dst2 = rectMats.dst2.Clone
-            labels(2) = rectMats.labels(3)
-
-            Dim rc As rcData
-            If standaloneTest() Then
-                For Each rc In rectMats.fLess.rcList
-                    If rc.index = 0 Then Continue For
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-                    SetTrueText(CStr(rc.index), rc.maxDist, 2)
-                Next
-            End If
-
-            Dim ranges() As Rangef = {New Rangef(-1, rectMats.rectList.Count)}
-            Dim histogram As New Mat
-
-            rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim rcOwner(rectMats.rectList.Count - 1) As Integer
-            Dim histArray() As Single = Nothing
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count - 1}, ranges)
-                histogram.GetArray(Of Single)(histArray)
-
-                Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rcOwner(val) = 0 Then rcOwner(val) = rc.index
-                For i = 0 To histArray.Length - 1
-                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
-                Next
-
-                If rc.index = task.gOptions.DebugSlider.Value Then Dim k = 0
-
-                SetTrueText(CStr(rc.index), rc.maxDist, 2)
-            Next
-
-            dst1.SetTo(0)
-            Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                For i = 0 To rectMats.rectList.Count - 1
-                    If rcOwner(i) = 0 Then Continue For
-                    Dim rcTuple = rectMats.rectList(i)
-                    ' rc.rect = rc.rect.Union(rcTuple.rect)
-
-                    If rc.index = task.gOptions.DebugSlider.Value And rcOwner(i) = rc.index Then
-                        tmp(rcTuple.rect).SetTo(white, rcTuple.mask)
-                    End If
-                    dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
-                Next
-            Next
-            cv.Cv2.ImShow("tmp", tmp)
-
-            dst3 = Palettize(dst1, 0)
-
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                rc = rcList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                ' task.color(rc.rect).SetTo(white, rc.mask)
-                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
-            End If
-
-            clickIndex = rectMats.dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                rc = rectMats.rectList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                ' task.color(rc.rect).SetTo(white, rc.mask)
-                dst2(rc.rect).SetTo(white, rc.mask)
-                SetTrueText(rc.displayCell, 1)
-            End If
-            labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
-        End Sub
-    End Class
-
 
 
 
@@ -525,36 +443,35 @@ Namespace VBClasses
             Dim histArray() As Single = Nothing
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
+
                 CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count - 1}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rcOwner(val) = 0 Then rcOwner(val) = rc.index
-                For i = 0 To histArray.Length - 1
-                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
+                For i = 1 To histArray.Length - 1
+                    If rectMats.rectList(i).rect.IntersectsWith(rc.rect) Then
+                        If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
+                    End If
                 Next
-
-                If rc.index = task.gOptions.DebugSlider.Value Then Dim k = 0
 
                 SetTrueText(CStr(rc.index), rc.maxDist, 2)
             Next
 
             dst1.SetTo(0)
-            Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
-                For i = 0 To rectMats.rectList.Count - 1
+                For i = 1 To rectMats.rectList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
-                    Dim rcTuple = rectMats.rectList(i)
-                    ' rc.rect = rc.rect.Union(rcTuple.rect)
-
-                    If rc.index = task.gOptions.DebugSlider.Value And rcOwner(i) = rc.index Then
-                        tmp(rcTuple.rect).SetTo(white, rcTuple.mask)
+                    If rcOwner(i) = rc.index Then
+                        Dim rcTuple = rectMats.rectList(i)
+                        rc.rect = rc.rect.Union(rcTuple.rect)
+                        dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                     End If
-                    dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                 Next
             Next
-            cv.Cv2.ImShow("tmp", tmp)
+
+            Rectangle(dst2, rcList(0).rect, task.highlight, task.lineWidth)
 
             dst3 = Palettize(dst1, 0)
 
@@ -565,18 +482,11 @@ Namespace VBClasses
                 Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
                 ' task.color(rc.rect).SetTo(white, rc.mask)
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
-            End If
-
-            clickIndex = rectMats.dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                rc = rectMats.rectList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                ' task.color(rc.rect).SetTo(white, rc.mask)
-                dst2(rc.rect).SetTo(white, rc.mask)
                 SetTrueText(rc.displayCell, 1)
             End If
+
             labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
         End Sub
     End Class
 End Namespace
+
