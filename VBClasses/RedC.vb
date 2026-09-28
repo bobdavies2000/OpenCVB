@@ -1,80 +1,5 @@
 Imports System.Runtime.InteropServices : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedC_BasicsNew : Inherits TaskParent
-        Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcList As New List(Of rcDataOld) ' includes cloud data.
-        Dim flood As New Flood_CellMerge
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "rcIndexMap version of cells.  Age is shown for the largest cells."
-            desc = "Segment the image based on color."
-        End Sub
-        Public Shared Function displayCell(rclist As List(Of rcDataOld), clickIndex As Integer) As String
-            Dim displayStr As String = "There is no cell defined for that point."
-            For Each rc In rclist
-                If rc.index = clickIndex Or clickIndex < 0 Then
-                    task.rcD = rc
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    displayStr = task.rcD.displayCell
-                    Exit For
-                End If
-            Next
-            Return displayStr
-        End Function
-        Public Shared Function rcIndexFind(rclist As List(Of rcDataOld), rcIndex As Integer) As rcDataOld
-            For Each rc In rclist
-                If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
-            Next
-            Return Nothing
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcDataOld)(rcList)
-            Dim rcIndexMapLast = rcIndexMap.Clone
-            Dim rcMapIDsLast = flood.dst1
-
-            flood.Run(src)
-            dst2 = flood.dst3
-
-            ' rcList = New List(Of rcDataOld)(flood.rcList)
-            'rcIndexMap = flood.rcIndexMap.Clone
-
-            dst3 = Palettize(rcIndexMap)
-
-            'rcList.Clear()
-            'For i = 0 To flood.rectList.Count - 1
-            '    Dim floodVal = flood.indexList(i)
-            '    Dim r = flood.rectList(i)
-            '    Dim rc As New rcDataOld(flood.mask(r), r, floodVal Mod 256)
-            '    rc.mapID = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-            '    rc.index = i + 1
-            '    rcList.Add(rc)
-            'Next
-
-            'rcIndexMap.SetTo(0)
-            'For i = rcList.Count - 1 To 0 Step -1
-            '    Dim rc = rcList(i)
-            '    rcIndexMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
-            'Next
-
-            'SetTrueText(displayCell(rcList, rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
-
-            'If task.rcD IsNot Nothing Then
-            '    Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-            '    Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
-            '    ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            'End If
-
-            'dst3 = Palettize(rcIndexMap, 0)
-
-            'labels(2) = CStr(rcList.Count) + " cells were found "
-        End Sub
-    End Class
-
-
-
-
     Public Class RedC_Basics : Inherits TaskParent
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -146,7 +71,6 @@ Namespace VBClasses
             labels(2) = CStr(rcList.Count) + " cells were found "
         End Sub
     End Class
-
 
 
 
