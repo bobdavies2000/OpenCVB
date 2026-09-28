@@ -23,13 +23,13 @@ Namespace VBClasses
 
     Public Class MSER_Basics1 : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public mserCells As New List(Of rcData)
+        Public mserCells As New List(Of rcDataOld)
         Public floodPoints As New List(Of cv.Point)
         Public redC As New RedC_Basics
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
-        Public Shared Function RebuildRCMap(rcIndexMap As Mat, rclist As List(Of rcData)) As Mat
+        Public Shared Function RebuildRCMap(rcIndexMap As Mat, rclist As List(Of rcDataOld)) As Mat
             Dim dst As New Mat(task.workRes, MatType.CV_8UC3, 0)
             For Each rc In rclist
                 rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
@@ -52,14 +52,14 @@ Namespace VBClasses
             Next
             floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
 
             Dim matched As New List(Of Integer)
 
             CvtColor(detect.dst2, dst0, ColorConversionCodes.BGR2GRAY)
             For i = 0 To boxes.Count - 1
                 Dim index = boxes.ElementAt(i).Value
-                Dim rc As New rcData With {.rect = boxInput(index)}
+                Dim rc As New rcDataOld With {.rect = boxInput(index)}
                 Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
                 InRange(dst0(rc.rect), val, val, rc.mask)
                 rc.pixels = detect.maskCounts(index)
@@ -76,7 +76,7 @@ Namespace VBClasses
                 If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
             Next
 
-            redC.rcList = New List(Of rcData)(sortedCells.Values)
+            redC.rcList = New List(Of rcDataOld)(sortedCells.Values)
 
             labels(2) = CStr(redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub
@@ -105,14 +105,14 @@ Namespace VBClasses
                 boxes.Add(r.Width * r.Height, i)
             Next
 
-            Dim rclist As New List(Of rcData)({New rcData})
+            Dim rclist As New List(Of rcDataOld)({New rcDataOld})
             dst1.SetTo(0)
             dst2.SetTo(0)
             Dim lastMap = cellMap.Clone
             cellMap.SetTo(0)
             Dim matchCount As Integer
             For i = 0 To floodPoints.Count - 1
-                Dim rc As New rcData With {.mapID = rclist.Count}
+                Dim rc As New rcDataOld With {.mapID = rclist.Count}
                 Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
                 rc.rect = boxInput(boxes.ElementAt(i).Value)
                 InRange(dst3(rc.rect), val, val, rc.mask)

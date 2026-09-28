@@ -479,7 +479,7 @@ Namespace VBClasses
 
     Public Class Delaunay_Map : Inherits TaskParent
         Dim subdiv As New Subdiv2D
-        Public rcList As List(Of rcData)
+        Public rcList As List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -493,7 +493,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
                 strOut = redC.strOut
-                rcList = New List(Of rcData)(redC.rcList)
+                rcList = New List(Of rcDataOld)(redC.rcList)
             End If
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))

@@ -53,7 +53,7 @@ Namespace VBClasses
             End Select
             Return fontThickness
         End Function
-        Public Shared Function ComputeHullCentroid(hull As Point(), rcD As rcData) As Point
+        Public Shared Function ComputeHullCentroid(hull As Point(), rcD As rcDataOld) As Point
             Dim area As Double = 0
             Dim cx As Double = 0
             Dim cy As Double = 0

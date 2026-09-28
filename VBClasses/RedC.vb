@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class RedC_BasicsNew : Inherits TaskParent
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcList As New List(Of rcData) ' includes cloud data.
+        Public rcList As New List(Of rcDataOld) ' includes cloud data.
         Dim flood As New Flood_CellMerge
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -11,7 +11,7 @@ Namespace VBClasses
             labels(3) = "rcIndexMap version of cells.  Age is shown for the largest cells."
             desc = "Segment the image based on color."
         End Sub
-        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
+        Public Shared Function displayCell(rclist As List(Of rcDataOld), clickIndex As Integer) As String
             Dim displayStr As String = "There is no cell defined for that point."
             For Each rc In rclist
                 If rc.index = clickIndex Or clickIndex < 0 Then
@@ -23,21 +23,21 @@ Namespace VBClasses
             Next
             Return displayStr
         End Function
-        Public Shared Function rcIndexFind(rclist As List(Of rcData), rcIndex As Integer) As rcData
+        Public Shared Function rcIndexFind(rclist As List(Of rcDataOld), rcIndex As Integer) As rcDataOld
             For Each rc In rclist
                 If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
             Next
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast = New List(Of rcDataOld)(rcList)
             Dim rcIndexMapLast = rcIndexMap.Clone
             Dim rcMapIDsLast = flood.dst1
 
             flood.Run(src)
             dst2 = flood.dst3
 
-            ' rcList = New List(Of rcData)(flood.rcList)
+            ' rcList = New List(Of rcDataOld)(flood.rcList)
             'rcIndexMap = flood.rcIndexMap.Clone
 
             dst3 = Palettize(rcIndexMap)
@@ -46,7 +46,7 @@ Namespace VBClasses
             'For i = 0 To flood.rectList.Count - 1
             '    Dim floodVal = flood.indexList(i)
             '    Dim r = flood.rectList(i)
-            '    Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256)
+            '    Dim rc As New rcDataOld(flood.mask(r), r, floodVal Mod 256)
             '    rc.mapID = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             '    rc.index = i + 1
             '    rcList.Add(rc)
@@ -78,7 +78,7 @@ Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcList As New List(Of rcData) ' includes cloud data.
+        Public rcList As New List(Of rcDataOld) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -86,7 +86,7 @@ Namespace VBClasses
             labels(3) = "rcIndexMap version of cells.  Age is shown for the largest cells."
             desc = "Segment the image based on color."
         End Sub
-        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
+        Public Shared Function displayCell(rclist As List(Of rcDataOld), clickIndex As Integer) As String
             Dim displayStr As String = "There is no cell defined for that point."
             For Each rc In rclist
                 If rc.index = clickIndex Or clickIndex < 0 Then
@@ -98,14 +98,14 @@ Namespace VBClasses
             Next
             Return displayStr
         End Function
-        Public Shared Function rcIndexFind(rclist As List(Of rcData), rcIndex As Integer) As rcData
+        Public Shared Function rcIndexFind(rclist As List(Of rcDataOld), rcIndex As Integer) As rcDataOld
             For Each rc In rclist
                 If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
             Next
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast = New List(Of rcDataOld)(rcList)
             Dim rcIndexMapLast = rcIndexMap.Clone
             Dim rcMapIDsLast = flood.dst1
 
@@ -121,7 +121,7 @@ Namespace VBClasses
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
-                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256)
+                Dim rc As New rcDataOld(flood.mask(r), r, floodVal Mod 256)
                 rc.mapID = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
                 rc.index = i + 1
                 rcList.Add(rc)
@@ -211,7 +211,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_Hulls : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Display the hull for each cell."
@@ -226,7 +226,7 @@ Namespace VBClasses
                 If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
             Next
 
-            rcList = New List(Of rcData)(redC.rcList)
+            rcList = New List(Of rcDataOld)(redC.rcList)
             dst3 = Palettize(dst1)
             labels(3) = CStr(redC.rcList.Count) + " hulls with the smallest on top."
         End Sub
@@ -341,13 +341,13 @@ Namespace VBClasses
 
     Public Class RedC_MergeCells : Inherits TaskParent
         Dim nabe As New RedC_NeighborHist
-        Public merged As New rcData
-        Public mergeList As New List(Of rcData)
+        Public merged As New rcDataOld
+        Public mergeList As New List(Of rcDataOld)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Merge the selected cell with neighbors that are at about the same depth."
         End Sub
-        Private Shared Function cellDepth(rc As rcData) As Single
+        Private Shared Function cellDepth(rc As rcDataOld) As Single
             If rc Is Nothing OrElse rc.mask.Width <= 1 OrElse rc.pixels = 0 Then Return 0
             Dim depthMask As New Mat
             BitwiseAnd(rc.mask, task.depthmask(rc.rect), depthMask)
@@ -388,7 +388,7 @@ Namespace VBClasses
                 fullMask(rc.rect).SetTo(255, rc.mask)
             Next
 
-            merged = New rcData() With {.rect = unionRect, .mask = fullMask(unionRect).Clone(), .mapID = rcD.mapID,
+            merged = New rcDataOld() With {.rect = unionRect, .mask = fullMask(unionRect).Clone(), .mapID = rcD.mapID,
                                         .index = rcD.index, .maxDStable = merged.maxDist}
             dst3.SetTo(0)
             For Each rc In mergeList
@@ -551,7 +551,7 @@ Namespace VBClasses
             labels(3) = "rcIndexMap version of cells"
             desc = "Cursor.ai: Merge neighboring RedC color cells when their min/max depths overlap."
         End Sub
-        Private Shared Function cellDepthRange(rc As rcData) As mmData
+        Private Shared Function cellDepthRange(rc As rcDataOld) As mmData
             Dim mm As mmData
             If rc Is Nothing OrElse rc.mask.Width <= 1 OrElse rc.pixels = 0 Then Return mm
             Dim depthMask As New Mat
@@ -629,14 +629,14 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim groups As New Dictionary(Of Integer, List(Of rcData))
+            Dim groups As New Dictionary(Of Integer, List(Of rcDataOld))
             For i = 1 To n - 1
                 Dim root = findRoot(parent, i)
-                If groups.ContainsKey(root) = False Then groups(root) = New List(Of rcData)
+                If groups.ContainsKey(root) = False Then groups(root) = New List(Of rcDataOld)
                 groups(root).Add(redC.rcList(i))
             Next
 
-            Dim sorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sorted As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             Dim fullMask As New Mat(dst2.Size, MatType.CV_8U, 0)
             For Each members In groups.Values
                 fullMask.SetTo(0)
@@ -648,7 +648,7 @@ Namespace VBClasses
                     If rc.pixels > biggest.pixels Then biggest = rc
                 Next
                 unionRect = ValidateRect(unionRect)
-                Dim merged As New rcData(fullMask(unionRect), unionRect, -1) With {.mapID = biggest.mapID}
+                Dim merged As New rcDataOld(fullMask(unionRect), unionRect, -1) With {.mapID = biggest.mapID}
                 If merged.pixels > 0 Then sorted.Add(merged.pixels, merged)
             Next
 
@@ -676,15 +676,15 @@ Namespace VBClasses
             task.gOptions.showMyDst1.Checked = True
             desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
         End Sub
-        Private Function rcDFindCell(rcLast As rcData) As rcData
-            Dim rcD As rcData = Nothing
-            Dim candidates As New List(Of (index As Integer, rc As rcData))
+        Private Function rcDFindCell(rcLast As rcDataOld) As rcDataOld
+            Dim rcD As rcDataOld = Nothing
+            Dim candidates As New List(Of (index As Integer, rc As rcDataOld))
             For Each rc In redC.rcList
                 If rcLast.mapID = rc.mapID Then candidates.Add((rc.index, rc))
             Next
 
             If candidates.Count > 0 Then
-                Dim pixelsSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+                Dim pixelsSorted As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
                 For i = 0 To candidates.Count - 1
                     Dim rc = candidates(i).rc
                     Dim rect = rc.rect.Intersect(rcLast.rect)
@@ -766,14 +766,14 @@ Namespace VBClasses
     Public Class XR_RedC_NeighborHist : Inherits TaskParent
         Public redC As New RedC_Basics
         Dim lastCenter As cv.Point
-        Public rcD As rcData
-        Public neighbors As New List(Of rcData)
+        Public rcD As rcDataOld
+        Public neighbors As New List(Of rcDataOld)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use a histogram to find the neighbors.  Not working..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcData)(redC.rcList)
+            Dim rcListLast = New List(Of rcDataOld)(redC.rcList)
 
             If task.heartBeatLT Then dst1.SetTo(0)
             redC.Run(src)
@@ -836,13 +836,13 @@ Namespace VBClasses
 
     Public Class RedC_NeighborHist : Inherits TaskParent
         Public redC As New RedC_Basics
-        Public neighbors As New List(Of rcData)
+        Public neighbors As New List(Of rcDataOld)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use rect intersections to find the neighbors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcData)(redC.rcList)
+            Dim rcListLast = New List(Of rcDataOld)(redC.rcList)
 
             redC.Run(src)
             dst2 = redC.dst2
@@ -877,7 +877,7 @@ Namespace VBClasses
     Public Class RedC_FeatureLess1 : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim fLess As New FeatureLess_Core
-        Public merged As New rcData
+        Public merged As New rcDataOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Cursor.ai: Merge RedC cells under the largest FeatureLess_ToList cell using CalcHist on rcIndexMap."
@@ -902,7 +902,7 @@ Namespace VBClasses
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
 
-            Dim members As New List(Of rcData)
+            Dim members As New List(Of rcDataOld)
             For Each rc In redC.rcList
                 Dim bin = rc.index Mod 255
                 If bin > 0 AndAlso bin < histArray.Length AndAlso histArray(bin) > 0 Then members.Add(rc)
@@ -920,7 +920,7 @@ Namespace VBClasses
                 fullMask(rc.rect).SetTo(255, rc.mask)
             Next
             unionRect = ValidateRect(unionRect)
-            merged = New rcData(fullMask(unionRect), unionRect, 255)
+            merged = New rcDataOld(fullMask(unionRect), unionRect, 255)
 
             dst3(merged.rect).SetTo(task.highlight, merged.mask)
             Rectangle(dst3, merged.rect, task.highlight, task.lineWidth)
@@ -939,7 +939,7 @@ Namespace VBClasses
         Dim redC As New RedC_Basics
         Dim fLess As New FeatureLess_Core
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Cursor.ai: Combine RedC cells under each FeatureLess_Core region using CalcHist on rcIndexMap."
@@ -956,7 +956,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim rcListNew As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim rcListNew As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
             Dim histogram As New Mat
             Dim histArray(histogram.Rows - 1) As Single
@@ -1013,7 +1013,7 @@ Namespace VBClasses
 
 
     Public Class RedC_CellMerge1 : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim flood As New Flood_CellMerge
         Public Sub New()
@@ -1038,7 +1038,7 @@ Namespace VBClasses
                 FindNonZero(cellMask, nz)
                 If nz.Rows = 0 Then Continue For
                 Dim r = ValidateRect(BoundingRect(nz))
-                Dim rc As New rcData(cellMask(r), r, 255)
+                Dim rc As New rcDataOld(cellMask(r), r, 255)
                 If rc.pixels = 0 Then Continue For
                 rc.mapID = label
                 rc.index = rcList.Count + 1
@@ -1063,7 +1063,7 @@ Namespace VBClasses
 
 
     Public Class RedC_CellMerge : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim flood As New Flood_CellMerge
         Dim redC As New RedC_Basics

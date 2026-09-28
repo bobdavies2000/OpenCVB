@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public options As New Options_RedCloud
         Dim reduction As New Reduction_BasicsParmInput
@@ -54,18 +54,18 @@ Namespace VBClasses
 
     Public Class RedCloud_Core : Inherits TaskParent
         Public prepEdges As New RedPrep_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
-        Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcData)
+        Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcDataOld)
             Dim index As Integer = 1
             Dim rect As New cv.Rect
             Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
             Dim flags As FloodFillFlags = FloodFillFlags.Link4
-            Dim rc As rcData
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim rc As rcDataOld
+            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     Dim pt = New cv.Point(x, y)
@@ -74,7 +74,7 @@ Namespace VBClasses
                         Dim count = FloodFill(input, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 Then
                             If count >= minSize Then
-                                rc = New rcData(input(rect), rect, index)
+                                rc = New rcDataOld(input(rect), rect, index)
                                 newList.Add(rc.pixels, rc)
                                 index += 1
                                 rc.mapID = newList.Count
@@ -84,7 +84,7 @@ Namespace VBClasses
                     If index = 254 Then index = 1
                 Next
             Next
-            Return New List(Of rcData)(newList.Values)
+            Return New List(Of rcDataOld)(newList.Values)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then
@@ -94,7 +94,7 @@ Namespace VBClasses
 
             rcList = sweepImage(src, src.Total * 0.0001)
             If rcList.Count = 0 Then
-                rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
+                rcList.Add(New rcDataOld(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
                 task.rcD = rcList(0)
             End If
             dst2.SetTo(0)
@@ -225,7 +225,7 @@ Namespace VBClasses
 
     Public Class XR_RedCloud_Matches : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public Sub New()
             task.fOptions.ReductionColor.Value = 120
             desc = "Display the RedCloud cells that matched to the previous frame."
@@ -259,7 +259,7 @@ Namespace VBClasses
 
     Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()

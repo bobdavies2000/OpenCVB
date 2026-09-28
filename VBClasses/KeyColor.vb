@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
-        Dim rcList As New List(Of rcData)
+        Dim rcList As New List(Of rcDataOld)
         Dim rcIndexMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
         Dim options As New Options_Contours
@@ -27,11 +27,11 @@ Namespace VBClasses
                 FindContours(edgeline.dst2, allContours, Nothing, options.retrievalMode, mode)
             End If
 
-            Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             Dim minSize = src.Total * 0.01 ' we are only interested in contours with more than X% of the pixels.
             For Each ptArray In allContours
-                Dim rc As New rcData With {.rect = Contour_Core.buildRect(ptArray)}
+                Dim rc As New rcDataOld With {.rect = Contour_Core.buildRect(ptArray)}
 
                 tourMat(rc.rect).SetTo(0)
                 rc.contour = ptArray.ToList
@@ -192,7 +192,7 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_Straight : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
@@ -207,7 +207,7 @@ Namespace VBClasses
 
             keyColors.keyList.RemoveAt(0)
             For Each key In keyColors.keyList
-                Dim rc = New rcData(key.mask, key.rect, -1) With {.mapID = rcList.Count + 1, .contour = key.contour}
+                Dim rc = New rcDataOld(key.mask, key.rect, -1) With {.mapID = rcList.Count + 1, .contour = key.contour}
                 rcList.Add(rc)
                 rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
             Next

@@ -16,7 +16,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static rclast As rcData = task.rcD
+            Static rclast As rcDataOld = task.rcD
             If rclast Is Nothing Then Exit Sub
             If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
                 For Each rc In redC.rcList
@@ -57,7 +57,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static rclast As rcData = task.rcD
+            Static rclast As rcDataOld = task.rcD
             If rclast IsNot Nothing Then
 
                 If lostCell And task.mouseClickFlag = False Then
@@ -103,7 +103,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            Static rclast As rcData = task.rcD
+            Static rclast As rcDataOld = task.rcD
             If task.rcD Is Nothing Or rclast Is Nothing Then Exit Sub
 
             Dim clickIndex = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)

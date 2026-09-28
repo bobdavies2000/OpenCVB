@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class Contour_Basics : Inherits TaskParent
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
@@ -14,7 +14,7 @@ Namespace VBClasses
             End If
             desc = "Create an rcIndexMap of the contours using the colors indicated by KMeans"
         End Sub
-        Public Shared Function clickContour(rcIndexMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
+        Public Shared Function clickContour(rcIndexMap As cv.Mat, rcList As List(Of rcDataOld), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
             Dim clickIndex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
@@ -36,7 +36,7 @@ Namespace VBClasses
 
             contours.Run(color8U.dst2.Clone)
 
-            Dim rcListLast As New List(Of rcData)(rcList)
+            Dim rcListLast As New List(Of rcDataOld)(rcList)
             rcIndexMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
@@ -45,7 +45,7 @@ Namespace VBClasses
                 If rc.pixels > pixelThreshold Then DrawContours(dst2, {rc.contour}, 0, white, task.lineWidth, task.lineType)
             Next
 
-            rcList = New List(Of rcData)(contours.rcList)
+            rcList = New List(Of rcDataOld)(contours.rcList)
 
             task.color = clickContour(rcIndexMap, rcList, color8U.dst2)
 
@@ -73,7 +73,7 @@ Namespace VBClasses
 
     Public Class Contour_Core : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Dim edgeMethod As New Edge_Basics_TA
         Dim options As New Options_Contours
         Dim allContours As cv.Point()()
@@ -141,11 +141,11 @@ Namespace VBClasses
 
             If allContours Is Nothing OrElse allContours.Length = 0 Then Exit Sub
 
-            Dim sortedList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             Dim tourMat As New Mat(task.workRes, MatType.CV_8U, 0)
             For Each ptArray In allContours
                 If ptArray.Length < 10 Then Continue For
-                Dim rc As New rcData With {.pixels = ContourArea(ptArray)}
+                Dim rc As New rcDataOld With {.pixels = ContourArea(ptArray)}
                 If rc.pixels < 5 Then Continue For
                 rc.contour = New List(Of cv.Point)(ptArray)
                 If rc.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
@@ -161,7 +161,7 @@ Namespace VBClasses
                 sortedList.Add(rc.pixels, rc)
             Next
 
-            Dim rcListLast As New List(Of rcData)(rcList)
+            Dim rcListLast As New List(Of rcDataOld)(rcList)
 
             dst2.SetTo(0)
             rcList.Clear()
@@ -1344,7 +1344,7 @@ Namespace VBClasses
 
     Public Class Contour_ToLine : Inherits TaskParent
         Dim contours As New Contour_Basics
-        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
+        Public rcLpList As New List(Of (lp As lpData, rc As rcDataOld))
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -1416,7 +1416,7 @@ Namespace VBClasses
 
     Public Class Contour_ToLineCenter : Inherits TaskParent
         Dim contours As New Contour_Basics
-        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
+        Public rcLpList As New List(Of (lp As lpData, rc As rcDataOld))
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -1478,7 +1478,7 @@ Namespace VBClasses
 
     Public Class Contour_ToLineOverlaps : Inherits TaskParent
         Dim contours As New Contour_Basics
-        Public rcLpList As New List(Of (lp As lpData, rc As rcData))
+        Public rcLpList As New List(Of (lp As lpData, rc As rcDataOld))
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

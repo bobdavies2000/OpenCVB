@@ -243,7 +243,7 @@ Namespace VBClasses
         Dim recurse As New XR_Bin2Way_RecurseOnce
         Dim redCs(3) As RedC_Basics
         Dim mats As New Mat_4to1
-        Dim rclist As New List(Of rcData)
+        Dim rclist As New List(Of rcDataOld)
         Dim rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
@@ -257,7 +257,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             recurse.Run(src)
 
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To recurse.mats.mat.Length - 1
                 Dim m = recurse.mats.mat(i)
 
@@ -273,7 +273,7 @@ Namespace VBClasses
             dst2 = mats.dst2
 
             rclist.Clear()
-            rclist.Add(New rcData)
+            rclist.Add(New rcDataOld)
             dst3.SetTo(0)
             rcIndexMap.SetTo(0)
             For Each rc In newList.Values

@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class EdgeLine_Basics : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat
         Public classCount As Integer
         Public Sub New()
@@ -40,11 +40,11 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcDataOld)
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
                 Dim mask = rcIndexMap(rects(i))
-                Dim rc = New rcData(mask, ValidateRect(rects(i)), index)
+                Dim rc = New rcDataOld(mask, ValidateRect(rects(i)), index)
 
                 rcList.Add(rc)
                 If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(index Mod 255), rc.mask)
@@ -64,7 +64,7 @@ Namespace VBClasses
 
     Public Class EdgeLine_Motion : Inherits TaskParent
         Dim edgeLine As New EdgeLine_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public classCount As Integer
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -72,7 +72,7 @@ Namespace VBClasses
             dst2 = New Mat(dst2.Size, MatType.CV_32F, 0)
             desc = "Retain edges where there was no motion."
         End Sub
-        Private Sub rcDataDraw(rc As rcData)
+        Private Sub rcDataOldDraw(rc As rcDataOld)
             Static nextList = New List(Of List(Of cv.Point))
             Dim n = rc.contour.Count - 1
             nextList.Clear()
@@ -84,7 +84,7 @@ Namespace VBClasses
             Dim histarray(edgeLine.rcList.Count - 1) As Single
             If task.motion.motionSort.Count = 0 Then Exit Sub ' no change!
 
-            Dim newList As New List(Of rcData)
+            Dim newList As New List(Of rcDataOld)
             dst2.SetTo(0)
             If edgeLine.rcList.Count Then
                 Dim ranges1 = New Rangef() {New Rangef(0, edgeLine.rcList.Count)}
@@ -98,7 +98,7 @@ Namespace VBClasses
                         rc.mapID = newList.Count + 1
                         newList.Add(rc)
 
-                        If rc.contour IsNot Nothing Then rcDataDraw(rc)
+                        If rc.contour IsNot Nothing Then rcDataOldDraw(rc)
                     End If
                 Next
             End If
@@ -121,7 +121,7 @@ Namespace VBClasses
                         rc.mapID = newList.Count + 1
                         newList.Add(rc)
 
-                        rcDataDraw(rc)
+                        rcDataOldDraw(rc)
                     End If
                 End If
             Next
@@ -129,7 +129,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst1, MatType.CV_8U)
             dst3 = Palettize(dst1, 0)
 
-            rcList = New List(Of rcData)(newList)
+            rcList = New List(Of rcDataOld)(newList)
             classCount = rcList.Count
 
             labels(2) = CStr(edgeLine.classCount) + " lines found. " +

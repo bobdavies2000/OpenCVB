@@ -563,7 +563,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim index As Integer = 1
             For Each rc In redC.rcList
-                Dim rcTest = New rcData(rc.mask, rc.rect, index)
+                Dim rcTest = New rcDataOld(rc.mask, rc.rect, index)
                 If rcTest.mapID >= 0 Then
                     dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
@@ -584,8 +584,8 @@ Namespace VBClasses
             desc = "Does the mask need to have rectangle of zeros?  Answer: yes"
         End Sub
         Public Shared Function setCloudData(_mask As Mat, _rect As cv.Rect, _index As Integer,
-                                                    Optional zeroRectangle As Boolean = True) As rcData
-            Dim rc As New rcData
+                                                    Optional zeroRectangle As Boolean = True) As rcDataOld
+            Dim rc As New rcDataOld
             InRange(_mask, _index, _index, rc.mask)
             rc.rect = _rect
             rc.mapID = _index
@@ -616,7 +616,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim rcList As New List(Of rcData)
+            Dim rcList As New List(Of rcDataOld)
             dst3.SetTo(0)
             For Each rc In redC.rcList
                 ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)

@@ -705,7 +705,7 @@ Namespace VBClasses
     Public Class Pixel_Vectors : Inherits TaskParent
         Dim hVector As New Hist3Dcolor_Vector
         Public pixelVector As New List(Of Single())
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public redC As New RedC_Basics
         Public Sub New()
             labels = {"", "", "RedFlood_List output", ""}

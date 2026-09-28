@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim fLess As New FeatureLess_Basics
@@ -35,7 +35,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rectSorted.Count - 2
                 Dim r1 = rectSorted.ElementAt(i).Value.r
                 If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
@@ -44,14 +44,14 @@ Namespace VBClasses
                         If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
                             r1 = r1.Union(r2)
                         Else
-                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
+                            Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Key) With {.mapID = rectSorted.ElementAt(j).Key}
                             rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                             i = j
                             Exit For
                         End If
                     Next
                 Else
-                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
+                    Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Key) With {.mapID = rectSorted.ElementAt(i).Key}
                     rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                 End If
             Next
@@ -59,7 +59,7 @@ Namespace VBClasses
             rcIndexMap.SetTo(0)
             rcMapIDs.SetTo(0)
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcDataOld)
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)
@@ -82,7 +82,7 @@ Namespace VBClasses
 
     Public Class XR_RedColor_Basics : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat
         Public runSelectCell As Boolean = True
         Public Sub New()
@@ -102,7 +102,7 @@ Namespace VBClasses
                     Dim mapID As Integer = rcIndexMap(r).Get(Of Byte)(0, 0)
                     Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.MaskOnly Or (255 << 8)
                     Dim count = FloodFill(rcIndexMap, mask, r.TopLeft, mapID, rect, 0, 0, flags)
-                    If count > 0 Then rcList.Add(New rcData(rcIndexMap(rect), rect, mapID))
+                    If count > 0 Then rcList.Add(New rcDataOld(rcIndexMap(rect), rect, mapID))
                 End If
             Next
             dst2 = Palettize(rcIndexMap)
@@ -128,7 +128,7 @@ Namespace VBClasses
     Public Class XR_RedColor_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             cPtr = RedCloudLined_Open()
@@ -154,14 +154,14 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast = New List(Of rcDataOld)(rcList)
             Dim rcMapLast As Mat = rcIndexMap.Clone
 
             Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rects.Length - 1
-                Dim rc = New rcData(dst0(rects(i)), rects(i), index)
+                Dim rc = New rcDataOld(dst0(rects(i)), rects(i), index)
                 If rc.pixels < minPixels Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1
@@ -305,7 +305,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_Hulls : Inherits TaskParent
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -588,7 +588,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            dMap.rcList = New List(Of rcData)(redC.rcList)
+            dMap.rcList = New List(Of rcDataOld)(redC.rcList)
             dMap.Run(task.gray)
             dst3 = dMap.dst3
             SetTrueText(redC.strOut, 3)
@@ -616,7 +616,7 @@ Namespace VBClasses
             If v > hi Then Return hi
             Return v
         End Function
-        Private Shared Function CellMaskFull(rcIndexMap As Mat, rc As rcData) As Mat
+        Private Shared Function CellMaskFull(rcIndexMap As Mat, rc As rcDataOld) As Mat
             Dim m As New Mat(rcIndexMap.Size, MatType.CV_8U, 0)
             Using roi = rcIndexMap(rc.rect)
                 Dim part As New Mat
@@ -631,7 +631,7 @@ Namespace VBClasses
             Dim k = GetStructuringElement(MorphShapes.Rect, New Size(3, 3))
             MorphologyEx(mask, mask, MorphTypes.Open, k)
         End Sub
-        Private Shared Function PickSubject(rcIndexMap As Mat, rcList As List(Of rcData)) As rcData
+        Private Shared Function PickSubject(rcIndexMap As Mat, rcList As List(Of rcDataOld)) As rcDataOld
             Dim total = rcIndexMap.Rows * rcIndexMap.Cols
             Dim minPx = CInt(total * 0.003)
             Dim maxPx = CInt(total * 0.62)
@@ -651,7 +651,7 @@ Namespace VBClasses
             End If
 
             Dim bestVotes As Integer = -1
-            Dim bestRc As rcData = Nothing
+            Dim bestRc As rcDataOld = Nothing
             Dim freq As New Dictionary(Of Integer, Integer)
             For dy = -4 To 4
                 For dx = -4 To 4

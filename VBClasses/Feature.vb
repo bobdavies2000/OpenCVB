@@ -1293,12 +1293,12 @@ Namespace VBClasses
     Public Class Feature_DelaunayRC : Inherits TaskParent
         Dim featDel As New Feature_Delaunay
         Dim delaunay As New Delaunay_Basics
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             delaunay.useFeatures = False
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
+            desc = "Cursor.ai: Build rcDataOld from each Feature_Delaunay cell using the cell rect and a filled mask."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             featDel.Run(src)
@@ -1316,7 +1316,7 @@ Namespace VBClasses
             End If
             delaunay.Run(src)
 
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast = New List(Of rcDataOld)(rcList)
             Dim rcIndexMapLast = rcIndexMap.Clone
             Dim usedList As New List(Of Single)
             Dim reusedIndex As Integer
@@ -1336,7 +1336,7 @@ Namespace VBClasses
                 FindNonZero(cellMask, nz)
                 Dim rect = ValidateRect(BoundingRect(nz))
 
-                Dim rc As New rcData(cellMask(rect), rect, 255)
+                Dim rc As New rcDataOld(cellMask(rect), rect, 255)
                 If rc.pixels = 0 Then Continue For
 
                 Dim prevPt = rc.maxDist
@@ -1383,11 +1383,11 @@ Namespace VBClasses
             For Each pt In featDel.feat.features
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            labels(2) = CStr(rcList.Count) + " rcData cells from Feature_Delaunay, " +
+            labels(2) = CStr(rcList.Count) + " rcDataOld cells from Feature_Delaunay, " +
                         CStr(reusedIndex) + " kept the same color"
 
             Dim clickIndex = CInt(rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
-            Dim selected As rcData = Nothing
+            Dim selected As rcDataOld = Nothing
             For Each rc In rcList
                 If rc.index = clickIndex Then
                     selected = rc

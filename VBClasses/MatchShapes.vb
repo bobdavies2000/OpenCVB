@@ -60,8 +60,8 @@ Namespace VBClasses
 
 
     Public Class MatchShapes_Nearby : Inherits TaskParent
-        Public similarCells As New List(Of rcData)
-        Public rc As New rcData
+        Public similarCells As New List(Of rcDataOld)
+        Public rc As New rcDataOld
         Dim options As New Options_MatchShapes
         Dim redC As New RedC_Basics
         Public Sub New()
@@ -82,9 +82,9 @@ Namespace VBClasses
                 End If
             End If
 
-            Static rcListLast As New List(Of rcData)
+            Static rcListLast As New List(Of rcDataOld)
             If task.heartBeat Then
-                rcListLast = New List(Of rcData)(redC.rcList)
+                rcListLast = New List(Of rcDataOld)(redC.rcList)
                 dst3.SetTo(0)
             End If
 
@@ -204,9 +204,9 @@ Namespace VBClasses
 
 
     Public Class XR_MatchShapes_NearbyHull : Inherits TaskParent
-        Public similarCells As New List(Of rcData)
+        Public similarCells As New List(Of rcDataOld)
         Public bestCell As Integer
-        Dim rc As New rcData
+        Dim rc As New rcDataOld
         Dim options As New Options_MatchShapes
         Dim redC As New XR_RedColor_Hulls
         Public Sub New()

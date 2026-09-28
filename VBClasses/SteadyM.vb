@@ -427,9 +427,9 @@ Namespace VBClasses
             labels(3) = "SteadyCam version of redc.rcIndexMap."
             desc = "Use M in SteadyCam_Basics maintain the index for each redC cell."
         End Sub
-        Public Shared Function setAge(rcList As List(Of rcData), rcLastList As List(Of rcData), map As cv.Mat) As List(Of rcData)
+        Public Shared Function setAge(rcList As List(Of rcDataOld), rcLastList As List(Of rcDataOld), map As cv.Mat) As List(Of rcDataOld)
             Dim usedList As New List(Of Integer)
-            Dim rcListStable As New List(Of rcData)
+            Dim rcListStable As New List(Of rcDataOld)
             For Each rc In rcList
                 Dim previousIndex = map.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
@@ -460,7 +460,7 @@ Namespace VBClasses
             Return rcListStable
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcLastList = New List(Of rcData)(redC.rcList)
+            Dim rcLastList = New List(Of rcDataOld)(redC.rcList)
 
             redC.Run(src)
             dst2 = redC.dst2

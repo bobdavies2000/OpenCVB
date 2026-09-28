@@ -352,7 +352,7 @@ Namespace VBClasses
     Public Class Hull_RedC : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public hulls As New List(Of List(Of cv.Point))
-        Public rclist As New List(Of rcData)
+        Public rclist As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}

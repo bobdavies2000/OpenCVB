@@ -52,7 +52,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
@@ -85,17 +85,17 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcLastList = New List(Of rcData)(rcList)
+            Dim rcLastList = New List(Of rcDataOld)(rcList)
 
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcDataOld)
             rcIndexMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
                 ' skip the cells that are just one gridRect.
                 If r.Size <> gRectSize Then
-                    Dim rc = New rcData(dst0(r), r, rcList.Count)
+                    Dim rc = New rcDataOld(dst0(r), r, rcList.Count)
                     If rc.pixels > 0 Then
                         For i = 0 To lastCenters.Count - 1
                             Dim rect = lastCenters(i)
@@ -343,7 +343,7 @@ Namespace VBClasses
     Public Class Flood_RectMats : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public fLess As New FeatureLess_Core
-        Public rectList As New List(Of rcData)
+        Public rectList As New List(Of rcDataOld)
         Public Sub New()
             dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -363,7 +363,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
             rectList.Clear()
-            rectList.Add(New rcData)
+            rectList.Add(New rcDataOld)
             dst1 = color8U.dst2.Clone
             dst0.SetTo(0)
             For y = 0 To dst2.Height - 1
@@ -373,9 +373,8 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
+                            Dim rc = New rcDataOld(dst1(rect), rect, index) With {.index = index}
                             dst0(rc.rect).SetTo(index, rc.mask)
-                            ' dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, rc.index)
                             rectList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -383,13 +382,6 @@ Namespace VBClasses
                     End If
                 Next
             Next
-
-            ' guarantees the CalcHist in Flood_CellMerge will work properly.
-            'For i = 1 To rectList.Count - 1
-            '    Dim rc1 = rectList(i)
-            '    Dim index = dst0.Get(Of Byte)(rc1.maxDist.Y, rc1.maxDist.X)
-            '    If i <> index Then dst0(rc1.rect).SetTo(index, rc1.mask)
-            'Next
 
             dst3 = Palettize(dst0, 0)
 
@@ -414,7 +406,7 @@ Namespace VBClasses
 
 
     Public Class Flood_CellMerge : Inherits TaskParent
-        Public rcList As New List(Of rcData)
+        Public rcList As New List(Of rcDataOld)
         Dim rectMats As New Flood_RectMats
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -426,7 +418,7 @@ Namespace VBClasses
             dst2 = rectMats.dst2.Clone
             labels(2) = rectMats.labels(3)
 
-            Dim rc As rcData
+            Dim rc As rcDataOld
             If standaloneTest() Then
                 For Each rc In rectMats.fLess.rcList
                     If rc.index = 0 Then Continue For
@@ -438,7 +430,7 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
             Dim histogram As New Mat
 
-            rcList = New List(Of rcData)(rectMats.fLess.rcList)
+            rcList = New List(Of rcDataOld)(rectMats.fLess.rcList)
             Dim rcOwner(rectMats.rectList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
             For Each rc In rcList

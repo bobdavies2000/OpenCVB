@@ -1530,7 +1530,7 @@ Namespace VBClasses
 
     Public Class Histogram_Depth : Inherits TaskParent
         Public plotHist As New PlotBar_Basics
-        Public rc As rcData
+        Public rc As rcDataOld
         Public mm As mmData
         Public histogram As New Mat
         Public Sub New()
