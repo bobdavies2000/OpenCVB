@@ -420,7 +420,7 @@ Namespace VBClasses
 
 
     Public Class XR_SteadyM_Cells : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
     Public Class SteadyM_RedCTest : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim rcIndexMap As cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -513,7 +513,7 @@ Namespace VBClasses
             Next
             dst3 = Palettize(dst1, 0)
 
-            If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
+            If task.rcDold IsNot Nothing Then SetTrueText(task.rcDold.displayCell, 1)
         End Sub
     End Class
 

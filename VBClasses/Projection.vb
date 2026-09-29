@@ -7,7 +7,7 @@ Namespace VBClasses
         Public objectList As New List(Of Vec4f)
         Public showRectangles As Boolean = True
         Dim histTop As New Projection_HistTop
-        Public redC As New RedColor_Basics
+        Public redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Find all the masks, rects, and counts in the input"
         End Sub
@@ -245,11 +245,11 @@ Namespace VBClasses
     Public Class Projection_Cell : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatCell As New HeatMap_Basics
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels = {"", "Top View projection of the selected cell", "RedColor_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
+            labels = {"", "Top View projection of the selected cell", "RedColor_BasicsOld output - select a cell to project at right and above", "Side projection of the selected cell"}
             desc = "Create a top and side projection of the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

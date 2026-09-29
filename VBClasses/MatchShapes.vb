@@ -63,7 +63,7 @@ Namespace VBClasses
         Public similarCells As New List(Of rcDataOld)
         Public rc As New rcDataOld
         Dim options As New Options_MatchShapes
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             labels(3) = "All the shapes that match since the last heartbeat."
             desc = "Find similar shapes in the redC cells."
@@ -76,7 +76,7 @@ Namespace VBClasses
                 redC.Run(src)
                 dst2 = redC.dst2.Clone
                 labels(2) = redC.labels(2)
-                If redC.rcList.Count = 0 Or task.rcD Is Nothing Then
+                If redC.rcList.Count = 0 Or task.rcDold Is Nothing Then
                     SetTrueText(selectMsg, 3)
                     Exit Sub
                 End If
@@ -99,8 +99,8 @@ Namespace VBClasses
             For i = 0 To rcListLast.Count - 1
                 Dim rc2 = rcListLast(i)
                 If rc2.contour Is Nothing Then Continue For
-                If Math.Abs(rc2.pixels - task.rcD.pixels) < 100 Then
-                    Dim matchval = MatchShapes(task.rcD.contour, rc2.contour, options.matchOption)
+                If Math.Abs(rc2.pixels - task.rcDold.pixels) < 100 Then
+                    Dim matchval = MatchShapes(task.rcDold.contour, rc2.contour, options.matchOption)
                     If matchval < options.matchThreshold Then
                         dst3(rc2.rect).SetTo(task.scalarColors(rc.index Mod 255), rc2.mask)
                         similarCells.Add(rc2)
@@ -117,7 +117,7 @@ Namespace VBClasses
                 Circle(dst3, rc.maxDist, task.DotSize, white, -1, task.lineType)
                 If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + options.matchThreshold.ToString(fmt2), New cv.Point(5, 5), 3)
             End If
-            SetTrueText("Best match", task.rcD.maxDist, 3)
+            SetTrueText("Best match", task.rcDold.maxDist, 3)
         End Sub
     End Class
 
@@ -142,8 +142,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             If task.heartBeat Then dst3.SetTo(0)
 
-            If task.rcD IsNot Nothing Then
-                Dim rcX = task.rcD
+            If task.rcDold IsNot Nothing Then
+                Dim rcX = task.rcDold
                 For Each rc In redC.rclist
                     If rc.approxPoly.Count = 0 Or rcX.approxPoly.Count = 0 Then Continue For
                     Dim matchVal = MatchShapes(rcX.approxPoly, rc.approxPoly, options.matchOption)
@@ -165,7 +165,7 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("Match Threshold %").Value = 3
@@ -182,8 +182,8 @@ Namespace VBClasses
             If task.heartBeat Then dst3.SetTo(0)
             SetTrueText(redC.strOut, 1)
 
-            Dim rcX = task.rcD
-            If task.rcD Is Nothing Then Exit Sub
+            Dim rcX = task.rcDold
+            If task.rcDold Is Nothing Then Exit Sub
             If rcX Is Nothing Then rcX = redC.rcList(0)
             For Each rc In redC.rcList
                 If rc.contour Is Nothing Then Continue For
@@ -220,10 +220,10 @@ Namespace VBClasses
                 redC.Run(task.color)
                 If redC.rclist.Count = 0 Then Exit Sub
                 dst2 = redC.dst2
-                rc = task.rcD
+                rc = task.rcDold
             End If
 
-            If task.rcD IsNot Nothing Then
+            If task.rcDold IsNot Nothing Then
                 dst3.SetTo(0)
                 similarCells.Clear()
 

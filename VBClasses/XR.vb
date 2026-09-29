@@ -253,7 +253,7 @@ Namespace VBClasses
 
     Public Class XR_Image_RedC : Inherits TaskParent
         Public images As New XR_Image_Series
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim reduction As New Reduction_Basics
         Public Sub New()
             task.fOptions.ReductionColor.Value = 50

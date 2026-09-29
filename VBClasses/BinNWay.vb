@@ -33,7 +33,7 @@ Namespace VBClasses
             dst3 = Palettize(dst2)
 
             If standalone Then
-                Static redC As New RedC_Basics
+                Static redC As New RedColor_BasicsOld
                 redC.Run(dst2)
                 labels(2) = redC.labels(2)
                 dst2 = redC.dst2

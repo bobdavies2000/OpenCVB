@@ -171,7 +171,7 @@
 '        Public Sub New()
 '            labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
 '            addW.src2 = dst2.Clone
-'            desc = "Find all the cells from a RedColor_Basics output that are likely to be flat"
+'            desc = "Find all the cells from a RedColor_BasicsOld output that are likely to be flat"
 '        End Sub
 '        Public Overrides Sub RunAlg(src As cv.Mat)
 '            plane.Run(src)
@@ -250,7 +250,7 @@
 '            Next
 '            If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-'            Dim rcX = task.rcD
+'            Dim rcX = task.rcDold
 '        End Sub
 '    End Class
 
@@ -334,7 +334,7 @@
 '    ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 '    Public Class Plane_CellColor : Inherits TaskParent
 '        Public options As New Options_Plane
-'        Public redC As New RedC_Basics
+'        Public redC As New RedColor_BasicsOld
 '        Public Sub New()
 '            labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and red - to the Z-axis"}
 '            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -395,7 +395,7 @@
 '        Public ptList As New List(Of Point3f)
 '        Public ptList2D As New List(Of List(Of cv.Point))
 '        Dim needOutput As Boolean
-'        Public redC As New RedColor_Basics
+'        Public redC As New RedColor_BasicsOld
 '        Public Sub New()
 '            labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
 '            desc = "Detect if a some or all points in a RedCloud cell are in a plane."
@@ -405,7 +405,7 @@
 '            dst2 = redC.dst2
 '            labels(2) = redC.labels(2)
 
-'            Dim rc = task.rcD
+'            Dim rc = task.rcDold
 
 '            Dim pt As Point3f, list2D As New List(Of cv.Point)
 '            If rc.contour IsNot Nothing Then
@@ -523,7 +523,7 @@
 '    Public Class Plane_Equation : Inherits TaskParent
 '        Public rc As New rcDataOld
 '        Public justEquation As String
-'        Dim redC As New RedColor_Basics
+'        Dim redC As New RedColor_BasicsOld
 '        Public Sub New()
 '            desc = "Compute the coefficients for an estimated plane equation given the rc contour"
 '        End Sub
@@ -532,7 +532,7 @@
 '                redC.Run(src)
 '                dst2 = redC.dst2
 '                labels(2) = redC.labels(2)
-'                rc = task.rcD
+'                rc = task.rcDold
 '                If rc Is Nothing Then SetTrueText("Select a cell in the image at left.")
 '            End If
 

@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Track_Basics : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             desc = "Track the selected cell."
         End Sub
@@ -16,13 +16,13 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static rclast As rcDataOld = task.rcD
+            Static rclast As rcDataOld = task.rcDold
             If rclast Is Nothing Then Exit Sub
-            If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
+            If rclast.mapID <> task.rcDold.mapID And task.mouseClickFlag = False Then
                 For Each rc In redC.rcList
                     If rc.mapID = rclast.mapID Then
                         If rc.rect.Contains(task.clickPoint) Then
-                            task.rcD = rc
+                            task.rcDold = rc
                             Exit For
                         End If
                     End If
@@ -30,10 +30,10 @@ Namespace VBClasses
             End If
 
             Dim clickIndex = redC.rcIndexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+            Circle(dst2, task.rcDold.maxDist, task.DotSize + 2, task.highlight, -1)
 
-            task.clickPoint = task.rcD.maxDist
-            labels(3) = "Map ID = " + CStr(task.rcD.mapID)
+            task.clickPoint = task.rcDold.maxDist
+            labels(3) = "Map ID = " + CStr(task.rcDold.mapID)
         End Sub
     End Class
 
@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
     Public Class Track_Simple : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim lostCell As Boolean
         Public Sub New()
             desc = "Track the selected cell."
@@ -57,7 +57,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Static rclast As rcDataOld = task.rcD
+            Static rclast As rcDataOld = task.rcDold
             If rclast IsNot Nothing Then
 
                 If lostCell And task.mouseClickFlag = False Then
@@ -68,19 +68,19 @@ Namespace VBClasses
                 End If
 
                 Dim clickIndex As Integer = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-                If task.rcD IsNot Nothing Then
-                    Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+                If task.rcDold IsNot Nothing Then
+                    Circle(dst2, task.rcDold.maxDist, task.DotSize + 2, task.highlight, -1)
 
-                    task.clickPoint = task.rcD.maxDist
-                    labels(3) = "Map ID = " + CStr(task.rcD.mapID)
+                    task.clickPoint = task.rcDold.maxDist
+                    labels(3) = "Map ID = " + CStr(task.rcDold.mapID)
 
-                    If rclast.mapID <> task.rcD.mapID And task.mouseClickFlag = False Then
+                    If rclast.mapID <> task.rcDold.mapID And task.mouseClickFlag = False Then
                         lostCell = True
                         Exit Sub
                     End If
                 End If
             End If
-            rclast = task.rcD
+            rclast = task.rcDold
         End Sub
     End Class
 
@@ -88,7 +88,7 @@ Namespace VBClasses
 
 
     Public Class Track_FindNearest : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim knn As New KNN_Basics
         Public Sub New()
             desc = "Find the nearest cell with the same mapID."
@@ -103,16 +103,16 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            Static rclast As rcDataOld = task.rcD
-            If task.rcD Is Nothing Or rclast Is Nothing Then Exit Sub
+            Static rclast As rcDataOld = task.rcDold
+            If task.rcDold Is Nothing Or rclast Is Nothing Then Exit Sub
 
             Dim clickIndex = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            Circle(dst2, task.rcD.maxDist, task.DotSize + 2, task.highlight, -1)
+            Circle(dst2, task.rcDold.maxDist, task.DotSize + 2, task.highlight, -1)
 
             knn.trainInput.Clear()
             Dim indexList As New List(Of Integer)
             For Each rc In redC.rcList
-                If rc.mapID = task.rcD.mapID Then
+                If rc.mapID = task.rcDold.mapID Then
                     knn.trainInput.Add(New Point2f(rc.maxDist.X, rc.maxDist.Y))
                     indexList.Add(rc.index)
                 End If
@@ -130,16 +130,16 @@ Namespace VBClasses
 
             For i = 0 To knn.queries.Count - 1
                 Dim index = indexList(knn.result(0, i))
-                Dim rc = RedC_Basics.rcIndexFind(redC.rcList, index)
+                Dim rc = RedC_BasicsOld.rcIndexFind(redC.rcList, index)
                 Circle(dst2, rc.maxDist, task.DotSize + 1, task.highlight, -1)
                 SetTrueText(CStr(knn.result(0, i)), rc.maxDist)
                 SetTrueText(CStr(knn.result(0, i)), rc.maxDist, 3)
             Next
-            task.clickPoint = task.rcD.maxDist
-            labels(3) = "Map ID = " + CStr(task.rcD.mapID)
+            task.clickPoint = task.rcDold.maxDist
+            labels(3) = "Map ID = " + CStr(task.rcDold.mapID)
             SetTrueText(redC.strOut, 1)
 
-            rclast = task.rcD
+            rclast = task.rcDold
         End Sub
     End Class
 End Namespace

@@ -134,7 +134,7 @@ Namespace VBClasses
 
     Public Class XR_FitEllipse_RedC : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Create an ellipse from a contour"
         End Sub
@@ -148,18 +148,18 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-            If task.rcD Is Nothing Then Exit Sub
+            If task.rcDold Is Nothing Then Exit Sub
 
-            If task.rcD.contour Is Nothing Then task.rcD = redC.rcList(0)
+            If task.rcDold.contour Is Nothing Then task.rcDold = redC.rcList(0)
             fitE.inputPoints.Clear()
-            For Each pt In task.rcD.contour
+            For Each pt In task.rcDold.contour
                 fitE.inputPoints.Add(New Point2f(pt.X, pt.Y))
             Next
             fitE.Run(src)
             dst3.SetTo(0)
-            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-            Rectangle(dst3, task.rcD.rect, white, task.lineWidth, task.lineType)
-            Cv2.Ellipse(dst3(task.rcD.rect), fitE.box, Scalar.Yellow, task.lineWidth, task.lineType)
+            dst3(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+            Rectangle(dst3, task.rcDold.rect, white, task.lineWidth, task.lineType)
+            Cv2.Ellipse(dst3(task.rcDold.rect), fitE.box, Scalar.Yellow, task.lineWidth, task.lineType)
         End Sub
     End Class
 

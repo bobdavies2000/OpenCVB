@@ -95,7 +95,7 @@ Namespace VBClasses
             rcList = sweepImage(src, src.Total * 0.0001)
             If rcList.Count = 0 Then
                 rcList.Add(New rcDataOld(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
-                task.rcD = rcList(0)
+                task.rcDold = rcList(0)
             End If
             dst2.SetTo(0)
             For Each rc In rcList
@@ -117,7 +117,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_CellDepthHistogram : Inherits TaskParent
         Dim plot As New PlotBar_Basics
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -128,14 +128,14 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If task.rcD Is Nothing Then Exit Sub
+            If task.rcDold Is Nothing Then Exit Sub
 
             SetTrueText(redC.strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            Dim depth As Mat = task.pcSplit(2)(task.rcDold.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcDold.rect))
             ImShow("depth", depth)
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
@@ -247,7 +247,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            If task.rcDold IsNot Nothing Then Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
             SetTrueText(redC.strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub

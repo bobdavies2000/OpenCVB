@@ -852,7 +852,7 @@ Namespace VBClasses
     Public Class XR_Edge_RedC : Inherits TaskParent
         Dim edges As New Edge_Basics_TA
         Public mats As New Mat_4Click
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
             labels(3) = "Cell boundaries that are also real edges."

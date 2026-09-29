@@ -24,7 +24,7 @@
 
 '            SetTrueText(redC.strOut, 1)
 
-'            Dim rc = task.rcD
+'            Dim rc = task.rcDold
 '            Dim depthPixels = CountNonZero(task.depthmask(rc.rect))
 '            If depthPixels = 0 Then
 '                strOut = "There is no depth data for that cell."
@@ -153,7 +153,7 @@
 '            dst2 = sides.dst2
 
 '            If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
-'            Dim rc = task.rcD
+'            Dim rc = task.rcDold
 '            If rc Is Nothing Then rc = sides.redC.rcList(0)
 
 '            Dim offset As Integer = 30
@@ -255,7 +255,7 @@
 
 '            sides.Run(src)
 '            dst2 = sides.dst2
-'            Dim rc = task.rcD
+'            Dim rc = task.rcDold
 '            If rc Is Nothing Then
 '                If sides.redC.rcList.Count = 0 Then Exit Sub
 '                rc = sides.redC.rcList(0)
@@ -321,7 +321,7 @@
 '            If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
 '            dst1 = sides.dst2
 '            dst2 = sides.dst3
-'            Dim rc = task.rcD
+'            Dim rc = task.rcDold
 '            If rc Is Nothing Then rc = sides.redC.rcList(0)
 
 '            If kalman.kInput.Length <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)

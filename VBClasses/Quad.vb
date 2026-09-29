@@ -27,7 +27,7 @@ Namespace VBClasses
         Public colorList As New List(Of Scalar)
         Public oglOptions As New Options_OpenGLFunctions
         Const depthListMaxCount As Integer = 10
-        Dim redc As New RedC_Basics
+        Dim redc As New RedColor_BasicsOld
         Public Sub New()
             labels(3) = "Values indicate the depth of the brick at that location."
             desc = "Create a representation of the cv.Point cloud with RedCloud data"
@@ -212,7 +212,7 @@ Namespace VBClasses
         Dim depthMinList As New List(Of List(Of Single))
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Create triangles from each gRect in cv.Point cloud"
         End Sub

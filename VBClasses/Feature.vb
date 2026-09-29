@@ -601,7 +601,7 @@ Namespace VBClasses
 
     Public Class XR_Feature_RedC : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Show the feature points in the RedC output."
         End Sub
@@ -1354,7 +1354,7 @@ Namespace VBClasses
                     rc.index = previousIndex
                     usedList.Add(rc.index)
                     reusedIndex += 1
-                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
+                    Dim rcLast = RedC_BasicsOld.rcIndexFind(rcListLast, CInt(rc.index))
                     If rcLast IsNot Nothing Then
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 100
@@ -1396,12 +1396,12 @@ Namespace VBClasses
             Next
 
             If selected IsNot Nothing Then
-                task.rcD = selected
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
-                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                strOut = task.rcD.displayCell
+                task.rcDold = selected
+                task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+                Rectangle(task.color, task.rcDold.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
+                Circle(dst2, task.rcDold.maxDist, task.DotSize + 1, white, -1)
+                strOut = task.rcDold.displayCell
                 SetTrueText(strOut, 1)
             End If
         End Sub

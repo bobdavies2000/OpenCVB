@@ -3,7 +3,7 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public redC As New RedColor_Basics
+        Public redC As New RedColor_BasicsOld
         Public Sub New()
             labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
@@ -25,7 +25,7 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcDataOld)
         Public floodPoints As New List(Of cv.Point)
-        Public redC As New RedC_Basics
+        Public redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
@@ -367,38 +367,6 @@ Namespace VBClasses
 
 
 
-    ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-    Public Class XR_MSER_Hulls : Inherits TaskParent
-        Dim options As New Options_MSER
-        Dim mser As New MSER_Basics
-        Public Sub New()
-            labels(3) = "Hulls derived from the rc.contour for each cell."
-            desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            mser.Run(src)
-            dst2 = mser.dst2
-
-            Dim pixels As Integer
-            dst3.SetTo(0)
-            For Each rc In mser.redC.rcList
-                pixels += rc.pixels
-                DrawTour(dst3(rc.rect), rc.hull, task.scalarColors(rc.index Mod 255), -1)
-            Next
-
-            labels(2) = CStr(mser.redC.rcList.Count) + " Regions with average size " +
-                            If(mser.redC.rcList.Count > 0, CStr(CInt(pixels / mser.redC.rcList.Count)), "0")
-        End Sub
-    End Class
-
-
-
-
-
-
-
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class XR_MSER_TestSynthetic : Inherits TaskParent
         Dim options As New Options_MSER
@@ -617,7 +585,7 @@ Namespace VBClasses
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()

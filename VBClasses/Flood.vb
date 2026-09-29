@@ -47,6 +47,76 @@ Namespace VBClasses
 
 
 
+    Public Class Flood_CellMerge : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim rectMats As New Flood_RectMats
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            rectMats.Run(src)
+            dst3 = rectMats.dst2.Clone
+            labels(3) = rectMats.labels(3)
+
+            Dim rc As rcData
+            If standaloneTest() Then
+                For Each rc In rectMats.fLess.rcList
+                    If rc.index = 0 Then Continue For
+                    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
+                    SetTrueText(CStr(rc.index), rc.maxDist, 2)
+                Next
+            End If
+
+            Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
+            Dim histogram As New Mat
+
+            rcList = New List(Of rcData)(rectMats.fLess.rcList)
+            Dim rcOwner(rectMats.rectList.Count - 1) As Integer
+            Dim histArray() As Single = Nothing
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+
+                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count}, ranges)
+                histogram.GetArray(Of Single)(histArray)
+
+                Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rcOwner(val) = 0 Then rcOwner(val) = rc.index
+                For i = 1 To histArray.Length - 1
+                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
+                Next
+
+                SetTrueText(CStr(rc.index), rc.maxDist, 2)
+            Next
+
+            dst1.SetTo(0)
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                For i = 1 To rectMats.rectList.Count - 1
+                    If rcOwner(i) = 0 Then Continue For
+                    If rcOwner(i) = rc.index Then
+                        Dim rcTuple = rectMats.rectList(i)
+                        rc.rect = rc.rect.Union(rcTuple.rect)
+                        dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
+                    End If
+                Next
+            Next
+
+            ' update all the rc.mask's in rcList with the merged cells.
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
+            Next
+
+            dst2 = Palettize(dst1, 0)
+
+            SetTrueText(RedColor_Basics.showCell(rcList, dst1, dst2), 1)
+
+            labels(2) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
+        End Sub
+    End Class
+
 
 
 
@@ -261,7 +331,7 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedC_Basics
+        Public redC As New RedColor_BasicsOld
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
@@ -290,7 +360,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Dim edges As New Edge_Basics_TA
         Public Sub New()
             desc = "Match flooded cells with FeatureLess clusters"
@@ -318,7 +388,7 @@ Namespace VBClasses
 
 
     Public Class XR_Flood_DarkLight : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Dim options As New Options_CComp
         Public Sub New()
             desc = "FloodFill the light half of the image."
@@ -399,88 +469,6 @@ Namespace VBClasses
             If rectList.Count > 255 Then
                 MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
             End If
-        End Sub
-    End Class
-
-
-
-
-    Public Class Flood_CellMerge : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Dim rectMats As New Flood_RectMats
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            rectMats.Run(src)
-            dst2 = rectMats.dst2.Clone
-            labels(2) = rectMats.labels(3)
-
-            Dim rc As rcData
-            If standaloneTest() Then
-                For Each rc In rectMats.fLess.rcList
-                    If rc.index = 0 Then Continue For
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-                    SetTrueText(CStr(rc.index), rc.maxDist, 2)
-                Next
-            End If
-
-            Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
-            Dim histogram As New Mat
-
-            rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim rcOwner(rectMats.rectList.Count - 1) As Integer
-            Dim histArray() As Single = Nothing
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-
-                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count}, ranges)
-                histogram.GetArray(Of Single)(histArray)
-
-                Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rcOwner(val) = 0 Then rcOwner(val) = rc.index
-                For i = 1 To histArray.Length - 1
-                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
-                Next
-
-                SetTrueText(CStr(rc.index), rc.maxDist, 2)
-            Next
-
-            dst1.SetTo(0)
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                For i = 1 To rectMats.rectList.Count - 1
-                    If rcOwner(i) = 0 Then Continue For
-                    If rcOwner(i) = rc.index Then
-                        Dim rcTuple = rectMats.rectList(i)
-                        rc.rect = rc.rect.Union(rcTuple.rect)
-                        dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
-                    End If
-                Next
-            Next
-
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
-            Next
-
-            Rectangle(dst2, rcList(0).rect, task.highlight, task.lineWidth)
-
-            dst3 = Palettize(dst1, 0)
-
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex > 0 Then
-                rc = rcList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                Rectangle(dst3, rc.rect, task.highlight, task.lineWidth)
-                task.color(rc.rect).SetTo(white, rc.mask)
-                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
-                SetTrueText(rc.displayCell, 1)
-            End If
-
-            labels(3) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
         End Sub
     End Class
 End Namespace

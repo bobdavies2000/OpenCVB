@@ -601,9 +601,8 @@ Rectangle_Fit
 Rectangle_Quadrants
 Rectangle_Rotated
 RedC_Basics
+RedC_BasicsOld
 RedC_CellLines
-RedC_CellMerge
-RedC_CellMerge1
 RedC_Depth
 RedC_DepthMerge
 RedC_FeatureLess1
@@ -614,6 +613,7 @@ RedC_TrackHull
 RedCloud_Basics
 RedCloud_Core
 RedColor_Basics
+RedColor_BasicsOld
 RedColor_GridRects
 RedColor_InRange
 RedPrep_Basics

@@ -488,7 +488,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static redC As New RedC_Basics
+                Static redC As New RedColor_BasicsOld
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)

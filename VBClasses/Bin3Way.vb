@@ -173,7 +173,7 @@ Namespace VBClasses
 
 
     Public Class Bin3Way_RedC : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Dim bin3 As New Bin3Way_GrayScale
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)

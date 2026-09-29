@@ -12792,7 +12792,7 @@ Namespace VBClasses
     '        Dim color8U As New Color8U_Basics
     '        Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcDataOld)
     '        Dim options As New Options_Bin3WayRedCloud
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcDataOld."
     '        End Sub
@@ -14129,9 +14129,9 @@ Namespace VBClasses
     '    Public Class XO_RedColor_CloudCellsNoContour : Inherits TaskParent
     '        Dim redMotion As New XO_RedCloud_Motion
     '        Dim reduction As New Reduction_Basics
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
-    '            desc = "Insert the RedCloud cells into the RedColor_Basics input."
+    '            desc = "Insert the RedCloud cells into the RedColor_BasicsOld input."
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            redMotion.Run(src)
@@ -16075,7 +16075,7 @@ Namespace VBClasses
     '    Public Class XO_RedList_Equations : Inherits TaskParent
     '        Dim eq As New Plane_Equation
     '        Public rclist As New List(Of rcDataOld)
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
     '            desc = "Show the estimated plane equations for all the cells."
@@ -17063,7 +17063,7 @@ Namespace VBClasses
     '    Public Class XO_Line_RotatedRects : Inherits TaskParent
     '        Dim roRect As New XO_Line_Map
     '        Public rcList As New List(Of rcDataOld)
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            desc = "Track each rotated rect."
     '        End Sub
@@ -18198,7 +18198,7 @@ Namespace VBClasses
 
 
     '    Public Class XO_RedWC_Basics : Inherits TaskParent
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Dim wcDataX As New XO_RedWC_Core
     '        Dim wcDataY As New XO_RedWC_Core
     '        Public rcList As New List(Of rcDataOld)
@@ -18260,7 +18260,7 @@ Namespace VBClasses
 
 
     '    Public Class XO_RedWC_BasicsOld : Inherits TaskParent
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public indexer As New Indexer_Basics
     '        Dim wcDataX As New XO_RedWC_Core
     '        Dim wcDataY As New XO_RedWC_Core
@@ -18495,7 +18495,7 @@ Namespace VBClasses
 
     '    Public Class XO_RedCloud_Basics1 : Inherits TaskParent
     '        Public indexer As New Indexer_Basics
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Dim element As New cv.Mat
     '        Public rcList As New List(Of rcDataOld)
     '        Public rcMap As cv.Mat
@@ -19137,7 +19137,7 @@ Namespace VBClasses
 
 
     '    Public Class XO_Flood_ContainedCells : Inherits TaskParent
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
     '        End Sub
@@ -19317,9 +19317,9 @@ Namespace VBClasses
 
     '    Public Class XO_LeftRight_RedRightGray : Inherits TaskParent
     '        Dim color8u As New Color8U_Basics
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public Sub New()
-    '            desc = "Segment the left view image with RedColor_Basics"
+    '            desc = "Segment the left view image with RedColor_BasicsOld"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            color8u.Run(task.rightView)
@@ -19336,9 +19336,9 @@ Namespace VBClasses
 
     '    Public Class XO_LeftRight_RedLeftGray : Inherits TaskParent
     '        Dim color8u As New Color8U_Basics
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public Sub New()
-    '            desc = "Segment the left view image with RedColor_Basics"
+    '            desc = "Segment the left view image with RedColor_BasicsOld"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            color8u.Run(task.leftView)
@@ -19358,7 +19358,7 @@ Namespace VBClasses
     '        Dim left As New XO_LeftRight_RedLeftGray
     '        Dim right As New XO_LeftRight_RedRightGray
     '        Public Sub New()
-    '            desc = "Compare the left and right RedColor_Basics output"
+    '            desc = "Compare the left and right RedColor_BasicsOld output"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            left.Run(task.leftView)
@@ -19410,7 +19410,7 @@ Namespace VBClasses
     '        Dim redLeft As New XO_LeftRight_FLessRedLeft
     '        Dim redRight As New XO_LeftRight_FLessRedRight
     '        Public Sub New()
-    '            desc = "Display the RedColor_Basics output for both the left and right images."
+    '            desc = "Display the RedColor_BasicsOld output for both the left and right images."
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            redLeft.Run(task.leftView)
@@ -19439,9 +19439,9 @@ Namespace VBClasses
 
     '    Public Class XO_LeftRight_FLessRedRight : Inherits TaskParent
     '        Dim fLess As New FeatureLess_Correlation
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public Sub New()
-    '            desc = "Segment the right view image with RedColor_Basics"
+    '            desc = "Segment the right view image with RedColor_BasicsOld"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            dst3 = task.rightView
@@ -19460,9 +19460,9 @@ Namespace VBClasses
 
     '    Public Class XO_LeftRight_FLessRedLeft : Inherits TaskParent
     '        Dim fLess As New FeatureLess_Correlation
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public Sub New()
-    '            desc = "Segment the left view image with RedColor_Basics"
+    '            desc = "Segment the left view image with RedColor_BasicsOld"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            dst3 = task.leftView
@@ -20739,7 +20739,7 @@ Namespace VBClasses
     '    Public Class XO_Swarm_Percentage : Inherits TaskParent
     '        Dim swarm As New XO_Swarm_Flood
     '        Dim options As New Options_SwarmPercent
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     '        End Sub
@@ -20774,7 +20774,7 @@ Namespace VBClasses
     '        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     '        Public options As New Options_RedCloud
     '        Public runSelectCell As Boolean = True
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            task.gOptions.stableDepthRGB.Checked = True
     '            desc = "Build contours for each cell"
@@ -20836,7 +20836,7 @@ Namespace VBClasses
     '        Public fLess As New XR_FeatureLess_DepthFull
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
-    '            desc = "Use the XR_FeatureLess_DepthFull output as input to RedColor_Basics"
+    '            desc = "Use the XR_FeatureLess_DepthFull output as input to RedColor_BasicsOld"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            fLess.Run(task.gray)
@@ -21451,7 +21451,7 @@ Namespace VBClasses
 
     '    Public Class XO_RedFlood_FourColor : Inherits TaskParent
     '        Dim binar4 As New Bin4Way_Regions
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
     '            labels(3) = "A 4-way split of the input grayscale image based on brightness"
@@ -21816,7 +21816,7 @@ Namespace VBClasses
 
     '    Public Class XO_Reduction_Floodfill : Inherits TaskParent
     '        Public reduction As New Reduction_Basics
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
     '            labels(2) = "Reduced input to floodfill"
@@ -22085,7 +22085,7 @@ Namespace VBClasses
 
     '    Public Class XO_RedFlood_Delaunay : Inherits TaskParent
     '        Dim subdiv As New cv.Subdiv2D
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Dim facetList As New List(Of List(Of cv.Point))
     '        Dim rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     '        Public Sub New()
@@ -22163,11 +22163,11 @@ Namespace VBClasses
     '        Dim reduction As New Reduction_Basics
     '        Public rcList As List(Of rcDataOld)
     '        Public rcMap As cv.Mat
-    '        Public redC1 As New RedColor_Basics
+    '        Public redC1 As New RedColor_BasicsOld
     '        Public redC2 As New RedCloud_Basics
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
-    '            desc = "Insert the RedCloud cells into the RedColor_Basics input."
+    '            desc = "Insert the RedCloud cells into the RedColor_BasicsOld input."
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            redC2.Run(src)
@@ -22193,12 +22193,12 @@ Namespace VBClasses
     '    Public Class XO_RedCC_BasicsCombined : Inherits TaskParent
     '        Dim reduction As New Reduction_Basics
     '        Public rcList As List(Of rcDataOld)
-    '        Public redC1 As New RedColor_Basics
+    '        Public redC1 As New RedColor_BasicsOld
     '        Public redC2 As New RedCloud_Basics
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
     '            labels(1) = "Contours of each RedCloud cell."
-    '            desc = "Insert the RedCloud cells into the RedColor_Basics input."
+    '            desc = "Insert the RedCloud cells into the RedColor_BasicsOld input."
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            redC2.Run(src)
@@ -23260,7 +23260,7 @@ Namespace VBClasses
     '    Public Class XO_RedPrep_CloudAndColor : Inherits TaskParent
     '        Dim prepEdges As New RedPrep_Edges_CPP
     '        Public options As New Options_RedPrep
-    '        Dim redSimple As New RedColor_Basics
+    '        Dim redSimple As New RedColor_BasicsOld
     '        Dim edges As New EdgeLine_Basics
     '        Public Sub New()
     '            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -23480,7 +23480,7 @@ Namespace VBClasses
 
     '    Public Class XO_RedCloud_BasicsFlood : Inherits TaskParent
     '        Dim prepXY As New XO_RedPrep_XY_Add
-    '        Public redC As New RedColor_Basics
+    '        Public redC As New RedColor_BasicsOld
     '        Public rcList As New List(Of rcDataOld)
     '        Public rcMap As cv.Mat
     '        Public Sub New()
@@ -24030,7 +24030,7 @@ Namespace VBClasses
 
     '    Public Class XO_RedCloud_DelaunayMap : Inherits TaskParent
     '        Public dMap As New Delaunay_Map
-    '        Dim redC As New RedColor_Basics
+    '        Dim redC As New RedColor_BasicsOld
     '        Public Sub New()
     '            desc = "Run RedColor as usual but use the Delaunay map to select cells."
     '        End Sub
@@ -24942,4 +24942,36 @@ End Class
             dst1 = fLess.dst1.Clone
         End Sub
     End Class
+
+
+
+
+
+
+    ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
+    Public Class XR_MSER_Hulls : Inherits TaskParent
+        Dim options As New Options_MSER
+        Dim mser As New MSER_Basics
+        Public Sub New()
+            labels(3) = "Hulls derived from the rc.contour for each cell."
+            desc = "Use MSER (Maximally Stable Extremal Region) but show the contours of each region."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            mser.Run(src)
+            dst2 = mser.dst2
+
+            Dim pixels As Integer
+            dst3.SetTo(0)
+            For Each rc In mser.redC.rcList
+                pixels += rc.pixels
+                DrawTour(dst3(rc.rect), rc.hull, task.scalarColors(rc.index Mod 255), -1)
+            Next
+
+            labels(2) = CStr(mser.redC.rcList.Count) + " Regions with average size " +
+                            If(mser.redC.rcList.Count > 0, CStr(CInt(pixels / mser.redC.rcList.Count)), "0")
+        End Sub
+    End Class
+
 End Namespace

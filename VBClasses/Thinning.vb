@@ -1,7 +1,7 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Imports OpenCvSharp.XImgProc
 Public Class Thinning_Basics : Inherits TaskParent
-    Dim redC As New RedC_Basics
+    Dim redC As New RedC_BasicsOld
     Dim options As New Options_Thinning
     Public Sub New()
         desc = "Thin each RedC cell mask and store the result on that cell."

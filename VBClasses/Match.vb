@@ -232,7 +232,7 @@ Namespace VBClasses
 
     Public Class XR_Match_TraceRedC : Inherits TaskParent
         Dim frameList As New List(Of Mat)
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
             dst1 = New Mat(dst1.Size(), MatType.CV_32S, 0)
@@ -687,7 +687,7 @@ Namespace VBClasses
 
 
     Public Class Match_RedC : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Dim matchFeat As New Match_Features
         Public Sub New()
             desc = "Create a stable RedC output image."
@@ -714,7 +714,7 @@ Namespace VBClasses
 
 
     Public Class Match_ClickPoint : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Dim rcIndexMap As New cv.Mat
         Dim mapID As Byte = 0
         Dim maxDist As cv.Point
@@ -728,16 +728,16 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.mouseClickFlag Then
-                mapID = redC.rcMapIDs.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-                maxDist = WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M)
+                mapID = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                maxDist = WarpAffine_Basics.WarpPoint(task.rcDold.maxDist, task.steadyCam.M)
                 WarpAffine(redC.rcIndexMap, rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
-            If task.rcD Is Nothing Then Exit Sub
+            If task.rcDold Is Nothing Then Exit Sub
 
-            Dim pt = validatePoint(WarpAffine_Basics.WarpPoint(task.rcD.maxDist, task.steadyCam.M))
+            Dim pt = validatePoint(WarpAffine_Basics.WarpPoint(task.rcDold.maxDist, task.steadyCam.M))
             Dim mapIDaligned = rcIndexMap.Get(Of Single)(pt.Y, pt.X)
             If mapIDaligned <> mapID Then
                 SetTrueText("Tracking the selected cell was lost", 1)

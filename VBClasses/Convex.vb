@@ -22,8 +22,8 @@ Namespace VBClasses
             options.Run()
 
             Dim hullList As New List(Of cv.Point)
-            If task.rcD IsNot Nothing Then
-                If task.rcD.contour IsNot Nothing Then hullList = task.rcD.contour
+            If task.rcDold IsNot Nothing Then
+                If task.rcDold.contour IsNot Nothing Then hullList = task.rcDold.contour
             End If
 
             If standaloneTest() Then
@@ -58,7 +58,7 @@ Namespace VBClasses
 
     Public Class XR_Convex_RedC : Inherits TaskParent
         Dim convex As New Convex_Basics
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
             desc = "Get lots of odd shapes from the Convex_Basics output and use ConvexHull to simplify them."
@@ -69,13 +69,13 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-            If task.rcD Is Nothing Then Exit Sub
-            If task.rcD.contour IsNot Nothing Then
+            If task.rcDold Is Nothing Then Exit Sub
+            If task.rcDold.contour IsNot Nothing Then
                 convex.Run(src)
 
                 dst3.SetTo(0)
-                dst3(task.rcD.rect) = convex.dst2(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height))
-                Circle(dst3, task.rcD.maxDist, task.DotSize, white, -1, task.lineType)
+                dst3(task.rcDold.rect) = convex.dst2(New cv.Rect(0, 0, task.rcDold.rect.Width, task.rcDold.rect.Height))
+                Circle(dst3, task.rcDold.maxDist, task.DotSize, white, -1, task.lineType)
             End If
         End Sub
     End Class
@@ -87,7 +87,7 @@ Namespace VBClasses
 
     Public Class Convex_RedCDefects : Inherits TaskParent
         Dim contours As New Contour_Largest
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
@@ -150,7 +150,7 @@ Namespace VBClasses
             dst1 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim rc = task.rcD
+            Dim rc = task.rcDold
             If rc Is Nothing Then Exit Sub
 
             Dim sz As New Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)

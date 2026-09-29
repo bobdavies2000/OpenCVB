@@ -1069,7 +1069,7 @@ Namespace VBClasses
 
     Public Class XR_Depth_CellTiers : Inherits TaskParent
         Public valley As New HistValley_Count
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Find the number of valleys (tiers) in a RedCloud cell."
         End Sub

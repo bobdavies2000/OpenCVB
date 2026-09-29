@@ -328,7 +328,7 @@ Namespace VBClasses
 
     'Public Class XR_Corner_RedCloud : Inherits TaskParent
     '    Dim corners As New Neighbor_Intersects32S
-    '    Dim redC As New RedC_Basics
+    '    Dim redC As New RedC_BasicsOld
     '    Public Sub New()
     '        labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
     '        desc = "Find the corners for each RedCloud cell."

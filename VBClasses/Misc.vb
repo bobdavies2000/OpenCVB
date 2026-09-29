@@ -550,7 +550,7 @@ Namespace VBClasses
 
 
     Public Class XR_MaxDist_Basics : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             labels(3) = "Below left shows hullMask while below shows the contour mask."
             desc = "Find the cv.Point farthest from the edges of a mask."
@@ -578,7 +578,7 @@ Namespace VBClasses
 
 
     Public Class XR_MaxDist_NoRectangle : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             labels(3) = "Below left shows hullMask while below shows the contour mask."
             desc = "Does the mask need to have rectangle of zeros?  Answer: yes"

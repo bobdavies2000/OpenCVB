@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class SuperPixel_Basics : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "A superpixel algorithm that might be better"
         End Sub

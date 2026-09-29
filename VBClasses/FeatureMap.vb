@@ -303,7 +303,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureMap_RedC : Inherits TaskParent
         Dim fcs As New FeatureMap_CreateList
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Output of FeatureMap_CreateList."

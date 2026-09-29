@@ -18,8 +18,8 @@ Namespace VBClasses
             Dim dst = task.color.Clone
             Dim clickIndex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
-                task.rcD = rcList(clickIndex)
-                dst(task.rcD.rect).SetTo(white, task.rcD.mask)
+                task.rcDold = rcList(clickIndex)
+                dst(task.rcDold.rect).SetTo(white, task.rcDold.mask)
             ElseIf clickIndex < 1 Then
                 Dim mask As New Mat(New Size(dst.Width + 2, dst.Height + 2), MatType.CV_8U, 0)
                 Dim mapID = color8U.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -470,7 +470,7 @@ Namespace VBClasses
     '    Public Overrides Sub RunAlg(src As cv.Mat)
     '        sides.Run(src)
     '        dst2 = sides.dst2
-    '        Dim rc = task.rcD
+    '        Dim rc = task.rcDold
 
     '        If sides.corners.Count > 0 And task.heartBeat Then
     '            ptLeft = sides.corners(1)
@@ -591,7 +591,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
@@ -603,15 +603,15 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-            If task.rcD Is Nothing Then Exit Sub
-            Dim tmp = task.rcD.mask.Clone
+            If task.rcDold Is Nothing Then Exit Sub
+            Dim tmp = task.rcDold.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing
             If options.retrievalMode = RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, MatType.CV_32SC1)
             FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
             dst3.SetTo(0)
-            DrawContours(dst3(task.rcD.rect), allContours, -1, Scalar.Yellow)
+            DrawContours(dst3(task.rcDold.rect), allContours, -1, Scalar.Yellow)
         End Sub
     End Class
 
@@ -623,7 +623,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
@@ -635,7 +635,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
 
-            Dim rc = task.rcD
+            Dim rc = task.rcDold
             If rc Is Nothing Then rc = redC.rcList(1)
             If rc.contour Is Nothing Then Exit Sub
 

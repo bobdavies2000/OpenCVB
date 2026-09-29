@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class XR_Boundary_Basics : Inherits TaskParent
-        Public redC As New RedC_Basics
+        Public redC As New RedC_BasicsOld
         Dim color8U As New Color8U_Basics
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
@@ -55,8 +55,8 @@ Namespace VBClasses
             smallRects.Clear()
             smallContours.Clear()
             For i = bounds.redC.rcList.Count - 1 To CInt(bounds.redC.rcList.Count * options.percentRect) Step -1
-                task.rcD = bounds.redC.rcList(i)
-                Dim r = task.rcD.rect
+                task.rcDold = bounds.redC.rcList(i)
+                Dim r = task.rcDold.rect
                 Dim contained As Boolean = False
                 For Each rc In bounds.redC.rcList
                     If r = rc.rect Then Continue For
@@ -67,7 +67,7 @@ Namespace VBClasses
                 Next
 
                 If contained Then
-                    smallContours.Add(task.rcD.contour)
+                    smallContours.Add(task.rcDold.contour)
                     smallRects.Add(r)
                 Else
                     rects.Add(r)
@@ -118,7 +118,7 @@ Namespace VBClasses
 
     Public Class XR_Boundary_GuidedBP : Inherits TaskParent
         Dim guided As New GuidedBP_Depth
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))

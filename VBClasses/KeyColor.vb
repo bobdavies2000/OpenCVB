@@ -57,7 +57,7 @@ Namespace VBClasses
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
             Dim clickIndex As Integer = rcIndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
-            SetTrueText(RedC_Basics.displayCell(rcList, clickIndex - 1), 3)
+            SetTrueText(RedC_BasicsOld.displayCell(rcList, clickIndex - 1), 3)
         End Sub
     End Class
 
@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_OverColor : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Dim redC As New RedColor_BasicsOld
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)

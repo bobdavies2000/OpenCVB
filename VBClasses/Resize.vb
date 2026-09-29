@@ -51,7 +51,7 @@ Namespace VBClasses
 
 
     Public Class Resize_Proportional : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             desc = "Resize the input but keep the results proportional to the original."
         End Sub
@@ -61,7 +61,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
                 SetTrueText(redC.strOut, 3)
-                If task.rcD IsNot Nothing Then src = src(task.rcD.rect)
+                If task.rcDold IsNot Nothing Then src = src(task.rcDold.rect)
             End If
 
             Dim newSize As Size

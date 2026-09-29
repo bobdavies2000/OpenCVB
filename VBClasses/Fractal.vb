@@ -160,7 +160,7 @@ Namespace VBClasses
 
     ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
     Public Class XR_Fractal_Dimension : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_BasicsOld
         Public Sub New()
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
             labels = {"", "", "RedFlood_List output - select any region.", "The selected region (as a square)"}
@@ -211,15 +211,15 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
 
             dst3.SetTo(0)
-            If task.rcD Is Nothing Then Exit Sub
+            If task.rcDold Is Nothing Then Exit Sub
 
-            Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+            Static rect = New cv.Rect(0, 0, task.rcDold.rect.Width, task.rcDold.rect.Height)
             If task.optionsChanged Or task.mouseClickFlag Then
-                rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+                rect = New cv.Rect(0, 0, task.rcDold.rect.Width, task.rcDold.rect.Height)
             End If
 
-            If task.rcD.rect.Width = 0 Or task.rcD.rect.Height = 0 Then Exit Sub
-            task.rcD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)))
+            If task.rcDold.rect.Width = 0 Or task.rcDold.rect.Height = 0 Then Exit Sub
+            task.rcDold.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcDold.rect.Width, task.rcDold.rect.Height)))
             If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
             Rectangle(dst3, rect, white, task.lineWidth, task.lineType)
         End Sub

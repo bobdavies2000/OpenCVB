@@ -122,7 +122,7 @@ Namespace VBClasses
             ' strOut = Utility_Basics.selectCell(flood.rcIndexMap, flood.rcList)
 
             dst0 = New Mat(dst2.Size(), MatType.CV_32FC3, 0)
-            If task.rcD IsNot Nothing Then task.pointCloud(task.rcD.rect).CopyTo(dst0(task.rcD.rect), task.rcD.mask)
+            If task.rcDold IsNot Nothing Then task.pointCloud(task.rcDold.rect).CopyTo(dst0(task.rcDold.rect), task.rcDold.mask)
 
             heat.Run(dst0)
             dst1 = heat.dst2

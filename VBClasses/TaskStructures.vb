@@ -462,8 +462,6 @@ Namespace VBClasses
             Public contour As New List(Of cv.Point)
             Public depth As Single
             Public index As Integer
-            Public indexLast As Integer
-            Public mapID As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
             Public pixels As Integer
@@ -500,7 +498,6 @@ Namespace VBClasses
 
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf
 
-                strout += "mapID = " + CStr(mapID) + vbCrLf
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf
                 strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
