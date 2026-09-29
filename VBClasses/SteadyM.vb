@@ -12,7 +12,7 @@ Namespace VBClasses
             desc = "Use the M mat in SteadyCam_Basics to track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayOriginal)
+            feat.Run(task.gray)
 
             If validList.Count < 3 Then
                 dst1.SetTo(0)
@@ -56,7 +56,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_SteadyM_Delaunay : Inherits TaskParent
+    Public Class SteadyM_Delaunay : Inherits TaskParent
         Dim ptList As New List(Of cv.Point)
         Dim ptListLast As New List(Of cv.Point)
         Dim indexList As New List(Of Integer)

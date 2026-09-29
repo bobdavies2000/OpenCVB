@@ -26,7 +26,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If template.Size <> src.Size Then Exit Sub
+            ' If template.Size <> src.Size Then Exit Sub
 
             correlationMat = New cv.Mat
             MatchTemplate(template, src, correlationMat, TemplateMatchModes.CCoeffNormed)
@@ -594,7 +594,6 @@ Namespace VBClasses
         Dim quads(3) As cv.Rect
         Dim templates(quads.Length - 1) As cv.Mat
         Public Sub New()
-            matchCenter.displayRequest = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             quads = Rectangle_Basics.buildQuads()
@@ -798,8 +797,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + shiftXY.ToString
+                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + $"({shiftXY.X:F1}, {shiftXY.Y:F1})"
                 labels(3) = "Aligned gray; missing data is black."
             End If
         End Sub

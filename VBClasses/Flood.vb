@@ -81,8 +81,6 @@ Namespace VBClasses
                 CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
-                Dim val = rectMats.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rcOwner(val) = 0 Then rcOwner(val) = rc.index
                 For i = 1 To histArray.Length - 1
                     If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
                 Next

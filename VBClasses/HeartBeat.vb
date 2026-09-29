@@ -23,7 +23,7 @@ Namespace VBClasses
             End If
 
             For i = 0 To task.quarter.Length - 1
-                If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                If task.quarter(i) = False And ms > Choose(i, 0.25, 0.5, 0.75, 1.0) Then
                     task.quarterBeat = True
                     If i = 1 Then task.midHeartBeat = True
                     If i = 3 Then task.heartBeat = True

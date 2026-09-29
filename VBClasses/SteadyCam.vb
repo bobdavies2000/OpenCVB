@@ -6,11 +6,10 @@ Namespace VBClasses
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
-            match.displayRequest = True
             desc = "Use Match_CenterRect to determine the offset due to camera motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayOriginal
+            If src.Channels <> 1 Then src = task.gray
             match.Run(src)
             dst2 = match.dst2
             dst3 = match.dst3

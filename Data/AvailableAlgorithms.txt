@@ -206,7 +206,9 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_BasicsCore
 FeatureLess_Order
-FeatureLess_OrderKnn
+FeatureLess_Ordered
+FeatureLess_OrderKNN
+FeatureLess_SteadyCam
 FeatureMap_Basics
 FeatureMap_Core
 FeatureMap_CreateList
@@ -673,6 +675,7 @@ SteadyCam_Kalman
 SteadyCam_LongestLine
 SteadyCam_WarpAffine
 SteadyM_Basics
+SteadyM_Delaunay
 SteadyM_DelaunayLines
 SteadyM_DelaunayPoints
 SteadyM_Lines

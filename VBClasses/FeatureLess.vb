@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
@@ -49,6 +50,8 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst1, 0)
+
+            If task.firstPass Then task.clickPoint = rcList(1).maxDist
 
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             rc = rcList(clickIndex)
@@ -1790,32 +1793,31 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_OrderKnn : Inherits TaskParent
+    Public Class FeatureLess_OrderKNN : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim knn As New KNN_Minimal
-        Dim dimension As Integer = 6
+        Dim dimension As Integer = 5
         Public Sub New()
             desc = "Try to keep the featureless region index consistent from frame to frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                Static fLess As New FeatureLess_Basics
-                fLess.Run(task.gray)
-                dst2 = fLess.dst2
-                labels(2) = fLess.labels(2)
+            Static fLess As New FeatureLess_Basics
+            fLess.Run(task.gray)
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(2)
 
-                rcList = fLess.rcList
-            End If
+            rcList = fLess.rcList
 
             Static queries As New List(Of Single)
             Dim trainInput = New List(Of Single)(queries)
             queries.Clear()
             For Each rc In rcList
-                For i As Single = 0 To task.quads.Length - 1
-                    If rc.rect.IntersectsWith(task.quads(i)) Then queries.Add(i) Else queries.Add(0)
-                Next
+                Dim color As cv.Scalar = Mean(task.color(rc.rect), rc.mask)
+                queries.Add(color(0))
+                queries.Add(color(1))
+                queries.Add(color(2))
                 queries.Add(rc.pixels)
-                queries.Add(rc.rect.X)
+                queries.Add(rc.depth)
             Next
 
             If task.firstPass Then
@@ -1840,7 +1842,6 @@ Namespace VBClasses
 
     Public Class FeatureLess_Order : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public lastMap As New cv.Mat
         Dim maxDLast(255) As cv.Point
         Dim myLabels(255) As Byte
         Dim fLess As New FeatureLess_Basics
@@ -1849,36 +1850,140 @@ Namespace VBClasses
             desc = "Cursor.ai: Hungarian Assignment using Bounding Boxes (rects)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim oldRects As New List(Of cv.Rect)
-            Dim newRects As New List(Of cv.Rect)
+            Static mapNewToOld(255) As Integer
 
-            oldRects.Clear()
+            If task.heartBeatLT Then
+                ReDim mapNewToOld(255)
+                Dim lastMap = fLess.dst1.Clone
+                Dim lastList As New List(Of rcData)(rcList)
+
+                fLess.Run(task.gray)
+                rcList = New List(Of rcData)(fLess.rcList)
+                dst1 = fLess.dst1.Clone
+                dst3 = fLess.dst2
+                labels(3) = fLess.labels(2)
+
+                For Each rcLast In lastList
+                    If rcLast.index = 0 Then Continue For
+                    For Each rc In rcList
+                        If rc.rect.IntersectsWith(rcLast.rect) Then
+                            If rc.index = rcLast.index Then
+                                mapNewToOld(rc.index) = rcLast.index
+                                Exit For
+                            Else
+                                'Dim valOld = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                                'Dim val = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                                'If valOld = rcLast.index And val = rc.index Then
+                                '    mapNewToOld(rc.index) = rcLast.index
+                                'End If
+                            End If
+                        End If
+                    Next
+                Next
+            End If
+
             For Each rc In rcList
-                oldRects.Add(rc.rect)
+                If rc.index = 0 Then Continue For
+                If rc.index <> mapNewToOld(rc.index) Then
+                    SetTrueText(CStr(rc.index) + " maps to " + CStr(mapNewToOld(rc.index)), rc.maxDist)
+                End If
+                dst1(rc.rect).SetTo(mapNewToOld(rc.index), rc.mask)
+            Next
+            dst2 = Palettize(dst1, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_Ordered : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim fLess As New FeatureLess_Basics
+        Dim tracked As New List(Of rcData)
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            desc = "Keep the rc.index assigned the first time each FeatureLess_Basics cell appears."
+        End Sub
+        Private Function indexUsed(index As Integer) As Boolean
+            For Each rcPrev In tracked
+                If rcPrev.index = index Then Return True
+            Next
+            Return False
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
+            Dim claimed As New List(Of Integer)
+            rcList.Clear()
+            rcList.Add(fLess.rcList(0))
+            For Each rc In fLess.rcList
+                If rc.index = 0 Then Continue For
+
+                Dim matched As rcData = Nothing
+                For Each rcPrev In tracked
+                    If claimed.Contains(rcPrev.index) Then Continue For
+
+                    If rc.rect.IntersectsWith(rcPrev.rect) Then
+                        matched = rcPrev
+                        Exit For
+                    End If
+                Next
+
+                If matched IsNot Nothing Then
+                    rc.index = matched.index
+                    rc.age = matched.age + 1
+                    tracked(tracked.IndexOf(matched)) = rc
+                Else
+                    Dim nextFree As Integer = 1
+                    While indexUsed(nextFree)
+                        nextFree += 1
+                    End While
+                    rc.index = nextFree
+                    tracked.Add(rc)
+                End If
+                claimed.Add(rc.index)
+                rcList.Add(rc)
             Next
 
-            fLess.Run(task.gray)
+            dst1.SetTo(0)
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                SetTrueText(CStr(rc.index), rc.maxDist)
+            Next
+            dst2 = Palettize(dst1, 0)
+
+            labels(2) = CStr(rcList.Count - 1) + " featureless cells with stable indices"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_SteadyCam : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics Cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
             dst2 = fLess.dst2
             labels(2) = fLess.labels(2)
 
-            rcList = fLess.rcList
-            For Each rc In rcList
-                newRects.Add(rc.rect)
-            Next
+            dst3 = task.steadyCam.dst3
 
-            'Dim cost = BuildCostMatrix(oldRects, newRects)
-            'Dim assignment = Hungarian(cost)
+            Static rcList As List(Of rcData)
+            If task.quarterBeat Then rcList = New List(Of rcData)(fLess.rcList)
 
-            'Dim result As New Dictionary(Of Integer, Integer)
-
-            'For i = 0 To assignment.Length - 1
-            '    Dim j = assignment(i)
-
-            '    ' IoU threshold to reject bad matches
-            '    If IoU(oldRects(i), newRects(j)) > 0.1 Then
-            '        result(i) = j   ' old index → new index
-            '    End If
-            'Next
+            If standaloneTest() Then
+                For Each rc In rcList
+                    If rc.index = 0 Then Continue For
+                    Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                    Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                Next
+            End If
         End Sub
     End Class
+
 End Namespace
