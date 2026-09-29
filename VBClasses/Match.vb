@@ -762,7 +762,7 @@ Namespace VBClasses
         Public Sub New()
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
-            desc = "Cursor.ai: Match the image center using Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
+            desc = "Cursor.ai: Match image center with Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.grayOriginal

@@ -1882,48 +1882,144 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Ordered : Inherits TaskParent
+
+    Public Class FeatureLess_BoundaryBoxes : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public lastMap As New cv.Mat
         Dim maxDLast(255) As cv.Point
-        Dim myLabels As New List(Of Byte)
+        Dim myLabels(255) As Byte
+        Dim fLess As New FeatureLess_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-            desc = "Try to keep the featureless region index consistent from frame to frame."
+            desc = "Cursor.ai: Hungarian Assignment using Bounding Boxes (rects)"
         End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static fLess As New FeatureLess_Basics
-            lastMap = dst1.Clone
-            fLess.Run(task.gray)
-            dst2 = fLess.dst2
-            dst1 = fLess.dst1
-            labels(2) = fLess.labels(2)
-            rcList = fLess.rcList
+        Private Shared Function IoU(a As cv.Rect, b As cv.Rect) As Double
+            Dim x1 = Math.Max(a.X, b.X)
+            Dim y1 = Math.Max(a.Y, b.Y)
+            Dim x2 = Math.Min(a.X + a.Width, b.X + b.Width)
+            Dim y2 = Math.Min(a.Y + a.Height, b.Y + b.Height)
 
-            myLabels.Clear()
-            For Each rc In rcList
-                Dim lastIndex = lastMap.Get(Of Byte)(maxDLast(rc.index).Y, maxDLast(rc.index).X)
-                Dim currIndex = dst1.Get(Of Byte)(maxDLast(rc.index).Y, maxDLast(rc.index).X)
+            Dim interW = Math.Max(0, x2 - x1)
+            Dim interH = Math.Max(0, y2 - y1)
+            Dim intersection = interW * interH
 
-                If lastIndex = 255 Then
-                    myLabels.Add(rc.index)
-                Else
-                    If currIndex <> lastIndex Then
-                        myLabels.Add(0)
-                        dst1(rc.rect).SetTo(0, rc.mask)
-                    Else
-                        myLabels.Add(rc.index)
-                    End If
-                    maxDLast(rc.index) = rc.maxDist
+            Dim unionArea = a.Width * a.Height + b.Width * b.Height - intersection
+            If unionArea = 0 Then Return 0
+
+            Return intersection / unionArea
+        End Function
+        Private Shared Function BuildCostMatrix(oldRects As List(Of cv.Rect), newRects As List(Of cv.Rect)) As Double(,)
+            Dim n = oldRects.Count
+            Dim m = newRects.Count
+            Dim cost(n - 1, m - 1) As Double
+
+            For i = 0 To n - 1
+                For j = 0 To m - 1
+                    Dim iouVal = IoU(oldRects(i), newRects(j))
+                    cost(i, j) = 1.0 - iouVal
+                Next
+            Next
+
+            Return cost
+        End Function
+        Public Shared Function Hungarian(cost(,) As Double) As Integer()
+            Dim n = cost.GetLength(0)
+            Dim m = cost.GetLength(1)
+
+            Dim u(n) As Double
+            Dim v(m) As Double
+            Dim p(m) As Integer
+            Dim way(m) As Integer
+
+            For i = 1 To n
+                p(0) = i
+                Dim j0 = 0
+                Dim minv(m) As Double
+                Dim used(m) As Boolean
+
+                For j = 0 To m
+                    minv(j) = Double.PositiveInfinity
+                Next
+
+                Do
+                    used(j0) = True
+                    Dim i0 = p(j0)
+                    Dim delta = Double.PositiveInfinity
+                    Dim j1 = 0
+
+                    For j = 1 To m
+                        If Not used(j) Then
+                            Dim cur = cost(i0 - 1, j - 1) - u(i0) - v(j)
+                            If cur < minv(j) Then
+                                minv(j) = cur
+                                way(j) = j0
+                            End If
+                            If minv(j) < delta Then
+                                delta = minv(j)
+                                j1 = j
+                            End If
+                        End If
+                    Next
+
+                    For j = 0 To m
+                        If used(j) Then
+                            u(p(j)) += delta
+                            v(j) -= delta
+                        Else
+                            minv(j) -= delta
+                        End If
+                    Next
+
+                    j0 = j1
+                Loop While p(j0) <> 0
+
+                Do
+                    Dim j1 = way(j0)
+                    p(j0) = p(j1)
+                    j0 = j1
+                Loop While j0 <> 0
+            Next
+
+            Dim assignment(n - 1) As Integer
+            For j = 1 To m
+                If p(j) <> 0 Then
+                    assignment(p(j) - 1) = j - 1
                 End If
+            Next
 
-                If rc.index <> 0 Then SetTrueText(CStr(rc.index), rc.maxDist)
-            Next
-            For i = myLabels.Count To 255
-                myLabels.Add(0)
-                maxDLast(i) = newPoint
-            Next
-            LUT(dst1, Mat.FromPixelData(1, 256, MatType.CV_8U, myLabels.ToArray), dst3)
+            Return assignment
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            'Dim oldRects As New List(Of cv.Rect)
+            'Dim newRects As New List(Of cv.Rect)
+
+            'oldRects.Clear()
+            'For Each rc In rcList
+            '    oldRects.Add(rc.rect)
+            'Next
+
+            'fLess.Run(task.gray)
+            'dst2 = fLess.dst2
+            'labels(2) = fLess.labels(2)
+
+            'rcList = fLess.rcList
+            'For Each rc In rcList
+            '    newRects.Add(rc.rect)
+            'Next
+
+            'Dim cost = BuildCostMatrix(oldRects, newRects)
+            'Dim assignment = Hungarian(cost)
+
+            'Dim result As New Dictionary(Of Integer, Integer)
+
+            'For i = 0 To assignment.Length - 1
+            '    Dim j = assignment(i)
+
+            '    ' IoU threshold to reject bad matches
+            '    If IoU(oldRects(i), newRects(j)) > 0.1 Then
+            '        result(i) = j   ' old index → new index
+            '    End If
+            'Next
         End Sub
     End Class
 
