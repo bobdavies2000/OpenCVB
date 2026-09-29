@@ -673,8 +673,8 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Featureless : Inherits TaskParent
-        Dim fLess As New FeatureLess_Correlation
+    Public Class XR_GL_Featureless : Inherits TaskParent
+        Dim fLess As New XR_FeatureLess_Correlation
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             desc = "Display the pointcloud"

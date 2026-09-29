@@ -410,7 +410,7 @@ Namespace VBClasses
         Public trainInput As New List(Of Point3f)
         Public queries As New List(Of Point3f)
         Public Sub New()
-            desc = "Use FeatureLess_DepthFull grid elements to define the clusters for all remaining pixels."
+            desc = "Use XR_FeatureLess_DepthFull grid elements to define the clusters for all remaining pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)

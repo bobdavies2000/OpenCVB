@@ -20833,10 +20833,10 @@ Namespace VBClasses
 
     '    Public Class XO_FeatureLess_RedColor : Inherits TaskParent
     '        Public redC As New RedCloud_Flood_CPP
-    '        Public fLess As New FeatureLess_DepthFull
+    '        Public fLess As New XR_FeatureLess_DepthFull
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
-    '            desc = "Use the FeatureLess_DepthFull output as input to RedColor_Basics"
+    '            desc = "Use the XR_FeatureLess_DepthFull output as input to RedColor_Basics"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            fLess.Run(task.gray)
@@ -20861,7 +20861,7 @@ Namespace VBClasses
     '    Public Class XO_RedCloud_FeatureLess : Inherits TaskParent
     '        Dim fRed As New XO_FeatureLess_RedColor
     '        Public Sub New()
-    '            desc = "Use the FeatureLess_DepthFull output as input to RedCloud - identical to FeatureLess_RedColor (now)"
+    '            desc = "Use the XR_FeatureLess_DepthFull output as input to RedCloud - identical to FeatureLess_RedColor (now)"
     '        End Sub
     '        Public Overrides Sub RunAlg(src As cv.Mat)
     '            fRed.Run(task.gray)
@@ -21843,7 +21843,7 @@ Namespace VBClasses
     '        Public rcList As New List(Of rcDataOld)
     '        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     '        Dim redCore As New XO_RedFlood_CPP
-    '        Dim fLess As New FeatureLess_DepthFull
+    '        Dim fLess As New XR_FeatureLess_DepthFull
     '        Public fLessGridRects As New List(Of List(Of Integer))
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
@@ -21947,7 +21947,7 @@ Namespace VBClasses
     '        Public rcList As New List(Of rcDataOld)
     '        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     '        Dim redCore As New XO_RedFlood_CPP
-    '        Dim fLess As New FeatureLess_DepthFull
+    '        Dim fLess As New XR_FeatureLess_DepthFull
     '        Dim knn As New KNN_Minimal
     '        Public fLessGridRects As New List(Of List(Of Integer))
     '        Public trainInput As New List(Of cv.Point3f)
@@ -22133,7 +22133,7 @@ Namespace VBClasses
     '        Public redMask As New XO_RedFlood_MapAndList
     '        Dim delaunay As New Delaunay_Basics
     '        Public facetList As New List(Of List(Of cv.Point))
-    '        Dim fLess As New FeatureLess_DepthFull
+    '        Dim fLess As New XR_FeatureLess_DepthFull
     '        Public Sub New()
     '            If standalone Then task.gOptions.displayDst1.Checked = True
     '            desc = "Use the maxDist points as input to delaunay."
@@ -24310,7 +24310,6 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
-	
 
 
 
@@ -24318,122 +24317,123 @@ Namespace VBClasses
 
 
 
-Public Class XO_IMU_Lines : Inherits TaskParent
-    Dim vert As New XO_Line_GCloud
-    Dim lastGcell As gravityLine
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
-        desc = "Find the vertical and horizontal lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        vert.Run(src)
-        dst2 = vert.dst2
-        If vert.sortedVerticals.Count = 0 Then Exit Sub ' nothing to work on ...
 
-        Dim gcell As New gravityLine
-        Dim cells = vert.sortedVerticals
-        If cells.Count > 0 Then gcell = cells.ElementAt(0).Value Else gcell = lastGcell
-        If gcell.len3D > 0 Then
-            strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
-            If task.heartBeat Then dst3.SetTo(0)
-            Dim p1 = gcell.tc1.center
-            Dim p2 = gcell.tc2.center
-            Dim lastP1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-            Dim lastp2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+    Public Class XO_IMU_Lines : Inherits TaskParent
+        Dim vert As New XO_Line_GCloud
+        Dim lastGcell As gravityLine
+        Dim kalman As New Kalman_Basics
+        Public Sub New()
+            labels(2) = "Vertical lines in Blue and horizontal lines in Yellow"
+            desc = "Find the vertical and horizontal lines"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            vert.Run(src)
+            dst2 = vert.dst2
+            If vert.sortedVerticals.Count = 0 Then Exit Sub ' nothing to work on ...
 
-            kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
-            kalman.Run(emptyMat)
+            Dim gcell As New gravityLine
+            Dim cells = vert.sortedVerticals
+            If cells.Count > 0 Then gcell = cells.ElementAt(0).Value Else gcell = lastGcell
+            If gcell.len3D > 0 Then
+                strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
+                If task.heartBeat Then dst3.SetTo(0)
+                Dim p1 = gcell.tc1.center
+                Dim p2 = gcell.tc2.center
+                Dim lastP1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+                Dim lastp2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
 
-            p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-            p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
-            Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
-            Circle(dst3, p1, task.DotSize, white, -1, task.lineType)
+                kalman.kInput = {p1.X, p1.Y, p2.X, p2.Y}
+                kalman.Run(emptyMat)
 
-            Circle(dst3, p2, task.DotSize, white, -1, task.lineType)
-            lastGcell = gcell
-            strOut += CStr(0) + vbTab + gcell.len3D.ToString(fmt1) + "m" + vbTab +
+                p1 = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
+                p2 = New cv.Point(kalman.kOutput(2), kalman.kOutput(3))
+                Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, p2, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst3, p1, task.DotSize, white, -1, task.lineType)
+
+                Circle(dst3, p2, task.DotSize, white, -1, task.lineType)
+                lastGcell = gcell
+                strOut += CStr(0) + vbTab + gcell.len3D.ToString(fmt1) + "m" + vbTab +
                                                     gcell.tc1.depth.ToString(fmt1) + "m" + vbTab +
                                                     gcell.arcY.ToString(fmt1) + vbTab +
                                                     gcell.imageAngle.ToString(fmt1) + vbTab
-            strOut += (task.accRadians.Y * RadToDeg).ToString(fmt1) + vbCrLf
+                strOut += (task.accRadians.Y * RadToDeg).ToString(fmt1) + vbCrLf
 
-            SetTrueText(strOut, 3)
-            labels(2) = vert.labels(3)
-        End If
-    End Sub
-End Class
-
-
+                SetTrueText(strOut, 3)
+                labels(2) = vert.labels(3)
+            End If
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XO_Match_VH : Inherits TaskParent
-    Public brickCells As New List(Of gravityLine)
-    Dim match As New XO_Match_tCell
-    Dim gLines As New XO_Line_GCloud
-    Public Sub New()
-        labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
-        desc = "Find and track all the horizontal or vertical lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        gLines.Run(src)
 
-        Dim sortedLines = If(task.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
-        If sortedLines.Count = 0 Then
-            SetTrueText("There were no vertical lines found.", 3)
-            Exit Sub
-        End If
 
-        Dim gRect As gravityLine
-        brickCells.Clear()
-        match.tCells.Clear()
-        For i = 0 To sortedLines.Count - 1
-            gRect = sortedLines.ElementAt(i).Value
+    Public Class XO_Match_VH : Inherits TaskParent
+        Public brickCells As New List(Of gravityLine)
+        Dim match As New XO_Match_tCell
+        Dim gLines As New XO_Line_GCloud
+        Public Sub New()
+            labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
+            desc = "Find and track all the horizontal or vertical lines"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            gLines.Run(src)
 
-            If i = 0 Then
-                dst1.SetTo(0)
-                gRect.tc1.template.CopyTo(dst1(gRect.tc1.rect))
-                gRect.tc2.template.CopyTo(dst1(gRect.tc2.rect))
+            Dim sortedLines = If(task.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
+            If sortedLines.Count = 0 Then
+                SetTrueText("There were no vertical lines found.", 3)
+                Exit Sub
             End If
 
+            Dim gRect As gravityLine
+            brickCells.Clear()
             match.tCells.Clear()
-            match.tCells.Add(gRect.tc1)
-            match.tCells.Add(gRect.tc2)
+            For i = 0 To sortedLines.Count - 1
+                gRect = sortedLines.ElementAt(i).Value
 
-            match.Run(src)
-            Dim threshold = task.fCorrThreshold
-            If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
-                gRect.tc1 = match.tCells(0)
-                gRect.tc2 = match.tCells(1)
-                gRect = gLines.updateGLine(src, gRect, gRect.tc1.center, gRect.tc2.center)
-                If gRect.len3D > 0 Then brickCells.Add(gRect)
-            End If
-        Next
+                If i = 0 Then
+                    dst1.SetTo(0)
+                    gRect.tc1.template.CopyTo(dst1(gRect.tc1.rect))
+                    gRect.tc2.template.CopyTo(dst1(gRect.tc2.rect))
+                End If
 
-        dst2 = src
-        dst3.SetTo(0)
+                match.tCells.Clear()
+                match.tCells.Add(gRect.tc1)
+                match.tCells.Add(gRect.tc2)
 
-        For i = 0 To brickCells.Count - 1
-            Dim tc As New tCell
-            gRect = brickCells(i)
-            Dim p1 As Point2f, p2 As Point2f
-            For j = 0 To 2 - 1
-                tc = Choose(j + 1, gRect.tc1, gRect.tc2)
-                If j = 0 Then p1 = tc.center Else p2 = tc.center
+                match.Run(src)
+                Dim threshold = task.fCorrThreshold
+                If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
+                    gRect.tc1 = match.tCells(0)
+                    gRect.tc2 = match.tCells(1)
+                    gRect = gLines.updateGLine(src, gRect, gRect.tc1.center, gRect.tc2.center)
+                    If gRect.len3D > 0 Then brickCells.Add(gRect)
+                End If
             Next
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 2)
-            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 3)
 
-            Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
-            Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
-        Next
-    End Sub
-End Class
+            dst2 = src
+            dst3.SetTo(0)
+
+            For i = 0 To brickCells.Count - 1
+                Dim tc As New tCell
+                gRect = brickCells(i)
+                Dim p1 As Point2f, p2 As Point2f
+                For j = 0 To 2 - 1
+                    tc = Choose(j + 1, gRect.tc1, gRect.tc2)
+                    If j = 0 Then p1 = tc.center Else p2 = tc.center
+                Next
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 2)
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + gRect.arcY.ToString(fmt1), gRect.tc1.center, 3)
+
+                Line(dst2, p1, p2, task.highlight, task.lineWidth, task.lineType)
+                Line(dst3, p1, p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End Sub
+    End Class
 
 
 
@@ -24446,70 +24446,70 @@ End Class
 
 
 
-Public Class XO_IMU_VerticalVerify : Inherits TaskParent
-    Public brickCells As New List(Of gravityLine)
-    Dim linesVH As New Match_VH
-    Dim options As New Options_VerticalVerify
-    Public Sub New()
-        labels = {"", "", "Highlighted vertical lines", "Line details"}
-        desc = "Use the Y-Arc to confirm which vertical lines are valid"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+    Public Class XO_IMU_VerticalVerify : Inherits TaskParent
+        Public brickCells As New List(Of gravityLine)
+        Dim linesVH As New Match_VH
+        Dim options As New Options_VerticalVerify
+        Public Sub New()
+            labels = {"", "", "Highlighted vertical lines", "Line details"}
+            desc = "Use the Y-Arc to confirm which vertical lines are valid"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        dst2 = src.Clone
+            dst2 = src.Clone
 
-        If standaloneTest() Then
-            linesVH.Run(src)
-            brickCells = linesVH.brickCells
-        End If
+            If standaloneTest() Then
+                linesVH.Run(src)
+                brickCells = linesVH.brickCells
+            End If
 
-        strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
-        dst3.SetTo(0)
-        Dim index As Integer
-        For i = brickCells.Count - 1 To 0 Step -1
-            Dim r = brickCells(i)
-            If r.arcY > options.angleThreshold Then
-                index = brickCells.Count - i
-                Dim p1 = r.tc1.center
-                Dim p2 = r.tc2.center
-                Dim xOffset = p1.X - p2.X
-                If p1.Y < p2.Y Then xOffset = p2.X - p1.X
-                Dim hypot = p1.DistanceTo(p2)
-                r.imageAngle = -Math.Asin(xOffset / hypot) * RadToDeg
+            strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc Y" + vbTab + "Image" + vbTab + "IMU Y" + vbTab + vbCrLf
+            dst3.SetTo(0)
+            Dim index As Integer
+            For i = brickCells.Count - 1 To 0 Step -1
+                Dim r = brickCells(i)
+                If r.arcY > options.angleThreshold Then
+                    index = brickCells.Count - i
+                    Dim p1 = r.tc1.center
+                    Dim p2 = r.tc2.center
+                    Dim xOffset = p1.X - p2.X
+                    If p1.Y < p2.Y Then xOffset = p2.X - p1.X
+                    Dim hypot = p1.DistanceTo(p2)
+                    r.imageAngle = -Math.Asin(xOffset / hypot) * RadToDeg
 
-                strOut += CStr(index) + vbTab + r.len3D.ToString(fmt1) + "m" + vbTab +
+                    strOut += CStr(index) + vbTab + r.len3D.ToString(fmt1) + "m" + vbTab +
                                                     r.tc1.depth.ToString(fmt1) + "m" + vbTab +
                                                     r.arcY.ToString(fmt1) + vbTab +
                                                     r.imageAngle.ToString(fmt1) + vbTab
-                strOut += (task.accRadians.Y * RadToDeg).ToString(fmt1) + vbCrLf
+                    strOut += (task.accRadians.Y * RadToDeg).ToString(fmt1) + vbCrLf
 
-                SetTrueText(CStr(index), r.tc1.center, 2)
-                SetTrueText(CStr(index), r.tc1.center, 3)
-                Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
-                Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
-                brickCells(i) = r
-            Else
-                brickCells.RemoveAt(i)
-            End If
-        Next
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
+                    SetTrueText(CStr(index), r.tc1.center, 2)
+                    SetTrueText(CStr(index), r.tc1.center, 3)
+                    Line(dst2, r.tc1.center, r.tc2.center, task.highlight, task.lineWidth, task.lineType)
+                    Line(dst3, r.tc1.center, r.tc2.center, white, task.lineWidth, task.lineType)
+                    brickCells(i) = r
+                Else
+                    brickCells.RemoveAt(i)
+                End If
+            Next
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
-    Public rcList As New List(Of rcDataOld)
-    Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
-    Dim redMask As New XO_RedFlood_MapAndList
-    Dim fLess As New FeatureLess_DepthFull
-    Dim knn As New KNN_Minimal
+
+
+    Public Class XO_RedFlood_BasicsOld : Inherits TaskParent
+        Public rcList As New List(Of rcDataOld)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32S, 0)
+        Dim redMask As New XO_RedFlood_MapAndList
+        Dim fLess As New XR_FeatureLess_DepthFull
+        Dim knn As New KNN_Minimal
     Public trainInput As New List(Of Point3f)
     Public queries As New List(Of Point3f)
     Public Sub New()
@@ -24600,179 +24600,346 @@ End Class
 
 
 
-Public Class XO_Structured_LinearizeFloor : Inherits TaskParent
-    Public floor As New XO_Structured_FloorCeiling
-    Dim kalman As New Kalman_VB_Basics
-    Public sliceMask As Mat
-    Public floorYPlane As Single
-    Dim options As New Options_StructuredFloor
-    Public Sub New()
-        desc = "Using the mask for the floor create a better representation of the floor plane"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        floor.Run(src)
-        dst2 = floor.dst2
-        dst3 = floor.dst3
-        sliceMask = floor.slice.sliceMask
-
-        Dim imuPC = task.pointCloud.Clone
-        imuPC.SetTo(0, Not sliceMask)
-
-        If CountNonZero(sliceMask) > 0 Then
-            Dim splitMats() As Mat = Split(imuPC)
-            If options.xCheck Then
-                Dim mm As mmData = GetMinMax(splitMats(0), sliceMask)
-
-                Dim firstCol As Integer, lastCol As Integer
-                For firstCol = 0 To sliceMask.Width - 1
-                    If CountNonZero(sliceMask.Col(firstCol)) > 0 Then Exit For
-                Next
-                For lastCol = sliceMask.Width - 1 To 0 Step -1
-                    If CountNonZero(sliceMask.Col(lastCol)) Then Exit For
-                Next
-
-                Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
-                For i = firstCol To lastCol
-                    Dim maskCol = sliceMask.Col(i)
-                    If CountNonZero(maskCol) > 0 Then splitMats(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
-                Next
-            End If
-
-            If options.yCheck Then
-                Dim mm As mmData = GetMinMax(splitMats(1), sliceMask)
-                kalman.kInput = (mm.minVal + mm.maxVal) / 2
-                kalman.Run(src)
-                floorYPlane = kalman.kAverage
-                splitMats(1).SetTo(floorYPlane, sliceMask)
-            End If
-
-            If options.zCheck Then
-                Dim firstRow As Integer, lastRow As Integer
-                For firstRow = 0 To sliceMask.Height - 1
-                    If CountNonZero(sliceMask.Row(firstRow)) > 20 Then Exit For
-                Next
-                For lastRow = sliceMask.Height - 1 To 0 Step -1
-                    If CountNonZero(sliceMask.Row(lastRow)) > 20 Then Exit For
-                Next
-
-                If lastRow >= 0 And firstRow < sliceMask.Height Then
-                    Dim meanMin = Mean(splitMats(2).Row(lastRow), sliceMask.Row(lastRow))
-                    Dim meanMax = Mean(splitMats(2).Row(firstRow), sliceMask.Row(firstRow))
-                    Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
-                    For i = firstRow To lastRow
-                        Dim maskRow = sliceMask.Row(i)
-                        Dim meanVal = Mean(splitMats(2).Row(i), maskRow)
-                        If CountNonZero(maskRow) > 0 Then
-                            splitMats(2).Row(i).SetTo(meanVal(0))
-                        End If
-                    Next
-                    Line(dst2, New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1)
-                    Line(dst2, New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1)
-                End If
-            End If
-
-            Merge(splitMats, imuPC)
-
-            imuPC.CopyTo(task.pointCloud, sliceMask)
-        End If
-    End Sub
-	
-	
-
-
-
-
-
-
-    Public Class XO_Line_EdgePoints : Inherits TaskParent
-        Dim knn As New KNN_Basics
-        Public xMatches As New List(Of Single)
-        Public yMatches As New List(Of Single)
+    Public Class XO_Structured_LinearizeFloor : Inherits TaskParent
+        Public floor As New XO_Structured_FloorCeiling
+        Dim kalman As New Kalman_VB_Basics
+        Public sliceMask As Mat
+        Public floorYPlane As Single
+        Dim options As New Options_StructuredFloor
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            labels(2) = "The accumulated image after WarpAffine."
-            labels(3) = "The lines below had non-zero X or Y displacement"
-            desc = "Use KNN to match edge points of the current and previous frames."
+            desc = "Using the mask for the floor create a better representation of the floor plane"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.lines.lpList.Count = 0 Then Exit Sub
-            Dim lpList As New List(Of lpData)(task.lines.lpList)
-            knn.queries.Clear()
-            For Each lp In lpList
-                knn.queries.Add(lp.ptE1)
-                knn.queries.Add(lp.ptE2)
-            Next
+            options.Run()
 
-            For Each lp In task.lines.lpList
-                knn.queries.Add(lp.ptE1)
-                knn.queries.Add(lp.ptE2)
-                lpList.Add(lp)
-            Next
+            floor.Run(src)
+            dst2 = floor.dst2
+            dst3 = floor.dst3
+            sliceMask = floor.slice.sliceMask
 
-            If task.firstPass Then knn.trainInput = New List(Of Point2f)(knn.queries)
+            Dim imuPC = task.pointCloud.Clone
+            imuPC.SetTo(0, Not sliceMask)
 
-            knn.Run(emptyMat)
+            If CountNonZero(sliceMask) > 0 Then
+                Dim splitMats() As Mat = Split(imuPC)
+                If options.xCheck Then
+                    Dim mm As mmData = GetMinMax(splitMats(0), sliceMask)
 
-            If task.heartBeat Then dst3 = src.Clone
+                    Dim firstCol As Integer, lastCol As Integer
+                    For firstCol = 0 To sliceMask.Width - 1
+                        If CountNonZero(sliceMask.Col(firstCol)) > 0 Then Exit For
+                    Next
+                    For lastCol = sliceMask.Width - 1 To 0 Step -1
+                        If CountNonZero(sliceMask.Col(lastCol)) Then Exit For
+                    Next
 
-            xMatches.Clear()
-            yMatches.Clear()
-            Dim vectors As New List(Of lpData)
-            Dim outLiers As New List(Of lpData)
-            Dim zeroVectors As New List(Of lpData)
-            Dim xPerp As New List(Of lpData)
-            Dim yPerp As New List(Of lpData)
-            For i = 0 To knn.queries.Count - 1
-                Dim p1 = knn.queries(i)
-                Dim index = knn.result(i, 0)
-                Dim p2 = knn.trainInput(index)
-                Dim distance = p1.DistanceTo(p2)
-                Dim lp = lpList(Math.Floor(i / 2))
-
-                If distance > task.gridWH Then
-                    outLiers.Add(lp)
-                    Continue For
-                End If
-
-                If distance = 0 Then
-                    zeroVectors.Add(lp)
-                    Continue For
-                End If
-
-                If i Mod 2 = 0 Then
-                    If Math.Abs(lp.angle) > 85 Then xPerp.Add(lp)
-                    If Math.Abs(lp.angle) < 5 Then yPerp.Add(lp)
-                End If
-
-                If distance < 0.5 Then vectors.Add(lp)
-                xMatches.Add(p1.X - p2.X)
-                yMatches.Add(p1.Y - p2.Y)
-            Next
-
-            knn.trainInput = New List(Of Point2f)(knn.queries)
-
-            If xMatches.Count > 0 Then
-                strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
-                strOut += "Average X offset = " + xMatches.Average.ToString(fmt2) + vbCrLf
-                strOut += "Average Y offset = " + yMatches.Average.ToString(fmt2) + vbCrLf
-                strOut += "There were " + CStr(lpList.Count) + " lines in the current image" + vbCrLf
-                strOut += "There were " + CStr(lpList.Count * 2) + " edge points in the current image" + vbCrLf
-                strOut += "There were " + CStr(vectors.Count)
-                strOut += " with delta < 0.5 indicating direction of motion." + vbCrLf
-                strOut += "There were " + CStr(outLiers.Count) + " outliers implying new or lost lines " + vbCrLf
-                strOut += "There were " + CStr(zeroVectors.Count) + " implying identical lines" + vbCrLf
-
-                ' if we have enough lines show the vectors that are closest.
-                If xMatches.Count >= knn.queries.Count / 2 Then
-                    For Each lp In vectors
-                        Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth)
+                    Dim xIncr = (mm.maxVal - mm.minVal) / (lastCol - firstCol)
+                    For i = firstCol To lastCol
+                        Dim maskCol = sliceMask.Col(i)
+                        If CountNonZero(maskCol) > 0 Then splitMats(0).Col(i).SetTo(mm.minVal + xIncr * i, maskCol)
                     Next
                 End If
+
+                If options.yCheck Then
+                    Dim mm As mmData = GetMinMax(splitMats(1), sliceMask)
+                    kalman.kInput = (mm.minVal + mm.maxVal) / 2
+                    kalman.Run(src)
+                    floorYPlane = kalman.kAverage
+                    splitMats(1).SetTo(floorYPlane, sliceMask)
+                End If
+
+                If options.zCheck Then
+                    Dim firstRow As Integer, lastRow As Integer
+                    For firstRow = 0 To sliceMask.Height - 1
+                        If CountNonZero(sliceMask.Row(firstRow)) > 20 Then Exit For
+                    Next
+                    For lastRow = sliceMask.Height - 1 To 0 Step -1
+                        If CountNonZero(sliceMask.Row(lastRow)) > 20 Then Exit For
+                    Next
+
+                    If lastRow >= 0 And firstRow < sliceMask.Height Then
+                        Dim meanMin = Mean(splitMats(2).Row(lastRow), sliceMask.Row(lastRow))
+                        Dim meanMax = Mean(splitMats(2).Row(firstRow), sliceMask.Row(firstRow))
+                        Dim zIncr = (meanMax(0) - meanMin(0)) / Math.Abs(lastRow - firstRow)
+                        For i = firstRow To lastRow
+                            Dim maskRow = sliceMask.Row(i)
+                            Dim meanVal = Mean(splitMats(2).Row(i), maskRow)
+                            If CountNonZero(maskRow) > 0 Then
+                                splitMats(2).Row(i).SetTo(meanVal(0))
+                            End If
+                        Next
+                        Line(dst2, New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), Scalar.Yellow, task.lineWidth + 1)
+                        Line(dst2, New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), Scalar.Yellow, task.lineWidth + 1)
+                    End If
+                End If
+
+                Merge(splitMats, imuPC)
+
+                imuPC.CopyTo(task.pointCloud, sliceMask)
             End If
-            SetTrueText(strOut, 1)
+        End Sub
+
+
+
+
+
+
+
+
+        Public Class XO_Line_EdgePoints : Inherits TaskParent
+            Dim knn As New KNN_Basics
+            Public xMatches As New List(Of Single)
+            Public yMatches As New List(Of Single)
+            Public Sub New()
+                If standalone Then task.gOptions.displayDst1.Checked = True
+                labels(2) = "The accumulated image after WarpAffine."
+                labels(3) = "The lines below had non-zero X or Y displacement"
+                desc = "Use KNN to match edge points of the current and previous frames."
+            End Sub
+            Public Overrides Sub RunAlg(src As cv.Mat)
+                If task.lines.lpList.Count = 0 Then Exit Sub
+                Dim lpList As New List(Of lpData)(task.lines.lpList)
+                knn.queries.Clear()
+                For Each lp In lpList
+                    knn.queries.Add(lp.ptE1)
+                    knn.queries.Add(lp.ptE2)
+                Next
+
+                For Each lp In task.lines.lpList
+                    knn.queries.Add(lp.ptE1)
+                    knn.queries.Add(lp.ptE2)
+                    lpList.Add(lp)
+                Next
+
+                If task.firstPass Then knn.trainInput = New List(Of Point2f)(knn.queries)
+
+                knn.Run(emptyMat)
+
+                If task.heartBeat Then dst3 = src.Clone
+
+                xMatches.Clear()
+                yMatches.Clear()
+                Dim vectors As New List(Of lpData)
+                Dim outLiers As New List(Of lpData)
+                Dim zeroVectors As New List(Of lpData)
+                Dim xPerp As New List(Of lpData)
+                Dim yPerp As New List(Of lpData)
+                For i = 0 To knn.queries.Count - 1
+                    Dim p1 = knn.queries(i)
+                    Dim index = knn.result(i, 0)
+                    Dim p2 = knn.trainInput(index)
+                    Dim distance = p1.DistanceTo(p2)
+                    Dim lp = lpList(Math.Floor(i / 2))
+
+                    If distance > task.gridWH Then
+                        outLiers.Add(lp)
+                        Continue For
+                    End If
+
+                    If distance = 0 Then
+                        zeroVectors.Add(lp)
+                        Continue For
+                    End If
+
+                    If i Mod 2 = 0 Then
+                        If Math.Abs(lp.angle) > 85 Then xPerp.Add(lp)
+                        If Math.Abs(lp.angle) < 5 Then yPerp.Add(lp)
+                    End If
+
+                    If distance < 0.5 Then vectors.Add(lp)
+                    xMatches.Add(p1.X - p2.X)
+                    yMatches.Add(p1.Y - p2.Y)
+                Next
+
+                knn.trainInput = New List(Of Point2f)(knn.queries)
+
+                If xMatches.Count > 0 Then
+                    strOut = "There were " + CStr(xMatches.Count) + " useful edge points after filtering." + vbCrLf
+                    strOut += "Average X offset = " + xMatches.Average.ToString(fmt2) + vbCrLf
+                    strOut += "Average Y offset = " + yMatches.Average.ToString(fmt2) + vbCrLf
+                    strOut += "There were " + CStr(lpList.Count) + " lines in the current image" + vbCrLf
+                    strOut += "There were " + CStr(lpList.Count * 2) + " edge points in the current image" + vbCrLf
+                    strOut += "There were " + CStr(vectors.Count)
+                    strOut += " with delta < 0.5 indicating direction of motion." + vbCrLf
+                    strOut += "There were " + CStr(outLiers.Count) + " outliers implying new or lost lines " + vbCrLf
+                    strOut += "There were " + CStr(zeroVectors.Count) + " implying identical lines" + vbCrLf
+
+                    ' if we have enough lines show the vectors that are closest.
+                    If xMatches.Count >= knn.queries.Count / 2 Then
+                        For Each lp In vectors
+                            Line(dst3, lp.p1, lp.p2, task.highlight, task.lineWidth)
+                        Next
+                    End If
+                End If
+                SetTrueText(strOut, 1)
+            End Sub
+        End Class
+    End Class
+
+
+
+
+
+
+    Public Class XO_FeatureLess_ReductionTest : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Dim rcList As New List(Of rcDataOld)
+        Dim fLess As New FeatureLess_BasicsOld
+        Public Sub New()
+            desc = "Identify each featureless region by index."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+
+            color8u.Run(task.gray)
+            dst1 = fLess.dst3
+            dst2 = color8u.dst3
+            dst3 = fLess.mask
+
+            rcList.Clear()
+            For i = 0 To fLess.regions.Count - 1
+                Dim r = fLess.regions.Values(i)
+                rcList.Add(New rcDataOld(dst1(r), r, fLess.indexList.Values(i)))
+            Next
+
+            Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+            If rcIndex < rcList.Count Then
+                Dim rc = rcList(rcIndex)
+                DrawTour(dst2(rc.rect), rc.contour, task.highlight, task.lineWidth)
+                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            End If
         End Sub
     End Class
-End Class
+
+
+
+
+
+    Public Class XO_FeatureLess_CalcHist : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
+        Dim fLess As New FeatureLess_BasicsOld
+        Public Sub New()
+            dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
+            desc = "Find the LUT values in each featureless region."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8u.Run(task.gray)
+            dst1 = fLess.dst3
+            dst2 = color8u.dst3
+
+            Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
+            histMapList.Clear()
+            For i = 0 To fLess.regions.Count - 1
+                Dim r = fLess.regions.Values(i)
+                Dim histogram As New Mat
+                CalcHist({dst1(r)}, {0}, New Mat, histogram, 1, {256}, ranges)
+                Dim histArray(histogram.Rows - 1) As Single
+                histogram.GetArray(Of Single)(histArray)
+                Dim histList As New List(Of Integer)
+                For j = 0 To histArray.Length - 1
+                    If histArray(j) > 0 Then histList.Add(j)
+                Next
+                histMapList.Add((fLess.indexList.Values(i), histList))
+            Next
+
+            dst0.SetTo(0)
+            For Each tup In histMapList
+                Dim lutArray As Byte() = Enumerable.Repeat(CByte(0), 256).ToArray()
+                For Each index In tup.histList
+                    lutArray(index) = tup.Index
+                Next
+
+                Dim tmp As New Mat
+                LUT(color8u.dst2, lutArray, tmp)
+                dst0 += tmp
+            Next
+
+            dst3 = Palettize(dst0)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_FeatureLess_Tracker : Inherits TaskParent
+        Public regions As New List(Of (count As Integer, r As cv.Rect))
+        Dim overlap As New XO_FeatureLess_Overlap
+        Dim fLess As New FeatureLess_BasicsOld
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Track featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
+            Dim index As Integer
+
+            overlap.Run(emptyMat)
+
+            regions.Clear()
+            dst0 = fLess.dst1.Clone
+            Dim newCandidates As New List(Of cv.Rect)
+            Dim floodRects As New List(Of cv.Rect)
+            For Each r In task.gridRects
+                If overlap.dst3(r).Get(Of Byte)(0, 0) = 255 Then
+                    index = dst3(r).Get(Of Byte)(0, 0)
+                    If index > 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                        Dim count = FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
+                        regions.Add((count, ValidateRect(rect)))
+                        floodRects.Add(r)
+                    End If
+                ElseIf overlap.dst2(r).Get(Of Byte)(0, 0) = 255 Then
+                    newCandidates.Add(r)
+                End If
+            Next
+
+            Dim indexNew = regions.Count + 1
+            For Each r In newCandidates
+                If dst3(r).Get(Of Byte)(0, 0) = 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
+                    Dim flags = FloodFillFlags.FixedRange Or (indexNew << 8)
+                    Dim count = FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
+                    regions.Add((count, ValidateRect(rect)))
+                    indexNew += 1
+                End If
+            Next
+
+            dst2 = Palettize(dst0, 0)
+            labels(2) = CStr(regions.Count) + " regions were found."
+
+            dst1 = fLess.dst1.Clone
+            If task.heartBeatLT Then dst3 = fLess.dst3.Clone
+
+            For Each r In floodRects
+                Rectangle(dst2, r, task.highlight, task.lineWidth)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_FeatureLess_Overlap : Inherits TaskParent
+        Dim fLess As New FeatureLess_BasicsOld
+        Public Sub New()
+            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
+            desc = "Compare the current and previous featureless regions and define overlap and not overlap."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = fLess.dst1.Clone
+
+            dst2 = dst0.Clone
+            dst2.SetTo(0, dst1)
+            dst3 = dst0 And dst1
+
+            dst1 = fLess.dst1.Clone
+        End Sub
+    End Class
 End Namespace

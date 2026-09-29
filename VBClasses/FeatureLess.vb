@@ -4,17 +4,20 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
+        Public brickList As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
+            brickList.Clear()
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
                 If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
                 dst1(r).SetTo(255)
+                brickList.Add(r)
             Next
 
             Dim rect As cv.Rect
@@ -61,7 +64,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Core : Inherits TaskParent
+    Public Class XR_FeatureLess_Core : Inherits TaskParent
         Public rcList As New List(Of rcDataOld)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -150,7 +153,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_BasicsOld : Inherits TaskParent
+    Public Class XR_FeatureLess_BasicsOld : Inherits TaskParent
         Public regions As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         Public indexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public brickList As New List(Of cv.Rect)
@@ -227,7 +230,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_BasicsOldOld : Inherits TaskParent
+    Public Class FeatureLess_BasicsCore : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -426,7 +429,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Correlation : Inherits TaskParent
+    Public Class XR_FeatureLess_Correlation1 : Inherits TaskParent
         Dim corr As New Correlation_Basics
         Public fLessList As New List(Of cv.Rect)
         Public Sub New()
@@ -694,7 +697,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_History : Inherits TaskParent
         Dim frames As New History_Basics
-        Dim fLess As New FeatureLess_Correlation
+        Dim fLess As New XR_FeatureLess_Correlation
         Public Sub New()
             labels(3) = "The brighter the grid square, the more recent appearance."
             desc = "Accumulate the edges over a span of X images."
@@ -777,7 +780,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_Lines : Inherits TaskParent
+    Public Class XR_FeatureLess_Lines1 : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
         Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
         Public lpList As New List(Of lpData)
@@ -818,9 +821,9 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Cells : Inherits TaskParent
+    Public Class XR_FeatureLess_Cells : Inherits TaskParent
         Dim saveColorMap As Mat
-        Dim fLess As New FeatureLess_Correlation
+        Dim fLess As New XR_FeatureLess_Correlation
         Public Sub New()
             saveColorMap = task.colorMap.Clone
             labels(3) = "Region Colors are ordered by size."
@@ -971,7 +974,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_ToList : Inherits TaskParent
+    Public Class XR_FeatureLess_ToList : Inherits TaskParent
         Dim clusters As New XR_FeatureLess_ClusterFlood
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
@@ -1055,7 +1058,7 @@ Namespace VBClasses
         Dim fLess As New XR_FeatureLess_DepthFull
         Public floodPoints As New List(Of cv.Point)
         Public Sub New()
-            desc = "Identify the clusters in the FeatureLess_DepthFull output"
+            desc = "Identify the clusters in the XR_FeatureLess_DepthFull output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)
@@ -1247,7 +1250,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_IndexKNN : Inherits TaskParent
+    Public Class XR_FeatureLess_IndexKNN : Inherits TaskParent
         Dim feat As New XR_FeatureLess_Features
         Dim knn As New KNN_IndividualQuery
         Public Sub New()
@@ -1378,9 +1381,9 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_XLines : Inherits TaskParent
+    Public Class XR_FeatureLess_XLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Dim fLess As New FeatureLess_BasicsOld
+        Dim fLess As New XR_FeatureLess_BasicsOld
         Public Sub New()
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
         End Sub
@@ -1418,9 +1421,9 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_YLines : Inherits TaskParent
+    Public Class XR_FeatureLess_YLines : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Dim fLess As New FeatureLess_BasicsOld
+        Dim fLess As New XR_FeatureLess_BasicsOld
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find horizontal and vertical lines through the center of featureless grid rects."
@@ -1460,9 +1463,9 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Lines : Inherits TaskParent
-        Dim xLines As New FeatureLess_XLines
-        Dim yLines As New FeatureLess_YLines
+    Public Class XR_FeatureLess_Lines : Inherits TaskParent
+        Dim xLines As New XR_FeatureLess_XLines
+        Dim yLines As New XR_FeatureLess_YLines
         Public Sub New()
             desc = "Access the line data to get info about the featureless region."
         End Sub
@@ -1552,114 +1555,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Tracker : Inherits TaskParent
-        Public regions As New List(Of (count As Integer, r As cv.Rect))
-        Dim overlap As New FeatureLess_Overlap
-        Dim fLess As New FeatureLess_BasicsOld
-        Public Sub New()
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Track featureless regions."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            Dim index As Integer
-
-            overlap.Run(emptyMat)
-
-            regions.Clear()
-            dst0 = fLess.dst1.Clone
-            Dim newCandidates As New List(Of cv.Rect)
-            Dim floodRects As New List(Of cv.Rect)
-            For Each r In task.gridRects
-                If overlap.dst3(r).Get(Of Byte)(0, 0) = 255 Then
-                    index = dst3(r).Get(Of Byte)(0, 0)
-                    If index > 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
-                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(dst0, mask, r.TopLeft, index, rect, 0, 0, flags)
-                        regions.Add((count, ValidateRect(rect)))
-                        floodRects.Add(r)
-                    End If
-                ElseIf overlap.dst2(r).Get(Of Byte)(0, 0) = 255 Then
-                    newCandidates.Add(r)
-                End If
-            Next
-
-            Dim indexNew = regions.Count + 1
-            For Each r In newCandidates
-                If dst3(r).Get(Of Byte)(0, 0) = 0 And dst0(r).Get(Of Byte)(0, 0) = 255 Then
-                    Dim flags = FloodFillFlags.FixedRange Or (indexNew << 8)
-                    Dim count = FloodFill(dst0, mask, r.TopLeft, indexNew, rect, 0, 0, flags)
-                    regions.Add((count, ValidateRect(rect)))
-                    indexNew += 1
-                End If
-            Next
-
-            dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(regions.Count) + " regions were found."
-
-            dst1 = fLess.dst1.Clone
-            If task.heartBeatLT Then dst3 = fLess.dst3.Clone
-
-            For Each r In floodRects
-                Rectangle(dst2, r, task.highlight, task.lineWidth)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class FeatureLess_Overlap : Inherits TaskParent
-        Dim fLess As New FeatureLess_BasicsOld
-        Public Sub New()
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            labels = {"", "", "Grid rects that did not overlap", "Grid rects that overlapped."}
-            desc = "Compare the current and previous featureless regions and define overlap and not overlap."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = fLess.dst1.Clone
-
-            dst2 = dst0.Clone
-            dst2.SetTo(0, dst1)
-            dst3 = dst0 And dst1
-
-            dst1 = fLess.dst1.Clone
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class FeatureLess_RedC : Inherits TaskParent
-        Dim fLess As New FeatureLess_BasicsOld
-        Dim redC As New RedC_Basics
-        Dim addw As New AddWeighted_Basics
-        Public Sub New()
-            labels = {"", "", "RedC_Basics output", "AddWeighted of RedC_Basics and FeatureLess_BasicsOld"}
-            desc = "Cursor.ai: Run FeatureLess_BasicsOld and RedC_Basics, then blend them with AddWeighted."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            addw.src2 = fLess.dst2
-            addw.Run(dst2)
-            dst3 = addw.dst2
-            labels(3) = addw.labels(2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class FeatureLess_BrickList : Inherits TaskParent
+    Public Class XR_FeatureLess_BrickList : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Dim index As Integer
         Public Sub New()
@@ -1703,88 +1599,6 @@ Namespace VBClasses
     End Class
 
 
-
-
-
-
-    Public Class FeatureLess_ReductionTest : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Dim rcList As New List(Of rcDataOld)
-        Dim fLess As New FeatureLess_BasicsOld
-        Public Sub New()
-            desc = "Identify each featureless region by index."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-
-            color8u.Run(task.gray)
-            dst1 = fLess.dst3
-            dst2 = color8u.dst3
-            dst3 = fLess.mask
-
-            rcList.Clear()
-            For i = 0 To fLess.regions.Count - 1
-                Dim r = fLess.regions.Values(i)
-                rcList.Add(New rcDataOld(dst1(r), r, fLess.indexList.Values(i)))
-            Next
-
-            Dim rcIndex = Math.Abs(task.gOptions.DebugSlider.Value)
-            If rcIndex < rcList.Count Then
-                Dim rc = rcList(rcIndex)
-                DrawTour(dst2(rc.rect), rc.contour, task.highlight, task.lineWidth)
-                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class FeatureLess_CalcHist : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Dim histMapList As New List(Of (Index As Integer, histList As List(Of Integer)))
-        Dim fLess As New FeatureLess_BasicsOld
-        Public Sub New()
-            dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
-            desc = "Find the LUT values in each featureless region."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.gray)
-            dst1 = fLess.dst3
-            dst2 = color8u.dst3
-
-            Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
-            histMapList.Clear()
-            For i = 0 To fLess.regions.Count - 1
-                Dim r = fLess.regions.Values(i)
-                Dim histogram As New Mat
-                CalcHist({dst1(r)}, {0}, New Mat, histogram, 1, {256}, ranges)
-                Dim histArray(histogram.Rows - 1) As Single
-                histogram.GetArray(Of Single)(histArray)
-                Dim histList As New List(Of Integer)
-                For j = 0 To histArray.Length - 1
-                    If histArray(j) > 0 Then histList.Add(j)
-                Next
-                histMapList.Add((fLess.indexList.Values(i), histList))
-            Next
-
-            dst0.SetTo(0)
-            For Each tup In histMapList
-                Dim lutArray As Byte() = Enumerable.Repeat(CByte(0), 256).ToArray()
-                For Each index In tup.histList
-                    lutArray(index) = tup.Index
-                Next
-
-                Dim tmp As New Mat
-                LUT(color8u.dst2, lutArray, tmp)
-                dst0 += tmp
-            Next
-
-            dst3 = Palettize(dst0)
-        End Sub
-    End Class
 
 
 
