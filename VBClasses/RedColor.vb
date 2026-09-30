@@ -17,11 +17,10 @@ Namespace VBClasses
             Else
                 clickindex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             End If
-            If clickIndex > 0 Then
-                Dim rc = rcList(clickIndex)
+            If clickindex > 0 And clickindex < rcList.Count Then
+                Dim rc = rcList(clickindex)
                 Rectangle(dst, rc.rect, task.highlight, task.lineWidth)
                 task.color(rc.rect).SetTo(white, rc.mask)
-                Circle(dst, rc.maxDist, task.DotSize, task.highlight, -1)
                 Return rc.displayCell
             End If
             Return ""
