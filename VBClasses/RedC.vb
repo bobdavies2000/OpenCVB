@@ -229,7 +229,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_TrackHull : Inherits TaskParent
+    Public Class XR_RedC_TrackHull : Inherits TaskParent
         Dim redC As New RedC_BasicsOld
         Dim lastCenter As cv.Point
         Dim lastMapID As Byte
@@ -406,7 +406,7 @@ Namespace VBClasses
 
 
     Public Class RedC_Depth : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
@@ -428,12 +428,13 @@ Namespace VBClasses
             ApplyColorMap(dst0, dst3, task.colorMapDepth)
             dst3.SetTo(0, task.noDepthMask)
 
-            SetTrueText(RedC_BasicsOld.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            If task.firstPass Then task.rcD = redC.rcList(1)
+            SetTrueText(RedC_Basics.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
-            SetTrueText(task.rcDold.displayCell() + vbCrLf + "Mean depth = " + task.rcDold.depth.ToString(fmt2) + "m", 1)
-            task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
-            dst2(task.rcDold.rect).SetTo(task.highlight, task.rcDold.mask)
-            Rectangle(dst3, task.rcDold.rect, task.highlight, task.lineWidth)
+            SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            dst2(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
+            Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
 
             labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" + task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
         End Sub

@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Threading
 
-Module Program
+Module UI_Generator
     Sub Main()
         ' Ensure only one instance can run at a time using a named Mutex
         Dim mutexName As String = "Global\UI_Generator_SingleInstance"
@@ -129,11 +129,11 @@ Module Program
 
             Console.WriteLine()
             Console.WriteLine()
-            Console.WriteLine($"{displayClasses.Count} classes will be visible in the ComboBox:")
-            Console.WriteLine($"Total source lines for visible classes: {totalLinesRead}")
-            Console.WriteLine($"XR_ Reference algorithm count: {xrClasses.Count}")
-            Console.WriteLine($"Cursor.ai algorithms: {cursorClasses.Count}")
-            Console.WriteLine($"Total algorithms in development: { allClasses.Count}")
+            Console.WriteLine($"{displayClasses.Count} classes will be visible in the user interface.")
+            Console.WriteLine($"Total source lines for visible classes: " + totalLinesRead.ToString("N0"))
+            Console.WriteLine($"Unused but compiling Reference algorithms: " + xrClasses.Count.ToString("N0"))
+            Console.WriteLine($"Cursor.ai algorithms: " + cursorClasses.Count.ToString("N0"))
+            Console.WriteLine($"Total algorithms in development: " + allClasses.Count.ToString("N0"))
             Console.WriteLine($"Average lines per visible algorithm: " + (totalLinesRead \ displayClasses.Count).ToString())
             Console.WriteLine($"Algorithm groups: {groupTokens.Count}")
             Console.WriteLine()

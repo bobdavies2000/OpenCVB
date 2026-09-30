@@ -591,12 +591,11 @@ Namespace VBClasses
 
     Public Class Match_Quadrants : Inherits TaskParent
         Dim matchCenter As New Match_CenterRect
-        Dim quads(3) As cv.Rect
-        Dim templates(quads.Length - 1) As cv.Mat
+        Dim templates(task.quads.Length - 1) As cv.Mat
         Public Sub New()
+            If standalone Then task.gOptions.DebugCheckBox.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            quads = Rectangle_Basics.buildQuads()
             desc = "Run Match_CenterRect on each of the 4 quadrants of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -605,19 +604,19 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim forceRecenter As Boolean
             Static saveRecenter As Boolean
-            For i = 0 To quads.Length - 1
+            For i = 0 To task.quads.Length - 1
                 If templates(i) IsNot Nothing Then matchCenter.match.template = templates(i).Clone
                 matchCenter.forceRecenter = saveRecenter
-                matchCenter.Run(src(quads(i)))
+                matchCenter.Run(src(task.quads(i)))
                 templates(i) = matchCenter.match.template.Clone
 
                 If matchCenter.forceRecenter Then forceRecenter = True
                 If task.firstPass = False Then
-                    dst2(quads(i)) = matchCenter.dst2(quads(i)).Clone
-                    Rectangle(dst2(quads(i)), matchCenter.centerRect, white, task.lineWidth)
-                    Circle(dst2(quads(i)), matchCenter.match.newCenter, task.DotSize, black, -1, task.lineType)
+                    dst2(task.quads(i)) = matchCenter.dst2.Clone
+                    Rectangle(dst2(task.quads(i)), matchCenter.centerRect, white, task.lineWidth)
+                    Circle(dst2(task.quads(i)), matchCenter.match.newCenter, task.DotSize, black, -1, task.lineType)
 
-                    dst3(quads(i)) = matchCenter.dst3.Clone
+                    dst3(task.quads(i)) = matchCenter.dst3.Clone
                 End If
             Next
 
@@ -885,6 +884,7 @@ Namespace VBClasses
         Dim knn As New KNN_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
+            task.gOptions.DebugCheckBox.Checked = True
             desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

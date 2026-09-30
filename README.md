@@ -1,3 +1,37 @@
+**September 30, 2026 – Lines, Debug Checkbox, SteadyCam M**
+
+-   There are over 1700 algorithms in various stages of development.
+    -   The UI_Generator report shows the tallies at compile time.
+    -   737 classes will be visible in the user interface.
+    -   Total source lines for visible classes: 35,087
+    -   Unused but compiling Reference algorithms: 1,006
+    -   Cursor.ai algorithms: 58
+    -   Total algorithms in development: 1,755
+    -   Average lines per visible algorithm: 47
+    -   Algorithm groups: 200
+-   Line_Basics was improved to more accurately determine a line’s age.
+    -   The number of lines tracked is limited to simplify tracking.
+        -   Longer lines and fewer overlaps improve results.
+    -   The index of each line is maintained across images.
+    -   New lines are assigned new indexes using the unused indexes.
+    -   Lines can be tracked even with some camera and scene motion.
+-   DebugCheckBox now enables intermediate images to be computed and displayed.
+    -   DebugCheckBox provides more visibility into any debugging effort.
+-   The SteadyCam M factor is used to translate from image data from an earlier snapshot.
+    -   The M Mat structure enables affine translation from a snapshot.
+    -   The M factor is a simple shift left/right, up/down, and without rotation.
+    -   Below are examples of the M factor translating from a snapshot.
+    -   The code implements a solution to the Hungarian Assignment problem.
+        -   Cells can come and go and change in size and location.
+
+![](media/2302dea9ce5eba3d74afd3f0340de98a.gif)
+
+**FeatureLess_SteadyCam:** *The lower left image shows the identified featureless cells for a camera that is not moving. The lower right image shows the heartbeat snapshot (once a second) that is used to track each of the featureless cells. The circles in the lower left show that the cell has been matched to one in the snapshot and the color confirms the match between the lower left and right images. The upper right shows the details of the selected cell which is also highlighted in white in the RGB image in the upper left.*
+
+![](media/579c98cef0220f30fa2964f5b1e3469e.gif)
+
+**FeatureLess_SteadyCam:** *The same test as above but this time the camera is moving. Note that some circles in the lower left did not land on featureless cells. These circles represent cells that were lost in the time since the snapshot (lower right.) As before, the circles inside the cell show a match to the snapshot with color confirming the match. Cells can grow and shrink which is why the blue cell has several markers. The cells in the lower right were covered by the growth in the blue cell in the current frame (lower left.).*
+
 **August 30, 2026 – CUDA Version, Structures, Contours, ApproxPoly, Cell Lines, and Tracking Feature Points.**
 
 -   There are over 1700 algorithms in various stages of development.
@@ -30,7 +64,7 @@
     -   Features are reset on long-term heartbeats – some are typically lost
     -   Features may be reset when too many points are lost. Example below.
 
-**![](media/3ab8fecd1e6a45366779c3c0265286f5.gif) Match_InverseMDelaunay :** *Features are found on the heartbeat or when there are fewer than 3 features successfully tracked. The feature’s color stays the same when it is successfully tracked. The lower right image contains all the tracked features but is in the steadyCam coordinates. The steadyCam image is key and despite the motion of the camera, the features are approximately in the same location in the lower right image. The map to find any feature is produced using Delaunay here but can also be a map that resembles the lower right.*
+**![](media/3ab8fecd1e6a45366779c3c0265286f5.gif) SteadyM_Basics:** *Features are found on the heartbeat or when there are fewer than 3 features successfully tracked. The feature’s color stays the same when it is successfully tracked. The lower right image contains all the tracked features but is in the steadyCam coordinates. The steadyCam image is key and despite the motion of the camera, the features are approximately in the same location in the lower right image. The map to find any feature is produced using Delaunay here but can also be a map that resembles the lower right.*
 
 **![](media/338fdfc736ee8b47136b0e914454bf9a.gif)**
 
