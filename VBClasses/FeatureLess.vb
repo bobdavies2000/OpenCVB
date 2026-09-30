@@ -1963,27 +1963,51 @@ Namespace VBClasses
 
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
+        Public rcList As New List(Of rcData)
         Public Sub New()
+            labels(3) = "Snapshot that is used to identify and track cells."
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics Cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
-            dst2 = fLess.dst2
             labels(2) = fLess.labels(2)
 
-            dst3 = task.steadyCam.dst3
+            Static rcListPrev As List(Of rcData)
+            If task.heartBeat Or rcList.Count = 0 Then
+                rcListPrev = New List(Of rcData)(fLess.rcList)
+                rcListPrev.RemoveAt(0)
+                dst3 = Palettize(fLess.dst1, 0)
+            End If
 
-            Static rcList As List(Of rcData)
-            If task.quarterBeat Then rcList = New List(Of rcData)(fLess.rcList)
+            If standaloneTest() Then dst0.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData())
+            Dim usedList As New List(Of Integer)
+            For Each rcPrev In rcListPrev
+                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
+                For i = 1 To fLess.rcList.Count - 1
+                    Dim rc = fLess.rcList(i)
+                    If rc.rect.Contains(pt) Then
+                        Dim val = fLess.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        If usedList.Contains(rc.index) = False Then
+                            If standaloneTest() Then dst0(rc.rect).SetTo(rcPrev.index, rc.mask)
+                            rcList.Add(rc)
+                            usedList.Add(rc.index)
+                            Exit For
+                        End If
+                    End If
+                Next
+            Next
 
             If standaloneTest() Then
+                dst2 = Palettize(dst0, 0)
+
                 For Each rc In rcList
-                    If rc.index = 0 Then Continue For
-                    Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
-                    Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                    If rc.index <> 0 Then Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
             End If
+            labels(2) = CStr(rcList.Count - 1) + " cells were tracked"
         End Sub
     End Class
-
 End Namespace
