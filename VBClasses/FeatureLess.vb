@@ -1,7 +1,4 @@
-Imports System.Windows.Documents
-Imports OpenCvSharp
-Imports OpenCvSharp.Cv2
-Imports cv = OpenCvSharp
+Imports System.Windows.Documents : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
@@ -232,7 +229,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_BasicsCore : Inherits TaskParent
+    Public Class XR_FeatureLess_BasicsCore : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -1604,152 +1601,6 @@ Namespace VBClasses
 
 
 
-
-    'Public Class FeatureLess_BoundaryBoxes : Inherits TaskParent
-    '    Public rcList As New List(Of rcData)
-    '    Public lastMap As New cv.Mat
-    '    Dim maxDLast(255) As cv.Point
-    '    Dim myLabels(255) As Byte
-    '    Dim fLess As New FeatureLess_Basics
-    '    Public Sub New()
-    '        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    '        desc = "Cursor.ai: Hungarian Assignment using Bounding Boxes (rects)"
-    '    End Sub
-    '    Private Shared Function IoU(a As cv.Rect, b As cv.Rect) As Double
-    '        Dim x1 = Math.Max(a.X, b.X)
-    '        Dim y1 = Math.Max(a.Y, b.Y)
-    '        Dim x2 = Math.Min(a.X + a.Width, b.X + b.Width)
-    '        Dim y2 = Math.Min(a.Y + a.Height, b.Y + b.Height)
-
-    '        Dim interW = Math.Max(0, x2 - x1)
-    '        Dim interH = Math.Max(0, y2 - y1)
-    '        Dim intersection = interW * interH
-
-    '        Dim unionArea = a.Width * a.Height + b.Width * b.Height - intersection
-    '        If unionArea = 0 Then Return 0
-
-    '        Return intersection / unionArea
-    '    End Function
-    '    Private Shared Function BuildCostMatrix(oldRects As List(Of cv.Rect), newRects As List(Of cv.Rect)) As Double(,)
-    '        Dim n = oldRects.Count
-    '        Dim m = newRects.Count
-    '        Dim cost(n - 1, m - 1) As Double
-
-    '        For i = 0 To n - 1
-    '            For j = 0 To m - 1
-    '                Dim iouVal = IoU(oldRects(i), newRects(j))
-    '                cost(i, j) = 1.0 - iouVal
-    '            Next
-    '        Next
-
-    '        Return cost
-    '    End Function
-    '    Public Shared Function Hungarian(cost(,) As Double) As Integer()
-    '        Dim n = cost.GetLength(0)
-    '        Dim m = cost.GetLength(1)
-
-    '        Dim u(n) As Double
-    '        Dim v(m) As Double
-    '        Dim p(m) As Integer
-    '        Dim way(m) As Integer
-
-    '        For i = 1 To n
-    '            p(0) = i
-    '            Dim j0 = 0
-    '            Dim minv(m) As Double
-    '            Dim used(m) As Boolean
-
-    '            For j = 0 To m
-    '                minv(j) = Double.PositiveInfinity
-    '            Next
-
-    '            Do
-    '                used(j0) = True
-    '                Dim i0 = p(j0)
-    '                Dim delta = Double.PositiveInfinity
-    '                Dim j1 = 0
-
-    '                For j = 1 To m
-    '                    If Not used(j) Then
-    '                        Dim cur = cost(i0 - 1, j - 1) - u(i0) - v(j)
-    '                        If cur < minv(j) Then
-    '                            minv(j) = cur
-    '                            way(j) = j0
-    '                        End If
-    '                        If minv(j) < delta Then
-    '                            delta = minv(j)
-    '                            j1 = j
-    '                        End If
-    '                    End If
-    '                Next
-
-    '                For j = 0 To m
-    '                    If used(j) Then
-    '                        u(p(j)) += delta
-    '                        v(j) -= delta
-    '                    Else
-    '                        minv(j) -= delta
-    '                    End If
-    '                Next
-
-    '                j0 = j1
-    '            Loop While p(j0) <> 0
-
-    '            Do
-    '                Dim j1 = way(j0)
-    '                p(j0) = p(j1)
-    '                j0 = j1
-    '            Loop While j0 <> 0
-    '        Next
-
-    '        Dim assignment(n - 1) As Integer
-    '        For j = 1 To m
-    '            If p(j) <> 0 Then
-    '                assignment(p(j) - 1) = j - 1
-    '            End If
-    '        Next
-
-    '        Return assignment
-    '    End Function
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        'Dim oldRects As New List(Of cv.Rect)
-    '        'Dim newRects As New List(Of cv.Rect)
-
-    '        'oldRects.Clear()
-    '        'For Each rc In rcList
-    '        '    oldRects.Add(rc.rect)
-    '        'Next
-
-    '        'fLess.Run(task.gray)
-    '        'dst2 = fLess.dst2
-    '        'labels(2) = fLess.labels(2)
-
-    '        'rcList = fLess.rcList
-    '        'For Each rc In rcList
-    '        '    newRects.Add(rc.rect)
-    '        'Next
-
-    '        'Dim cost = BuildCostMatrix(oldRects, newRects)
-    '        'Dim assignment = Hungarian(cost)
-
-    '        'Dim result As New Dictionary(Of Integer, Integer)
-
-    '        'For i = 0 To assignment.Length - 1
-    '        '    Dim j = assignment(i)
-
-    '        '    ' IoU threshold to reject bad matches
-    '        '    If IoU(oldRects(i), newRects(j)) > 0.1 Then
-    '        '        result(i) = j   ' old index → new index
-    '        '    End If
-    '        'Next
-    '    End Sub
-    'End Class
-
-
-
-
-
-
     Public Class XR_FeatureLess_DepthFull : Inherits TaskParent
         Public brickList As New List(Of cv.Rect)
         Public Sub New()
@@ -1840,62 +1691,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Order : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Dim maxDLast(255) As cv.Point
-        Dim myLabels(255) As Byte
-        Dim fLess As New FeatureLess_Basics
-        Public Sub New()
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-            desc = "Cursor.ai: Hungarian Assignment using Bounding Boxes (rects)"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static mapNewToOld(255) As Integer
-
-            If task.heartBeatLT Then
-                ReDim mapNewToOld(255)
-                Dim lastMap = fLess.dst1.Clone
-                Dim lastList As New List(Of rcData)(rcList)
-
-                fLess.Run(task.gray)
-                rcList = New List(Of rcData)(fLess.rcList)
-                dst1 = fLess.dst1.Clone
-                dst3 = fLess.dst2
-                labels(3) = fLess.labels(2)
-
-                For Each rcLast In lastList
-                    If rcLast.index = 0 Then Continue For
-                    For Each rc In rcList
-                        If rc.rect.IntersectsWith(rcLast.rect) Then
-                            If rc.index = rcLast.index Then
-                                mapNewToOld(rc.index) = rcLast.index
-                                Exit For
-                            Else
-                                'Dim valOld = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                                'Dim val = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                                'If valOld = rcLast.index And val = rc.index Then
-                                '    mapNewToOld(rc.index) = rcLast.index
-                                'End If
-                            End If
-                        End If
-                    Next
-                Next
-            End If
-
-            For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                If rc.index <> mapNewToOld(rc.index) Then
-                    SetTrueText(CStr(rc.index) + " maps to " + CStr(mapNewToOld(rc.index)), rc.maxDist)
-                End If
-                dst1(rc.rect).SetTo(mapNewToOld(rc.index), rc.mask)
-            Next
-            dst2 = Palettize(dst1, 0)
-        End Sub
-    End Class
-
-
-
-
     Public Class FeatureLess_Ordered : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim fLess As New FeatureLess_Basics
@@ -1965,16 +1760,15 @@ Namespace VBClasses
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
-            labels(3) = "Snapshot that is used to identify and track cells."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics Cells."
+            desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
             labels(2) = fLess.labels(2)
 
             Static rcListPrev As List(Of rcData)
-            If task.heartBeat Or rcList.Count = 0 Then
+            If task.heartBeat Then
                 rcListPrev = New List(Of rcData)(fLess.rcList)
                 rcListPrev.RemoveAt(0)
                 dst3 = Palettize(fLess.dst1, 0)
@@ -1989,7 +1783,6 @@ Namespace VBClasses
                 For i = 1 To fLess.rcList.Count - 1
                     Dim rc = fLess.rcList(i)
                     If rc.rect.Contains(pt) Then
-                        Dim val = fLess.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                         If usedList.Contains(rc.index) = False Then
                             If standaloneTest() Then dst0(rc.rect).SetTo(rcPrev.index, rc.mask)
                             rcList.Add(rc)
@@ -2000,6 +1793,15 @@ Namespace VBClasses
                 Next
             Next
 
+            For Each rc In fLess.rcList
+                If rc.index = 0 Then Continue For
+                If usedList.Contains(rc.index) = False Then
+                    rc.index = rcList.Count
+                    dst0(rc.rect).SetTo(rc.index, rc.mask)
+                    rcList.Add(rc)
+                End If
+            Next
+
             If standaloneTest() Then
                 dst2 = Palettize(dst0, 0)
 
@@ -2008,6 +1810,7 @@ Namespace VBClasses
                 Next
             End If
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked"
+            labels(3) = CStr(rcListPrev.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
 End Namespace

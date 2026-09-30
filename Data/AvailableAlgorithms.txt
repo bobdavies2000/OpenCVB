@@ -204,8 +204,6 @@ Feature_WarpAlign
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
-FeatureLess_BasicsCore
-FeatureLess_Order
 FeatureLess_Ordered
 FeatureLess_OrderKNN
 FeatureLess_SteadyCam
