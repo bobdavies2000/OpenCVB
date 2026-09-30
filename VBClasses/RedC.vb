@@ -254,16 +254,16 @@ Namespace VBClasses
             SetTrueText(RedC_BasicsOld.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             dst3.SetTo(0)
-            task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
-            FillPoly(dst3(task.rcDold.rect), {task.rcDold.hull}, task.scalarColors(task.rcDold.mapID + 1))
-            dst3(task.rcDold.rect).SetTo(task.scalarColors(task.rcDold.mapID), task.rcDold.mask)
-            Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
-            Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
-            SetTrueText(task.rcDold.displayCell() + vbCrLf, 1)
+            'task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+            'FillPoly(dst3(task.rcDold.rect), {task.rcDold.hull}, task.scalarColors(task.rcDold.mapID + 1))
+            'dst3(task.rcDold.rect).SetTo(task.scalarColors(task.rcDold.mapID), task.rcDold.mask)
+            'Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
+            'Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
+            'SetTrueText(task.rcDold.displayCell() + vbCrLf, 1)
 
-            lastCenter = Utility_Basics.ComputeHullCentroid(task.rcDold.hull.ToArray, task.rcDold)
-            lastMapID = task.rcDold.mapID
-            lastRect = task.rcDold.rect
+            'lastCenter = Utility_Basics.ComputeHullCentroid(task.rcDold.hull.ToArray, task.rcDold)
+            'lastMapID = task.rcDold.mapID
+            'lastRect = task.rcDold.rect
         End Sub
     End Class
 
