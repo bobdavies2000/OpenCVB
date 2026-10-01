@@ -712,35 +712,33 @@ Namespace VBClasses
 
 
     Public Class Match_ClickPoint : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
-        Dim rcIndexMap As New cv.Mat
-        Dim mapID As Byte = 0
-        Dim maxDist As cv.Point
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
+            labels(3) = "Once a second, the SteadyCam M factor is updated and this image will match the current cells."
             desc = "Use the clickpoint to confirm the "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            labels(2) = redC.labels(2) + "  Click on any featureless cell to track it."
 
+            Static clickIndex As Integer
             If task.mouseClickFlag Then
-                mapID = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-                maxDist = WarpAffine_Basics.WarpPoint(task.rcDold.maxDist, task.steadyCam.M)
-                WarpAffine(redC.rcIndexMap, rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                clickIndex = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+            Else
+                clickIndex = 1
             End If
 
+            task.rcD = RedC_Basics.findCell(redC.rcList, clickIndex)
+            If task.rcD Is Nothing Then task.rcD = redC.rcList(1)
+
+            SetTrueText(RedC_Basics.displayCell(redC.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
+                        vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
+
+            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            WarpAffine(redC.rcIndexMap, redC.rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-            If task.rcDold Is Nothing Then Exit Sub
-
-            Dim pt = validatePoint(WarpAffine_Basics.WarpPoint(task.rcDold.maxDist, task.steadyCam.M))
-            Dim mapIDaligned = rcIndexMap.Get(Of Single)(pt.Y, pt.X)
-            If mapIDaligned <> mapID Then
-                SetTrueText("Tracking the selected cell was lost", 1)
-                Exit Sub
-            End If
         End Sub
     End Class
 

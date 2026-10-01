@@ -23,6 +23,12 @@ Namespace VBClasses
             Next
             Return displayStr
         End Function
+        Public Shared Function findCell(rclist As List(Of rcData), index As Integer) As rcData
+            For Each rc In rclist
+                If rc.index = index Then Return rc
+            Next
+            Return Nothing
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcIndexMapLast = rcIndexMap.Clone
@@ -572,7 +578,7 @@ Namespace VBClasses
     Public Class RedC_FeatureLessTestSingle : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim fLess As New FeatureLess_SteadyCam
-        Public merged As New rcDataOld
+        Public merged As New rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Cursor.ai: Merge RedC cells under the largest FeatureLess_ToList cell using CalcHist on rcIndexMap."
@@ -597,7 +603,7 @@ Namespace VBClasses
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
 
-            Dim members As New List(Of rcDataOld)
+            Dim members As New List(Of rcData)
             For Each rc In redC.rcList
                 Dim bin = rc.index Mod 255
                 If bin > 0 AndAlso bin < histArray.Length AndAlso histArray(bin) > 0 Then members.Add(rc)
@@ -615,7 +621,7 @@ Namespace VBClasses
                 fullMask(rc.rect).SetTo(255, rc.mask)
             Next
             unionRect = ValidateRect(unionRect)
-            merged = New rcDataOld(fullMask(unionRect), unionRect, 255)
+            merged = New rcData(fullMask(unionRect), unionRect, 255)
 
             dst3(merged.rect).SetTo(task.highlight, merged.mask)
             Rectangle(dst3, merged.rect, task.highlight, task.lineWidth)
