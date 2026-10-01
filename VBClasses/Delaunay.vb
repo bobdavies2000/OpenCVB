@@ -349,10 +349,10 @@ Namespace VBClasses
             Next
 
             Dim facet = delaunay.dst1.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim facetIndex = facetList.IndexOf(facet)
+            Dim facetIndex = facetList.IndexOf(facet) \ 2
             If facetIndex >= indexList.Count Then facetIndex = 0
             If task.lines.lpList.Count = 0 Then Exit Sub
-            task.lpD = task.lines.lpList(indexList(facetIndex \ 2))
+            task.lpD = task.lines.lpList(indexList(facetIndex))
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
             Static saveID As Integer = p1GridIndex
