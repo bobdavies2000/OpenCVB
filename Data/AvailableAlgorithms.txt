@@ -28,7 +28,6 @@ Blur_Basics
 Blur_Bilateral
 Blur_Motion
 Brick_Basics
-Brick_Features
 Brick_LeftRight
 Brick_Ranges
 Brick_Variability
@@ -605,7 +604,7 @@ RedC_BasicsOld
 RedC_CellLines
 RedC_Depth
 RedC_DepthMerge
-RedC_FeatureLess1
+RedC_FeatureLessTestSingle
 RedC_Features
 RedC_MergeCells
 RedC_NeighborHist

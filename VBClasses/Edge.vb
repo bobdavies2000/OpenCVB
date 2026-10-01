@@ -1482,30 +1482,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Edge_Featureless : Inherits TaskParent
-        Public fLess As New FeatureLess_Basics
-        Public sceneMotionDetected As Boolean
-        Public rectCountThreshold As Integer
-        Public Sub New()
-            desc = "Find the edges in the featureless output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.grayOriginal)
-
-            dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst1)
-            labels(2) = fLess.labels(2)
-
-            strOut = "Scene motion = " + CStr(sceneMotionDetected) + vbCrLf +
-                 "Camera motion threshold = " + CStr(rectCountThreshold) + vbCrLf +
-                 "Current rcList (region) count = " + CStr(fLess.rcList.Count)
-
-            SetTrueText(strOut, 3)
-        End Sub
-    End Class
-
-
-
 
 
     Public Class Edge_StableLeftRight : Inherits TaskParent

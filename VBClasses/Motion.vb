@@ -518,34 +518,4 @@ Namespace VBClasses
             lastDepth = task.pcSplit(2).Clone
         End Sub
     End Class
-
-
-
-
-
-    Public Class XR_Motion_Featureless : Inherits TaskParent
-        Dim edges As New XR_Edge_Featureless
-        Dim plotdots As New PlotTime_FixedScale
-        Public Sub New()
-            plotdots.plotCount = 1
-            plotdots.showScale = False
-            plotdots.fixedScale = True
-            plotdots.minScale = 0
-
-            desc = "The count of featureless cells is used to determine if the camera has moved."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(task.grayOriginal)
-            dst2 = edges.dst2
-            labels(2) = edges.labels(2)
-
-            plotdots.maxScale = task.gridRects.Count
-            plotdots.plotData(0) = edges.fLess.rcList.Count
-            plotdots.Run(src)
-            dst3 = plotdots.dst2
-            labels(3) = plotdots.labels(2)
-
-            SetTrueText(edges.strOut, 3)
-        End Sub
-    End Class
 End Namespace
