@@ -49,36 +49,36 @@ Namespace VBClasses
 
     Public Class Flood_CellMerge : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim rectMats As New Flood_RectMats
+        Dim redC As New RedC_BasicsNew
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            rectMats.Run(src)
-            dst3 = rectMats.dst2.Clone
-            labels(3) = rectMats.labels(3)
+            redC.Run(src)
+            dst3 = redC.dst2.Clone
+            labels(3) = redC.labels(3)
 
             Dim rc As rcData
             If standaloneTest() Then
-                For Each rc In rectMats.fLess.rcList
+                For Each rc In redC.fLess.rcList
                     If rc.index = 0 Then Continue For
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                     SetTrueText(CStr(rc.index), rc.maxDist, 2)
                 Next
             End If
 
-            Dim ranges() As Rangef = {New Rangef(0, rectMats.rectList.Count)}
+            Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
             Dim histogram As New Mat
 
-            rcList = New List(Of rcData)(rectMats.fLess.rcList)
-            Dim rcOwner(rectMats.rectList.Count - 1) As Integer
+            rcList = New List(Of rcData)(redC.fLess.rcList)
+            Dim rcOwner(redC.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
 
-                CalcHist({rectMats.dst0(rc.rect)}, {0}, rc.mask, histogram, 1, {rectMats.rectList.Count}, ranges)
+                CalcHist({redC.rcIndexMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redC.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
@@ -91,10 +91,10 @@ Namespace VBClasses
             dst1.SetTo(0)
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
-                For i = 1 To rectMats.rectList.Count - 1
+                For i = 1 To redC.rcList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
                     If rcOwner(i) = rc.index Then
-                        Dim rcTuple = rectMats.rectList(i)
+                        Dim rcTuple = redC.rcList(i)
                         rc.rect = rc.rect.Union(rcTuple.rect)
                         dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                     End If
@@ -111,7 +111,7 @@ Namespace VBClasses
 
             SetTrueText(RedColor_Basics.showCell(rcList, dst1, dst2), 1)
 
-            labels(2) = CStr(rectMats.rectList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
+            labels(2) = CStr(redC.rcList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
         End Sub
     End Class
 
@@ -402,71 +402,6 @@ Namespace VBClasses
             redC.Run(Not dst1)
             dst3 = Palettize(redC.rcIndexMap, 0)
             labels(3) = redC.labels(2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class Flood_RectMats : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
-        Public fLess As New FeatureLess_Basics
-        Public rectList As New List(Of rcData)
-        Public Sub New()
-            dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Build a list of cv.rects and cv.mats for each floodfill region in the Color8U input."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                color8U.Run(task.gray)
-                src = color8U.dst2.Clone
-                labels(2) = color8U.labels(2)
-            End If
-
-            fLess.Run(src)
-            dst2 = color8U.dst3.Clone
-
-            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim rect As cv.Rect
-            Dim filled As New cv.Mat
-            rectList.Clear()
-            rectList.Add(New rcData)
-            dst1 = color8U.dst2.Clone
-            dst0.SetTo(0)
-            For y = 0 To dst2.Height - 1
-                For x = 0 To dst2.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = rectList.Count
-                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
-                        If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            dst0(rc.rect).SetTo(index, rc.mask)
-                            rectList.Add(rc)
-                        Else
-                            If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
-                        End If
-                    End If
-                Next
-            Next
-
-            dst3 = Palettize(dst0, 0)
-
-            If standaloneTest() Then
-                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-                Dim rc = rectList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                dst2(rc.rect).SetTo(white, rc.mask)
-                SetTrueText(CStr(clickIndex), rc.maxDist)
-                SetTrueText(rc.displayCell, 1)
-            End If
-
-            labels(1) = fLess.labels(2)
-            labels(3) = CStr(rectList.Count) + " cells in the Color8U output."
-            If rectList.Count > 255 Then
-                MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
-            End If
         End Sub
     End Class
 End Namespace

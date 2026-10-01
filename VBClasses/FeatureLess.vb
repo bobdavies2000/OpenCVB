@@ -1759,9 +1759,9 @@ Namespace VBClasses
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             ' Hungarian Assignment algorithm solution.
             desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
         End Sub
@@ -1776,7 +1776,7 @@ Namespace VBClasses
                 dst3 = Palettize(fLess.dst1, 0)
             End If
 
-            If standaloneTest() Then dst0.SetTo(0)
+            indexMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
@@ -1787,7 +1787,7 @@ Namespace VBClasses
                     If rc.rect.Contains(pt) Then
                         If usedList.Contains(rc.index) = False Then
                             rc.ID = rcPrev.index
-                            If standaloneTest() Then dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                            indexMap(rc.rect).SetTo(rc.ID, rc.mask)
                             rcList.Add(rc)
                             usedList.Add(rc.index)
                             Exit For
@@ -1803,13 +1803,13 @@ Namespace VBClasses
                 If usedList.Contains(rc.index) = False Then
                     rc.ID = nextSlot
                     nextSlot += 1
-                    dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                    indexMap(rc.rect).SetTo(rc.ID, rc.mask)
                     rcList.Add(rc)
                 End If
             Next
 
             If standaloneTest() Then
-                dst2 = Palettize(dst0, 0)
+                dst2 = Palettize(indexMap, 0)
 
                 For Each rc In rcSnapshotList
                     If rc.index <> 0 Then
@@ -1820,7 +1820,7 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut = RedColor_Basics.showCell(rcList, dst0, dst2) + vbCrLf
+            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
             strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
             strOut += "All circles represent the location of a cell at the time of the heartbeat snapshot." + vbCrLf

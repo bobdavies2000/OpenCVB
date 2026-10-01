@@ -885,7 +885,7 @@ Namespace VBClasses
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_SteadyCam
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -897,12 +897,11 @@ Namespace VBClasses
 
             fLess.Run(task.leftView)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst2)
+            dst2.SetTo(0, fLess.indexMap)
             labels(2) = fLess.labels(2)
 
             depthList.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
+            For Each r In task.gridRects
                 Dim depth = Mean(task.pcSplit(2)(r), task.depthmask(r))(0)
                 depthList.Add(depth)
             Next
@@ -937,7 +936,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New FeatureLess_Basics
+        Dim fLess As New FeatureLess_SteadyCam
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -950,7 +949,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.dst2)
+            dst2.SetTo(0, fLess.indexMap)
             labels(2) = fLess.labels(2)
 
             If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
@@ -961,7 +960,7 @@ Namespace VBClasses
                 Dim mmDepth = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
                 If mmDepth.range >= options.meters Then
                     rangeJumpers.Add(i)
-                    dst3(task.gridRects(i)).SetTo(255)
+                    dst3(r).SetTo(255)
                 End If
             Next
 
@@ -970,33 +969,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-    Public Class Brick_Features : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Dim fLess As New FeatureLess_Basics
-        Public Sub New()
-            desc = "Use FeatureLess_Core to identify bricks with good contrast."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayOriginal
-            fLess.Run(src)
-
-            bricks.Run(src)
-
-            CvtColor(src, dst2, cv.ColorConversionCodes.GRAY2BGR)
-            dst2.SetTo(0, fLess.dst1)
-            labels(2) = fLess.labels(2)
-
-            CvtColor(task.rightView, dst3, ColorConversionCodes.GRAY2BGR)
-            Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim brick = bricks.brickList(index)
-            Rectangle(dst2, brick.lRect, task.highlight, task.lineWidth)
-            Rectangle(task.color, brick.lRect, task.highlight, task.lineWidth)
-            Rectangle(dst3, brick.rRect, task.highlight, task.lineWidth)
-        End Sub
-    End Class
 
 
 
