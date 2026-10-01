@@ -8,7 +8,7 @@ Namespace VBClasses
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of features."
+            labels(3) = "steadyCamIMU map of features."
             desc = "Use the M mat in SteadyCam_Basics to track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -22,13 +22,13 @@ Namespace VBClasses
                     Circle(dst1, pt, task.DotSize * 5, cv.Scalar.All(index), -1, cv.LineTypes.Link8)
                     index += 1
                 Next
-                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(dst1, dst0, task.SteadyCamIMU.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             validList.Clear()
             indexList.Clear()
             For Each pt In feat.features
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.SteadyCamIMU.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then
                     validList.Add(pt)
@@ -40,7 +40,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = 0 To validList.Count - 1
                 Circle(dst2, validList(i), task.DotSize * 5, task.scalarColors(indexList(i)), -1, task.lineType)
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.SteadyCamIMU.M))
                 Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
             Next
 
@@ -73,13 +73,13 @@ Namespace VBClasses
             indexList.Clear()
             Dim newPoints As New List(Of cv.Point)
             For Each pt In ptListLast
-                Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
+                Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, task.SteadyCamIMU.M)
                 Dim index = dst1.Get(Of Byte)(ptAligned.Y, ptAligned.X)
                 If indexList.Contains(index) Then
                     newPoints.Add(pt)
                 Else
                     indexList.Add(index)
-                    ptList.Add(WarpAffine_Basics.WarpPoint(ptAligned, task.steadyCam.inverseM))
+                    ptList.Add(WarpAffine_Basics.WarpPoint(ptAligned, task.SteadyCamIMU.inverseM))
                 End If
             Next
 
@@ -93,7 +93,7 @@ Namespace VBClasses
                 Circle(dst2, ptList(i), task.DotSize * 3, task.scalarColors(indexList(i)), -1, task.lineType)
             Next
 
-            WarpAffine(dst1, dst3, task.steadyCam.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(dst1, dst3, task.SteadyCamIMU.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             ptListLast = New List(Of cv.Point)(delaunay.feat.features)
         End Sub
     End Class
@@ -109,7 +109,7 @@ Namespace VBClasses
         Dim validLine As lpData
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of longest line."
+            labels(3) = "steadyCamIMU map of longest line."
             desc = "Use M in SteadyCam_Basics to track the longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -121,16 +121,16 @@ Namespace VBClasses
             If validLine Is Nothing Then
                 lp = longest.lp
                 dst0.SetTo(0)
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.SteadyCamIMU.M))
                 Dim lpSteady = New lpData(p1, p2)
                 Line(dst0, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(1), lineWidth, cv.LineTypes.Link8)
 
                 validLine = lp
                 Line(dst2, validLine.p1, validLine.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
             Else
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(validLine.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(validLine.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(validLine.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(validLine.p2, task.SteadyCamIMU.M))
                 Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
                 Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
                 If index1 <> 0 Or index2 <> 0 Then validLine = longest.lp Else validLine = Nothing
@@ -158,13 +158,13 @@ Namespace VBClasses
         Dim longest As lpData
         Dim retained As New List(Of Integer)
         Public Sub New()
-            labels(3) = "SteadyCam map of longest line."
+            labels(3) = "steadyCamIMU map of longest line."
             desc = "Use M in SteadyCam_Basics to track the longest line."
         End Sub
         Public Shared Function checkLine(lp As lpData, map As cv.Mat) As Boolean
             If CountNonZero(task.motion.motionMask(lp.rect)) > 0 Then Return False ' motion near the line
-            Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-            Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+            Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.SteadyCamIMU.M))
+            Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.SteadyCamIMU.M))
             Dim index1 = map.Get(Of Byte)(p1.Y, p1.X)
             Dim index2 = map.Get(Of Byte)(p2.Y, p2.X)
             Return index1 <> 0 And index2 <> 0
@@ -178,8 +178,8 @@ Namespace VBClasses
             If longest Is Nothing Then
                 retained.Add(0)
                 longest = task.lines.lpList(0)
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.SteadyCamIMU.M))
 
                 Dim lpSteady = New lpData(p1, p2)
                 dst3.SetTo(0)
@@ -205,7 +205,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim retained As New List(Of Integer)
         Public Sub New()
-            labels(3) = "SteadyCam map of longest line."
+            labels(3) = "steadyCamIMU map of longest line."
             desc = "Cursor.ai: Keep the saved longest line when longest.rect still matches the stored template above MatchCorrSlider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -240,8 +240,8 @@ Namespace VBClasses
                 retained.Add(0)
                 longest = task.lines.lpList(0)
                 template = src(ValidateRect(longest.rect)).Clone
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(longest.p2, task.SteadyCamIMU.M))
 
                 Dim lpSteady = New lpData(p1, p2)
                 dst3.SetTo(0)
@@ -267,19 +267,19 @@ Namespace VBClasses
         Dim validList As New List(Of lpData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "SteadyCam map of lines.  It is updated when < X lines are found."
+            labels(3) = "steadyCamIMU map of lines.  It is updated when < X lines are found."
             desc = "Use M in SteadyCam_Basics to track lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If validList.Count < 5 Then
                 lpList = New List(Of lpData)(task.lines.lpList)
-                WarpAffine(task.lines.dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(task.lines.dst1, dst0, task.SteadyCamIMU.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             validList.Clear()
             For Each lp In task.lines.lpList
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.SteadyCamIMU.M))
                 Dim index1 = dst0.Get(Of Byte)(p1.Y, p2.X)
                 Dim index2 = dst0.Get(Of Byte)(p2.Y, p2.X)
                 If index1 > 0 Or index2 > 0 Then validList.Add(lp)
@@ -296,7 +296,7 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
                             CStr(lpList.Count - validList.Count) + " were lost..."
-                labels(1) = CStr(validList.Count) + " lines were found through the SteadyCam map."
+                labels(1) = CStr(validList.Count) + " lines were found through the steadyCamIMU map."
             End If
         End Sub
     End Class
@@ -315,7 +315,7 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of features."
+            labels(3) = "steadyCamIMU map of features."
             desc = "Use M in SteadyCam_Basics with Delaunayto track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -333,13 +333,13 @@ Namespace VBClasses
                 delaunay.Run(emptyMat)
                 delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
 
-                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(dst1, dst0, task.SteadyCamIMU.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             validList.Clear()
             indexList.Clear()
             For Each pt In feat.features
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.SteadyCamIMU.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then
                     validList.Add(pt)
@@ -351,7 +351,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             For i = 0 To validList.Count - 1
                 Circle(dst2, validList(i), task.steadyLineWidth, task.scalarColors(indexList(i)), -1, task.lineType)
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(validList(i), task.SteadyCamIMU.M))
                 Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
             Next
 
@@ -373,7 +373,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "SteadyCam map of lines."
+            labels(3) = "steadyCamIMU map of lines."
             desc = "Use M in SteadyCam_Basics with Delaunay to track points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -388,12 +388,12 @@ Namespace VBClasses
                 delaunay.Run(emptyMat)
                 delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
 
-                WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(dst1, dst0, task.SteadyCamIMU.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             validList.Clear()
             For Each lp In task.lines.lpList
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(lp.ptCenter, task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(lp.ptCenter, task.SteadyCamIMU.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then validList.Add(lp)
             Next
@@ -402,8 +402,8 @@ Namespace VBClasses
             dst0.SetTo(0)
             For Each lp In validList
                 Line(dst2, lp.p1, lp.p2, task.scalarColors(lp.index), task.steadyLineWidth, task.lineType)
-                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.steadyCam.M))
-                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.steadyCam.M))
+                Dim p1 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p1, task.SteadyCamIMU.M))
+                Dim p2 = validatePoint(WarpAffine_Basics.WarpPoint(lp.p2, task.SteadyCamIMU.M))
                 Line(dst0, lp.p1, lp.p2, cv.Scalar.All(lp.index), task.steadyLineWidth, cv.LineTypes.Link8)
             Next
 
@@ -424,7 +424,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            labels(3) = "SteadyCam version of redc.rcIndexMap."
+            labels(3) = "steadyCamIMU version of redc.rcIndexMap."
             desc = "Use M in SteadyCam_Basics maintain the index for each redC cell."
         End Sub
         Public Shared Function setAge(rcList As List(Of rcDataOld), rcLastList As List(Of rcDataOld), map As cv.Mat) As List(Of rcDataOld)
@@ -467,12 +467,12 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.heartBeatLT Then
-                WarpAffine(redC.rcIndexMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(redC.rcIndexMap, dst0, task.SteadyCamIMU.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             setAge(redC.rcList, rcLastList, dst0)
             For Each rc In redC.rcList
-                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M))
+                Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(rc.maxDist, task.SteadyCamIMU.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then rc.index = index
             Next

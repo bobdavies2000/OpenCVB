@@ -1760,7 +1760,7 @@ Namespace VBClasses
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim steadyCam As New SteadyCam_Motion
+        Dim steadyCam As New SteadyCam_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm solution.

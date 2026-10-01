@@ -1301,7 +1301,7 @@ Namespace VBClasses
             desc = "SteadyCamIMU but with Kalman filtering"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            kalman.kInput = {task.SteadyCamIMU.rotateAngle, task.SteadyCamIMU.ptShiftXY.X, task.SteadyCamIMU.ptShiftXY.Y}
+            kalman.kInput = {task.SteadyCamIMU.rotateAngle, task.SteadyCamIMU.shiftXY.X, task.SteadyCamIMU.shiftXY.Y}
             kalman.Run(emptyMat)
 
             Dim center = New Point2f(src.Cols / 2.0F, src.Rows / 2.0F)
@@ -1324,7 +1324,7 @@ Namespace VBClasses
         Dim lastTheta As Point3f
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public ptShiftXY As New cv.Point2f
+        Public shiftXY As New cv.Point2f
         Public Sub New()
             desc = "Cursor.ai: Use the IMU angular velocity and gravity angles to measure camera motion and stabilize the image."
         End Sub
@@ -1335,7 +1335,7 @@ Namespace VBClasses
             If task.heartBeatLT Then
                 lastTimeStamp = task.IMU_TimeStamp
                 lastTheta = task.accRadians
-                ptShiftXY = New cv.Point2f
+                shiftXY = New cv.Point2f
                 rotateAngle = 0
             Else
                 Dim dt = (task.IMU_TimeStamp - lastTimeStamp) / 1000.0
@@ -1353,8 +1353,8 @@ Namespace VBClasses
                 Dim maxShift = task.gridWH
                 dx = CSng(Math.Max(-maxShift, Math.Min(maxShift, dx)))
                 dy = CSng(Math.Max(-maxShift, Math.Min(maxShift, dy)))
-                ptShiftXY.X += dx
-                ptShiftXY.Y += dy
+                shiftXY.X += dx
+                shiftXY.Y += dy
             End If
 
             Dim motion = CSng(Math.Sqrt(gyro.X * gyro.X + gyro.Y * gyro.Y + gyro.Z * gyro.Z))
@@ -1362,12 +1362,18 @@ Namespace VBClasses
 
             Dim center = New Point2f(src.Cols / 2.0F, src.Rows / 2.0F)
             M = GetRotationMatrix2D(center, rotateAngle, 1.0)
-            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + ptShiftXY.X)
-            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ptShiftXY.Y)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + shiftXY.X)
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + shiftXY.Y)
             WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             InvertAffineTransform(task.SteadyCamIMU.M, inverseM)
 
-            labels(2) = "Stabilized  image shift=" + ptShiftXY.X.ToString(fmt1) + "," + ptShiftXY.Y.ToString(fmt1) +
+            dst3 = task.color.Clone
+            Dim origin = New cv.Point(CInt(center.X), CInt(center.Y))
+            Dim tip = New cv.Point(CInt(center.X + shiftXY.X * 4), CInt(center.Y + shiftXY.Y * 4))
+            Line(dst3, origin, tip, task.highlight, task.lineWidth, task.lineType)
+            Circle(dst3, tip, task.DotSize, task.highlight, -1)
+
+            labels(2) = "Stabilized  image shift=" + shiftXY.X.ToString(fmt1) + "," + shiftXY.Y.ToString(fmt1) +
                         "  roll=" + rotateAngle.ToString(fmt2) + " deg"
             labels(3) = If(noCameraMotion, "Camera steady", "Camera moving") + "  |gyro|=" + motion.ToString(fmt3) + " rad/s"
         End Sub

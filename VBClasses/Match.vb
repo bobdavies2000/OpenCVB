@@ -637,7 +637,7 @@ Namespace VBClasses
             desc = "Accumulate the lines in dst2 as a measure of how closely the lines will land."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            WarpAffine(task.lines.dst3, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(task.lines.dst3, dst3, task.SteadyCamIMU.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             accum.Run(dst3)
             dst2 = accum.dst2
             labels(2) = "Accumulated lines with each frame given " + accum.options.accumWeighted.ToString("0%")
@@ -666,8 +666,8 @@ Namespace VBClasses
 
             If task.heartBeatLT = False Then
                 Dim Minv As New Mat
-                InvertAffineTransform(task.steadyCam.M, Minv)
-                dst2 = task.steadyCam.dst3
+                InvertAffineTransform(task.SteadyCamIMU.M, Minv)
+                dst2 = task.SteadyCamIMU.dst3
                 For Each pt In ptLast
                     Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, lastM)
                     pt = WarpAffine_Basics.WarpPoint(ptAligned, Minv)
@@ -675,7 +675,7 @@ Namespace VBClasses
                 Next
             End If
 
-            lastM = task.steadyCam.M.Clone
+            lastM = task.SteadyCamIMU.M.Clone
         End Sub
     End Class
 
@@ -737,8 +737,8 @@ Namespace VBClasses
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            WarpAffine(redC.rcIndexMap, redC.rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redC.rcIndexMap, redC.rcIndexMap, task.SteadyCamIMU.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(dst2, dst3, task.SteadyCamIMU.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
 
@@ -826,7 +826,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             task.gOptions.DebugCheckBox.Checked = True
-            desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
+            desc = "Use steadyCamIMU.M to translate features from the current image to the steadyCam image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
@@ -839,18 +839,18 @@ Namespace VBClasses
             End If
 
             If task.heartBeatLT Then dst3.SetTo(0)
-            dst1 = task.steadyCam.dst3.Clone
+            dst1 = task.SteadyCamIMU.dst3.Clone
             For Each pt In ptList
-                pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
+                pt = WarpAffine_Basics.WarpPoint(pt, task.SteadyCamIMU.M)
                 Circle(dst1, pt, task.DotSize * 3, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
             Next
 
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             knn.queries = New List(Of cv.Point2f)(ptList)
 
-            CvtColor(task.steadyCam.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
+            CvtColor(task.SteadyCamIMU.dst3, dst2, cv.ColorConversionCodes.GRAY2BGR)
             For Each pt In knn.queries
-                pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
+                pt = WarpAffine_Basics.WarpPoint(pt, task.SteadyCamIMU.M)
                 Circle(dst2, pt, task.DotSize * 3, task.highlight, -1, task.lineType)
             Next
 

@@ -1466,7 +1466,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_SteadyCam : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics_TA
+        Dim steady As New SteadyCam_Basics
         Dim redC As New RedC_BasicsOld
         Dim color8U As New Color8U_Basics
         Public Sub New()

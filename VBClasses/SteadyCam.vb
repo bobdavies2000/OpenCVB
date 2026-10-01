@@ -1,27 +1,6 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class SteadyCam_Basics_TA : Inherits TaskParent
-        Public shiftXY As cv.Point
-        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public Sub New()
-            desc = "Use Match_CenterRect to determine the offset due to camera motion."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then
-                dst2 = task.SteadyCamIMU.dst2
-                dst3 = task.SteadyCamIMU.dst3
-                labels = task.SteadyCamIMU.labels
-            End If
-            shiftXY = task.SteadyCamIMU.ptShiftXY
-            InvertAffineTransform(task.SteadyCamIMU.M, inverseM)
-        End Sub
-    End Class
-
-
-
-
-    Public Class SteadyCam_Motion : Inherits TaskParent
+    Public Class SteadyCam_Basics : Inherits TaskParent
         Dim match As New Match_CenterRect
         Public shiftXY As cv.Point
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
@@ -40,6 +19,7 @@ Namespace VBClasses
             InvertAffineTransform(M, inverseM)
         End Sub
     End Class
+
 
 
 
@@ -115,7 +95,7 @@ Namespace VBClasses
             desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics_TA"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim shiftXY = task.SteadyCamIMU.ptShiftXY
+            Dim shiftXY = task.SteadyCamIMU.shiftXY
             kalman.kInput = {shiftXY.X, shiftXY.Y}
             kalman.Run(emptyMat)
             shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
@@ -126,8 +106,8 @@ Namespace VBClasses
             ' Shift gray so content stays locked to the template frame; 
             WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
-            dst2 = task.steadyCam.dst2
-            labels = task.steadyCam.labels
+            dst2 = task.SteadyCamIMU.dst2
+            labels = task.SteadyCamIMU.labels
         End Sub
     End Class
 
@@ -137,7 +117,7 @@ Namespace VBClasses
 
 
     Public Class SteadyCam_WarpAffine : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics_TA
+        Dim steady As New SteadyCam_Basics
         Public Sub New()
             desc = "Cursor.ai: Use SteadyCam_Basics shift output as WarpAffine input, then rotate with verticalizeAngle."
             labels = {"", "", "SteadyCam_Basics match", "Original gray with rotation + shift"}
