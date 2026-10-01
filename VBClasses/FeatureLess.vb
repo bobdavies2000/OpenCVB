@@ -1756,16 +1756,19 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_SteadyCam : Inherits TaskParent
+    Public Class FeatureLess_SteadyCamMotion : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim steadyCam As New SteadyCam_Motion
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm solution.
-            desc = "Use the maxDist point with task.steadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
+            desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            steadyCam.Run(task.gray)
+
             fLess.Run(src)
             labels(2) = fLess.labels(2)
 
@@ -1781,7 +1784,7 @@ Namespace VBClasses
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
             For Each rcPrev In rcSnapshotList
-                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
+                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, steadyCam.inverseM)
                 For Each rc In fLess.rcList
                     If rc.index = 0 Then Continue For
                     If rc.rect.Contains(pt) Then
@@ -1813,7 +1816,7 @@ Namespace VBClasses
 
                 For Each rc In rcSnapshotList
                     If rc.index <> 0 Then
-                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, steadyCam.inverseM)
                         Circle(dst2, pt, task.DotSize + 2, black, -1)
                         Circle(dst2, pt, task.DotSize, task.highlight, -1)
                     End If
@@ -1823,7 +1826,91 @@ Namespace VBClasses
             strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
             strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
-            strOut += "All circles represent the location of a cell at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
+            strOut += ""
+            SetTrueText(strOut, 1)
+
+            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
+            labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_SteadyCamIMU : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public rcList As New List(Of rcData)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            ' Hungarian Assignment algorithm solution.
+            desc = "Use the maxDist point with task.steadyCamIMU.M to track the FeatureLess_Basics cells.  No cost function needed."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            labels(2) = fLess.labels(2)
+
+            Static rcSnapshotList As List(Of rcData)
+            If task.heartBeatLT Then
+                rcSnapshotList = New List(Of rcData)(fLess.rcList)
+                rcSnapshotList.RemoveAt(0)
+                dst3 = Palettize(fLess.dst1, 0)
+            End If
+
+            indexMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData())
+            Dim usedList As New List(Of Integer)
+            For Each rcPrev In rcSnapshotList
+                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.SteadyCamIMU.inverseM)
+                For Each rc In fLess.rcList
+                    If rc.index = 0 Then Continue For
+                    If rc.rect.Contains(pt) Then
+                        If usedList.Contains(rc.index) = False Then
+                            rc.ID = rcPrev.index
+                            indexMap(rc.rect).SetTo(rc.ID, rc.mask)
+                            rcList.Add(rc)
+                            usedList.Add(rc.index)
+                            Exit For
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim unusedCount = fLess.rcList.Count - usedList.Count
+            Dim nextSlot As Integer = fLess.rcList.Count
+            For Each rc In fLess.rcList
+                If rc.index = 0 Then Continue For
+                If usedList.Contains(rc.index) = False Then
+                    rc.ID = nextSlot
+                    nextSlot += 1
+                    indexMap(rc.rect).SetTo(rc.ID, rc.mask)
+                    rcList.Add(rc)
+                End If
+            Next
+
+            If standaloneTest() Then
+                dst2 = Palettize(indexMap, 0)
+
+                For Each rc In rcSnapshotList
+                    If rc.index <> 0 Then
+                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.SteadyCamIMU.inverseM)
+                        pt.X = Math.Abs(pt.X)
+                        pt.Y = Math.Abs(pt.Y)
+                        Circle(dst2, pt, task.DotSize + 2, black, -1)
+                        Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                    End If
+                Next
+            End If
+
+            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
+            strOut += "A cell with no circle is a new cell." + vbCrLf
+            strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
             strOut += ""
             SetTrueText(strOut, 1)
 

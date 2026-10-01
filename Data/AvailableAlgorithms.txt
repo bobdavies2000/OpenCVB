@@ -205,7 +205,8 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_Ordered
 FeatureLess_OrderKNN
-FeatureLess_SteadyCam
+FeatureLess_SteadyCamIMU
+FeatureLess_SteadyCamMotion
 FeatureMap_Basics
 FeatureMap_Core
 FeatureMap_CreateList
@@ -351,6 +352,8 @@ IMU_Methods
 IMU_Plot
 IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime
+IMU_SteadyCam_TA
+IMU_SteadyCamKalman
 IMU_Vertical
 Indexer_Basics
 Indexer_Corners
@@ -669,6 +672,7 @@ SteadyCam_BasicsOriginal
 SteadyCam_FindLines
 SteadyCam_Kalman
 SteadyCam_LongestLine
+SteadyCam_Motion
 SteadyCam_WarpAffine
 SteadyM_Basics
 SteadyM_Delaunay

@@ -746,63 +746,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Match_CenterRect : Inherits TaskParent
-        Public match As New Match_Basics
-        Dim kalman As New Kalman_Basics
-        Public shiftXY As cv.Point2f
-        Public forceRecenter As Boolean
-        Public centerRect As cv.Rect
-        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public useKalman As Boolean = True
-        Public Sub New()
-            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
-            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
-            desc = "Cursor.ai: Match image center with Match_Basics to find X/Y shift; dst3 is gray shifted to align (black edges where missing)."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayOriginal
-
-            If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
-                forceRecenter = False
-
-                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
-                match.template = src(centerRect).Clone
-                shiftXY = New cv.Point2f(-shiftXY.X, -shiftXY.Y) ' return to zero, zero
-                If standaloneTest() Then dst3 = src.Clone
-            Else
-                match.Run(src)
-                If standaloneTest() And match.correlationMat.Width > 0 Then
-                    dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
-                    Rectangle(dst2, centerRect, white, task.lineWidth)
-                    Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
-                End If
-
-                If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
-
-                shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
-
-                If useKalman Then
-                    kalman.kInput = {shiftXY.X, shiftXY.Y}
-                    kalman.Run(emptyMat)
-                    shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-                End If
-            End If
-
-            M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 2, shiftXY.Y)
-
-            If standaloneTest() Then
-                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + $"({shiftXY.X:F1}, {shiftXY.Y:F1})"
-                labels(3) = "Aligned gray; missing data is black."
-            End If
-        End Sub
-    End Class
-
-
-
-
     Public Class Match_Points : Inherits TaskParent
         Public ptDataList As New List(Of ptData)
         Public ptList As New List(Of cv.Point)
@@ -921,6 +864,56 @@ Namespace VBClasses
                     Line(dst3, pt, ptAligned, task.highlight, task.lineWidth, task.lineType)
                 End If
             Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Match_CenterRect : Inherits TaskParent
+        Public match As New Match_Basics
+        Public shiftXY As cv.Point2f
+        Public forceRecenter As Boolean
+        Public centerRect As cv.Rect
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
+            desc = "Cursor.ai: Match image center to find X/Y shift; dst3 is aligned (black edges where missing)."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayOriginal
+
+            If task.heartBeat Or forceRecenter Or task.optionsChanged Then
+                forceRecenter = False
+
+                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
+                match.template = src(centerRect).Clone
+                shiftXY = New cv.Point2f(0, 0) ' return to (zero, zero)
+                If standaloneTest() Then dst3 = src.Clone
+            Else
+                match.Run(src)
+                If standaloneTest() And match.correlationMat.Width > 0 Then
+                    dst2 = Match_Basics.showCorrelationMat(match.correlationMat, match.mm.minVal, src.Size)
+                    Rectangle(dst2, centerRect, white, task.lineWidth)
+                    Circle(dst2, match.newCenter, task.DotSize, black, -1, task.lineType)
+                End If
+
+                If centerRect.Contains(match.newCenter) = False Then forceRecenter = True
+
+                shiftXY = New cv.Point2f(src.Width \ 2 - match.newCenter.X, src.Height \ 2 - match.newCenter.Y)
+            End If
+
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            If standaloneTest() Then
+                WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                labels(2) = "corr=" + match.correlation.ToString(fmt3) + "  shift=" + $"({shiftXY.X:F1}, {shiftXY.Y:F1})"
+                labels(3) = "Aligned gray; missing data is black."
+            End If
         End Sub
     End Class
 End Namespace

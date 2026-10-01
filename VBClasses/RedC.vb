@@ -75,7 +75,7 @@ Namespace VBClasses
 
     Public Class RedC_BasicsNew : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Public fLess As New FeatureLess_SteadyCam
+        Public fLess As New FeatureLess_SteadyCamIMU
         Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
@@ -577,7 +577,7 @@ Namespace VBClasses
 
     Public Class RedC_FeatureLessTestSingle : Inherits TaskParent
         Dim redC As New RedC_Basics
-        Dim fLess As New FeatureLess_SteadyCam
+        Dim fLess As New FeatureLess_SteadyCamIMU
         Public merged As New rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

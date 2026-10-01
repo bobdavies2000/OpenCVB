@@ -24,6 +24,8 @@ Namespace VBClasses
         Public sharpRGB As Mat
         Public pcSplit() As Mat
         Public depthRGB As Mat
+        Public steadyCam As SteadyCam_Basics_TA
+        Public SteadyCamIMU As IMU_SteadyCam_TA
 
         Public depthmask As Mat
         Public noDepthMask As Mat
@@ -81,7 +83,6 @@ Namespace VBClasses
         Public lines As Line_Basics_TA
         Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
         Public steadyLineWidth As Integer
-        Public steadyCam As SteadyCam_Basics_TA
 
         Public motion As Motion_Basics_TA
         ' Public motionStable As StableGray_Measure
@@ -195,7 +196,6 @@ Namespace VBClasses
         Public yawIMU As Single
         Public rollIMU As Single
 
-        ' RedCloud variables
         Public channelCount As Integer = 2
         Public channelIndex As Integer = 0
         Public channels() As Integer = {0, 1}

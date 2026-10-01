@@ -4,7 +4,7 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim fLess As New FeatureLess_SteadyCam
+        Dim fLess As New FeatureLess_SteadyCamIMU
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use the FeatureLess regions to improve the RedColor output.  Issue: rects are oversized!  Fix coming..."

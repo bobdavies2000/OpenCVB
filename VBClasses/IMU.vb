@@ -1,4 +1,6 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class IMU_Basics_TA : Inherits TaskParent
         Public noCameraMotion As Boolean
@@ -1286,6 +1288,88 @@ Namespace VBClasses
             dst2 = plot.dst2
             dst3 = plot.dst3
             labels(2) = "When run standaloneTest(), the default is to plot the angular velocity for X, Y, and Z"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class IMU_SteadyCamKalman : Inherits TaskParent
+        Dim kalman As New Kalman_Basics
+        Public Sub New()
+            desc = "SteadyCamIMU but with Kalman filtering"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            kalman.kInput = {task.SteadyCamIMU.rotateAngle, task.SteadyCamIMU.ptShiftXY.X, task.SteadyCamIMU.ptShiftXY.Y}
+            kalman.Run(emptyMat)
+
+            Dim center = New Point2f(src.Cols / 2.0F, src.Rows / 2.0F)
+            Dim M = GetRotationMatrix2D(center, kalman.kOutput(0), 1.0)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + kalman.kOutput(1))
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + kalman.kOutput(2))
+            WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            labels(2) = task.SteadyCamIMU.labels(2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class IMU_SteadyCam_TA : Inherits TaskParent
+        Public rotateAngle As Single
+        Public noCameraMotion As Boolean
+        Dim lastTimeStamp As Double
+        Dim lastTheta As Point3f
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public ptShiftXY As New cv.Point2f
+        Public Sub New()
+            desc = "Cursor.ai: Use the IMU angular velocity and gravity angles to measure camera motion and stabilize the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Dim gyro = task.IMU_AngularVelocity
+            If task.heartBeatLT Then
+                lastTimeStamp = task.IMU_TimeStamp
+                lastTheta = task.accRadians
+                ptShiftXY = New cv.Point2f
+                rotateAngle = 0
+            Else
+                Dim dt = (task.IMU_TimeStamp - lastTimeStamp) / 1000.0
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt /= 1000.0
+                If dt < 0.000001 Or dt > 1.0 Then dt = 0
+                lastTimeStamp = task.IMU_TimeStamp
+
+                Dim dPitch = task.accRadians.X - lastTheta.X
+                Dim dRoll = task.accRadians.Z - lastTheta.Z
+                lastTheta = task.accRadians
+
+                rotateAngle = CSng(-dRoll * RadToDeg)
+                Dim dx = CSng(-dPitch * PixelsPerRad - gyro.Y * dt * PixelsPerRad)
+                Dim dy = CSng(gyro.X * dt * PixelsPerRad)
+                Dim maxShift = task.gridWH
+                dx = CSng(Math.Max(-maxShift, Math.Min(maxShift, dx)))
+                dy = CSng(Math.Max(-maxShift, Math.Min(maxShift, dy)))
+                ptShiftXY.X += dx
+                ptShiftXY.Y += dy
+            End If
+
+            Dim motion = CSng(Math.Sqrt(gyro.X * gyro.X + gyro.Y * gyro.Y + gyro.Z * gyro.Z))
+            noCameraMotion = motion < 0.05F
+
+            Dim center = New Point2f(src.Cols / 2.0F, src.Rows / 2.0F)
+            M = GetRotationMatrix2D(center, rotateAngle, 1.0)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + ptShiftXY.X)
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + ptShiftXY.Y)
+            WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            InvertAffineTransform(task.SteadyCamIMU.M, inverseM)
+
+            labels(2) = "Stabilized  image shift=" + ptShiftXY.X.ToString(fmt1) + "," + ptShiftXY.Y.ToString(fmt1) +
+                        "  roll=" + rotateAngle.ToString(fmt2) + " deg"
+            labels(3) = If(noCameraMotion, "Camera steady", "Camera moving") + "  |gyro|=" + motion.ToString(fmt3) + " rad/s"
         End Sub
     End Class
 End Namespace
