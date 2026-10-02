@@ -883,13 +883,19 @@ Namespace VBClasses
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
             desc = "Cursor.ai: Match image center to find X/Y shift; dst3 is aligned (black edges where missing)."
         End Sub
+        Public Shared Function buildCenterRect(sz As cv.Size) As cv.Rect
+            Dim padFactor As Integer = 4
+            Dim padX As Integer = sz.Width \ padFactor
+            Dim padY As Integer = sz.Height \ padFactor
+            Return New cv.Rect(padX, padY, sz.Width - padX * 2, sz.Height - padY * 2)
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.grayOriginal
 
-            If task.heartBeat Or forceRecenter Or task.optionsChanged Then
+            If task.heartBeatLT Or forceRecenter Or task.optionsChanged Then
                 forceRecenter = False
 
-                centerRect = Rectangle_Basics.centerRect(src.Size, 3)
+                centerRect = buildCenterRect(src.Size)
                 match.template = src(centerRect).Clone
                 shiftXY = New cv.Point2f(0, 0) ' return to (zero, zero)
                 If standaloneTest() Then dst3 = src.Clone

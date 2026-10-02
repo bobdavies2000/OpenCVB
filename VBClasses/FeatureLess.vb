@@ -1768,6 +1768,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             steadyCam.Run(task.gray)
+            dst1 = steadyCam.dst2
 
             fLess.Run(src)
             labels(2) = fLess.labels(2)
@@ -1823,7 +1824,7 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut = "" ' RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
             strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
             strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf

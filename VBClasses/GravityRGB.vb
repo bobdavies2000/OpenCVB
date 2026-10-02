@@ -430,4 +430,56 @@ Namespace VBClasses
             labels(3) = "lpGravity angle = " + task.lpGravity.angle.ToString(fmt2) + " deg"
         End Sub
     End Class
+
+
+
+
+    Public Class GravityRGB_SteadyCam : Inherits TaskParent
+        Public bestAngle As Double
+        Public angleOffset As Double
+        Dim center As cv.Point2f
+        Public Sub New()
+            center = New Point2f(dst2.Width / 2, dst2.Height / 2)
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",
+                  "AbsDiff of inverse vs original lines (jagged residual)"}
+            desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst1: rotateRGB, inverse WarpAffine, compare to original."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Dim reconstructed As New Mat
+            Dim diff As New Mat
+            Dim sortScores As New SortedList(Of Integer, Double)(New compareAllowIdenticalInteger)
+
+            ' Search near the IMU gravity angle for the rotation that leaves the least jagged residual
+            ' after rotateRGB + inverse WarpAffine compared to the original lines image.
+            For i = -10 To 10
+                Dim angle = task.verticalizeAngle + i * 0.01
+                dst3 = GravityRGB_Basics.rotateRGB(src, angle)
+
+                ' Inverse of rotateRGB's WarpAffine (forward used GetRotationMatrix2D(center, -angle, 1))
+                Dim Minv = GetRotationMatrix2D(center, angle, 1)
+                WarpAffine(dst3, reconstructed, Minv, src.Size(), InterpolationFlags.Nearest)
+
+                Absdiff(reconstructed, src, diff)
+                Threshold(diff, diff, 0, 255, ThresholdTypes.Binary)
+                sortScores.Add(CountNonZero(diff), angle)
+            Next
+
+            bestAngle = sortScores.Values(0)
+            angleOffset = bestAngle - task.verticalizeAngle
+
+            dst2 = GravityRGB_Basics.rotateRGB(src, bestAngle)
+
+            Dim MinvBest = GetRotationMatrix2D(center, bestAngle, 1)
+            WarpAffine(dst2, dst1, MinvBest, src.Size(), InterpolationFlags.Nearest)
+
+            strOut = "IMU verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg" + vbCrLf +
+                     "Corrected bestAngle = " + bestAngle.ToString(fmt3) + " deg" + vbCrLf +
+                     "angleOffset = " + angleOffset.ToString(fmt3) + " deg" + vbCrLf
+            SetTrueText(strOut, 1)
+            labels(2) = "Best gravity angle = " + bestAngle.ToString("0.000") + " (offset " + angleOffset.ToString("0.000") + ")"
+        End Sub
+    End Class
 End Namespace

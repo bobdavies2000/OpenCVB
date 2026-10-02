@@ -263,6 +263,7 @@ Gravity_Jitter
 Gravity_LineTrackStabilize
 GravityRGB_Basics
 GravityRGB_RotateRGB
+GravityRGB_SteadyCam
 GravityRGB_Vertical
 Grid_Basics_TA
 Grid_FPS
@@ -352,7 +353,12 @@ IMU_Methods
 IMU_Plot
 IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime
+IMU_SteadyCam
 IMU_SteadyCam_TA
+IMU_SteadyCam1
+IMU_SteadyCam2
+IMU_SteadyCam3
+IMU_SteadyCam4
 IMU_SteadyCamKalman
 IMU_Vertical
 Indexer_Basics
