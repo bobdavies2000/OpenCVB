@@ -61,7 +61,7 @@ Namespace VBClasses
             task.filterBasics = New Filter_Basics_TA
             task.foreground = New Foreground_Basics_TA
             task.leftRightBrightness = New LeftRight_Brightness_TA
-            task.SteadyCamIMU = New IMU_SteadyCam_TA
+            task.steadyCam = New SteadyCam_Basics_TA
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To task.cpu.callTrace.Count - 1
@@ -138,7 +138,7 @@ Namespace VBClasses
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(New cv.Mat)
-            task.SteadyCamIMU.Run(task.gray)
+            task.steadyCam.Run(task.gray)
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 

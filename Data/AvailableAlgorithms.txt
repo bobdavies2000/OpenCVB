@@ -205,8 +205,8 @@ FeatureFlow_LucasKanade
 FeatureLess_Basics
 FeatureLess_Ordered
 FeatureLess_OrderKNN
-FeatureLess_SteadyCamIMU
-FeatureLess_SteadyCamMotion
+FeatureLess_SteadyCam
+FeatureLess_Tracker
 FeatureMap_Basics
 FeatureMap_Core
 FeatureMap_CreateList
@@ -354,12 +354,6 @@ IMU_Plot
 IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime
 IMU_SteadyCam
-IMU_SteadyCam_TA
-IMU_SteadyCam1
-IMU_SteadyCam2
-IMU_SteadyCam3
-IMU_SteadyCam4
-IMU_SteadyCamKalman
 IMU_Vertical
 Indexer_Basics
 Indexer_Corners
@@ -608,8 +602,8 @@ Rectangle_Fit
 Rectangle_Quadrants
 Rectangle_Rotated
 RedC_Basics
-RedC_BasicsNew
 RedC_BasicsOld
+RedC_BasicsTest
 RedC_CellLines
 RedC_Depth
 RedC_DepthMerge
@@ -673,7 +667,7 @@ StableGray_ToggleMinMax
 StableLine_Basics
 StDev_Highest
 StDev_Range
-SteadyCam_Basics
+SteadyCam_Basics_TA
 SteadyCam_BasicsOriginal
 SteadyCam_FindLines
 SteadyCam_Kalman

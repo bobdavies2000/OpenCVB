@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class SteadyCam_Basics : Inherits TaskParent
+    Public Class SteadyCam_Basics_TA : Inherits TaskParent
         Dim match As New Match_CenterRect
         Public shiftXY As cv.Point
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
@@ -95,7 +95,7 @@ Namespace VBClasses
             desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics_TA"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim shiftXY = task.SteadyCamIMU.shiftXY
+            Dim shiftXY = task.steadyCam.shiftXY
             kalman.kInput = {shiftXY.X, shiftXY.Y}
             kalman.Run(emptyMat)
             shiftXY = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
@@ -106,8 +106,8 @@ Namespace VBClasses
             ' Shift gray so content stays locked to the template frame; 
             WarpAffine(src, dst3, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
-            dst2 = task.SteadyCamIMU.dst2
-            labels = task.SteadyCamIMU.labels
+            dst2 = task.steadyCam.dst2
+            labels = task.steadyCam.labels
         End Sub
     End Class
 
@@ -117,23 +117,21 @@ Namespace VBClasses
 
 
     Public Class SteadyCam_WarpAffine : Inherits TaskParent
-        Dim steady As New SteadyCam_Basics
         Public Sub New()
             desc = "Cursor.ai: Use SteadyCam_Basics shift output as WarpAffine input, then rotate with verticalizeAngle."
             labels = {"", "", "SteadyCam_Basics match", "Original gray with rotation + shift"}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            steady.Run(src)
-            dst2 = steady.dst2
+            dst2 = task.steadyCam.dst2
 
             Dim angle = task.verticalizeAngle
-            Dim center = New Point2f(steady.dst3.Width / 2.0F, steady.dst3.Height / 2.0F)
+            Dim center = New Point2f(task.steadyCam.dst3.Width / 2.0F, task.steadyCam.dst3.Height / 2.0F)
             Dim M = GetRotationMatrix2D(center, -angle, 1.0)
 
             ' Rotate the shift-aligned SteadyCam_Basics output so dst3 reflects both shift and rotation.
-            WarpAffine(steady.dst3, dst3, M, steady.dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(task.steadyCam.dst3, dst3, M, task.steadyCam.dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
-            labels(2) = steady.labels(2)
+            labels(2) = task.steadyCam.labels(2)
             labels(3) = "angle=" + angle.ToString(fmt2) + " deg after shiftXY "
         End Sub
     End Class

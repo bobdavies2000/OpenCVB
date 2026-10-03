@@ -24,7 +24,7 @@ Namespace VBClasses
         Public sharpRGB As Mat
         Public pcSplit() As Mat
         Public depthRGB As Mat
-        Public SteadyCamIMU As IMU_SteadyCam_TA
+        Public steadyCam As SteadyCam_Basics_TA
 
         Public depthmask As Mat
         Public noDepthMask As Mat

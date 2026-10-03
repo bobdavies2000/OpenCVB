@@ -462,9 +462,9 @@ Namespace VBClasses
             Public contour As New List(Of cv.Point)
             Public depth As Single
             Public index As Integer
-            Public ID As Integer ' this identifies the cell in an index map
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
+            Public maxDStable As New cv.Point
             Public pixels As Integer
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Sub New()
@@ -489,13 +489,13 @@ Namespace VBClasses
                 Dim maxDist As cv.Point
                 maxDist.X = mm.maxLoc.X + rect.X
                 maxDist.Y = mm.maxLoc.Y + rect.Y
+                maxDStable = maxDist
 
                 Return maxDist
             End Function
             Public Function displayCell() As String
                 Dim strout = ""
                 strout += "index = " + CStr(index) + vbCrLf
-                strout += "ID = " + CStr(ID) + vbCrLf
                 strout += "age = " + CStr(age) + vbCrLf
 
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf

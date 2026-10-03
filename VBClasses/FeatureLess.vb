@@ -37,7 +37,7 @@ Namespace VBClasses
 
             rcList.Clear()
             Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
-            rcList.Add(New rcData(dst0, New cv.Rect(0, 0, dst0.Width, dst0.Height), 255) With {.pixels = 0, .index = 0})
+            rcList.Add(New rcData)
             dst1.SetTo(0)
             For Each rc In sortList.Values
                 rc.index = rcList.Count
@@ -48,7 +48,7 @@ Namespace VBClasses
 
             dst2 = Palettize(dst1, 0)
 
-            If task.firstPass Then task.clickPoint = rcList(1).maxDist
+            If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
 
             Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             rc = rcList(clickIndex)
@@ -1755,20 +1755,17 @@ Namespace VBClasses
 
 
 
-
-    Public Class FeatureLess_SteadyCamMotion : Inherits TaskParent
+    Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim steadyCam As New SteadyCam_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm solution.
             desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            steadyCam.Run(task.gray)
-            dst1 = steadyCam.dst2
+            dst1 = task.steadyCam.dst2
 
             fLess.Run(src)
             labels(2) = fLess.labels(2)
@@ -1777,7 +1774,7 @@ Namespace VBClasses
             If task.heartBeatLT Then
                 rcSnapshotList = New List(Of rcData)(fLess.rcList)
                 rcSnapshotList.RemoveAt(0)
-                dst3 = Palettize(fLess.dst1, 0)
+                dst3 = fLess.dst3
             End If
 
             indexMap.SetTo(0)
@@ -1785,13 +1782,13 @@ Namespace VBClasses
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
             For Each rcPrev In rcSnapshotList
-                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, steadyCam.inverseM)
+                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
                 For Each rc In fLess.rcList
                     If rc.index = 0 Then Continue For
                     If rc.rect.Contains(pt) Then
                         If usedList.Contains(rc.index) = False Then
-                            rc.ID = rcPrev.index
-                            indexMap(rc.rect).SetTo(rc.ID, rc.mask)
+                            rc.index = rcPrev.index
+                            indexMap(rc.rect).SetTo(rc.index, rc.mask)
                             rcList.Add(rc)
                             usedList.Add(rc.index)
                             Exit For
@@ -1805,9 +1802,9 @@ Namespace VBClasses
             For Each rc In fLess.rcList
                 If rc.index = 0 Then Continue For
                 If usedList.Contains(rc.index) = False Then
-                    rc.ID = nextSlot
+                    rc.index = nextSlot
                     nextSlot += 1
-                    indexMap(rc.rect).SetTo(rc.ID, rc.mask)
+                    indexMap(rc.rect).SetTo(rc.index, rc.mask)
                     rcList.Add(rc)
                 End If
             Next
@@ -1817,90 +1814,7 @@ Namespace VBClasses
 
                 For Each rc In rcSnapshotList
                     If rc.index <> 0 Then
-                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, steadyCam.inverseM)
-                        Circle(dst2, pt, task.DotSize + 2, black, -1)
-                        Circle(dst2, pt, task.DotSize, task.highlight, -1)
-                    End If
-                Next
-            End If
-
-            strOut = "" ' RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
-            strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
-            strOut += "A cell with no circle is a new cell." + vbCrLf
-            strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
-            strOut += "Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
-            strOut += ""
-            SetTrueText(strOut, 1)
-
-            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
-            labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class FeatureLess_SteadyCamIMU : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
-        Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            ' Hungarian Assignment algorithm solution.
-            desc = "Use the maxDist point with task.steadyCamIMU.M to track the FeatureLess_Basics cells.  No cost function needed."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            labels(2) = fLess.labels(2)
-
-            Static rcSnapshotList As List(Of rcData)
-            If task.heartBeatLT Then
-                rcSnapshotList = New List(Of rcData)(fLess.rcList)
-                rcSnapshotList.RemoveAt(0)
-                dst3 = Palettize(fLess.dst1, 0)
-            End If
-
-            indexMap.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData())
-            Dim usedList As New List(Of Integer)
-            For Each rcPrev In rcSnapshotList
-                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.SteadyCamIMU.inverseM)
-                For Each rc In fLess.rcList
-                    If rc.index = 0 Then Continue For
-                    If rc.rect.Contains(pt) Then
-                        If usedList.Contains(rc.index) = False Then
-                            rc.ID = rcPrev.index
-                            indexMap(rc.rect).SetTo(rc.ID, rc.mask)
-                            rcList.Add(rc)
-                            usedList.Add(rc.index)
-                            Exit For
-                        End If
-                    End If
-                Next
-            Next
-
-            Dim unusedCount = fLess.rcList.Count - usedList.Count
-            Dim nextSlot As Integer = fLess.rcList.Count
-            For Each rc In fLess.rcList
-                If rc.index = 0 Then Continue For
-                If usedList.Contains(rc.index) = False Then
-                    rc.ID = nextSlot
-                    nextSlot += 1
-                    indexMap(rc.rect).SetTo(rc.ID, rc.mask)
-                    rcList.Add(rc)
-                End If
-            Next
-
-            If standaloneTest() Then
-                dst2 = Palettize(indexMap, 0)
-
-                For Each rc In rcSnapshotList
-                    If rc.index <> 0 Then
-                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.SteadyCamIMU.inverseM)
-                        pt.X = Math.Abs(pt.X)
-                        pt.Y = Math.Abs(pt.Y)
+                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
                         Circle(dst2, pt, task.DotSize + 2, black, -1)
                         Circle(dst2, pt, task.DotSize, task.highlight, -1)
                     End If
@@ -1917,6 +1831,142 @@ Namespace VBClasses
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
             labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+        End Sub
+    End Class
+
+
+
+
+    Public Class XR_FeatureLess_Delaunay : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim delaunay As New Delaunay_Basics
+        Dim fLess As New FeatureLess_Basics
+        Public Sub New()
+            desc = "Create a map for the featureless cells with Delaunay triangulation"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+            rcList = fLess.rcList
+            dst2 = fLess.dst2
+            labels(2) = fLess.labels(2)
+
+            If task.heartBeatLT Or task.optionsChanged Then
+                delaunay.ptList.Clear()
+                For Each rc In rcList
+                    delaunay.ptList.Add(rc.maxDist)
+                Next
+
+                delaunay.Run(emptyMat)
+                dst1 = delaunay.dst3.Clone
+                labels(3) = delaunay.labels(2)
+
+                For Each rc In rcList
+                    If rc.index = 0 Then Continue For
+                    dst1(rc.rect).SetTo(rc.index, rc.mask)
+                Next
+            End If
+
+            dst3 = Palettize(dst1, 0)
+
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+        End Sub
+    End Class
+
+
+
+    Public Class XR_FeatureLess_SimpleOriginal : Inherits TaskParent
+        Dim fLessD As New XR_FeatureLess_Delaunay
+        Public rcList As New List(Of rcData)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public Sub New()
+            desc = "Build a Delaunay map on heartbeatLT then use it to keep the index consistent."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLessD.Run(src)
+
+            dst3 = fLessD.dst3
+            labels(2) = fLessD.labels(2)
+            dst1 = fLessD.dst1.Clone
+
+            indexMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData())
+            For Each rc In fLessD.rcList
+                If rc.index = 0 Then Continue For
+                Dim nextID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                indexMap(rc.rect).SetTo(nextID, rc.mask)
+                rcList.Add(rc)
+            Next
+
+            dst2 = Palettize(indexMap, 0)
+
+            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+    Public Class FeatureLess_Tracker : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public rcList As New List(Of rcData)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim delaunay As New Delaunay_Basics
+        Public Sub New()
+            desc = "Build a Delaunay map on heartbeatLT then use it to keep the rc.index consistent."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastIndexMap = indexMap.Clone
+            Dim rcLastList = New List(Of rcData)(rcList)
+
+            fLess.Run(src)
+            labels(2) = fLess.labels(2)
+
+            If task.heartBeatLT Or task.optionsChanged Then
+                delaunay.ptList.Clear()
+                For Each rc In fLess.rcList
+                    delaunay.ptList.Add(rc.maxDist)
+                Next
+
+                delaunay.Run(emptyMat)
+                dst1 = delaunay.dst3
+                labels(3) = delaunay.labels(2)
+
+                For Each rc In fLess.rcList
+                    If rc.index = 0 Then Continue For
+                    dst1(rc.rect).SetTo(rc.index, rc.mask)
+                Next
+            End If
+
+            indexMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData())
+            For Each rc In fLess.rcList
+                If rc.index = 0 Then Continue For
+                rc.index = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+
+                Dim lastIndex = lastIndexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If lastIndex = rc.index And rc.index < rcLastList.Count Then
+                    rc.age = rcLastList(rc.index).age + 1
+                    If rc.age > 999 Then rc.age = 10
+                End If
+            Next
+
+            dst2 = Palettize(indexMap, 0)
+
+            If standaloneTest() Then
+                dst3 = Palettize(dst1, 0)
+                For Each rc In fLess.rcList
+                    SetTrueText(CStr(rc.age), rc.maxDStable, 2)
+                    Circle(dst3, rc.maxDStable, task.DotSize, task.highlight, -1)
+                Next
+            End If
         End Sub
     End Class
 End Namespace

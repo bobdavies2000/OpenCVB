@@ -49,11 +49,11 @@ Namespace VBClasses
 
     Public Class Flood_CellMerge : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim redC As New RedC_BasicsNew
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Use CalcHist on FeatureLess_Core cells to find Color8U floodfill regions."
+            desc = "Use CalcHist on FeatureLess_Tracker cells to find Color8U floodfill regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -62,17 +62,16 @@ Namespace VBClasses
 
             Dim rc As rcData
             If standaloneTest() Then
-                For Each rc In redC.fLess.rcList
+                For Each rc In redC.tracker.rcList
                     If rc.index = 0 Then Continue For
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-                    SetTrueText(CStr(rc.index), rc.maxDist, 2)
                 Next
             End If
 
             Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
             Dim histogram As New Mat
 
-            rcList = New List(Of rcData)(redC.fLess.rcList)
+            rcList = New List(Of rcData)(redC.tracker.rcList)
             Dim rcOwner(redC.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
             For Each rc In rcList
@@ -85,7 +84,7 @@ Namespace VBClasses
                     If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
                 Next
 
-                SetTrueText(CStr(rc.index), rc.maxDist, 2)
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
             dst1.SetTo(0)
