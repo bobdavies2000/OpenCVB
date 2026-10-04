@@ -10,7 +10,7 @@ Namespace VBClasses
         Dim subdiv As New Subdiv2D
         Public Sub New()
             If standalone Then useFeatures = True
-            dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
+            dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
             desc = "Subdivide an image based on ptList."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -19,6 +19,7 @@ Namespace VBClasses
                 ptList.Clear()
                 For Each pt In feat.features
                     ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                    If ptList.Count >= 255 Then Exit For ' CV_8U limit...
                 Next
             End If
 

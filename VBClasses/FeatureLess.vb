@@ -55,7 +55,7 @@ Namespace VBClasses
             Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
             SetTrueText(rc.displayCell, 3)
 
-            labels(2) = CStr(rcList.Count) + " featureless regions found"
+            labels(2) = CStr(rcList.Count - 1) + " featureless regions found"
         End Sub
     End Class
 
@@ -1878,7 +1878,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_SimpleOriginal : Inherits TaskParent
+    Public Class XR_FeatureLess_TrackerOriginal : Inherits TaskParent
         Dim fLessD As New XR_FeatureLess_Delaunay
         Public rcList As New List(Of rcData)
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1911,11 +1911,93 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Tracker : Inherits TaskParent
+
+    Public Class FeatureLess_Delaunay : Inherits TaskParent
+        Public delaunay As New Delaunay_Basics
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Use Delaunay to manage the rc.index and keep the featureless cells unique."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(src)
+            labels(2) = fLess.labels(2)
+
+            If task.heartBeatLT Or task.optionsChanged Then
+                rcList = New List(Of rcData)(fLess.rcList)
+                delaunay.ptList.Clear()
+                delaunay.ptList.Add(New cv.Point)
+                For Each rc In rcList
+                    delaunay.ptList.Add(rc.maxDist)
+                Next
+
+                dst0 = dst1.Clone
+                delaunay.Run(emptyMat)
+                dst1 = delaunay.dst3
+                If task.firstPass Then dst0 = delaunay.dst3.Clone
+
+                labels(3) = delaunay.labels(2)
+
+                Dim usedList As New List(Of Byte)
+                Dim nextSlot As Integer = fLess.rcList.Count
+                For Each rc In rcList
+                    rc.id = dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If usedList.Contains(rc.id) Then
+                        rc.id = nextSlot
+                        nextSlot += 1
+                    End If
+                    usedList.Add(rc.id)
+                Next
+
+                dst1.SetTo(0)
+                For i = 0 To delaunay.facetList.Count - 1
+                    If rcList(i).index = 0 Then Continue For
+                    FillConvexPoly(dst1, delaunay.facetList(i), rcList(i).id, LineTypes.Link4)
+                Next
+
+                ' run before palettize
+                For Each rc In rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    DrawContours(dst1(rc.rect), {rc.contour}, 0, rc.id, -1)
+                Next
+
+                dst3 = Palettize(dst1, 0)
+
+                ' run after palettize
+                For Each rc In rcList
+                    If rc.index = 0 Then Continue For
+                    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+                    Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+                Next
+            Else
+                rcList = New List(Of rcData)(fLess.rcList)
+
+                For Each rc In rcList
+                    rc.id = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Next
+            End If
+
+            Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                tmp(rc.rect).SetTo(rc.id, rc.mask)
+                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+
+            dst2 = Palettize(tmp, 0)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_Tracker : Inherits TaskParent
+        Public rcList As New List(Of rcData)
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim delaunay As New Delaunay_Basics
+        Dim fLessD As New FeatureLess_Delaunay
+        Dim inputList As New List(Of rcData)
         Public Sub New()
             desc = "Build a Delaunay map on heartbeatLT then use it to keep the rc.index consistent."
         End Sub
@@ -1923,32 +2005,16 @@ Namespace VBClasses
             Dim lastIndexMap = indexMap.Clone
             Dim rcLastList = New List(Of rcData)(rcList)
 
-            fLess.Run(src)
-            labels(2) = fLess.labels(2)
+            fLessD.Run(task.gray)
+            inputList = New List(Of rcData)(fLessD.rcList)
+            indexMap = fLessD.dst1
+            labels(2) = fLessD.labels(2)
 
-            If task.heartBeatLT Or task.optionsChanged Then
-                delaunay.ptList.Clear()
-                For Each rc In fLess.rcList
-                    delaunay.ptList.Add(rc.maxDist)
-                Next
-
-                delaunay.Run(emptyMat)
-                dst1 = delaunay.dst3
-                labels(3) = delaunay.labels(2)
-
-                For Each rc In fLess.rcList
-                    If rc.index = 0 Then Continue For
-                    dst1(rc.rect).SetTo(rc.index, rc.mask)
-                Next
-            End If
-
-            indexMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
-            For Each rc In fLess.rcList
+            For Each rc In inputList
                 If rc.index = 0 Then Continue For
-                rc.index = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.id = indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcList.Add(rc)
 
                 Dim lastIndex = lastIndexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -1962,7 +2028,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst3 = Palettize(dst1, 0)
-                For Each rc In fLess.rcList
+                For Each rc In fLessD.rcList
                     SetTrueText(CStr(rc.age), rc.maxDStable, 2)
                     Circle(dst3, rc.maxDStable, task.DotSize, task.highlight, -1)
                 Next
