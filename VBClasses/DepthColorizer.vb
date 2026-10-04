@@ -11,12 +11,22 @@ Namespace VBClasses
             Dim gradientWidth = Math.Min(dst2.Width, 256)
             Dim f As Double = 1.0
             If saveVecColors.Length = 1 Then
-                Dim initVal = 43
-                Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
-                Dim bgr(3) As Byte
+                ' some solid colors that should be easier to see.
+                task.vecColors(0) = CrimsonRed
+                task.vecColors(1) = VividAmber
+                task.vecColors(2) = ElectricAmberYellow
+                task.vecColors(3) = KellyGreen
+                task.vecColors(4) = ElectricLime
+                task.vecColors(5) = DeepCyan
+                task.vecColors(6) = CobaltBlue
+                task.vecColors(7) = ElectricRoyalBlue
+                task.vecColors(8) = DeepViolet
+                task.vecColors(9) = HotCoral
+                task.vecColors(10) = RichGold
+                For i = 11 To task.vecColors.Length - 1
+                    task.vecColors(i) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+                Next
                 For i = 0 To task.vecColors.Length - 1
-                    rand.NextBytes(bgr)
-                    task.vecColors(i) = New Vec3b(bgr(0), bgr(1), bgr(2))
                     task.scalarColors(i) = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
                 Next
 

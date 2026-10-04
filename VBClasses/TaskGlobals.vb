@@ -20,14 +20,29 @@ Public Module vbc
     Public Const fmt2 = "0.00"
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
+
+    Public ReadOnly CrimsonRed As New cv.Vec3b(60, 20, 220)
+    Public ReadOnly VividAmber As New cv.Vec3b(0, 102, 255)
+    Public ReadOnly ElectricAmberYellow As New cv.Vec3b(0, 191, 255)
+    Public ReadOnly KellyGreen As New cv.Vec3b(67, 168, 0)
+    Public ReadOnly ElectricLime As New cv.Vec3b(50, 205, 50)
+    Public ReadOnly DeepCyan As New cv.Vec3b(204, 168, 0)
+    Public ReadOnly CobaltBlue As New cv.Vec3b(171, 71, 0)
+    Public ReadOnly ElectricRoyalBlue As New cv.Vec3b(255, 80, 30)
+    Public ReadOnly DeepViolet As New cv.Vec3b(255, 0, 128)
+    Public ReadOnly HotCoral As New cv.Vec3b(96, 64, 255)
+    Public ReadOnly RichGold As New cv.Vec3b(32, 165, 218)
+
     Public ReadOnly white As New Scalar(255, 255, 255)
     Public ReadOnly black As New Scalar(0, 0, 0)
     Public ReadOnly grayColor As New Scalar(127, 127, 127)
     Public ReadOnly yellow As New Scalar(0, 255, 255)
     Public ReadOnly purple As New Scalar(255, 0, 255)
     Public ReadOnly teal As New Scalar(255, 255, 0)
-    Public ReadOnly red As New Scalar(0, 0, 255), green As New Scalar(0, 255, 0)
+    Public ReadOnly red As New Scalar(0, 0, 255)
+    Public ReadOnly green As New Scalar(0, 255, 0)
     Public ReadOnly blue As New Scalar(255, 0, 0)
+
 
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
@@ -98,7 +113,7 @@ Public Module vbc
         Return GetMinMax(mat)
     End Function
     ' alternative optional parameter: ApproxTC89L1 or ApproxNone
-    Public Function ContourBuild(mask As Mat, Optional approxMode As contourApproximationModes = contourApproximationModes.ApproxNone) As List(Of cv.Point)
+    Public Function ContourBuild(mask As Mat, Optional approxMode As ContourApproximationModes = ContourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing
         FindContours(mask, allContours, Nothing, RetrievalModes.External, approxMode)
 

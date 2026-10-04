@@ -110,6 +110,7 @@ Namespace VBClasses
             Else
                 task.colorMap.Set(Of Vec3b)(0, 0, task.vecColors(0))
             End If
+
             Dim output As New Mat
             If input.Type <> MatType.CV_8U Then
                 Dim input8u As New Mat

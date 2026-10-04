@@ -1912,7 +1912,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Delaunay : Inherits TaskParent
+    Public Class FeatureLess_Tracker : Inherits TaskParent
         Public delaunay As New Delaunay_Basics
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
@@ -1921,10 +1921,11 @@ Namespace VBClasses
             desc = "Use Delaunay to manage the rc.index and keep the featureless cells unique."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcLastList = New List(Of rcData)(rcList)
             fLess.Run(src)
-            labels(2) = fLess.labels(2)
+            Dim idCount As Integer
 
-            If task.heartBeatLT Or task.optionsChanged Then
+            If task.heartBeat Or task.optionsChanged Then
                 rcList = New List(Of rcData)(fLess.rcList)
                 delaunay.ptList.Clear()
                 delaunay.ptList.Add(New cv.Point)
@@ -1948,6 +1949,7 @@ Namespace VBClasses
                         nextSlot += 1
                     End If
                     usedList.Add(rc.id)
+                    rc.maxDStable = rc.maxDist
                 Next
 
                 dst1.SetTo(0)
@@ -1967,13 +1969,14 @@ Namespace VBClasses
                 ' run after palettize
                 For Each rc In rcList
                     If rc.index = 0 Then Continue For
-                    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+                    DrawContours(dst3(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
             Else
                 rcList = New List(Of rcData)(fLess.rcList)
 
                 For Each rc In rcList
+                    If rc.index = 0 Then Continue For
                     rc.id = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Next
             End If
@@ -1981,58 +1984,30 @@ Namespace VBClasses
             Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
+                Dim rcPrev As rcData = Nothing
+                For Each rcPrev In rcLastList
+                    If rc.index = 0 Then Continue For
+                    If rcPrev.id = rc.id Then Exit For
+                Next
+
+                If rcPrev IsNot Nothing AndAlso rc.id = rcPrev.id Then
+                    rc.age = rcPrev.age + 1
+                    If rc.age > 999 Then rc.age = 10
+                    rc.maxDStable = rcPrev.maxDStable
+                    idCount += 1
+                Else
+                    rc.maxDStable = rc.maxDist
+                End If
+
                 tmp(rc.rect).SetTo(rc.id, rc.mask)
-                Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(rc.age, rc.maxDist, 2)
+                Circle(dst3, rc.maxDStable, task.DotSize, task.highlight, -1)
             Next
 
             dst2 = Palettize(tmp, 0)
-        End Sub
-    End Class
 
-
-
-
-
-    Public Class FeatureLess_Tracker : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim fLessD As New FeatureLess_Delaunay
-        Dim inputList As New List(Of rcData)
-        Public Sub New()
-            desc = "Build a Delaunay map on heartbeatLT then use it to keep the rc.index consistent."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastIndexMap = indexMap.Clone
-            Dim rcLastList = New List(Of rcData)(rcList)
-
-            fLessD.Run(task.gray)
-            inputList = New List(Of rcData)(fLessD.rcList)
-            indexMap = fLessD.dst1
-            labels(2) = fLessD.labels(2)
-
-            rcList.Clear()
-            rcList.Add(New rcData())
-            For Each rc In inputList
-                If rc.index = 0 Then Continue For
-                rc.id = indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcList.Add(rc)
-
-                Dim lastIndex = lastIndexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If lastIndex = rc.index And rc.index < rcLastList.Count Then
-                    rc.age = rcLastList(rc.index).age + 1
-                    If rc.age > 999 Then rc.age = 10
-                End If
-            Next
-
-            dst2 = Palettize(indexMap, 0)
-
-            If standaloneTest() Then
-                dst3 = Palettize(dst1, 0)
-                For Each rc In fLessD.rcList
-                    SetTrueText(CStr(rc.age), rc.maxDStable, 2)
-                    Circle(dst3, rc.maxDStable, task.DotSize, task.highlight, -1)
-                Next
-            End If
+            labels(2) = CStr(rcList.Count) + " featureless cells.  " + CStr(idCount) + " were tracked."
+            labels(3) = "Heartbeat ID index map and cells.  Circles are the MaxDStable which can move if cell is lost."
         End Sub
     End Class
 End Namespace
