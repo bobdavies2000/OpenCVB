@@ -340,7 +340,7 @@ Namespace VBClasses
 
     Public Class Flood_CellMergeOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -411,7 +411,7 @@ Namespace VBClasses
     Public Class Flood_CellMergeFail : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim tracker As New FeatureLess_Tracker
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -479,7 +479,7 @@ Namespace VBClasses
 
     Public Class Flood_CellMerge : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

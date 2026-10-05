@@ -1,79 +1,5 @@
 Imports System.Runtime.InteropServices : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedC_Basics : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
-        Public tracker As New FeatureLess_Tracker
-        Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Build a list of cells for each floodfill region in the Color8U input."
-        End Sub
-        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
-            Dim displayStr As String = "There is no cell defined for that point."
-            For Each rc In rclist
-                If rc.index = clickIndex Or clickIndex < 0 Then
-                    task.rcD = rc
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    displayStr = task.rcD.displayCell
-                    Exit For
-                End If
-            Next
-            Return displayStr
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(task.gray)
-            labels(2) = color8U.labels(2)
-
-            tracker.Run(color8U.dst2)
-            dst2 = color8U.dst3.Clone
-
-            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim rect As cv.Rect
-            Dim filled As New cv.Mat
-            rcList.Clear()
-            rcList.Add(New rcData)
-            dst1 = color8U.dst2.Clone
-            rcIndexMap.SetTo(0)
-            For y = 0 To dst2.Height - 1
-                For x = 0 To dst2.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = rcList.Count
-                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
-                        If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            rcIndexMap(rc.rect).SetTo(index, rc.mask)
-                            rcList.Add(rc)
-                        Else
-                            If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
-                        End If
-                    End If
-                Next
-            Next
-
-            dst3 = Palettize(rcIndexMap, 0)
-
-            If standaloneTest() Then
-                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-                Dim rc = rcList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                dst2(rc.rect).SetTo(white, rc.mask)
-                SetTrueText(CStr(clickIndex), rc.maxDist)
-                SetTrueText(rc.displayCell, 1)
-            End If
-
-            labels(1) = tracker.labels(2)
-            labels(3) = CStr(rcList.Count) + " cells in the Color8U output."
-            If rcList.Count > 255 Then
-                MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
-            End If
-        End Sub
-    End Class
-
-
-
-
     Public Class RedC_BasicsTest : Inherits TaskParent
         Public rcMapIDs As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -300,7 +226,7 @@ Namespace VBClasses
 
 
     Public Class RedC_Depth : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))

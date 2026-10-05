@@ -711,7 +711,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_ClickPoint : Inherits TaskParent
+    Public Class XR_Match_ClickPoint : Inherits TaskParent
         Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

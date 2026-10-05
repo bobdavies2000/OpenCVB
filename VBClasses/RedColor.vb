@@ -1,14 +1,26 @@
-Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim fLess As New FeatureLess_SteadyCam
+        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use the FeatureLess regions to improve the RedColor output.  Issue: rects are oversized!  Fix coming..."
+            desc = "Build a list of cells for each floodfill region in the Color8U input."
         End Sub
+        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
+            Dim displayStr As String = "There is no cell defined for that point."
+            For Each rc In rclist
+                If rc.index = clickIndex Or clickIndex < 0 Then
+                    task.rcD = rc
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    displayStr = task.rcD.displayCell
+                    Exit For
+                End If
+            Next
+            Return displayStr
+        End Function
         Public Shared Function showCell(rcList As List(Of rcData), rcIndexMap As cv.Mat, dst As cv.Mat) As String
             Dim clickindex As Integer
             If rcIndexMap.Type = cv.MatType.CV_8U Then
@@ -25,66 +37,55 @@ Namespace VBClasses
             Return ""
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8U As New Color8U_Basics
-                color8U.Run(task.gray)
-                src = color8U.dst2
-            End If
+            color8U.Run(task.gray)
+            labels(2) = color8U.labels(2)
 
-            fLess.Run(task.gray)
+            tracker.Run(color8U.dst2)
+            dst2 = color8U.dst3.Clone
 
-
-            'Dim rect As cv.Rect
-            'Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            'Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            'For Each r In task.gridRects
-            '    Dim val = mask(r).Get(Of Byte)(0, 0)
-            '    If val = 0 Then
-            '        Dim index As Integer = fLess.indexMap(r).Get(Of Byte)(0, 0)
-            '        If index > 0 Then
-            '            Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
-            '            Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
-            '            rectSorted.Add(index, (count, ValidateRect(rect)))
-            '        End If
-            '    End If
-            'Next
-
-            'Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            'For i = 0 To rectSorted.Count - 2
-            '    Dim r1 = rectSorted.ElementAt(i).Value.r
-            '    If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
-            '        For j = i To rectSorted.Count - 2
-            '            Dim r2 = rectSorted.ElementAt(j + 1).Value.r
-            '            If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
-            '                r1 = r1.Union(r2)
-            '            Else
-            '                Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
-            '                rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-            '                i = j
-            '                Exit For
-            '            End If
-            '        Next
-            '    Else
-            '        Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
-            '        rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-            '    End If
-            'Next
-
-            rcIndexMap.SetTo(0)
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim rect As cv.Rect
+            Dim filled As New cv.Mat
             rcList.Clear()
-            For Each rc In fLess.rcList
-                rc.index = rcList.Count
-                rcList.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+            rcList.Add(New rcData)
+            dst1 = color8U.dst2.Clone
+            rcIndexMap.SetTo(0)
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index = rcList.Count
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        If count >= task.minCellSize Then
+                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
+                            rcIndexMap(rc.rect).SetTo(index, rc.mask)
+                            rcList.Add(rc)
+                        Else
+                            If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
+                        End If
+                    End If
+                Next
             Next
 
-            dst2 = Palettize(rcIndexMap, 0)
+            dst3 = Palettize(rcIndexMap, 0)
 
-            SetTrueText(showCell(rcList, rcIndexMap, dst2), 1)
+            If standaloneTest() Then
+                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                Dim rc = rcList(clickIndex)
+                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+                dst2(rc.rect).SetTo(white, rc.mask)
+                SetTrueText(CStr(clickIndex), rc.maxDist)
+                SetTrueText(rc.displayCell, 1)
+            End If
 
-            labels(2) = CStr(rcList.Count) + " cells were identified."
+            labels(1) = tracker.labels(2)
+            labels(3) = CStr(rcList.Count) + " cells in the Color8U output."
+            If rcList.Count > 255 Then
+                MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
+            End If
         End Sub
     End Class
+
 
 
 
