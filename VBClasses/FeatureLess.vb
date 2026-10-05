@@ -1923,7 +1923,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcLastList = New List(Of rcData)(rcList)
             fLess.Run(src)
-            Dim idCount As Integer
 
             If task.heartBeat Or task.optionsChanged Then
                 rcList = New List(Of rcData)(fLess.rcList)
@@ -1946,6 +1945,8 @@ Namespace VBClasses
                     rc.id = dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If usedList.Contains(rc.id) Then
                         rc.id = nextSlot
+                        rc.age = 1
+                        rc.maxDStable = rc.maxDist
                         nextSlot += 1
                     End If
                     usedList.Add(rc.id)
@@ -1982,6 +1983,7 @@ Namespace VBClasses
             End If
 
             Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Dim idCount As Integer
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
                 Dim rcPrev As rcData = Nothing
@@ -1996,6 +1998,7 @@ Namespace VBClasses
                     rc.maxDStable = rcPrev.maxDStable
                     idCount += 1
                 Else
+                    rc.age = 1
                     rc.maxDStable = rc.maxDist
                 End If
 

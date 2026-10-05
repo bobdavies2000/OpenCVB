@@ -232,6 +232,8 @@ FitLine_BasicsOld
 FitLine_Conventional
 Flood_Basics
 Flood_CellMerge
+Flood_CellMergeFail
+Flood_CellMergeOld
 Flood_Edges
 Flood_OriginalDemo
 Flood_OriginalMask
