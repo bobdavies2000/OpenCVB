@@ -173,11 +173,10 @@ Namespace VBClasses
 
 
     Public Class Bin3Way_RedC : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Dim bin3 As New Bin3Way_GrayScale
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            labels(3) = "The output of all 3 RedColor runs are combined below."
             desc = "Combine the results of the 3 different RedColor runs..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -186,7 +185,7 @@ Namespace VBClasses
 
             redC.Run(bin3.dst2)
             dst2 = redC.dst2
-            labels(2) = CStr(redC.rcList.Count) + " cells found in the image."
+            labels(2) = redC.labels(2)
         End Sub
     End Class
 End Namespace

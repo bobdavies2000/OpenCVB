@@ -4,6 +4,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Dim redC As New RedColor_Basics
         Dim idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public fLessCount As Integer
         Public Sub New()
             desc = "Use CalcHist on FeatureLess_Tracker cells to merge Color8U floodfill regions."
         End Sub
@@ -83,13 +84,14 @@ Namespace VBClasses
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
                 InRange(idMap(rc.rect), rc.index, rc.index, rc.mask)
+                rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
                 Dim val1 = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Then rc.maxDStable = rc.maxDist
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
-            Dim agedCount = redC.rcList.Count
+            fLessCount = redC.rcList.Count
             For i = 1 To redC.rcList.Count - 1
                 If rcOwner(i) = 0 Then
                     rc = redC.rcList(i)
@@ -104,7 +106,7 @@ Namespace VBClasses
             SetTrueText(RedC_Basics.showCell(rcList, dst1, dst2), 1)
 
             labels(2) = CStr(redC.rcList.Count) + " input cells merged into the " +
-                        CStr(agedCount - 1) + " featureless regions.  Age is shown."
+                        CStr(fLessCount - 1) + " featureless cells.  Age is shown."
         End Sub
     End Class
 

@@ -9,6 +9,7 @@ Bin4Way
 Binarize
 BinNWay
 Blur
+Boundary
 Brick
 BrickPoint
 Brightness

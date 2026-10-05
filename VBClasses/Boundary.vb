@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class XR_Boundary_Basics : Inherits TaskParent
-        Public redC As New RedC_BasicsOld
+    Public Class Boundary_Basics : Inherits TaskParent
+        Public redC As New RedC_Basics
         Dim color8U As New Color8U_Basics
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
     Public Class XR_Boundary_Rectangles : Inherits TaskParent
-        Public bounds As New XR_Boundary_Basics
+        Public bounds As New Boundary_Basics
         Public rects As New List(Of cv.Rect)
         Public smallRects As New List(Of cv.Rect)
         Public smallContours As New List(Of List(Of cv.Point))
@@ -55,8 +55,8 @@ Namespace VBClasses
             smallRects.Clear()
             smallContours.Clear()
             For i = bounds.redC.rcList.Count - 1 To CInt(bounds.redC.rcList.Count * options.percentRect) Step -1
-                task.rcDold = bounds.redC.rcList(i)
-                Dim r = task.rcDold.rect
+                task.rcD = bounds.redC.rcList(i)
+                Dim r = task.rcD.rect
                 Dim contained As Boolean = False
                 For Each rc In bounds.redC.rcList
                     If r = rc.rect Then Continue For
@@ -67,7 +67,7 @@ Namespace VBClasses
                 Next
 
                 If contained Then
-                    smallContours.Add(task.rcDold.contour)
+                    smallContours.Add(task.rcD.contour)
                     smallRects.Add(r)
                 Else
                     rects.Add(r)

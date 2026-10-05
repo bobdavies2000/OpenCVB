@@ -27,6 +27,7 @@ BinNWay_Basics
 Blur_Basics
 Blur_Bilateral
 Blur_Motion
+Boundary_Basics
 Brick_Basics
 Brick_LeftRight
 Brick_Ranges
