@@ -1293,12 +1293,12 @@ Namespace VBClasses
     Public Class Feature_DelaunayRC : Inherits TaskParent
         Dim featDel As New Feature_Delaunay
         Dim delaunay As New Delaunay_Basics
-        Public rcList As New List(Of rcDataOld)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcList As New List(Of rcData)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             delaunay.useFeatures = False
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Cursor.ai: Build rcDataOld from each Feature_Delaunay cell using the cell rect and a filled mask."
+            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             featDel.Run(src)
@@ -1309,19 +1309,21 @@ Namespace VBClasses
             For Each pt In featDel.feat.features
                 delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
             Next
+
             If delaunay.ptList.Count = 0 Then
                 rcList.Clear()
-                rcIndexMap.SetTo(0)
+                idMap.SetTo(0)
                 Exit Sub
             End If
+
             delaunay.Run(src)
 
-            Dim rcListLast = New List(Of rcDataOld)(rcList)
-            Dim rcIndexMapLast = rcIndexMap.Clone
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim idMapLast = idMap.Clone
             Dim usedList As New List(Of Single)
             Dim reusedIndex As Integer
 
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
             For i = 0 To delaunay.facetList.Count - 1
@@ -1336,7 +1338,7 @@ Namespace VBClasses
                 FindNonZero(cellMask, nz)
                 Dim rect = ValidateRect(BoundingRect(nz))
 
-                Dim rc As New rcDataOld(cellMask(rect), rect, 255)
+                Dim rc As New rcData(cellMask(rect), rect, 255)
                 If rc.pixels = 0 Then Continue For
 
                 Dim prevPt = rc.maxDist
@@ -1346,15 +1348,15 @@ Namespace VBClasses
                 End If
                 If prevPt.X < 0 Then prevPt.X = 0
                 If prevPt.Y < 0 Then prevPt.Y = 0
-                If prevPt.X >= rcIndexMapLast.Width Then prevPt.X = rcIndexMapLast.Width - 1
-                If prevPt.Y >= rcIndexMapLast.Height Then prevPt.Y = rcIndexMapLast.Height - 1
+                If prevPt.X >= idMapLast.Width Then prevPt.X = idMapLast.Width - 1
+                If prevPt.Y >= idMapLast.Height Then prevPt.Y = idMapLast.Height - 1
 
-                Dim previousIndex = rcIndexMapLast.Get(Of Single)(prevPt.Y, prevPt.X)
+                Dim previousIndex = idMapLast.Get(Of Single)(prevPt.Y, prevPt.X)
                 If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
                     rc.index = previousIndex
                     usedList.Add(rc.index)
                     reusedIndex += 1
-                    Dim rcLast = RedC_BasicsOld.rcIndexFind(rcListLast, CInt(rc.index))
+                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
                     If rcLast IsNot Nothing Then
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 100
@@ -1375,19 +1377,19 @@ Namespace VBClasses
                     usedList.Add(nextIndex)
                     rc.age = 1
                 End If
-                rc.mapID = rc.index
-                rcIndexMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                rc.id = rc.index
+                idMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
             Next
 
-            dst2 = Palettize(rcIndexMap)
+            dst2 = Palettize(idMap)
             For Each pt In featDel.feat.features
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            labels(2) = CStr(rcList.Count) + " rcDataOld cells from Feature_Delaunay, " +
-                        CStr(reusedIndex) + " kept the same color"
+            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(reusedIndex) +
+                        " or " + (reusedIndex / rcList.Count).ToString("0%") + " kept the same color"
 
-            Dim clickIndex = CInt(rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
-            Dim selected As rcDataOld = Nothing
+            Dim clickIndex = CInt(idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            Dim selected As rcData = Nothing
             For Each rc In rcList
                 If rc.index = clickIndex Then
                     selected = rc
@@ -1396,12 +1398,12 @@ Namespace VBClasses
             Next
 
             If selected IsNot Nothing Then
-                task.rcDold = selected
-                task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
-                Rectangle(task.color, task.rcDold.rect, task.highlight, task.lineWidth)
-                Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
-                Circle(dst2, task.rcDold.maxDist, task.DotSize + 1, white, -1)
-                strOut = task.rcDold.displayCell
+                task.rcD = selected
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                strOut = task.rcD.displayCell
                 SetTrueText(strOut, 1)
             End If
         End Sub

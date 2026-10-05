@@ -87,9 +87,6 @@ Namespace VBClasses
 
 
 
-
-
-
     Public Class XR_Boundary_RemovedRects : Inherits TaskParent
         Public bRects As New XR_Boundary_Rectangles
         Public Sub New()
@@ -108,53 +105,6 @@ Namespace VBClasses
             Next
             labels(1) = labels(2)
             labels(2) = $"{bRects.bounds.redC.rcList.Count - bRects.smallRects.Count} cells after contain test"
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_Boundary_GuidedBP : Inherits TaskParent
-        Dim guided As New GuidedBP_Depth
-        Dim redC As New RedC_BasicsOld
-        Public Sub New()
-            task.gOptions.setHistogramBins(100)
-            dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            guided.Run(src)
-
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            dst3.SetTo(0)
-            For Each rc In redC.rcList
-                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
-            Next
-
-            labels(3) = $"{redC.rcList.Count} cells were found."
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_Boundary_RedC : Inherits TaskParent
-        Dim prep As New RedPrep_Basics
-        Public Sub New()
-            dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            desc = "Find the RedC cell contours"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prep.Run(src)
-            dst2 = prep.dst2
-            labels(2) = prep.labels(2)
         End Sub
     End Class
 End Namespace

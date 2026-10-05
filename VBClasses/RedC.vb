@@ -35,6 +35,12 @@ Namespace VBClasses
             End If
             Return ""
         End Function
+        Public Shared Function rcIndexFind(rclist As List(Of rcData), rcIndex As Integer) As rcData
+            For Each rc In rclist
+                If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
+            Next
+            Return Nothing
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap = idMap.Clone
 
