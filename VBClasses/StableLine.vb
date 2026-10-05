@@ -71,7 +71,7 @@ Namespace VBClasses
 
 
     Public Class XR_StableLine_BasicsOldCount : Inherits TaskParent
-        Public basics As New FeatureMap_StablePoints
+        Public basics As New XR_FeatureMap_StablePoints
         Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim bPoint As New BrickPoint_Basics
         Public features As New List(Of cv.Point)
@@ -113,7 +113,7 @@ Namespace VBClasses
 
 
     Public Class XR_StableLine_Lines : Inherits TaskParent
-        Public basics As New FeatureMap_StablePoints
+        Public basics As New XR_FeatureMap_StablePoints
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the line end points found in the BGR image and keep those that are stable."
@@ -149,7 +149,7 @@ Namespace VBClasses
 
 
     Public Class XR_StableLine_FAST : Inherits TaskParent
-        Public basics As New FeatureMap_StablePoints
+        Public basics As New XR_FeatureMap_StablePoints
         Dim fast As New Corner_Basics
         Public Sub New()
             desc = "Track the FAST feature points found in the BGR image and track those that appear stable."

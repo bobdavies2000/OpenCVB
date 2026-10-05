@@ -192,7 +192,6 @@ Feature_Bricks
 Feature_BRISK
 Feature_CheckAll
 Feature_Delaunay
-Feature_DelaunayRC
 Feature_GoodFeatures
 Feature_KNN
 Feature_LeftRight
@@ -209,12 +208,9 @@ FeatureLess_OrderKNN
 FeatureLess_SteadyCam
 FeatureLess_Tracker
 FeatureMap_Basics
-FeatureMap_Core
+FeatureMap_ByDepth
 FeatureMap_CreateList
-FeatureMap_Info
-FeatureMap_Motion
 FeatureMap_Periphery
-FeatureMap_StablePoints
 FeatureMatch_Basics
 FeatureMatch_BRISK
 FeatureMatch_KAZE

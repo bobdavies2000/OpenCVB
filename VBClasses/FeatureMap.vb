@@ -1,8 +1,131 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureMap_Basics : Inherits TaskParent
+        Dim featDel As New Feature_Delaunay
+        Dim delaunay As New Delaunay_Basics
+        Public rcList As New List(Of rcData)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public Sub New()
+            delaunay.useFeatures = False
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            featDel.Run(src)
+            dst3 = featDel.dst3
+            labels(3) = featDel.labels(3)
+
+            delaunay.ptList.Clear()
+            For Each pt In featDel.feat.features
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+
+            If delaunay.ptList.Count = 0 Then
+                rcList.Clear()
+                idMap.SetTo(0)
+                Exit Sub
+            End If
+
+            delaunay.Run(src)
+
+            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim idMapLast = idMap.Clone
+            Dim usedList As New List(Of Single)
+            Dim reusedIndex As Integer
+
+            idMap.SetTo(0)
+            rcList.Clear()
+            Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            For i = 0 To delaunay.facetList.Count - 1
+                Dim facet = delaunay.facetList(i)
+                If facet.Count < 3 Then Continue For
+
+                cellMask.SetTo(0)
+                FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
+                If CountNonZero(cellMask) = 0 Then Continue For
+
+                Dim nz As New Mat
+                FindNonZero(cellMask, nz)
+                Dim rect = ValidateRect(BoundingRect(nz))
+
+                Dim rc As New rcData(cellMask(rect), rect, 255)
+                If rc.pixels = 0 Then Continue For
+
+                Dim prevPt = rc.maxDist
+                If i < delaunay.ptList.Count Then
+                    Dim p = delaunay.ptList(i)
+                    prevPt = New cv.Point(CInt(p.X), CInt(p.Y))
+                End If
+                If prevPt.X < 0 Then prevPt.X = 0
+                If prevPt.Y < 0 Then prevPt.Y = 0
+                If prevPt.X >= idMapLast.Width Then prevPt.X = idMapLast.Width - 1
+                If prevPt.Y >= idMapLast.Height Then prevPt.Y = idMapLast.Height - 1
+
+                Dim previousIndex = idMapLast.Get(Of Single)(prevPt.Y, prevPt.X)
+                If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
+                    rc.index = previousIndex
+                    usedList.Add(rc.index)
+                    reusedIndex += 1
+                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
+                    If rcLast IsNot Nothing Then
+                        rc.age = rcLast.age + 1
+                        If rc.age >= 1000 Then rc.age = 100
+                    Else
+                        rc.age = 1
+                    End If
+                End If
+                rcList.Add(rc)
+            Next
+
+            Dim nextIndex As Integer = 1
+            For Each rc In rcList
+                If rc.index = 0 Then
+                    While usedList.Contains(nextIndex) Or nextIndex Mod 255 = 0
+                        nextIndex += 1
+                    End While
+                    rc.index = nextIndex
+                    usedList.Add(nextIndex)
+                    rc.age = 1
+                End If
+                rc.id = rc.index
+                idMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+            Next
+
+            dst2 = Palettize(idMap)
+            For Each pt In featDel.feat.features
+                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(reusedIndex) +
+                        " or " + (reusedIndex / rcList.Count).ToString("0%") + " kept the same color"
+
+            Dim clickIndex = CInt(idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            Dim selected As rcData = Nothing
+            For Each rc In rcList
+                If rc.index = clickIndex Then
+                    selected = rc
+                    Exit For
+                End If
+            Next
+
+            If selected IsNot Nothing Then
+                task.rcD = selected
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                strOut = task.rcD.displayCell
+                SetTrueText(strOut, 1)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_FeatureMap_Basics : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Public basics As New FeatureMap_StablePoints
+        Public basics As New XR_FeatureMap_StablePoints
         Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
@@ -15,7 +138,7 @@ Namespace VBClasses
         '    If fpIndex >= 0 Then task.fpD = fcs.fplist(fpIndex)
         'End Sub
         Public Shared Sub fpCellContour(fp As fpData, dst As Mat, Optional colorIndex As Integer = 0)
-            Dim color = Choose(colorIndex + 1, Scalar.white, Scalar.Black)
+            Dim color = Choose(colorIndex + 1, Scalar.White, Scalar.Black)
             For i = 0 To fp.facets.Count - 1
                 Dim p1 = fp.facets(i)
                 Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
@@ -55,7 +178,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureMap_StablePoints : Inherits TaskParent
+    Public Class XR_FeatureMap_StablePoints : Inherits TaskParent
         Public facetGen As New Delaunay_Generations
         Public ptList As New List(Of Point2f)
         Public anchorPoint As Point2f
@@ -111,73 +234,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class XR_FeatureMap_BasicsOld : Inherits TaskParent
-        Dim fcs As New FeatureMap_Core
-        Dim contours As New XR_Contour_BasicsOld
-        Public desiredMapCount As Integer = 5
-        Public Sub New()
-            desc = "Create the reference map for FCS. "
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(src)
-            Static restartRequest As Boolean
-            fcs.inputFeatures.Clear()
-            For Each contour In contours.tourList
-                fcs.inputFeatures.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
-            Next
-            If contours.tourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
-                restartRequest = True
-                Exit Sub
-            End If
-            restartRequest = False
-
-            fcs.Run(emptyMat)
-
-            Static paletteRandom = New Palette_RandomColors
-            dst2 = paletteRandom.useColorMapFull(fcs.fcsMap)
-
-            dst3 = contours.dst2
-            labels(2) = fcs.labels(2)
-            labels(3) = contours.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class FeatureMap_Core : Inherits TaskParent
-        Dim subdiv As New Subdiv2D
-        Public inputFeatures As New List(Of Point2f)
-        Public fcsMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public Sub New()
-            desc = "Subdivide an image based on the points provided."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            subdiv.InitDelaunay(New cv.Rect(0, 0, fcsMap.Width, fcsMap.Height))
-            subdiv.Insert(inputFeatures)
-
-            Dim facets = New Point2f()() {Nothing}
-            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-            For i = 0 To Math.Min(inputFeatures.Count, facets.Length) - 1
-                Dim facetList = New List(Of cv.Point)
-                For Each pt In facets(i)
-                    facetList.Add(New cv.Point(pt.X, pt.Y))
-                Next
-                FillConvexPoly(fcsMap, facetList, i, LineTypes.Link8)
-            Next
-
-            If standaloneTest() Then dst2 = Palettize(fcsMap)
-
-            labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
-        End Sub
-    End Class
 
 
 
@@ -301,57 +357,8 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureMap_RedC : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Dim redC As New RedC_BasicsOld
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(1) = "Output of FeatureMap_CreateList."
-            desc = "Isolate FCS cells for each redCell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            fcs.Run(src)
-            dst1 = fcs.dst2
-            labels(3) = fcs.labels(2)
-            For Each fp In fcs.fpList
-                Dim val = dst2.Get(Of Vec3b)(fp.pt.Y, fp.pt.X)
-                FillConvexPoly(dst3, fp.facets, val)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureMap_InfoTest : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Dim info As New FeatureMap_Info
-        Public Sub New()
-            desc = "Invoke FeatureMap_CreateList and display the contents of the selected feature cv.Point cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(src)
-            dst2 = fcs.dst2
-
-            info.Run(src)
-            SetTrueText(info.strOut, 3)
-
-            ' FeatureMap_Basics.fpDSet()
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_FeatureMap_MotionDirection : Inherits TaskParent
-        Dim fcsM As New FeatureMap_Motion
+        Dim fcsM As New XR_FeatureMap_Motion
         Dim plothist As New PlotBar_Basics
         Dim mats As New Mat_4Click
         Dim range As Integer, rangeText As String
@@ -407,156 +414,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class FeatureMap_Info : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Public Sub New()
-            desc = "Display the contents of the Feature Coordinate System (FCS) cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            If standalone Then
-                Static fcs As New FeatureMap_CreateList
-                fcs.Run(task.gray)
-                dst2 = fcs.dst2
-            End If
-
-            If task.fpD IsNot Nothing Then
-                Dim fp = task.fpD
-                strOut = "Feature cv.Point: " + fp.pt.ToString + vbCrLf + vbCrLf
-                strOut += "index = " + CStr(fp.index) + vbCrLf
-                strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
-                strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-                strOut += "ClickPoint = " + task.clickPoint.ToString + vbCrLf + vbCrLf
-
-                strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-                Dim brick = bricks.brickList(fp.brickIndex)
-                strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-                strOut += brick.correlation.ToString(fmt3) + vbTab + "Correlation to right image" + vbCrLf
-
-                strOut += "Depth = " + fp.depth.ToString(fmt1)
-                strOut += vbCrLf
-                strOut += "Index " + vbTab + "Facet X" + vbTab + "Facet Y" + vbCrLf
-                For i = 0 To fp.facets.Count - 1
-                    strOut += CStr(i) + ":" + vbTab + CStr(fp.facets(i).X) + vbTab + CStr(fp.facets(i).Y) + vbCrLf
-                Next
-
-                If standalone Then SetTrueText(strOut, 3)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureMap_Lines : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Dim options As New Options_Features
-        Public Sub New()
-            OptionParent.FindSlider("Min Distance").Value = 60
-            task.fOptions.FeatureMethod.SelectedItem() = "LineInput"
-            labels(3) = "Cell boundaries with the age (in frames) for each cell."
-            desc = "Use lines as input to FCS."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            fcs.Run(task.gray)
-            dst2 = fcs.dst2
-
-            labels(2) = CStr(fcs.feat.features.Count) + " lines were used to create " +
-                                               CStr(fcs.fpList.Count) + " cells"
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
-    Public Class XR_FeatureMap_ByDepth : Inherits TaskParent
-        Dim plotHist As New PlotBar_Basics
-        Dim fcs As New FeatureMap_CreateList
-        Dim palInput As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Dim bPoint As New BrickPoint_Basics
-        Public Sub New()
-            plotHist.addLabels = False
-            plotHist.removeZeroEntry = True
-            plotHist.createHistogram = True
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            task.gOptions.setHistogramBins(20)
-            desc = "Use cell depth to break down the layers in an image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(src)
-            fcs.feat.features = New List(Of cv.Point)(bPoint.ptList)
-
-            fcs.Run(src)
-            dst2 = fcs.dst2
-            labels(2) = fcs.labels(2)
-
-            Dim dBricks As New List(Of Single)
-            For Each fp In fcs.fpList
-                dBricks.Add(fp.depth)
-            Next
-
-            plotHist.minRange = 0
-            plotHist.maxRange = task.MaxZmeters
-            plotHist.Run(Mat.FromPixelData(dBricks.Count, 1, MatType.CV_32F, dBricks.ToArray))
-            dst1 = plotHist.dst2
-
-            Dim incr = dst1.Width / task.histogramBins
-            Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
-            Rectangle(dst1, New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), Scalar.Yellow, task.lineWidth)
-            Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
-            Dim depthStart = histIndex * depthIncr
-            Dim depthEnd = (histIndex + 1) * depthIncr
-
-            Static fpCells As New List(Of (fpData, Integer))
-            Static histIndexSave = histIndex
-
-            If histIndexSave <> histIndex Or task.optionsChanged Then
-                histIndexSave = histIndex
-                fpCells.Clear()
-            End If
-            palInput.SetTo(0)
-
-            For Each fp In fcs.fpList
-                If fp.depth > depthStart And fp.depth < depthEnd Then
-                    Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
-                    If val = 0 Then
-                        FillConvexPoly(palInput, fp.facets, fp.brickIndex Mod 255)
-                        fpCells.Add((fp, task.fOptions.FrameHistoryCount.Value))
-                    End If
-                End If
-            Next
-
-            For Each ele In fpCells
-                Dim fp As fpData = ele.Item1
-                FeatureMap_Basics.fpCellContour(fp, task.color, 0)
-            Next
-            dst3 = Palettize(palInput)
-            Dim tmp As New Mat
-            Threshold(palInput, tmp, 0, Scalar.All(255), ThresholdTypes.BinaryInv)
-            dst3.SetTo(Scalar.All(0), tmp)
-
-
-            Dim removeFrame As Integer = If(task.fOptions.FrameHistoryCount.Value > task.fOptions.FrameHistoryCount.Value, task.fOptions.FrameHistoryCount.Value - task.fOptions.FrameHistoryCount.Value, -1)
-            For i = fpCells.Count - 1 To 0 Step -1
-                Dim frame = fpCells(i).Item2
-                If frame = removeFrame Then fpCells.RemoveAt(i)
-            Next
-
-            labels(3) = "Cells with depth between " + depthStart.ToString(fmt1) + "m to " + depthEnd.ToString(fmt1) + "m"
-        End Sub
-    End Class
 
 
 
@@ -681,7 +538,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureMap_Motion : Inherits TaskParent
+    Public Class XR_FeatureMap_Motion : Inherits TaskParent
         Dim fcs As New FeatureMap_CreateList
         Dim plot As New PlotTime_Basics
         Public xDist As New List(Of Single), yDist As New List(Of Single)
@@ -801,9 +658,90 @@ Namespace VBClasses
                 If fp.depth > 0 Then Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
-            If standalone And task.fpD IsNot Nothing Then FeatureMap_Basics.fpCellContour(task.fpD, task.color)
+            If standalone And task.fpD IsNot Nothing Then XR_FeatureMap_Basics.fpCellContour(task.fpD, task.color)
             If task.heartBeat Then labels(2) = traceName + ": " + feat.features.Count.ToString("000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureMap_ByDepth : Inherits TaskParent
+        Dim plotHist As New PlotBar_Basics
+        Dim featMap As New FeatureMap_CreateList
+        Dim palInput As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Dim bPoint As New BrickPoint_Basics
+        Public Sub New()
+            plotHist.addLabels = False
+            plotHist.removeZeroEntry = True
+            plotHist.createHistogram = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            task.gOptions.setHistogramBins(20)
+            desc = "Use cell depth to break down the layers in an image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bPoint.Run(src)
+            featMap.feat.features = New List(Of cv.Point)(bPoint.ptList)
+
+            featMap.Run(src)
+            dst2 = featMap.dst2
+            labels(2) = featMap.labels(2)
+
+            Dim dBricks As New List(Of Single)
+            For Each fp In featMap.fpList
+                dBricks.Add(fp.depth)
+            Next
+
+            plotHist.minRange = 0
+            plotHist.maxRange = task.MaxZmeters
+            plotHist.Run(Mat.FromPixelData(dBricks.Count, 1, MatType.CV_32F, dBricks.ToArray))
+            dst1 = plotHist.dst2
+
+            Dim incr = dst1.Width / task.histogramBins
+            Dim histIndex = Math.Truncate(task.mouseMovePoint.X / incr)
+            Rectangle(dst1, New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), Scalar.Yellow, task.lineWidth)
+            Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / task.histogramBins
+            Dim depthStart = histIndex * depthIncr
+            Dim depthEnd = (histIndex + 1) * depthIncr
+
+            Static fpCells As New List(Of (fpData, Integer))
+            Static histIndexSave = histIndex
+
+            If histIndexSave <> histIndex Or task.optionsChanged Then
+                histIndexSave = histIndex
+                fpCells.Clear()
+            End If
+            palInput.SetTo(0)
+
+            For Each fp In featMap.fpList
+                If fp.depth > depthStart And fp.depth < depthEnd Then
+                    Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
+                    If val = 0 Then
+                        FillConvexPoly(palInput, fp.facets, fp.brickIndex Mod 255)
+                        fpCells.Add((fp, task.fOptions.FrameHistoryCount.Value))
+                    End If
+                End If
+            Next
+
+            For Each ele In fpCells
+                Dim fp As fpData = ele.Item1
+                XR_FeatureMap_Basics.fpCellContour(fp, task.color, 0)
+            Next
+            dst3 = Palettize(palInput)
+            Dim tmp As New Mat
+            Threshold(palInput, tmp, 0, Scalar.All(255), ThresholdTypes.BinaryInv)
+            dst3.SetTo(Scalar.All(0), tmp)
+
+
+            Dim removeFrame As Integer = If(task.fOptions.FrameHistoryCount.Value > task.fOptions.FrameHistoryCount.Value, task.fOptions.FrameHistoryCount.Value - task.fOptions.FrameHistoryCount.Value, -1)
+            For i = fpCells.Count - 1 To 0 Step -1
+                Dim frame = fpCells(i).Item2
+                If frame = removeFrame Then fpCells.RemoveAt(i)
+            Next
+
+            labels(3) = "Cells with depth between " + depthStart.ToString(fmt1) + "m to " + depthEnd.ToString(fmt1) + "m"
         End Sub
     End Class
 End Namespace
