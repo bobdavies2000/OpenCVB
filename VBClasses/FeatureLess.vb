@@ -1821,7 +1821,7 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut = RedC_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
             strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
             strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
@@ -1904,7 +1904,7 @@ Namespace VBClasses
 
             dst2 = Palettize(indexMap, 0)
 
-            strOut = RedColor_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut = RedC_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
             SetTrueText(strOut, 3)
         End Sub
     End Class

@@ -718,6 +718,12 @@ Namespace VBClasses
             labels(3) = "Once a second, the SteadyCam M factor is updated and this image will match the current cells."
             desc = "Use the clickpoint to confirm the "
         End Sub
+        Public Shared Function findCell(rclist As List(Of rcData), index As Integer) As rcData
+            For Each rc In rclist
+                If rc.index = index Then Return rc
+            Next
+            Return Nothing
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst2 = redC.dst2
@@ -725,19 +731,19 @@ Namespace VBClasses
 
             Static clickIndex As Integer
             If task.mouseClickFlag Then
-                clickIndex = redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                clickIndex = redC.indexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             Else
                 clickIndex = 1
             End If
 
-            task.rcD = RedC_BasicsTest.findCell(redC.rcList, clickIndex)
+            task.rcD = findCell(redC.rcList, clickIndex)
             If task.rcD Is Nothing Then task.rcD = redC.rcList(1)
 
-            SetTrueText(RedC_BasicsTest.displayCell(redC.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
+            SetTrueText(RedC_Basics.displayCell(redC.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            WarpAffine(redC.rcIndexMap, redC.rcIndexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redC.indexMap, redC.indexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class

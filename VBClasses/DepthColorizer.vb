@@ -12,17 +12,17 @@ Namespace VBClasses
             Dim f As Double = 1.0
             If saveVecColors.Length = 1 Then
                 ' some solid colors that should be easier to see.
-                task.vecColors(0) = CrimsonRed
+                task.vecColors(0) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                 task.vecColors(1) = VividAmber
                 task.vecColors(2) = ElectricAmberYellow
                 task.vecColors(3) = KellyGreen
                 task.vecColors(4) = ElectricLime
                 task.vecColors(5) = DeepCyan
                 task.vecColors(6) = CobaltBlue
-                task.vecColors(7) = ElectricRoyalBlue
-                task.vecColors(8) = DeepViolet
-                task.vecColors(9) = HotCoral
-                task.vecColors(10) = RichGold
+                task.vecColors(7) = DeepViolet
+                task.vecColors(8) = HotCoral
+                task.vecColors(9) = RichGold
+                task.vecColors(10) = CrimsonRed
                 For i = 11 To task.vecColors.Length - 1
                     task.vecColors(i) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
                 Next

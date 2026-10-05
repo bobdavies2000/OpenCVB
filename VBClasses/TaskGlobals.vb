@@ -21,14 +21,13 @@ Public Module vbc
     Public Const fmt3 = "0.000"
     Public Const fmt4 = "0.0000"
 
-    Public ReadOnly CrimsonRed As New cv.Vec3b(60, 20, 220)
+    Public ReadOnly CrimsonRed As New cv.Vec3b(0, 0, 255)
     Public ReadOnly VividAmber As New cv.Vec3b(0, 102, 255)
     Public ReadOnly ElectricAmberYellow As New cv.Vec3b(0, 191, 255)
     Public ReadOnly KellyGreen As New cv.Vec3b(67, 168, 0)
     Public ReadOnly ElectricLime As New cv.Vec3b(50, 205, 50)
     Public ReadOnly DeepCyan As New cv.Vec3b(204, 168, 0)
     Public ReadOnly CobaltBlue As New cv.Vec3b(171, 71, 0)
-    Public ReadOnly ElectricRoyalBlue As New cv.Vec3b(255, 80, 30)
     Public ReadOnly DeepViolet As New cv.Vec3b(255, 0, 128)
     Public ReadOnly HotCoral As New cv.Vec3b(96, 64, 255)
     Public ReadOnly RichGold As New cv.Vec3b(32, 165, 218)

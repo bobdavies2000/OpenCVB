@@ -1346,11 +1346,11 @@ Namespace VBClasses
     Public Class XR_RedC_CellMerge1 : Inherits TaskParent
         Public rcList As New List(Of rcDataOld)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim flood As New Flood_CellMerge
+        Dim flood As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "rcIndexMap from Flood_CellMerge dst3 labels"
-            desc = "Cursor.ai: Build rcList and rcIndexMap from the Flood_CellMerge dst3 output."
+            labels(3) = "rcIndexMap from RedC_Basics dst3 labels"
+            desc = "Cursor.ai: Build rcList and rcIndexMap from the RedC_Basics dst3 output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             flood.Run(src)
@@ -1384,83 +1384,9 @@ Namespace VBClasses
                 Circle(dst2, task.rcDold.maxDStable, task.DotSize + 1, black, -1)
             End If
             labels(2) = flood.labels(3)
-            labels(3) = CStr(rcList.Count) + " cells built from Flood_CellMerge"
+            labels(3) = CStr(rcList.Count) + " cells built from RedC_Basics"
         End Sub
     End Class
-
-
-
-
-
-
-    Public Class XR_RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_BasicsOld
-        Dim lastCenter As cv.Point
-        Public rcD As rcDataOld
-        Public neighbors As New List(Of rcDataOld)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use a histogram to find the neighbors.  Not working..."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast = New List(Of rcDataOld)(redC.rcList)
-
-            If task.heartBeatLT Then dst1.SetTo(0)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            If task.mouseClickFlag Then lastCenter = task.clickPoint
-            Dim index As Integer = redC.rcIndexMap.Get(Of Single)(lastCenter.Y, lastCenter.X)
-
-            If index >= 0 Then
-                rcD = RedC_BasicsOld.rcIndexFind(rcListLast, index)
-            Else
-                Dim rect As New cv.Rect(lastCenter.X, lastCenter.Y, task.gridWH, task.gridWH)
-                Dim myMapID As Integer = redC.rcMapIDs.Get(Of Single)(lastCenter.Y, lastCenter.X)
-                For Each rc In redC.rcList
-                    If rc.mapID = myMapID And rc.rect.IntersectsWith(rect) Then
-                        rcD = rc
-                        Exit For
-                    End If
-                Next
-            End If
-            If rcD Is Nothing Then rcD = redC.rcList(0)
-            SetTrueText(rcD.displayCell() + vbCrLf, 1)
-
-            Dim histogram As New Mat, tmp As New cv.Mat
-            Dim ranges() As Rangef = New Rangef() {New Rangef(0, redC.rcList.Count + 1)}
-            Dim delta = task.gridWH / 2
-            Dim r = New cv.Rect(rcD.rect.X - delta, rcD.rect.Y - delta, rcD.rect.Width + task.gridWH, rcD.rect.Height + task.gridWH)
-            r = ValidateRect(r)
-            CalcHist({redC.rcIndexMap(r)}, {0}, New Mat, histogram, 1, {redC.rcList.Count}, ranges)
-
-            Dim histArray(histogram.Rows - 1) As Single
-            histogram.GetArray(Of Single)(histArray)
-
-            neighbors.Clear()
-
-            For i = 1 To histArray.Length - 1
-                If histArray(i) > 0 Then neighbors.Add(redC.rcList(i))
-            Next
-
-            dst3.SetTo(0)
-            For i = 0 To neighbors.Count - 1
-                dst3(neighbors(i).rect).SetTo(task.scalarColors(neighbors(i).mapID), neighbors(i).mask)
-            Next
-
-            dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
-            Rectangle(dst3, r, task.highlight, task.lineWidth)
-            Rectangle(dst2, r, task.highlight, task.lineWidth)
-            labels(3) = CStr(neighbors.Count) + " neighbors were present."
-
-            lastCenter = rcD.maxDStable
-            Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
-        End Sub
-    End Class
-
-
-
 
 
 

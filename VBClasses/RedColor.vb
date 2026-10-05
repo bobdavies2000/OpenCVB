@@ -1,41 +1,73 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
+        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcList As New List(Of rcData) ' includes cloud data.
+        Dim flood As New Flood_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Build an rcList from the flood data and present smalles to largest."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastMap = indexMap.Clone
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(task.gray)
+                src = color8u.dst2
+            End If
+
+            flood.Run(src)
+            dst2 = flood.dst2
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To flood.rectList.Count - 1
+                Dim floodVal = flood.indexList(i)
+                Dim r = flood.rectList(i)
+                Dim rc As New rcData(flood.mask(r), r, floodVal)
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData())
+            indexMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+            Next
+
+            SetTrueText(RedC_Basics.displayCell(rcList, indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+
+            For Each rc In rcList
+                rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.id = 0 Then rc.id = rc.index
+                indexMap(rc.rect).SetTo(rc.id, rc.mask)
+            Next
+            labels(2) = CStr(sortList.Values.Count) + " cells were found "
+
+            If task.rcD IsNot Nothing Then
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+                ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            End If
+
+            dst3 = Palettize(indexMap, 0)
+            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_Basics1 : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build a list of cells for each floodfill region in the Color8U input."
         End Sub
-        Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
-            Dim displayStr As String = "There is no cell defined for that point."
-            For Each rc In rclist
-                If rc.index = clickIndex Or clickIndex < 0 Then
-                    task.rcD = rc
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    displayStr = task.rcD.displayCell
-                    Exit For
-                End If
-            Next
-            Return displayStr
-        End Function
-        Public Shared Function showCell(rcList As List(Of rcData), rcIndexMap As cv.Mat, dst As cv.Mat) As String
-            Dim clickindex As Integer
-            If rcIndexMap.Type = cv.MatType.CV_8U Then
-                clickindex = rcIndexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            Else
-                clickindex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            End If
-            If clickindex > 0 And clickindex < rcList.Count Then
-                Dim rc = rcList(clickindex)
-                Rectangle(dst, rc.rect, task.highlight, task.lineWidth)
-                task.color(rc.rect).SetTo(white, rc.mask)
-                Return rc.displayCell
-            End If
-            Return ""
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
             labels(2) = color8U.labels(2)
@@ -49,7 +81,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData)
             dst1 = color8U.dst2.Clone
-            rcIndexMap.SetTo(0)
+            indexMap.SetTo(0)
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
@@ -58,7 +90,7 @@ Namespace VBClasses
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            rcIndexMap(rc.rect).SetTo(index, rc.mask)
+                            indexMap(rc.rect).SetTo(index, rc.mask)
                             rcList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -67,7 +99,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst3 = Palettize(rcIndexMap, 0)
+            dst3 = Palettize(indexMap, 0)
 
             If standaloneTest() Then
                 Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
