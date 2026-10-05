@@ -2,10 +2,9 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim redC As New RedColor_Basics1
+        Dim redC As New RedColor_Basics
+        Dim idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Use CalcHist on FeatureLess_Tracker cells to merge Color8U floodfill regions."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
@@ -36,6 +35,8 @@ Namespace VBClasses
             Return ""
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastMap = idMap.Clone
+
             redC.Run(src)
             dst3 = redC.dst2.Clone
             labels(3) = redC.labels(3)
@@ -65,7 +66,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst1.SetTo(0)
+            idMap.SetTo(0)
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
                 For i = 1 To redC.rcList.Count - 1
@@ -73,7 +74,7 @@ Namespace VBClasses
                     If rcOwner(i) = rc.index Then
                         Dim rcTuple = redC.rcList(i)
                         rc.rect = rc.rect.Union(rcTuple.rect)
-                        dst1(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
+                        idMap(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                     End If
                 Next
             Next
@@ -81,18 +82,29 @@ Namespace VBClasses
             ' update all the rc.mask's in rcList with the merged cells.
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
-                InRange(dst1(rc.rect), rc.index, rc.index, rc.mask)
-                Dim val1 = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim val2 = dst1.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                InRange(idMap(rc.rect), rc.index, rc.index, rc.mask)
+                Dim val1 = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim val2 = idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Then rc.maxDStable = rc.maxDist
-                SetTrueText(CStr(rc.age), rc.maxDStable, 2)
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
-            dst2 = Palettize(dst1, 0)
+            Dim agedCount = redC.rcList.Count
+            For i = 1 To redC.rcList.Count - 1
+                If rcOwner(i) = 0 Then
+                    rc = redC.rcList(i)
+                    rc.index = rcList.Count
+                    rcList.Add(rc)
+                    idMap(rc.rect).SetTo(rc.index, rc.mask)
+                End If
+            Next
+
+            dst2 = Palettize(idMap, 0)
 
             SetTrueText(RedC_Basics.showCell(rcList, dst1, dst2), 1)
 
-            labels(2) = CStr(redC.rcList.Count) + " input cells merged into the " + CStr(rcList.Count - 1) + " featureless regions."
+            labels(2) = CStr(redC.rcList.Count) + " input cells merged into the " +
+                        CStr(agedCount - 1) + " featureless regions.  Age is shown."
         End Sub
     End Class
 

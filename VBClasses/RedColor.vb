@@ -1,65 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
-        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public rcList As New List(Of rcData) ' includes cloud data.
-        Dim flood As New Flood_Basics
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Build an rcList from the flood data and present smalles to largest."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = indexMap.Clone
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(task.gray)
-                src = color8u.dst2
-            End If
-
-            flood.Run(src)
-            dst2 = flood.dst2
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To flood.rectList.Count - 1
-                Dim floodVal = flood.indexList(i)
-                Dim r = flood.rectList(i)
-                Dim rc As New rcData(flood.mask(r), r, floodVal)
-                sortList.Add(rc.pixels, rc)
-            Next
-
-            rcList.Clear()
-            rcList.Add(New rcData())
-            indexMap.SetTo(0)
-            For Each rc In sortList.Values
-                rc.index = rcList.Count
-                indexMap(rc.rect).SetTo(rc.index, rc.mask)
-                rcList.Add(rc)
-            Next
-
-            SetTrueText(RedC_Basics.displayCell(rcList, indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
-
-            For Each rc In rcList
-                rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.id = 0 Then rc.id = rc.index
-                indexMap(rc.rect).SetTo(rc.id, rc.mask)
-            Next
-            labels(2) = CStr(sortList.Values.Count) + " cells were found "
-
-            If task.rcD IsNot Nothing Then
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
-                ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            End If
-
-            dst3 = Palettize(indexMap, 0)
-            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedColor_Basics1 : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
@@ -118,6 +59,64 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class RedColor_FloodToID : Inherits TaskParent
+        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcList As New List(Of rcData) ' includes cloud data.
+        Dim flood As New Flood_Basics
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Build an rcList from the flood data and present smalles to largest."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastMap = indexMap.Clone
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(task.gray)
+                src = color8u.dst2
+            End If
+
+            flood.Run(src)
+            dst2 = flood.dst2
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To flood.rectList.Count - 1
+                Dim floodVal = flood.indexList(i)
+                Dim r = flood.rectList(i)
+                Dim rc As New rcData(flood.mask(r), r, floodVal)
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData())
+            indexMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcList.Add(rc)
+            Next
+
+            SetTrueText(RedC_Basics.displayCell(rcList, indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+
+            For Each rc In rcList
+                rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.id = 0 Then rc.id = rc.index
+                indexMap(rc.rect).SetTo(rc.id, rc.mask)
+            Next
+            labels(2) = CStr(sortList.Values.Count) + " cells were found "
+
+            If task.rcD IsNot Nothing Then
+                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+                Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
+                ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            End If
+
+            dst3 = Palettize(indexMap, 0)
+            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
+        End Sub
+    End Class
 
 
 

@@ -265,5 +265,6 @@ Namespace VBClasses
 
         Public term As New TermCriteria(CriteriaTypes.Eps + CriteriaTypes.Count, 10, 1.0)
         Public msRNG As New System.Random
+
     End Class
 End Namespace
