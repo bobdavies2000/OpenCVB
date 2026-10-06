@@ -44,15 +44,11 @@ Namespace VBClasses
             If task.heartBeatLT Then dst3.SetTo(0)
             For i = 0 To delaunay.facetList.Count - 1
                 Dim facet = delaunay.facetList(i)
-                cellMask.SetTo(0)
-                FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
+                Dim rect = ValidateRect(BoundingRect(facet))
+                Dim mask = delaunay.dst3(rect).Clone
+                InRange(mask, i, i, mask)
 
-                Dim nz As New Mat
-                FindNonZero(cellMask, nz)
-                Dim rect = ValidateRect(BoundingRect(nz))
-
-                Dim rc As New rcData(cellMask(rect), rect, 255)
-                If rc.pixels = 0 Then Continue For
+                Dim rc As New rcData(mask, rect, 255)
 
                 Dim prevPt = rc.maxDist
                 Dim previousIndex = idMapLast.Get(Of Byte)(prevPt.Y, prevPt.X)
@@ -65,13 +61,14 @@ Namespace VBClasses
                         If rc.age >= 1000 Then rc.age = 10
                         Circle(dst3, featD.feat.features(i), task.DotSize, white, -1, task.lineType)
                         stableList.Add(featD.feat.features(i))
-                        If rc.maxDStable <> rcLast.maxDStable Then Dim k = 0
                         rc.maxDStable = rcLast.maxDStable
                         ages.Add(rc.age)
                     Else
                         rc.age = 1
                     End If
                 End If
+
+                DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.index, -1)
                 rcList.Add(rc)
             Next
 
