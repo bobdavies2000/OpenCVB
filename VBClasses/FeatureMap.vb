@@ -4,12 +4,20 @@ Namespace VBClasses
         Dim featD As New Feature_Delaunay
         Dim delaunay As New Delaunay_Basics
         Public rcList As New List(Of rcData)
+        Dim rcLastList As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
         End Sub
+        Public Function rcIndexFind(rcIndex As Integer) As rcData
+            For Each rc In rcLastList
+                If rc.index = rcIndex Then Return rcLastList(rcLastList.IndexOf(rc))
+            Next
+            Return Nothing
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            rcLastList = New List(Of rcData)(rcList)
             featD.Run(src)
 
             If featD.feat.features.Count = 0 Then
@@ -25,10 +33,10 @@ Namespace VBClasses
 
             delaunay.Run(src)
 
-            Dim rcListLast = New List(Of rcData)(rcList)
             Dim idMapLast = idMap.Clone
             Dim usedList As New List(Of Single)
-            Dim reusedIndex As Integer
+            Dim stableList As New List(Of cv.Point)
+            Dim ages As New List(Of Integer)
 
             idMap.SetTo(0)
             rcList.Clear()
@@ -60,8 +68,7 @@ Namespace VBClasses
                 If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
                     rc.index = previousIndex
                     usedList.Add(rc.index)
-                    reusedIndex += 1
-                    Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
+                    Dim rcLast = rcIndexFind(CInt(rc.index))
                     If rcLast IsNot Nothing Then
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
@@ -92,9 +99,12 @@ Namespace VBClasses
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
-            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(reusedIndex) +
-                        " or " + (reusedIndex / rcList.Count).ToString("0%") + " kept the same color"
-            labels(3) = CStr(reusedIndex) + " features with age greater than 1."
+            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableList.Count) +
+                        " or " + (stableList.Count / rcList.Count).ToString("0%") + " kept the same color"
+            If ages.Count > 0 Then
+                labels(3) = CStr(stableList.Count) + " features were stable with average age = " +
+                            CStr(CInt(ages.Average))
+            End If
 
             Dim clickIndex = CInt(idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
             Dim selected As rcData = Nothing
