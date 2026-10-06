@@ -5,100 +5,101 @@ Namespace VBClasses
         Dim delaunay As New Delaunay_Basics
         Public rcList As New List(Of rcData)
         Dim rcLastList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
         End Sub
-        Public Function rcIndexFind(rcIndex As Integer) As rcData
-            For Each rc In rcLastList
-                If rc.index = rcIndex Then Return rcLastList(rcLastList.IndexOf(rc))
-            Next
-            Return Nothing
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             rcLastList = New List(Of rcData)(rcList)
             featD.Run(src)
 
             If featD.feat.features.Count = 0 Then
                 rcList.Clear()
-                idMap.SetTo(0)
+                indexMap.SetTo(0)
                 Exit Sub
             End If
 
             delaunay.ptList.Clear()
             For Each pt In featD.feat.features
                 delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                If delaunay.ptList.Count >= 3 Then Exit For
             Next
 
             delaunay.Run(src)
 
-            Dim idMapLast = idMap.Clone
+            Dim indexMapLast = indexMap.Clone
             Dim usedList As New List(Of Single)
-            Dim stableList As New List(Of cv.Point)
             Dim ages As New List(Of Integer)
 
-            idMap.SetTo(0)
+            indexMap = delaunay.dst3.Clone
             rcList.Clear()
             Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
-            If task.heartBeatLT Then dst3.SetTo(0)
+            dst3.SetTo(0)
             For i = 0 To delaunay.facetList.Count - 1
                 Dim facet = delaunay.facetList(i)
                 Dim rect = ValidateRect(BoundingRect(facet))
                 Dim mask = delaunay.dst3(rect).Clone
                 InRange(mask, i, i, mask)
 
-                Dim rc As New rcData(mask, rect, 255)
+                Dim rc As New rcData(mask, rect, 255) With {.index = i, .id = i, .pt = featD.feat.features(i)}
 
-                Dim prevPt = rc.maxDist
-                Dim previousIndex = idMapLast.Get(Of Byte)(prevPt.Y, prevPt.X)
-                If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
-                    rc.index = previousIndex
-                    usedList.Add(rc.index)
-                    Dim rcLast = rcIndexFind(CInt(rc.index))
+                Dim ptPrev = rc.maxDist
+                Dim indexPrev = indexMapLast.Get(Of Byte)(ptPrev.Y, ptPrev.X)
+                If usedList.Contains(indexPrev) = False Then
+                    Dim rcLast As rcData = Nothing
+                    If indexPrev < rcLastList.Count Then
+                        rcLast = rcLastList(indexPrev)
+                        If rcLast.rect.IntersectsWith(rc.rect) = False Then rcLast = Nothing
+                    End If
                     If rcLast IsNot Nothing Then
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         Circle(dst3, featD.feat.features(i), task.DotSize, white, -1, task.lineType)
-                        stableList.Add(featD.feat.features(i))
-                        rc.maxDStable = rcLast.maxDStable
                         ages.Add(rc.age)
+                        rc.id = rcLast.id
+                        rc.maxDStable = rcLast.maxDStable
                     Else
                         rc.age = 1
+                        rc.maxDStable = rc.maxDist
+                        rc.id = i
                     End If
+                    usedList.Add(rc.index)
                 End If
 
-                DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.index, -1)
+                Dim val1 = indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim val2 = indexMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                If val1 <> val2 Then rc.maxDStable = rc.maxDist
                 rcList.Add(rc)
             Next
 
-            Dim nextIndex As Integer = 1
+            dst1.SetTo(0)
             For Each rc In rcList
-                If rc.index = 0 Then
-                    While usedList.Contains(nextIndex) Or nextIndex Mod 255 = 0
-                        nextIndex += 1
-                    End While
-                    rc.index = nextIndex
-                    usedList.Add(nextIndex)
-                    rc.age = 1
+                dst1(rc.rect).SetTo(rc.id, rc.mask)
+            Next
+
+            dst2 = Palettize(dst1)
+
+            Dim stableCount As Integer
+            For i = 0 To rcList.Count - 1
+                If rcList(i).age > 1 Then
+                    stableCount += 1
+                    Circle(dst2, rcList(i).pt, task.DotSize, task.highlight, -1, task.lineType)
+                    SetTrueText(CStr(rcList(i).age), rcList(i).pt, 3)
                 End If
-                rc.id = rc.index
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst2 = Palettize(idMap)
-            For Each pt In featD.feat.features
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-
-            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableList.Count) +
-                        " or " + (stableList.Count / rcList.Count).ToString("0%") + " kept the same color"
+            If task.heartBeat Then
+                labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableCount) +
+                        " or " + (stableCount / rcList.Count).ToString("0%") + " kept the same color"
+            End If
             If ages.Count > 0 Then
-                labels(3) = CStr(stableList.Count) + " features were stable with average age = " +
+                labels(3) = CStr(stableCount) + " features were stable with average age = " +
                             CStr(CInt(ages.Average))
             End If
 
-            Dim clickIndex = CInt(idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            Dim clickIndex = CInt(indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             Dim selected As rcData = Nothing
             For Each rc In rcList
                 If rc.index = clickIndex Then
@@ -112,6 +113,7 @@ Namespace VBClasses
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                 Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                Rectangle(dst3, task.rcD.rect, white, task.lineWidth)
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
                 strOut = task.rcD.displayCell
                 SetTrueText(strOut, 1)

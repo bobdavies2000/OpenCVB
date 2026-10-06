@@ -467,6 +467,7 @@ Namespace VBClasses
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
             Public pixels As Integer
+            Public pt As cv.Point ' used with feature points.
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Sub New()
             End Sub
@@ -502,6 +503,7 @@ Namespace VBClasses
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf
 
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
+                strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf
                 strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
                 strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf + vbCrLf
