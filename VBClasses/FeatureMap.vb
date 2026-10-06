@@ -5,7 +5,7 @@ Namespace VBClasses
         Dim delaunay As New Delaunay_Basics
         Public rcList As New List(Of rcData)
         Dim rcLastList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
@@ -55,16 +55,7 @@ Namespace VBClasses
                 If rc.pixels = 0 Then Continue For
 
                 Dim prevPt = rc.maxDist
-                If i < delaunay.ptList.Count Then
-                    Dim p = delaunay.ptList(i)
-                    prevPt = New cv.Point(CInt(p.X), CInt(p.Y))
-                End If
-                If prevPt.X < 0 Then prevPt.X = 0
-                If prevPt.Y < 0 Then prevPt.Y = 0
-                If prevPt.X >= idMapLast.Width Then prevPt.X = idMapLast.Width - 1
-                If prevPt.Y >= idMapLast.Height Then prevPt.Y = idMapLast.Height - 1
-
-                Dim previousIndex = idMapLast.Get(Of Single)(prevPt.Y, prevPt.X)
+                Dim previousIndex = idMapLast.Get(Of Byte)(prevPt.Y, prevPt.X)
                 If previousIndex <> 0 AndAlso usedList.Contains(previousIndex) = False Then
                     rc.index = previousIndex
                     usedList.Add(rc.index)
@@ -73,6 +64,10 @@ Namespace VBClasses
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         Circle(dst3, featD.feat.features(i), task.DotSize, white, -1, task.lineType)
+                        stableList.Add(featD.feat.features(i))
+                        If rc.maxDStable <> rcLast.maxDStable Then Dim k = 0
+                        rc.maxDStable = rcLast.maxDStable
+                        ages.Add(rc.age)
                     Else
                         rc.age = 1
                     End If
@@ -91,7 +86,7 @@ Namespace VBClasses
                     rc.age = 1
                 End If
                 rc.id = rc.index
-                idMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             dst2 = Palettize(idMap)
@@ -106,7 +101,7 @@ Namespace VBClasses
                             CStr(CInt(ages.Average))
             End If
 
-            Dim clickIndex = CInt(idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
+            Dim clickIndex = CInt(idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             Dim selected As rcData = Nothing
             For Each rc In rcList
                 If rc.index = clickIndex Then
