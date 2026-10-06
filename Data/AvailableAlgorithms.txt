@@ -211,6 +211,8 @@ FeatureMap_Basics
 FeatureMap_ByDepth
 FeatureMap_CreateList
 FeatureMap_Periphery
+FeatureMap_Tracker
+FeatureMap_Tracker1
 FeatureMatch_Basics
 FeatureMatch_BRISK
 FeatureMatch_KAZE
