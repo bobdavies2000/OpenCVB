@@ -42,7 +42,6 @@ Namespace VBClasses
             For Each rc In contours.rcList
                 rc.id = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 idMap(rc.rect).SetTo(rc.index, rc.mask)
-                If rc.pixels > pixelThreshold Then DrawContours(dst2, {rc.contour}, 0, white, task.lineWidth, task.lineType)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)

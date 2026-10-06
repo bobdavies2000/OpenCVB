@@ -153,7 +153,7 @@ Public Class OptionsGlobal
         vbc.task.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
-        vbc.task.optionsChanged = True
+        vbc.task.optionsChanged = False ' this is a debug slider, not an option
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
 

@@ -6,25 +6,22 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            delaunay.useFeatures = False
-            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             featD.Run(src)
-            dst3 = featD.dst3
-            labels(3) = featD.labels(3)
+
+            If featD.feat.features.Count = 0 Then
+                rcList.Clear()
+                idMap.SetTo(0)
+                Exit Sub
+            End If
 
             delaunay.ptList.Clear()
             For Each pt In featD.feat.features
                 delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
             Next
-
-            If delaunay.ptList.Count = 0 Then
-                rcList.Clear()
-                idMap.SetTo(0)
-                Exit Sub
-            End If
 
             delaunay.Run(src)
 
@@ -36,10 +33,9 @@ Namespace VBClasses
             idMap.SetTo(0)
             rcList.Clear()
             Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+            If task.heartBeatLT Then dst3.SetTo(0)
             For i = 0 To delaunay.facetList.Count - 1
                 Dim facet = delaunay.facetList(i)
-                Dim r = BoundingRect(facet)
-
                 cellMask.SetTo(0)
                 FillConvexPoly(cellMask, facet, 255, LineTypes.Link4)
 
@@ -68,7 +64,8 @@ Namespace VBClasses
                     Dim rcLast = RedC_Basics.rcIndexFind(rcListLast, CInt(rc.index))
                     If rcLast IsNot Nothing Then
                         rc.age = rcLast.age + 1
-                        If rc.age >= 1000 Then rc.age = 100
+                        If rc.age >= 1000 Then rc.age = 10
+                        Circle(dst3, featD.feat.features(i), task.DotSize, white, -1, task.lineType)
                     Else
                         rc.age = 1
                     End If
@@ -97,6 +94,7 @@ Namespace VBClasses
 
             labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(reusedIndex) +
                         " or " + (reusedIndex / rcList.Count).ToString("0%") + " kept the same color"
+            labels(3) = CStr(reusedIndex) + " features with age greater than 1."
 
             Dim clickIndex = CInt(idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X))
             Dim selected As rcData = Nothing
@@ -433,13 +431,20 @@ Namespace VBClasses
 
     Public Class FeatureMap_Tracker : Inherits TaskParent
         Dim featMap As New FeatureMap_Basics
-
+        Dim rcSnap As New List(Of rcData)
         Public Sub New()
             desc = "Track the features since the last heartbeat to find a trend."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            CvtColor(src, src, cv.ColorConversionCodes.BGR2GRAY)
+            featMap.Run(src)
+            dst2 = featMap.dst2
+            labels(2) = featMap.labels(2)
+
+            If task.heartBeatLT Then
+                rcSnap = New List(Of rcData)(featMap.rcList)
+            End If
+
+
         End Sub
     End Class
-
 End Namespace

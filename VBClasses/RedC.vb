@@ -47,12 +47,12 @@ Namespace VBClasses
 
             Dim rc As rcData
             If standaloneTest() Then
-                ' labels(3) = redC.labels(3)
-                'dst3 = redC.dst2.Clone
-                'For Each rc In redC.tracker.rcList
-                '    If rc.index = 0 Then Continue For
-                '    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
-                'Next
+                labels(3) = redC.labels(3)
+                dst3 = redC.dst2.Clone
+                For Each rc In redC.tracker.rcList
+                    If rc.index = 0 Then Continue For
+                    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
+                Next
             End If
 
             Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
@@ -101,7 +101,7 @@ Namespace VBClasses
                     rc = redC.rcList(i)
                     rc.index = rcList.Count
                     rcList.Add(rc)
-                    idMap(rc.rect).SetTo(rc.index, rc.mask)
+                    FillConvexPoly(idMap(rc.rect), rc.contour, rc.index, cv.LineTypes.Link4)
                 End If
             Next
 
