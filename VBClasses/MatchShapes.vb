@@ -60,8 +60,8 @@ Namespace VBClasses
 
 
     Public Class MatchShapes_Nearby : Inherits TaskParent
-        Public similarCells As New List(Of rcDataOld)
-        Public rc As New rcDataOld
+        Public similarCells As New List(Of rcData)
+        Public rc As New rcData
         Dim options As New Options_MatchShapes
         Dim redC As New RedColor_BasicsOld
         Public Sub New()
@@ -82,9 +82,9 @@ Namespace VBClasses
                 End If
             End If
 
-            Static rcListLast As New List(Of rcDataOld)
+            Static rcListLast As New List(Of rcData)
             If task.heartBeat Then
-                rcListLast = New List(Of rcDataOld)(redC.rcList)
+                rcListLast = New List(Of rcData)(redC.rcList)
                 dst3.SetTo(0)
             End If
 
@@ -204,9 +204,9 @@ Namespace VBClasses
 
 
     Public Class XR_MatchShapes_NearbyHull : Inherits TaskParent
-        Public similarCells As New List(Of rcDataOld)
+        Public similarCells As New List(Of rcData)
         Public bestCell As Integer
-        Dim rc As New rcDataOld
+        Dim rc As New rcData
         Dim options As New Options_MatchShapes
         Dim redC As New XR_RedColor_Hulls
         Public Sub New()
@@ -229,15 +229,15 @@ Namespace VBClasses
 
                 Dim minMatch As Single = Single.MaxValue
                 For Each rc2 In redC.rclist
-                    If rc.approxPoly.Count = 0 Or rc2.approxPoly.Count = 0 Then Continue For
+                    If rc.contour.Count = 0 Or rc2.contour.Count = 0 Then Continue For
                     If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
-                    Dim matchVal = MatchShapes(rc.approxPoly, rc2.approxPoly, options.matchOption)
+                    Dim matchVal = MatchShapes(rc.contour, rc2.contour, options.matchOption)
                     If matchVal < options.matchThreshold Then
                         If matchVal < minMatch And matchVal > 0 Then
                             minMatch = matchVal
                             bestCell = similarCells.Count
                         End If
-                        DrawTour(dst3(rc2.rect), rc2.approxPoly, white, -1)
+                        DrawTour(dst3(rc2.rect), rc2.contour, white, -1)
                         similarCells.Add(rc2)
                     End If
                 Next

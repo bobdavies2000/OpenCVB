@@ -567,50 +567,50 @@ Namespace VBClasses
 
 
 
-    Public Class XR_GL_ImageHullsColor : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Prepare triangles from the RedCloud_Basics output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+    'Public Class XR_GL_ImageHullsColor : Inherits TaskParent
+    '    Dim redC As New RedCloud_Basics
+    '    Public Sub New()
+    '        desc = "Prepare triangles from the RedCloud_Basics output"
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        redC.Run(src)
+    '        dst2 = redC.dst2
+    '        labels(2) = redC.labels(2)
 
-            Dim dataBuffer As New List(Of Vec3f)
-            Dim vec(2) As Vec3f, pt As cv.Point
-            For Each rc In redC.rcList
-                Dim count As Single = rc.approxPoly.Count
-                For i = 0 To rc.approxPoly.Count - 1
-                    Dim goodDepth As Boolean = True
-                    For j = 0 To vec.Length - 1
-                        Select Case j
-                            Case 0
-                                pt = rc.approxPoly(i) + rc.rect.TopLeft
-                            Case 1
-                                pt = rc.maxDist
-                            Case 2
-                                pt = rc.approxPoly((i + 1) Mod count) + rc.rect.TopLeft
-                        End Select
+    '        Dim dataBuffer As New List(Of Vec3f)
+    '        Dim vec(2) As Vec3f, pt As cv.Point
+    '        For Each rc In redC.rcList
+    '            Dim count As Single = rc.approxPoly.Count
+    '            For i = 0 To rc.approxPoly.Count - 1
+    '                Dim goodDepth As Boolean = True
+    '                For j = 0 To vec.Length - 1
+    '                    Select Case j
+    '                        Case 0
+    '                            pt = rc.approxPoly(i) + rc.rect.TopLeft
+    '                        Case 1
+    '                            pt = rc.maxDist
+    '                        Case 2
+    '                            pt = rc.approxPoly((i + 1) Mod count) + rc.rect.TopLeft
+    '                    End Select
 
-                        vec(j) = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
-                        If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
-                    Next
+    '                    vec(j) = task.pointCloud.Get(Of Vec3f)(pt.Y, pt.X)
+    '                    If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
+    '                Next
 
-                    If goodDepth Then
-                        dataBuffer.Add(New Vec3f(task.scalarColors(rc.index Mod 255)(2),
-                                                 task.scalarColors(rc.index Mod 255)(1),
-                                                 task.scalarColors(rc.index Mod 255)(0)))
-                        For j = 0 To vec.Length - 1
-                            dataBuffer.Add(New Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
-                        Next
-                    End If
-                Next
-            Next
+    '                If goodDepth Then
+    '                    dataBuffer.Add(New Vec3f(task.scalarColors(rc.index Mod 255)(2),
+    '                                             task.scalarColors(rc.index Mod 255)(1),
+    '                                             task.scalarColors(rc.index Mod 255)(0)))
+    '                    For j = 0 To vec.Length - 1
+    '                        dataBuffer.Add(New Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
+    '                    Next
+    '                End If
+    '            Next
+    '        Next
 
-            strOut = task.sharpGL.RunTriangles(oCase.colorTriangles, dataBuffer)
-        End Sub
-    End Class
+    '        strOut = task.sharpGL.RunTriangles(oCase.colorTriangles, dataBuffer)
+    '    End Sub
+    'End Class
 
 
 

@@ -50,7 +50,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
@@ -83,17 +83,17 @@ Namespace VBClasses
             Dim rects(classCount - 1) As cv.Rect
             rectData.GetArray(Of cv.Rect)(rects)
 
-            Dim rcLastList = New List(Of rcDataOld)(rcList)
+            Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
-            rcList.Add(New rcDataOld)
+            rcList.Add(New rcData)
             rcIndexMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
                 ' skip the cells that are just one gridRect.
                 If r.Size <> gRectSize Then
-                    Dim rc = New rcDataOld(dst0(r), r, rcList.Count)
+                    Dim rc = New rcData(dst0(r), r, rcList.Count)
                     If rc.pixels > 0 Then
                         For i = 0 To lastCenters.Count - 1
                             Dim rect = lastCenters(i)

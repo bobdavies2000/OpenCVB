@@ -64,14 +64,14 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_Core : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless gridrects that also have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastIndex = dst1.Clone
-            Dim rcLastList = New List(Of rcDataOld)(rcList)
+            Dim rcLastList = New List(Of rcData)(rcList)
 
             dst1.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
@@ -83,18 +83,18 @@ Namespace VBClasses
 
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
-            Dim nextList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim nextList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             For Each r In task.gridRects
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(dst1, mask, r.TopLeft, nextList.Count + 1, rect, 0, 0, flags)
                     If count = 0 Or rect.Width = 0 Or rect.Height = 0 Then Continue For
-                    Dim rc = New rcDataOld(mask(rect), rect, 255) With {.pixels = count, .index = nextList.Count + 1}
+                    Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count, .index = nextList.Count + 1}
                     nextList.Add(rc.pixels, rc)
                 End If
             Next
 
-            rcList = New List(Of rcDataOld)(nextList.Values)
+            rcList = New List(Of rcData)(nextList.Values)
 
             Dim usedList As New List(Of Integer)
             Dim nextFree As Integer = 1
@@ -110,7 +110,7 @@ Namespace VBClasses
 
                 Dim prevIndex = lastIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-                Dim rcLast As rcDataOld = Nothing
+                Dim rcLast As rcData = Nothing
                 If prevIndex > 0 Then
                     For Each rcPrev In rcLastList
                         If rcPrev.index = prevIndex Then
@@ -977,7 +977,7 @@ Namespace VBClasses
         Dim clusters As New XR_FeatureLess_ClusterFlood
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -985,7 +985,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap As Mat = rcIndexMap.Clone
-            Dim rcLastList As New List(Of rcDataOld)(rcList)
+            Dim rcLastList As New List(Of rcData)(rcList)
 
             clusters.Run(task.gray)
             dst2 = clusters.dst2.Clone
@@ -1011,7 +1011,7 @@ Namespace VBClasses
                 clusterY(cIndex).Add(r.Y)
             Next
 
-            Dim sortList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 1 To clusterX.Count - 1
                 Dim minX = clusterX(i).Min
                 Dim minY = clusterY(i).Min
@@ -1021,7 +1021,7 @@ Namespace VBClasses
 
                 Dim pt = New cv.Point(clusterX(i)(0), clusterY(i)(0))
                 Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = New rcDataOld(dst2(rect), rect, val)
+                Dim rc = New rcData(dst2(rect), rect, val)
                 sortList.Add(rc.pixels, rc)
             Next
 
@@ -1209,7 +1209,7 @@ Namespace VBClasses
         Public featureList As New List(Of Single)
         Public idList As New List(Of Single)
         Public inputVariableCount As Integer = 5
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Expanded floodfill usage for the featureLess image."
@@ -1228,7 +1228,7 @@ Namespace VBClasses
                 If dst2.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                     Dim Count = FloodFill(dst2, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    Dim rc = New rcDataOld(mask(rect), rect, index)
+                    Dim rc = New rcData(mask(rect), rect, index)
                     rcList.Add(rc)
 
                     idList.Add(CSng(index))
@@ -1259,7 +1259,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastImage = feat.dst2.Clone
-            Dim lastList = New List(Of rcDataOld)(feat.rcList)
+            Dim lastList = New List(Of rcData)(feat.rcList)
 
             feat.Run(task.gray.Clone)
             dst2 = feat.dst2

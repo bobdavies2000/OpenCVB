@@ -420,16 +420,16 @@ Namespace VBClasses
 
 
     Public Class XR_SteadyM_Cells : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             labels(3) = "steadyCam version of redc.rcIndexMap."
             desc = "Use M in SteadyCam_Basics maintain the index for each redC cell."
         End Sub
-        Public Shared Function setAge(rcList As List(Of rcDataOld), rcLastList As List(Of rcDataOld), map As cv.Mat) As List(Of rcDataOld)
+        Public Shared Function setAge(rcList As List(Of rcData), rcLastList As List(Of rcData), map As cv.Mat) As List(Of rcData)
             Dim usedList As New List(Of Integer)
-            Dim rcListStable As New List(Of rcDataOld)
+            Dim rcListStable As New List(Of rcData)
             For Each rc In rcList
                 Dim previousIndex = map.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
@@ -460,14 +460,14 @@ Namespace VBClasses
             Return rcListStable
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcLastList = New List(Of rcDataOld)(redC.rcList)
+            Dim rcLastList = New List(Of rcData)(redC.rcList)
 
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
             If task.heartBeatLT Then
-                WarpAffine(redC.rcIndexMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(redC.idMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             setAge(redC.rcList, rcLastList, dst0)
@@ -485,36 +485,4 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
         End Sub
     End Class
-
-
-
-
-
-    Public Class SteadyM_RedCTest : Inherits TaskParent
-        Dim redC As New RedC_BasicsOld
-        Dim rcIndexMap As cv.Mat
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Display the raw RedC rcIndexMap"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            If task.heartBeatLT Then rcIndexMap = redC.rcIndexMap.Clone
-
-            dst1.SetTo(0)
-            For Each rc In redC.rcList
-                Dim val1 = rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                Dim val2 = redC.rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                If val1 = val2 Then dst1(rc.rect).SetTo(rc.index, rc.mask)
-            Next
-            dst3 = Palettize(dst1, 0)
-
-            If task.rcDold IsNot Nothing Then SetTrueText(task.rcDold.displayCell, 1)
-        End Sub
-    End Class
-
 End Namespace

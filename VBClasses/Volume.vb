@@ -1,7 +1,7 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Volume_Basics : Inherits TaskParent
-        Public rc As New rcDataOld
+        Public rc As New rcData
         Public volume As Single
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -14,7 +14,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 1)
-            rc = task.rcDold
+            rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(0)
             If rc.contour Is Nothing Then Exit Sub
 

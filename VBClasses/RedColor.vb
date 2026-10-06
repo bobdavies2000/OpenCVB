@@ -122,7 +122,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_BasicsOld : Inherits TaskParent
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
@@ -154,7 +154,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcSizeSort As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rectSorted.Count - 2
                 Dim r1 = rectSorted.ElementAt(i).Value.r
                 If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
@@ -163,21 +163,21 @@ Namespace VBClasses
                         If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
                             r1 = r1.Union(r2)
                         Else
-                            Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(j).Key)
+                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
                             rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                             i = j
                             Exit For
                         End If
                     Next
                 Else
-                    Dim rc As New rcDataOld(src(r1), r1, rectSorted.ElementAt(i).Key)
+                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
                     rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
                 End If
             Next
 
             rcIndexMap.SetTo(0)
             rcList.Clear()
-            rcList.Add(New rcDataOld)
+            rcList.Add(New rcData)
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)

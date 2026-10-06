@@ -380,79 +380,79 @@ Namespace VBClasses
 
 
 
-        Public Class rcDataOld
-            Public age As Integer = 1
-            Public approxPoly As New List(Of cv.Point)
-            Public contour As New List(Of cv.Point)
-            Public depth As Single
-            Public hull As New List(Of cv.Point)
-            Public index As Integer
-            Public lpList As New List(Of Integer) ' index into task.lines.lplist
-            Public mapID As Integer
-            Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
-            Public maskApprox As cv.Mat
-            Public maxDist As New cv.Point
-            Public maxDStable As New cv.Point
-            Public pixels As Integer
-            Public rect As New cv.Rect(0, 0, 1, 1)
-            Public Sub New()
-            End Sub
-            Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
-                rect = _rect
-                InRange(_mask, floodVal, floodVal, mask)
-                contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
-                pixels = CountNonZero(mask)
-                maxDist = buildMaxDist(mask)
-                depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
-            End Sub
-            Public Function buildMaxDist(mask As cv.Mat) As cv.Point
-                Dim tmpMask = mask.Clone
-                ' Rectangle is definitely needed.  Test it again to verify that the rectangle is essential.
-                Rectangle(tmpMask, New cv.Rect(0, 0, tmpMask.Width, tmpMask.Height), cv.Scalar.All(0), 1)
+        'Public Class rcDataOld
+        '    Public age As Integer = 1
+        '    Public approxPoly As New List(Of cv.Point)
+        '    Public contour As New List(Of cv.Point)
+        '    Public depth As Single
+        '    Public hull As New List(Of cv.Point)
+        '    Public index As Integer
+        '    Public lpList As New List(Of Integer) ' index into task.lines.lplist
+        '    Public mapID As Integer
+        '    Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
+        '    Public maskApprox As cv.Mat
+        '    Public maxDist As New cv.Point
+        '    Public maxDStable As New cv.Point
+        '    Public pixels As Integer
+        '    Public rect As New cv.Rect(0, 0, 1, 1)
+        '    Public Sub New()
+        '    End Sub
+        '    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
+        '        rect = _rect
+        '        InRange(_mask, floodVal, floodVal, mask)
+        '        contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
+        '        If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+        '        pixels = CountNonZero(mask)
+        '        maxDist = buildMaxDist(mask)
+        '        depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
+        '    End Sub
+        '    Public Function buildMaxDist(mask As cv.Mat) As cv.Point
+        '        Dim tmpMask = mask.Clone
+        '        ' Rectangle is definitely needed.  Test it again to verify that the rectangle is essential.
+        '        Rectangle(tmpMask, New cv.Rect(0, 0, tmpMask.Width, tmpMask.Height), cv.Scalar.All(0), 1)
 
-                Dim distance32f As New cv.Mat
-                DistanceTransform(tmpMask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
-                Dim mm As mmData = GetMinMax(distance32f)
-                Dim maxDist As cv.Point
-                maxDist.X = mm.maxLoc.X + rect.X
-                maxDist.Y = mm.maxLoc.Y + rect.Y
-                maxDStable = maxDist
+        '        Dim distance32f As New cv.Mat
+        '        DistanceTransform(tmpMask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
+        '        Dim mm As mmData = GetMinMax(distance32f)
+        '        Dim maxDist As cv.Point
+        '        maxDist.X = mm.maxLoc.X + rect.X
+        '        maxDist.Y = mm.maxLoc.Y + rect.Y
+        '        maxDStable = maxDist
 
-                Return maxDist
-            End Function
-            Public Function displayCell() As String
-                Dim strout = ""
-                strout += "index = " + CStr(index) + vbCrLf
-                strout += "age = " + CStr(age) + vbCrLf
+        '        Return maxDist
+        '    End Function
+        '    Public Function displayCell() As String
+        '        Dim strout = ""
+        '        strout += "index = " + CStr(index) + vbCrLf
+        '        strout += "age = " + CStr(age) + vbCrLf
 
-                strout += "ApproxPoly point count = " + CStr(approxPoly.Count) + vbCrLf
-                'Dim totalDistance As Single
-                'For i = 0 To approxPoly.Count - 2
-                '    totalDistance += approxPoly(i).DistanceTo(approxPoly(i + 1))
-                'Next
-                'Dim approxDensity = totalDistance / approxPoly.Count
-                'strout += "ApproxPoly density (distance/point) " + approxDensity.ToString("#0.0") + vbCrLf
+        '        strout += "ApproxPoly point count = " + CStr(approxPoly.Count) + vbCrLf
+        '        'Dim totalDistance As Single
+        '        'For i = 0 To approxPoly.Count - 2
+        '        '    totalDistance += approxPoly(i).DistanceTo(approxPoly(i + 1))
+        '        'Next
+        '        'Dim approxDensity = totalDistance / approxPoly.Count
+        '        'strout += "ApproxPoly density (distance/point) " + approxDensity.ToString("#0.0") + vbCrLf
 
-                strout += "contour point count = " + CStr(contour.Count) + vbCrLf
-                'totalDistance = 0
-                'For i = 0 To contour.Count - 2
-                '    totalDistance += contour(i).DistanceTo(contour(i + 1))
-                'Next
-                'Dim density = totalDistance / contour.Count
-                'strout += "contour density (distance/point) " + density.ToString("#0.0") + vbCrLf
+        '        strout += "contour point count = " + CStr(contour.Count) + vbCrLf
+        '        'totalDistance = 0
+        '        'For i = 0 To contour.Count - 2
+        '        '    totalDistance += contour(i).DistanceTo(contour(i + 1))
+        '        'Next
+        '        'Dim density = totalDistance / contour.Count
+        '        'strout += "contour density (distance/point) " + density.ToString("#0.0") + vbCrLf
 
-                strout += "mapID = " + CStr(mapID) + vbCrLf
-                strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
-                strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
-                strout += "Pixel count = " + CStr(pixels) + vbCrLf
-                strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-                strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf + vbCrLf
-                strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
+        '        strout += "mapID = " + CStr(mapID) + vbCrLf
+        '        strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
+        '        strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
+        '        strout += "Pixel count = " + CStr(pixels) + vbCrLf
+        '        strout += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        '        strout += "Width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf + vbCrLf
+        '        strout += "ClickPoint = " + CStr(task.clickPoint.X) + ", " + CStr(task.clickPoint.Y) + vbCrLf
 
-                Return strout
-            End Function
-        End Class
+        '        Return strout
+        '    End Function
+        'End Class
 
 
 

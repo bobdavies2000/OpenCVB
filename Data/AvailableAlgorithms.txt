@@ -439,6 +439,7 @@ LineTrack_Match
 LineTrack_MatchLines
 LUT_Basics
 LUT_Equalized
+LUT_RedC
 Mat_2to1
 Mat_4Click
 Mat_4to1
@@ -600,8 +601,6 @@ RedC_Basics
 RedC_BasicsOld
 RedC_CellLines
 RedC_Depth
-RedC_DepthMerge
-RedC_FeatureLessTestSingle
 RedC_Features
 RedC_FloodToRC
 RedC_MergeCells
@@ -674,7 +673,6 @@ SteadyM_Delaunay
 SteadyM_DelaunayLines
 SteadyM_DelaunayPoints
 SteadyM_Lines
-SteadyM_RedCTest
 Stitch_Basics
 Stripes_Basics
 Stripes_CloudX
@@ -701,9 +699,6 @@ Thinning_Basics
 Threshold_Basics
 Threshold_ByChannels
 Threshold_Definitions
-Track_Basics
-Track_FindNearest
-Track_Simple
 TrackOpenCV_Basics
 TrackOpenCV_Basics_QT
 Triangle_Basics

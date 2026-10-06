@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public options As New Options_RedCloud
         Dim reduction As New Reduction_BasicsParmInput
@@ -33,12 +33,12 @@ Namespace VBClasses
             For Each rc In redCore.rcList
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.mapID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                rc.id = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rcIndexMap(rc.rect).SetTo(rc.id, rc.mask)
                 rc.index = rcList.Count
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(task.scalarColors(rc.mapID Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.id Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -54,18 +54,18 @@ Namespace VBClasses
 
     Public Class RedCloud_Core : Inherits TaskParent
         Public prepEdges As New RedPrep_Basics
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
-        Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcDataOld)
+        Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcData)
             Dim index As Integer = 1
             Dim rect As New cv.Rect
             Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
             Dim flags As FloodFillFlags = FloodFillFlags.Link4
-            Dim rc As rcDataOld
-            Dim newList As New SortedList(Of Integer, rcDataOld)(New compareAllowIdenticalIntegerInverted)
+            Dim rc As rcData
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     Dim pt = New cv.Point(x, y)
@@ -74,17 +74,17 @@ Namespace VBClasses
                         Dim count = FloodFill(input, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 Then
                             If count >= minSize Then
-                                rc = New rcDataOld(input(rect), rect, index)
+                                rc = New rcData(input(rect), rect, index)
                                 newList.Add(rc.pixels, rc)
                                 index += 1
-                                rc.mapID = newList.Count
+                                rc.id = newList.Count
                             End If
                         End If
                     End If
                     If index = 254 Then index = 1
                 Next
             Next
-            Return New List(Of rcDataOld)(newList.Values)
+            Return New List(Of rcData)(newList.Values)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then
@@ -94,12 +94,12 @@ Namespace VBClasses
 
             rcList = sweepImage(src, src.Total * 0.0001)
             If rcList.Count = 0 Then
-                rcList.Add(New rcDataOld(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
-                task.rcDold = rcList(0)
+                rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
+                task.rcD = rcList(0)
             End If
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.mapID Mod 254, rc.mask)
+                dst2(rc.rect).SetTo(rc.id Mod 254, rc.mask)
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -117,7 +117,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_CellDepthHistogram : Inherits TaskParent
         Dim plot As New PlotBar_Basics
-        Dim redC As New RedC_BasicsOld
+        Dim redC As New RedC_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -128,14 +128,14 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If task.rcDold Is Nothing Then Exit Sub
+            If task.rcD Is Nothing Then Exit Sub
 
             SetTrueText(redC.strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            Dim depth As Mat = task.pcSplit(2)(task.rcDold.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcDold.rect))
+            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
             ImShow("depth", depth)
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
@@ -225,7 +225,7 @@ Namespace VBClasses
 
     Public Class XR_RedCloud_Matches : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public Sub New()
             task.fOptions.ReductionColor.Value = 120
             desc = "Display the RedCloud cells that matched to the previous frame."
@@ -247,7 +247,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.rcDold IsNot Nothing Then Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
+            If task.rcD IsNot Nothing Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             SetTrueText(redC.strOut, 3)
             labels(3) = CStr(rcList.Count) + " matched cells below with > " + CStr(redC.options.ageThreshold) + " age"
         End Sub
@@ -259,7 +259,7 @@ Namespace VBClasses
 
     Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Public rcList As New List(Of rcDataOld)
+        Public rcList As New List(Of rcData)
         Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()
@@ -300,9 +300,9 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age > 1 Then
-                    If rcMotionCells.Contains(rc.mapID) = False Then
+                    If rcMotionCells.Contains(rc.id) = False Then
                         dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                        rcIndexMap(rc.rect).SetTo(rc.id, rc.mask)
                         rcList.Add(rc)
                     End If
                 End If
