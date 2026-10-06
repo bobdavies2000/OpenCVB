@@ -481,15 +481,15 @@ Namespace VBClasses
     Public Class Delaunay_Map : Inherits TaskParent
         Dim subdiv As New Subdiv2D
         Public rcList As List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "Visualization of the rcIndexMap with colors.  The rcIndexMap contains integers."
+            labels(3) = "Visualization of the idMap with colors.  The idMap contains integers."
             desc = "Create a map using the rcList provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static redC As New RedColor_BasicsOld
+                Static redC As New RedColor_Basicsap
                 redC.Run(src)
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
@@ -517,7 +517,7 @@ Namespace VBClasses
                 Next
 
                 Dim rc = rcList(i)
-                FillConvexPoly(rcIndexMap, nextFacet, rc.mapID, LineTypes.Link4)
+                FillConvexPoly(idMap, nextFacet, rc.id, LineTypes.Link4)
                 FillConvexPoly(dst3, nextFacet, task.scalarColors(rc.index Mod 255), LineTypes.Link4)
                 facetList.Add(nextFacet)
             Next

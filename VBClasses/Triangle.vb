@@ -3,9 +3,9 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Triangle_Basics : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
-            labels = {"", "", "RedColor_BasicsOld output", "Selected contour - each pixel has depth"}
+            labels = {"", "", "RedColor_Basicsap output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13,23 +13,23 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.rcDold Is Nothing Then Exit Sub
+            If task.rcD Is Nothing Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)
-            For Each pt In task.rcDold.contour
-                pt = pt + task.rcDold.rect.TopLeft
+            For Each pt In task.rcD.contour
+                pt = New cv.Point(pt.X + task.rcD.rect.X, pt.Y + task.rcD.rect.Y)
                 Dim vec = task.pointCloud.Get(Of Point3f)(pt.Y, pt.X)
                 If vec.Z = 0 Then
-                    vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcDold.depth))
+                    vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcD.depth))
                 End If
                 Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 pt3D.Add(vec)
             Next
 
-            Dim c3D = task.pointCloud.Get(Of Point3f)(task.rcDold.maxDist.Y, task.rcDold.maxDist.X)
+            Dim c3D = task.pointCloud.Get(Of Point3f)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
             triangles.Clear()
-            Dim color = task.scalarColors(task.rcDold.index Mod 255)
+            Dim color = task.scalarColors(task.rcD.index Mod 255)
             Dim color3D As New Point3f(color(0), color(1), color(2))
             For i = 0 To pt3D.Count - 1
                 triangles.Add(color3D)
@@ -50,7 +50,7 @@ Namespace VBClasses
         Dim hulls As New XR_RedC_Hulls
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels = {"", "Selected hull", "RedColor_BasicsOld output", "Selected contour"}
+            labels = {"", "Selected hull", "RedColor_Basicsap output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -59,18 +59,19 @@ Namespace VBClasses
             If hulls.rcList.Count <= 1 Then Exit Sub
             Static rc As rcData = hulls.rcList(0)
 
-            rc.contour = ContourBuild(rc.mask, contourApproximationModes.ApproxTC89L1)
+            rc.contour = ContourBuild(rc.mask, ContourApproximationModes.ApproxTC89L1)
 
             dst3.SetTo(0)
             For Each pt In rc.contour
-                pt = pt + rc.rect.TopLeft
+                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
                 Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
             Next
 
             dst1.SetTo(0)
-            If rc.hull IsNot Nothing Then
-                For Each pt In rc.hull
-                    pt = pt + rc.rect.TopLeft
+            Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
+            If hull IsNot Nothing Then
+                For Each pt In hull
+                    pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
                     Circle(dst1, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 Next
             End If
@@ -85,7 +86,7 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected contour - each pixel has depth"}
@@ -98,9 +99,9 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
 
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.mapID = 0 Then Exit Sub
+            If rc.id = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)
@@ -147,7 +148,7 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. red dot is maxDist."}
@@ -161,9 +162,9 @@ Namespace VBClasses
 
             SetTrueText(redC.strOut, 1)
 
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.mapID = 0 Then Exit Sub
+            If rc.id = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)

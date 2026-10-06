@@ -74,7 +74,7 @@ Namespace VBClasses
 
     Public Class XR_Bin2Way_RedC : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify 4 gradations of light and combine them for input to RedColor"
@@ -87,7 +87,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
+                dst1(rc.rect).SetTo(rc.id, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
@@ -241,13 +241,13 @@ Namespace VBClasses
 
     Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
         Dim recurse As New XR_Bin2Way_RecurseOnce
-        Dim redCs(3) As RedColor_BasicsOld
+        Dim redCs(3) As RedColor_Basicsap
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)
-        Dim rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Dim idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
-                redCs(i) = New RedColor_BasicsOld
+                redCs(i) = New RedColor_Basicsap
             Next
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "4 separate RedColor runs - darkest to lightest."
@@ -275,16 +275,16 @@ Namespace VBClasses
             rclist.Clear()
             rclist.Add(New rcData)
             dst3.SetTo(0)
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             For Each rc In newList.Values
-                rc.mapID = rclist.Count + 1
+                rc.id = rclist.Count + 1
                 rclist.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
             Next
 
-            dst3 = Palettize(rcIndexMap)
+            dst3 = Palettize(idMap)
 
-            If task.rcDold IsNot Nothing Then SetTrueText(task.rcDold.displayCell, 1)
+            If task.rcD IsNot Nothing Then SetTrueText(task.rcD.displayCell, 1)
         End Sub
     End Class
 End Namespace

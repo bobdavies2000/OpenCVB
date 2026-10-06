@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public nabes As New List(Of Integer)
         Public Sub New()
             desc = "Find all the neighbors with CalcHist and the neighborMask"
@@ -13,12 +13,12 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.rcDold IsNot Nothing Then
-                Dim rc = task.rcDold
+            If task.rcD IsNot Nothing Then
+                Dim rc = task.rcD
                 Dim histogram As New Mat
                 Dim bins = redC.rcList.Count
                 Dim ranges = {New Rangef(0, bins + 1)}
-                CalcHist({redC.rcIndexMap(rc.rect)}, {0}, New cv.Mat, histogram, 1, {bins}, ranges)
+                CalcHist({redC.idMap(rc.rect)}, {0}, New cv.Mat, histogram, 1, {bins}, ranges)
 
                 Dim histArray(bins) As Single
                 histogram.GetArray(Of Single)(histArray)

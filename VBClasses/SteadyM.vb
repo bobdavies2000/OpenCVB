@@ -424,7 +424,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            labels(3) = "steadyCam version of redc.rcIndexMap."
+            labels(3) = "steadyCam version of redc.idMap."
             desc = "Use M in SteadyCam_Basics maintain the index for each redC cell."
         End Sub
         Public Shared Function setAge(rcList As List(Of rcData), rcLastList As List(Of rcData), map As cv.Mat) As List(Of rcData)

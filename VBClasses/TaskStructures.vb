@@ -388,7 +388,7 @@ Namespace VBClasses
         '    Public hull As New List(Of cv.Point)
         '    Public index As Integer
         '    Public lpList As New List(Of Integer) ' index into task.lines.lplist
-        '    Public mapID As Integer
+        '    Public id As Integer
         '    Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
         '    Public maskApprox As cv.Mat
         '    Public maxDist As New cv.Point
@@ -442,7 +442,7 @@ Namespace VBClasses
         '        'Dim density = totalDistance / contour.Count
         '        'strout += "contour density (distance/point) " + density.ToString("#0.0") + vbCrLf
 
-        '        strout += "mapID = " + CStr(mapID) + vbCrLf
+        '        strout += "id = " + CStr(id) + vbCrLf
         '        strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
         '        strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
         '        strout += "Pixel count = " + CStr(pixels) + vbCrLf

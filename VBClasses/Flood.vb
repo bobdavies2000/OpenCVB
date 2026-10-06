@@ -51,7 +51,7 @@ Namespace VBClasses
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -87,7 +87,7 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData)
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
@@ -105,7 +105,7 @@ Namespace VBClasses
                         rc.index = rcList.Count
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                        idMap(rc.rect).SetTo(rc.id, rc.mask)
                     End If
                 End If
             Next
@@ -259,7 +259,7 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
@@ -288,7 +288,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Dim edges As New Edge_Basics_TA
         Public Sub New()
             desc = "Match flooded cells with FeatureLess clusters"
@@ -316,7 +316,7 @@ Namespace VBClasses
 
 
     Public Class XR_Flood_DarkLight : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Dim options As New Options_CComp
         Public Sub New()
             desc = "FloodFill the light half of the image."
@@ -326,11 +326,11 @@ Namespace VBClasses
 
             Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
             redC.Run(dst1)
-            dst2 = Palettize(redC.rcIndexMap, 0)
+            dst2 = Palettize(redC.idMap, 0)
             labels(2) = redC.labels(2)
 
             redC.Run(Not dst1)
-            dst3 = Palettize(redC.rcIndexMap, 0)
+            dst3 = Palettize(redC.idMap, 0)
             labels(3) = redC.labels(2)
         End Sub
     End Class

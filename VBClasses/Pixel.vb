@@ -657,7 +657,7 @@ Namespace VBClasses
     Public Class Pixel_Vector3D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public pixelVector As New List(Of List(Of Single))
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then vbc.task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 3
@@ -677,12 +677,12 @@ Namespace VBClasses
                     hColor.inputMask = rc.mask
                     hColor.Run(src(rc.rect))
                     pixelVector.Add(hColor.histArray.ToList)
-                    strOut += "(" + CStr(rc.mapID) + ") "
+                    strOut += "(" + CStr(rc.id) + ") "
                     For Each count In hColor.histArray
                         strOut += CStr(count) + ","
                     Next
                     strOut += vbCrLf
-                    If rc.mapID >= maxRegion Then Exit For
+                    If rc.id >= maxRegion Then Exit For
                 Next
             End If
             SetTrueText(strOut, 3)
@@ -692,7 +692,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 vbc.task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
                 dst1(rc.rect).SetTo(vbc.task.scalarColors(rc.index Mod 255), rc.mask)
-                If rc.mapID <= maxRegion Then SetTrueText(CStr(rc.mapID), rc.maxDist, 2)
+                If rc.id <= maxRegion Then SetTrueText(CStr(rc.id), rc.maxDist, 2)
             Next
             labels(1) = redC.labels(3)
         End Sub
@@ -706,7 +706,7 @@ Namespace VBClasses
         Dim hVector As New Hist3Dcolor_Vector
         Public pixelVector As New List(Of Single())
         Public rclist As New List(Of rcData)
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Public Sub New()
             labels = {"", "", "RedFlood_List output", ""}
             desc = "Create a vector for each cell's 3D histogram."

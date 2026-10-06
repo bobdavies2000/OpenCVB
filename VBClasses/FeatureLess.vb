@@ -978,13 +978,13 @@ Namespace VBClasses
         Public clusterX As New List(Of List(Of Integer))
         Public clusterY As New List(Of List(Of Integer))
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap As Mat = rcIndexMap.Clone
+            Dim lastMap As Mat = idMap.Clone
             Dim rcLastList As New List(Of rcData)(rcList)
 
             clusters.Run(task.gray)
@@ -1001,7 +1001,7 @@ Namespace VBClasses
             Next
 
             rcList.Clear()
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim cIndex = dst2.Get(Of Byte)(r.Y, r.X)
@@ -1028,22 +1028,22 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In sortList.Values
                 If task.heartBeat Or True Then
-                    rc.mapID = rcList.Count + 1
+                    rc.id = rcList.Count + 1
                 Else
                     Dim lastIndex = lastMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                    rc.mapID = rcList.Count + 1
+                    rc.id = rcList.Count + 1
                     If lastIndex > 0 And lastIndex < rcLastList.Count Then
-                        rc.mapID = lastIndex
+                        rc.id = lastIndex
                         rc.age = rcLastList(lastIndex).age + 1
                     End If
                 End If
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
                 rcList.Add(rc)
             Next
 
-            dst3 = Palettize(rcIndexMap, 0)
+            dst3 = Palettize(idMap, 0)
 
-            ' strOut = Utility_Basics.selectCell(rcIndexMap, rcList)
+            ' strOut = Utility_Basics.selectCell(idMap, rcList)
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -1758,7 +1758,7 @@ Namespace VBClasses
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm solution.
@@ -1777,7 +1777,7 @@ Namespace VBClasses
                 dst3 = fLess.dst3
             End If
 
-            indexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
@@ -1788,7 +1788,7 @@ Namespace VBClasses
                     If rc.rect.Contains(pt) Then
                         If usedList.Contains(rc.index) = False Then
                             rc.index = rcPrev.index
-                            indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                            idMap(rc.rect).SetTo(rc.index, rc.mask)
                             rcList.Add(rc)
                             usedList.Add(rc.index)
                             Exit For
@@ -1804,13 +1804,13 @@ Namespace VBClasses
                 If usedList.Contains(rc.index) = False Then
                     rc.index = nextSlot
                     nextSlot += 1
-                    indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                    idMap(rc.rect).SetTo(rc.index, rc.mask)
                     rcList.Add(rc)
                 End If
             Next
 
             If standaloneTest() Then
-                dst2 = Palettize(indexMap, 0)
+                dst2 = Palettize(idMap, 0)
 
                 For Each rc In rcSnapshotList
                     If rc.index <> 0 Then
@@ -1821,7 +1821,7 @@ Namespace VBClasses
                 Next
             End If
 
-            strOut = RedC_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
             strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
             strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
@@ -1881,7 +1881,7 @@ Namespace VBClasses
     Public Class XR_FeatureLess_TrackerOriginal : Inherits TaskParent
         Dim fLessD As New XR_FeatureLess_Delaunay
         Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Build a Delaunay map on heartbeatLT then use it to keep the index consistent."
         End Sub
@@ -1892,19 +1892,19 @@ Namespace VBClasses
             labels(2) = fLessD.labels(2)
             dst1 = fLessD.dst1.Clone
 
-            indexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             For Each rc In fLessD.rcList
                 If rc.index = 0 Then Continue For
                 Dim nextID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                indexMap(rc.rect).SetTo(nextID, rc.mask)
+                idMap(rc.rect).SetTo(nextID, rc.mask)
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(indexMap, 0)
+            dst2 = Palettize(idMap, 0)
 
-            strOut = RedC_Basics.showCell(rcList, indexMap, dst2) + vbCrLf
+            strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
             SetTrueText(strOut, 3)
         End Sub
     End Class

@@ -24,7 +24,7 @@
 
 '            SetTrueText(redC.strOut, 1)
 
-'            Dim rc = task.rcDold
+'            Dim rc = task.rcD
 '            Dim depthPixels = CountNonZero(task.depthmask(rc.rect))
 '            If depthPixels = 0 Then
 '                strOut = "There is no depth data for that cell."
@@ -153,7 +153,7 @@
 '            dst2 = sides.dst2
 
 '            If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
-'            Dim rc = task.rcDold
+'            Dim rc = task.rcD
 '            If rc Is Nothing Then rc = sides.redC.rcList(0)
 
 '            Dim offset As Integer = 30
@@ -164,7 +164,7 @@
 '            dst3.SetTo(0)
 
 '            Dim color As Scalar, near = Scalar.Yellow, far = Scalar.Blue
-'            If rc.mapID > 0 Then
+'            If rc.id > 0 Then
 '                For i = 0 To rc.contour.Count - 1
 '                    Dim pt = rc.contour(i)
 '                    Dim vec = task.pointCloud(rc.rect).Get(Of Point3f)(pt.Y, pt.X)
@@ -255,7 +255,7 @@
 
 '            sides.Run(src)
 '            dst2 = sides.dst2
-'            Dim rc = task.rcDold
+'            Dim rc = task.rcD
 '            If rc Is Nothing Then
 '                If sides.redC.rcList.Count = 0 Then Exit Sub
 '                rc = sides.redC.rcList(0)
@@ -321,7 +321,7 @@
 '            If sides.redC.rcList.Count = 0 Then Exit Sub ' nothing to work on...
 '            dst1 = sides.dst2
 '            dst2 = sides.dst3
-'            Dim rc = task.rcDold
+'            Dim rc = task.rcD
 '            If rc Is Nothing Then rc = sides.redC.rcList(0)
 
 '            If kalman.kInput.Length <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
@@ -332,7 +332,7 @@
 
 '            kalman.Run(emptyMat)
 
-'            If rc.mapID > 0 Then
+'            If rc.id > 0 Then
 '                dst3.SetTo(0)
 '                DrawTour(dst3(rc.rect), rc.contour, Scalar.Yellow)
 '                For i = 0 To sides.corners.Count - 1

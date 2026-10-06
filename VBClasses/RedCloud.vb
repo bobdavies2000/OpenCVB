@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public options As New Options_RedCloud
         Dim reduction As New Reduction_BasicsParmInput
         Public runSelectCell As Boolean = True
@@ -24,7 +24,7 @@ Namespace VBClasses
             labels(3) = redCore.labels(3)
 
             rcList.Clear()
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             dst2.SetTo(0)
             Dim matchCount As Integer
             Dim unMatched As Integer
@@ -34,7 +34,7 @@ Namespace VBClasses
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
                 rc.id = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcIndexMap(rc.rect).SetTo(rc.id, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
                 rc.index = rcList.Count
                 rcList.Add(rc)
 
@@ -145,7 +145,7 @@ Namespace VBClasses
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)
                 Dim x = incr * i
-                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.white, task.lineWidth, task.lineType)
+                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
             Next
             dst3 = plot.dst2
         End Sub
@@ -169,7 +169,7 @@ Namespace VBClasses
             Dim count As Integer
             dst1.SetTo(0)
             For Each brick As brickData In bricks.brickList
-                If CountNonZero(redC.rcIndexMap(brick.lRect)) And brick.rRect.Width > 0 Then
+                If CountNonZero(redC.idMap(brick.lRect)) And brick.rRect.Width > 0 Then
                     dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                     count += 1
                 End If
@@ -260,7 +260,7 @@ Namespace VBClasses
     Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -273,7 +273,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            redC.rcIndexMap.ConvertTo(dst0, MatType.CV_8U)
+            redC.idMap.ConvertTo(dst0, MatType.CV_8U)
             dst1.SetTo(0)
             dst0.CopyTo(dst1, pcMotion.dst2)
 
@@ -296,13 +296,13 @@ Namespace VBClasses
             Next
 
             dst3.SetTo(0)
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age > 1 Then
                     If rcMotionCells.Contains(rc.id) = False Then
                         dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcIndexMap(rc.rect).SetTo(rc.id, rc.mask)
+                        idMap(rc.rect).SetTo(rc.id, rc.mask)
                         rcList.Add(rc)
                     End If
                 End If

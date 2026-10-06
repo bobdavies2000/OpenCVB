@@ -27,7 +27,7 @@ Namespace VBClasses
         Public colorList As New List(Of Scalar)
         Public oglOptions As New Options_OpenGLFunctions
         Const depthListMaxCount As Integer = 10
-        Dim redc As New RedColor_BasicsOld
+        Dim redc As New RedColor_Basicsap
         Public Sub New()
             labels(3) = "Values indicate the depth of the brick at that location."
             desc = "Create a representation of the cv.Point cloud with RedCloud data"
@@ -60,7 +60,7 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = redc.rcIndexMap.Get(Of Single)(center.Y, center.X)
+                Dim index = redc.idMap.Get(Of Single)(center.Y, center.X)
 
                 If index <= 0 Or index >= redc.rcList.Count Then
                     depthList1(i).Clear()
@@ -159,7 +159,7 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = hulls.rcIndexMap.Get(Of Single)(center.Y, center.X)
+                Dim index = hulls.idMap.Get(Of Single)(center.Y, center.X)
 
                 If index <= 0 Then
                     depthList(i).Clear()
@@ -212,7 +212,7 @@ Namespace VBClasses
         Dim depthMinList As New List(Of List(Of Single))
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             desc = "Create triangles from each gRect in cv.Point cloud"
         End Sub
@@ -241,7 +241,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim gRect = task.gridRects(i)
                 Dim center = New cv.Point(gRect.X + gRect.Width / 2, gRect.Y + gRect.Height / 2)
-                Dim index = redC.rcIndexMap.Get(Of Single)(center.Y, center.X)
+                Dim index = redC.idMap.Get(Of Single)(center.Y, center.X)
                 Dim depthMin As Double = 0, depthMax As Double = 0, minLoc As cv.Point, maxLoc As cv.Point
                 If index > 0 And index < redC.rcList.Count Then
                     MinMaxLoc(task.pcSplit(2)(gRect), depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))

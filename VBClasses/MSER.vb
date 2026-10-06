@@ -3,7 +3,7 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Public Sub New()
             labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
@@ -25,16 +25,16 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
-        Public Shared Function RebuildRCMap(rcIndexMap As Mat, rclist As List(Of rcData)) As Mat
+        Public Shared Function RebuildRCMap(idMap As Mat, rclist As List(Of rcData)) As Mat
             Dim dst As New Mat(task.workRes, MatType.CV_8UC3, 0)
             For Each rc In rclist
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
                 dst(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                If rc.mapID >= 255 Then Exit For
+                If rc.id >= 255 Then Exit For
             Next
             Return dst
         End Function
@@ -67,7 +67,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                Dim indexLast = redC.rcIndexMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = redC.idMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast <> 0 And indexLast < redC.rcList.Count Then
                     Dim lrc = redC.rcList(indexLast)
                     matched.Add(indexLast)
@@ -112,11 +112,11 @@ Namespace VBClasses
             cellMap.SetTo(0)
             Dim matchCount As Integer
             For i = 0 To floodPoints.Count - 1
-                Dim rc As New rcData With {.mapID = rclist.Count}
+                Dim rc As New rcData With {.id = rclist.Count}
                 Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
                 rc.rect = boxInput(boxes.ElementAt(i).Value)
                 InRange(dst3(rc.rect), val, val, rc.mask)
-                dst1(rc.rect).SetTo(rc.mapID, rc.mask)
+                dst1(rc.rect).SetTo(rc.id, rc.mask)
                 rc.pixels = detect.maskCounts(i)
 
                 Dim indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -125,7 +125,7 @@ Namespace VBClasses
                 If indexLast <> 0 Then matchCount += 1
 
                 rclist.Add(rc)
-                cellMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                cellMap(rc.rect).SetTo(rc.id, rc.mask)
                 dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 
@@ -585,7 +585,7 @@ Namespace VBClasses
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()

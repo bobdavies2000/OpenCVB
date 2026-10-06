@@ -1547,7 +1547,7 @@ Namespace VBClasses
             plotHist.minRange = 0
             plotHist.maxRange = task.MaxZmeters
             If rc IsNot Nothing Then
-                If rc.mapID = 0 Then Exit Sub
+                If rc.id = 0 Then Exit Sub
                 If src.Size <> rc.rect.Size Then src = src(rc.rect).Clone
             Else
                 mm = GetMinMax(src)

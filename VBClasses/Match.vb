@@ -232,7 +232,7 @@ Namespace VBClasses
 
     Public Class XR_Match_TraceRedC : Inherits TaskParent
         Dim frameList As New List(Of Mat)
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
             dst1 = New Mat(dst1.Size(), MatType.CV_32S, 0)
@@ -685,7 +685,7 @@ Namespace VBClasses
 
 
     Public Class Match_RedC : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Dim matchFeat As New Match_Features
         Public Sub New()
             desc = "Create a stable RedC output image."
@@ -731,7 +731,7 @@ Namespace VBClasses
 
             Static clickIndex As Integer
             If task.mouseClickFlag Then
-                clickIndex = redC.indexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                clickIndex = redC.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             Else
                 clickIndex = 1
             End If
@@ -743,7 +743,7 @@ Namespace VBClasses
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            WarpAffine(redC.indexMap, redC.indexMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redC.idMap, redC.idMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class

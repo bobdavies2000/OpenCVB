@@ -91,7 +91,7 @@ Namespace VBClasses
 
     Public Class XR_Hist3D_RedC : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Run RedFlood_List on the combined Hist3D color/cloud output."
@@ -118,9 +118,9 @@ Namespace VBClasses
 
     Public Class XR_Hist3D_RedC1 : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
-            desc = "Use the Hist3D color classes to segment the image with RedColor_BasicsOld"
+            desc = "Use the Hist3D color classes to segment the image with RedColor_Basicsap"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hColor.Run(src)
@@ -131,8 +131,8 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
             If redC.rcList.Count > 0 Then
-                If task.rcDold IsNot Nothing Then
-                    If task.rcDold.pixels > 0 Then dst2(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+                If task.rcD IsNot Nothing Then
+                    If task.rcD.pixels > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
                 End If
             End If
         End Sub
@@ -255,8 +255,8 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixels.Run(src)
-            dst2 = pixels.redC.rcIndexMap
-            dst0 = pixels.redC.rcIndexMap
+            dst2 = pixels.redC.idMap
+            dst0 = pixels.redC.idMap
 
             InRange(dst2, 0, 0, dst3)
             If pixels.pixelVector.Count = 0 Then Exit Sub

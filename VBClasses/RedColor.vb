@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
-        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build a list of cells for each floodfill region in the Color8U input."
@@ -22,7 +22,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData)
             dst1 = color8U.dst2.Clone
-            indexMap.SetTo(0)
+            idMap.SetTo(0)
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
@@ -31,7 +31,7 @@ Namespace VBClasses
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            indexMap(rc.rect).SetTo(index, rc.mask)
+                            idMap(rc.rect).SetTo(index, rc.mask)
                             rcList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -40,7 +40,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst3 = Palettize(indexMap, 0)
+            dst3 = Palettize(idMap, 0)
 
             If standaloneTest() Then
                 Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -64,7 +64,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_FloodToID : Inherits TaskParent
-        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
@@ -72,7 +72,7 @@ Namespace VBClasses
             desc = "Build an rcList from the flood data and present smalles to largest."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = indexMap.Clone
+            Dim lastMap = idMap.Clone
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(task.gray)
@@ -91,19 +91,19 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData())
-            indexMap.SetTo(0)
+            idMap.SetTo(0)
             For Each rc In sortList.Values
                 rc.index = rcList.Count
-                indexMap(rc.rect).SetTo(rc.index, rc.mask)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
-            SetTrueText(RedC_Basics.displayCell(rcList, indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Basics.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.id = 0 Then rc.id = rc.index
-                indexMap(rc.rect).SetTo(rc.id, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -113,7 +113,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(indexMap, 0)
+            dst3 = Palettize(idMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
         End Sub
     End Class
@@ -121,9 +121,9 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_BasicsOld : Inherits TaskParent
+    Public Class RedColor_Basicsap : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -175,16 +175,16 @@ Namespace VBClasses
                 End If
             Next
 
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData)
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst2 = Palettize(rcIndexMap, 0)
+            dst2 = Palettize(idMap, 0)
             dst3 = fLess.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
@@ -197,7 +197,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_GridRects : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
         Public Sub New()
             labels(3) = "RedColor output mapped into the gridRects."
@@ -214,11 +214,11 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index As Integer = redC.rcIndexMap.Get(Of Single)(center.Y, center.X) - 1
+                Dim index As Integer = redC.idMap.Get(Of Single)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
-                rcGridMap(r).SetTo(rc.mapID)
+                rcGridMap(r).SetTo(rc.id)
             Next
         End Sub
     End Class
@@ -230,11 +230,11 @@ Namespace VBClasses
     Public Class RedColor_InRange : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-            desc = "Use InRange to prepare an 8U input image for RedColor_BasicsOld"
+            desc = "Use InRange to prepare an 8U input image for RedColor_Basicsap"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)

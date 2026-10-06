@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public idMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -12,17 +12,17 @@ Namespace VBClasses
                 task.gOptions.showMyDst1.Checked = True
                 labels(3) = "Use the debugslider to display different cells."
             End If
-            desc = "Create an rcIndexMap of the contours using the colors indicated by KMeans"
+            desc = "Create an idMap of the contours using the colors indicated by KMeans"
         End Sub
-        Public Shared Function clickContour(rcIndexMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
+        Public Shared Function clickContour(idMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
-            Dim clickIndex = rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
+            Dim clickIndex = idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
-                task.rcDold = rcList(clickIndex)
-                dst(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+                task.rcD = rcList(clickIndex)
+                dst(task.rcD.rect).SetTo(white, task.rcD.mask)
             ElseIf clickIndex < 1 Then
                 Dim mask As New Mat(New Size(dst.Width + 2, dst.Height + 2), MatType.CV_8U, 0)
-                Dim mapID = color8U.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                Dim id = color8U.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
                 Dim floodRect As cv.Rect
                 Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
                 Dim count = FloodFill(color8U, mask, task.clickPoint, 255, floodRect, 0, 0, flags)
@@ -37,17 +37,17 @@ Namespace VBClasses
             contours.Run(color8U.dst2.Clone)
 
             Dim rcListLast As New List(Of rcData)(rcList)
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
-                rc.mapID = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcIndexMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.id = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
                 If rc.pixels > pixelThreshold Then DrawContours(dst2, {rc.contour}, 0, white, task.lineWidth, task.lineType)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
 
-            task.color = clickContour(rcIndexMap, rcList, color8U.dst2)
+            task.color = clickContour(idMap, rcList, color8U.dst2)
 
             If standalone And task.heartBeat Then
                 Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
@@ -169,9 +169,9 @@ Namespace VBClasses
             For i = 0 To sortedList.Count - 1
                 Dim rc = sortedList.Values(i)
                 rc.index = i + 1
-                rc.mapID = rc.index Mod 255
+                rc.id = rc.index Mod 255
                 rcList.Add(rc)
-                dst1(rc.rect).SetTo(rc.mapID Mod 255, rc.mask)
+                dst1(rc.rect).SetTo(rc.id Mod 255, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
@@ -470,7 +470,7 @@ Namespace VBClasses
     '    Public Overrides Sub RunAlg(src As cv.Mat)
     '        sides.Run(src)
     '        dst2 = sides.dst2
-    '        Dim rc = task.rcDold
+    '        Dim rc = task.rcD
 
     '        If sides.corners.Count > 0 And task.heartBeat Then
     '            ptLeft = sides.corners(1)
@@ -591,7 +591,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
@@ -603,15 +603,15 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             SetTrueText(redC.strOut, 3)
-            If task.rcDold Is Nothing Then Exit Sub
-            Dim tmp = task.rcDold.mask.Clone
+            If task.rcD Is Nothing Then Exit Sub
+            Dim tmp = task.rcD.mask.Clone
 
             Dim allContours As cv.Point()() = Nothing
             If options.retrievalMode = RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, MatType.CV_32SC1)
             FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
             dst3.SetTo(0)
-            DrawContours(dst3(task.rcDold.rect), allContours, -1, Scalar.Yellow)
+            DrawContours(dst3(task.rcD.rect), allContours, -1, Scalar.Yellow)
         End Sub
     End Class
 
@@ -623,7 +623,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
@@ -635,7 +635,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
 
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(1)
             If rc.contour Is Nothing Then Exit Sub
 

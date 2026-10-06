@@ -7,7 +7,7 @@ Namespace VBClasses
         Public objectList As New List(Of Vec4f)
         Public showRectangles As Boolean = True
         Dim histTop As New Projection_HistTop
-        Public redC As New RedColor_BasicsOld
+        Public redC As New RedColor_Basicsap
         Public Sub New()
             desc = "Find all the masks, rects, and counts in the input"
         End Sub
@@ -38,7 +38,7 @@ Namespace VBClasses
             rclist.Clear()
             rclist.Add(New rcData)
             For Each rc In sortedCells.Values
-                rc.mapID = rclist.Count
+                rc.id = rclist.Count
                 rclist.Add(rc)
             Next
 
@@ -52,7 +52,7 @@ Namespace VBClasses
             Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
             If task.heartBeat Then strOut = ""
             For Each rc In rclist
-                If rc.mapID = 0 Then Continue For
+                If rc.id = 0 Then Continue For
                 If viewType = "Side" Then
                     xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
                     xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
@@ -66,7 +66,7 @@ Namespace VBClasses
                 End If
                 objectList.Add(New Vec4f(xy1, xy2, z1, z2))
                 If task.heartBeat Then
-                    strOut += "Object " + vbTab + CStr(rc.mapID) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
+                    strOut += "Object " + vbTab + CStr(rc.id) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
                                                z1.ToString(fmt1) + "m " + " to " + z2.ToString(fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
                 End If
             Next
@@ -245,11 +245,11 @@ Namespace VBClasses
     Public Class Projection_Cell : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatCell As New HeatMap_Basics
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels = {"", "Top View projection of the selected cell", "RedColor_BasicsOld output - select a cell to project at right and above", "Side projection of the selected cell"}
+            labels = {"", "Top View projection of the selected cell", "RedColor_Basicsap output - select a cell to project at right and above", "Side projection of the selected cell"}
             desc = "Create a top and side projection of the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

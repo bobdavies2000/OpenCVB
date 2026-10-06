@@ -897,7 +897,7 @@ Namespace VBClasses
 
             fLess.Run(task.leftView)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.indexMap)
+            dst2.SetTo(0, fLess.idMap)
             labels(2) = fLess.labels(2)
 
             depthList.Clear()
@@ -949,7 +949,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.indexMap)
+            dst2.SetTo(0, fLess.idMap)
             labels(2) = fLess.labels(2)
 
             If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)

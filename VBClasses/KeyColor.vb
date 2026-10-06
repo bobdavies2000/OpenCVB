@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Namespace VBClasses
     Public Class KeyColor_Basics : Inherits TaskParent
         Dim rcList As New List(Of rcData)
-        Dim rcIndexMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Dim idMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Dim edgeline As New EdgeLine_KeyColorOnly
         Dim options As New Options_Contours
         Public Sub New()
@@ -43,20 +43,20 @@ Namespace VBClasses
                 If rc.pixels >= minSize Then sortedList.Add(rc.pixels, rc)
             Next
 
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             rcList.Clear()
             For i = 1 To sortedList.Values.Count - 1
                 Dim rc = sortedList.Values(i)
-                rcIndexMap(rc.rect).SetTo(i, rc.mask)
+                idMap(rc.rect).SetTo(i, rc.mask)
                 rc.index = i
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(rcIndexMap)
+            dst2 = Palettize(idMap)
 
             Static clickPoint As cv.Point
             If task.mouseClickFlag Then clickPoint = task.clickPoint
-            Dim clickIndex As Integer = rcIndexMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
+            Dim clickIndex As Integer = idMap.Get(Of Single)(clickPoint.Y, clickPoint.X)
             SetTrueText(RedC_BasicsOld.displayCell(rcList, clickIndex - 1), 3)
         End Sub
     End Class
@@ -148,7 +148,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-            Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
+                Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub
@@ -158,16 +158,16 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_OverColor : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Overlay the KeyColor_Contours cells on the reduced color results."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim _redC_cvt As New Mat
-        CvtColor(keyColors.dst2, _redC_cvt, ColorConversionCodes.BGR2GRAY)
-        redC.Run(_redC_cvt)
+            Dim _redC_cvt As New Mat
+            CvtColor(keyColors.dst2, _redC_cvt, ColorConversionCodes.BGR2GRAY)
+            redC.Run(_redC_cvt)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
@@ -182,7 +182,7 @@ Namespace VBClasses
             dst3 = Palettize(dst1, 0)
 
             For Each key In keyColors.keyList
-            Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
+                Circle(dst3, key.maxDist, task.DotSize, task.highlight, -1)
             Next
             labels(3) = CStr(keyColors.keyList.Count - 1) + " regions were found with more than 1% of the image."
         End Sub
@@ -193,7 +193,7 @@ Namespace VBClasses
 
     Public Class XR_KeyColor_Straight : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -201,18 +201,18 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             rcList.Clear()
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
 
             keyColors.Run(task.gray)
 
             keyColors.keyList.RemoveAt(0)
             For Each key In keyColors.keyList
-                Dim rc = New rcData(key.mask, key.rect, -1) With {.mapID = rcList.Count + 1, .contour = key.contour}
+                Dim rc = New rcData(key.mask, key.rect, -1) With {.id = rcList.Count + 1, .contour = key.contour}
                 rcList.Add(rc)
-                rcIndexMap(rc.rect).SetTo(rc.mapID, rc.mask)
+                idMap(rc.rect).SetTo(rc.id, rc.mask)
             Next
 
-            dst2 = Palettize(rcIndexMap, 0)
+            dst2 = Palettize(idMap, 0)
             labels(2) = CStr(rcList.Count - 1) + " cells were found."
         End Sub
     End Class

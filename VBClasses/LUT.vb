@@ -242,7 +242,7 @@ Namespace VBClasses
             SetTrueText(redC.strOut, 3)
 
             dst3.SetTo(0)
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
             src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
 

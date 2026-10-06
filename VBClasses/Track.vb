@@ -91,7 +91,7 @@
 '        Dim redC As New RedC_Basics
 '        Dim knn As New KNN_Basics
 '        Public Sub New()
-'            desc = "Find the nearest cell with the same mapID."
+'            desc = "Find the nearest cell with the same id."
 '        End Sub
 '        Public Overrides Sub RunAlg(src As cv.Mat)
 '            If src.Channels <> 1 Then

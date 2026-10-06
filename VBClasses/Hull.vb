@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Hull_Basics : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare hulls and contours for the redC cells."
@@ -13,7 +13,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(1)
             If rc.contour Is Nothing Then Exit Sub
 
@@ -21,9 +21,11 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
-            DrawTour(dst1(rc.rect), rc.hull, task.highlight)
+            Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
+            DrawTour(dst1(rc.rect), hull.ToList, task.highlight)
 
-            labels(2) = "Contour points count reduced from " + CStr(rc.contour.Count) + " to " + CStr(rc.hull.Count)
+            labels(2) = "Contour points count reduced from " +
+                         CStr(rc.contour.Count) + " to " + CStr(hull.Length)
         End Sub
     End Class
 
@@ -32,7 +34,7 @@ Namespace VBClasses
 
 
     Public Class Hull_Edges : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             desc = "Match hull edges that are also real edges."
         End Sub
@@ -43,7 +45,7 @@ Namespace VBClasses
 
             CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
             For Each rc In redC.rcList
-                DrawTour(dst3(rc.rect), rc.approxPoly, task.highlight, task.lineWidth)
+                DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
             Next
         End Sub
     End Class
@@ -280,7 +282,7 @@ Namespace VBClasses
 
 
     Public Class Hull_Contour : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Contour is in white and hull is highlighted."
@@ -291,7 +293,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim rc = task.rcDold
+            Dim rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(1)
 
             Dim newSize = New cv.Size(rc.rect.Width, rc.rect.Width * dst2.Height / dst2.Width)
@@ -350,10 +352,10 @@ Namespace VBClasses
 
 
     Public Class Hull_RedC : Inherits TaskParent
-        Dim redC As New RedColor_BasicsOld
+        Dim redC As New RedColor_Basicsap
         Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
-        Public rcIndexMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}
             desc = "Cursor.ai: Fill convexity defect regions for each hull in RedC.rcList"
@@ -365,16 +367,16 @@ Namespace VBClasses
 
             Dim defectCount As Integer
             Dim filledDefects As Integer
-            rcIndexMap.SetTo(0)
+            idMap.SetTo(0)
             dst3.SetTo(0)
             rclist.Clear()
             For Each rc In redC.rcList
                 If rc.contour.Count >= 3 Then
                     Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
                     hulls.Add(hull.ToList)
-                    Dim color = task.scalarColors(rc.mapID)
+                    Dim color = task.scalarColors(rc.id)
                     dst3(rc.rect).SetTo(color, rc.mask)
-                    DrawTour(rcIndexMap(rc.rect), hull.ToList, rc.index, -1)
+                    DrawTour(idMap(rc.rect), hull.ToList, rc.index, -1)
 
                     Dim defects As Vec4i() = Nothing
                     rc.contour = Convex_RedCDefects.checkDefects(rc.contour, defects)
