@@ -1,125 +1,124 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureMap_Basics : Inherits TaskParent
-        Dim featD As New Feature_Delaunay
-        Dim delaunay As New Delaunay_Basics
-        Public rcList As New List(Of rcData)
-        Dim rcLastList As New List(Of rcData)
-        Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            rcLastList = New List(Of rcData)(rcList)
-            featD.Run(src)
+    'Public Class FeatureMap_Basics : Inherits TaskParent
+    '    Dim featD As New Feature_Delaunay
+    '    Dim delaunay As New Delaunay_Basics
+    '    Public rcList As New List(Of rcData)
+    '    Dim rcLastList As New List(Of rcData)
+    '    Public indexMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+    '    Public Sub New()
+    '        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+    '        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+    '        desc = "Cursor.ai: Build rcData from each Feature_Delaunay cell using the cell rect and a filled mask."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        rcLastList = New List(Of rcData)(rcList)
+    '        featD.Run(src)
 
-            If featD.feat.features.Count = 0 Then
-                rcList.Clear()
-                indexMap.SetTo(0)
-                Exit Sub
-            End If
+    '        If featD.feat.features.Count = 0 Then
+    '            rcList.Clear()
+    '            indexMap.SetTo(0)
+    '            Exit Sub
+    '        End If
 
-            delaunay.ptList.Clear()
-            For Each pt In featD.feat.features
-                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
-                If delaunay.ptList.Count >= 3 Then Exit For
-            Next
+    '        delaunay.ptList.Clear()
+    '        For Each pt In featD.feat.features
+    '            delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+    '        Next
 
-            delaunay.Run(src)
+    '        delaunay.Run(src)
 
-            Dim indexMapLast = indexMap.Clone
-            Dim usedList As New List(Of Single)
-            Dim ages As New List(Of Integer)
+    '        Dim indexMapLast = indexMap.Clone
+    '        Dim usedList As New List(Of Single)
+    '        Dim ages As New List(Of Integer)
 
-            indexMap = delaunay.dst3.Clone
-            rcList.Clear()
-            Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3.SetTo(0)
-            For i = 0 To delaunay.facetList.Count - 1
-                Dim facet = delaunay.facetList(i)
-                Dim rect = ValidateRect(BoundingRect(facet))
-                Dim mask = delaunay.dst3(rect).Clone
-                InRange(mask, i, i, mask)
+    '        indexMap = featD.delaunay.dst3.Clone
+    '        rcList.Clear()
+    '        Dim cellMask As New Mat(dst2.Size, MatType.CV_8U, 0)
+    '        dst3.SetTo(0)
+    '        For i = 0 To featD.delaunay.facetList.Count - 1
+    '            Dim facet = featD.delaunay.facetList(i)
+    '            Dim rect = ValidateRect(BoundingRect(facet))
+    '            Dim mask = featD.delaunay.dst3(rect).Clone
+    '            InRange(mask, i, i, mask)
 
-                Dim rc As New rcData(mask, rect, 255) With {.index = i, .id = i, .pt = featD.feat.features(i)}
+    '            Dim rc As New rcData(mask, rect, 255) With {.index = i, .id = i, .pt = featD.feat.features(i)}
 
-                Dim ptPrev = rc.maxDist
-                Dim indexPrev = indexMapLast.Get(Of Byte)(ptPrev.Y, ptPrev.X)
-                If usedList.Contains(indexPrev) = False Then
-                    Dim rcLast As rcData = Nothing
-                    If indexPrev < rcLastList.Count Then
-                        rcLast = rcLastList(indexPrev)
-                        If rcLast.rect.IntersectsWith(rc.rect) = False Then rcLast = Nothing
-                    End If
-                    If rcLast IsNot Nothing Then
-                        rc.age = rcLast.age + 1
-                        If rc.age >= 1000 Then rc.age = 10
-                        Circle(dst3, featD.feat.features(i), task.DotSize, white, -1, task.lineType)
-                        ages.Add(rc.age)
-                        rc.id = rcLast.id
-                        rc.maxDStable = rcLast.maxDStable
-                    Else
-                        rc.age = 1
-                        rc.maxDStable = rc.maxDist
-                        rc.id = i
-                    End If
-                    usedList.Add(rc.index)
-                End If
+    '            Dim ptPrev = rc.maxDist
+    '            Dim indexPrev = indexMapLast.Get(Of Byte)(ptPrev.Y, ptPrev.X)
+    '            If usedList.Contains(indexPrev) = False Then
+    '                Dim rcLast As rcData = Nothing
+    '                If indexPrev < rcLastList.Count Then
+    '                    rcLast = rcLastList(indexPrev)
+    '                    If rcLast.rect.IntersectsWith(rc.rect) = False Then rcLast = Nothing
+    '                End If
+    '                If rcLast IsNot Nothing Then
+    '                    rc.age = rcLast.age + 1
+    '                    If rc.age >= 1000 Then rc.age = 10
+    '                    Circle(dst3, rc.pt, task.DotSize, white, -1, task.lineType)
+    '                    ages.Add(rc.age)
+    '                    rc.id = rcLast.id
+    '                    rc.maxDStable = rcLast.maxDStable
+    '                Else
+    '                    rc.age = 1
+    '                    rc.maxDStable = rc.maxDist
+    '                    rc.id = i
+    '                End If
+    '                usedList.Add(rc.index)
+    '            End If
 
-                Dim val1 = indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim val2 = indexMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
-                If val1 <> val2 Then rc.maxDStable = rc.maxDist
-                rcList.Add(rc)
-            Next
+    '            Dim val1 = indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+    '            Dim val2 = indexMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+    '            If val1 <> val2 Then rc.maxDStable = rc.maxDist
+    '            rcList.Add(rc)
+    '        Next
 
-            dst1.SetTo(0)
-            For Each rc In rcList
-                dst1(rc.rect).SetTo(rc.id, rc.mask)
-            Next
+    '        dst1.SetTo(0)
+    '        For Each rc In rcList
+    '            dst1(rc.rect).SetTo(rc.id, rc.mask)
+    '        Next
 
-            dst2 = Palettize(dst1)
+    '        dst2 = Palettize(dst1)
 
-            Dim stableCount As Integer
-            For i = 0 To rcList.Count - 1
-                If rcList(i).age > 1 Then
-                    stableCount += 1
-                    Circle(dst2, rcList(i).pt, task.DotSize, task.highlight, -1, task.lineType)
-                    SetTrueText(CStr(rcList(i).age), rcList(i).pt, 3)
-                End If
-            Next
+    '        Dim stableCount As Integer
+    '        For i = 0 To rcList.Count - 1
+    '            If rcList(i).age > 1 Then
+    '                stableCount += 1
+    '                Circle(dst2, rcList(i).pt, task.DotSize, task.highlight, -1, task.lineType)
+    '                'SetTrueText(CStr(rcList(i).age), rcList(i).pt, 3)
+    '            End If
+    '        Next
 
-            If task.heartBeat Then
-                labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableCount) +
-                        " or " + (stableCount / rcList.Count).ToString("0%") + " kept the same color"
-            End If
-            If ages.Count > 0 Then
-                labels(3) = CStr(stableCount) + " features were stable with average age = " +
-                            CStr(CInt(ages.Average))
-            End If
+    '        If task.heartBeat Then
+    '            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableCount) +
+    '                    " or " + (stableCount / rcList.Count).ToString("0%") + " kept the same color"
+    '        End If
+    '        If ages.Count > 0 Then
+    '            labels(3) = CStr(stableCount) + " features were stable with average age = " +
+    '                        CStr(CInt(ages.Average))
+    '        End If
 
-            Dim clickIndex = CInt(indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-            Dim selected As rcData = Nothing
-            For Each rc In rcList
-                If rc.index = clickIndex Then
-                    selected = rc
-                    Exit For
-                End If
-            Next
+    '        Dim clickIndex = CInt(indexMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+    '        Dim selected As rcData = Nothing
+    '        For Each rc In rcList
+    '            If rc.index = clickIndex Then
+    '                selected = rc
+    '                Exit For
+    '            End If
+    '        Next
 
-            If selected IsNot Nothing Then
-                task.rcD = selected
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
-                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                Rectangle(dst3, task.rcD.rect, white, task.lineWidth)
-                Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
-                strOut = task.rcD.displayCell
-                SetTrueText(strOut, 1)
-            End If
-        End Sub
-    End Class
+    '        If selected IsNot Nothing Then
+    '            task.rcD = selected
+    '            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+    '            Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+    '            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+    '            Rectangle(dst3, task.rcD.rect, white, task.lineWidth)
+    '            Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
+    '            strOut = task.rcD.displayCell
+    '            SetTrueText(strOut, 1)
+    '        End If
+    '    End Sub
+    'End Class
 
 
 
@@ -307,148 +306,148 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureMap_Tracker1 : Inherits TaskParent
-        Public shiftXY As New cv.Point2f
-        Public rotateAngle As Single
-        Public agreeCount As Integer
-        Dim featMap As New FeatureMap_Basics
-        Dim refPt As New Dictionary(Of Integer, cv.Point2f)
-        Const sameTol As Single = 5.0F
-        Const minAgree As Integer = 4
-        Private Structure trackDisp
-            Dim pref As cv.Point2f
-            Dim pnow As cv.Point2f
-            Dim delta As cv.Point2f
-        End Structure
-        Public Sub New()
-            desc = "Cursor.ai: Measure camera X, Y, and rotation from FeatureMap_Basics cells that share a displacement since heartBeatLT."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            featMap.Run(src)
-            dst2 = featMap.dst2
+    'Public Class FeatureMap_Tracker1 : Inherits TaskParent
+    '    Public shiftXY As New cv.Point2f
+    '    Public rotateAngle As Single
+    '    Public agreeCount As Integer
+    '    Dim featMap As New FeatureMap_Basics
+    '    Dim refPt As New Dictionary(Of Integer, cv.Point2f)
+    '    Const sameTol As Single = 5.0F
+    '    Const minAgree As Integer = 4
+    '    Private Structure trackDisp
+    '        Dim pref As cv.Point2f
+    '        Dim pnow As cv.Point2f
+    '        Dim delta As cv.Point2f
+    '    End Structure
+    '    Public Sub New()
+    '        desc = "Cursor.ai: Measure camera X, Y, and rotation from FeatureMap_Basics cells that share a displacement since heartBeatLT."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        featMap.Run(src)
+    '        dst2 = featMap.dst2
 
-            If task.heartBeatLT Or task.firstPass Then
-                refPt.Clear()
-                For Each rc In featMap.rcList
-                    If rc.index = 0 Then Continue For
-                    refPt(rc.index) = New cv.Point2f(rc.maxDist.X, rc.maxDist.Y)
-                Next
-                shiftXY = New cv.Point2f
-                rotateAngle = 0
-                agreeCount = refPt.Count
-            End If
+    '        If task.heartBeatLT Or task.firstPass Then
+    '            refPt.Clear()
+    '            For Each rc In featMap.rcList
+    '                If rc.index = 0 Then Continue For
+    '                refPt(rc.index) = New cv.Point2f(rc.maxDist.X, rc.maxDist.Y)
+    '            Next
+    '            shiftXY = New cv.Point2f
+    '            rotateAngle = 0
+    '            agreeCount = refPt.Count
+    '        End If
 
-            Dim samples As New List(Of trackDisp)
-            For Each rc In featMap.rcList
-                If rc.index = 0 OrElse refPt.ContainsKey(rc.index) = False Then Continue For
-                Dim pref = refPt(rc.index)
-                Dim pnow = New cv.Point2f(rc.maxDist.X, rc.maxDist.Y)
-                samples.Add(New trackDisp With {
-                    .pref = pref,
-                    .pnow = pnow,
-                    .delta = New cv.Point2f(pnow.X - pref.X, pnow.Y - pref.Y)
-                })
-            Next
+    '        Dim samples As New List(Of trackDisp)
+    '        For Each rc In featMap.rcList
+    '            If rc.index = 0 OrElse refPt.ContainsKey(rc.index) = False Then Continue For
+    '            Dim pref = refPt(rc.index)
+    '            Dim pnow = New cv.Point2f(rc.maxDist.X, rc.maxDist.Y)
+    '            samples.Add(New trackDisp With {
+    '                .pref = pref,
+    '                .pnow = pnow,
+    '                .delta = New cv.Point2f(pnow.X - pref.X, pnow.Y - pref.Y)
+    '            })
+    '        Next
 
-            Dim bestI As Integer = -1
-            Dim bestCount As Integer = 0
-            If samples.Count = 0 Then
-                shiftXY = New cv.Point2f
-                rotateAngle = 0
-                agreeCount = 0
-            End If
-            For i = 0 To samples.Count - 1
-                Dim n = 0
-                For j = 0 To samples.Count - 1
-                    Dim dx = samples(i).delta.X - samples(j).delta.X
-                    Dim dy = samples(i).delta.Y - samples(j).delta.Y
-                    If dx * dx + dy * dy <= sameTol * sameTol Then n += 1
-                Next
-                If n > bestCount Then
-                    bestCount = n
-                    bestI = i
-                End If
-            Next
+    '        Dim bestI As Integer = -1
+    '        Dim bestCount As Integer = 0
+    '        If samples.Count = 0 Then
+    '            shiftXY = New cv.Point2f
+    '            rotateAngle = 0
+    '            agreeCount = 0
+    '        End If
+    '        For i = 0 To samples.Count - 1
+    '            Dim n = 0
+    '            For j = 0 To samples.Count - 1
+    '                Dim dx = samples(i).delta.X - samples(j).delta.X
+    '                Dim dy = samples(i).delta.Y - samples(j).delta.Y
+    '                If dx * dx + dy * dy <= sameTol * sameTol Then n += 1
+    '            Next
+    '            If n > bestCount Then
+    '                bestCount = n
+    '                bestI = i
+    '            End If
+    '        Next
 
-            Dim inlier(samples.Count - 1) As Boolean
-            agreeCount = 0
-            If bestI >= 0 AndAlso bestCount >= minAgree Then
-                Dim sx As Single, sy As Single
-                For i = 0 To samples.Count - 1
-                    Dim dx = samples(i).delta.X - samples(bestI).delta.X
-                    Dim dy = samples(i).delta.Y - samples(bestI).delta.Y
-                    If dx * dx + dy * dy <= sameTol * sameTol Then
-                        inlier(i) = True
-                        agreeCount += 1
-                        sx += samples(i).delta.X
-                        sy += samples(i).delta.Y
-                    End If
-                Next
-                shiftXY = New cv.Point2f(sx / agreeCount, sy / agreeCount)
+    '        Dim inlier(samples.Count - 1) As Boolean
+    '        agreeCount = 0
+    '        If bestI >= 0 AndAlso bestCount >= minAgree Then
+    '            Dim sx As Single, sy As Single
+    '            For i = 0 To samples.Count - 1
+    '                Dim dx = samples(i).delta.X - samples(bestI).delta.X
+    '                Dim dy = samples(i).delta.Y - samples(bestI).delta.Y
+    '                If dx * dx + dy * dy <= sameTol * sameTol Then
+    '                    inlier(i) = True
+    '                    agreeCount += 1
+    '                    sx += samples(i).delta.X
+    '                    sy += samples(i).delta.Y
+    '                End If
+    '            Next
+    '            shiftXY = New cv.Point2f(sx / agreeCount, sy / agreeCount)
 
-                Dim center = New cv.Point2f(dst2.Width / 2.0F, dst2.Height / 2.0F)
-                Dim angles As New List(Of Single)
-                For i = 0 To samples.Count - 1
-                    If inlier(i) = False Then Continue For
-                    Dim v0 = New cv.Point2f(samples(i).pref.X - center.X, samples(i).pref.Y - center.Y)
-                    Dim v1 = New cv.Point2f(samples(i).pnow.X - shiftXY.X - center.X, samples(i).pnow.Y - shiftXY.Y - center.Y)
-                    If v0.X * v0.X + v0.Y * v0.Y < 25 OrElse v1.X * v1.X + v1.Y * v1.Y < 25 Then Continue For
-                    Dim cross = v0.X * v1.Y - v0.Y * v1.X
-                    Dim dot = v0.X * v1.X + v0.Y * v1.Y
-                    angles.Add(CSng(Math.Atan2(cross, dot)))
-                Next
-                rotateAngle = 0
-                If angles.Count > 0 Then
-                    angles.Sort()
-                    rotateAngle = CSng(angles(angles.Count \ 2) * RadToDeg)
-                End If
-            Else
-                shiftXY = New cv.Point2f
-                rotateAngle = 0
-                agreeCount = bestCount
-            End If
+    '            Dim center = New cv.Point2f(dst2.Width / 2.0F, dst2.Height / 2.0F)
+    '            Dim angles As New List(Of Single)
+    '            For i = 0 To samples.Count - 1
+    '                If inlier(i) = False Then Continue For
+    '                Dim v0 = New cv.Point2f(samples(i).pref.X - center.X, samples(i).pref.Y - center.Y)
+    '                Dim v1 = New cv.Point2f(samples(i).pnow.X - shiftXY.X - center.X, samples(i).pnow.Y - shiftXY.Y - center.Y)
+    '                If v0.X * v0.X + v0.Y * v0.Y < 25 OrElse v1.X * v1.X + v1.Y * v1.Y < 25 Then Continue For
+    '                Dim cross = v0.X * v1.Y - v0.Y * v1.X
+    '                Dim dot = v0.X * v1.X + v0.Y * v1.Y
+    '                angles.Add(CSng(Math.Atan2(cross, dot)))
+    '            Next
+    '            rotateAngle = 0
+    '            If angles.Count > 0 Then
+    '                angles.Sort()
+    '                rotateAngle = CSng(angles(angles.Count \ 2) * RadToDeg)
+    '            End If
+    '        Else
+    '            shiftXY = New cv.Point2f
+    '            rotateAngle = 0
+    '            agreeCount = bestCount
+    '        End If
 
-            dst3 = task.color.Clone
-            For i = 0 To samples.Count - 1
-                Dim color = If(inlier(i), task.highlight, Scalar.Gray)
-                Line(dst3, samples(i).pref, samples(i).pnow, color, task.lineWidth, task.lineType)
-                Circle(dst3, samples(i).pnow, task.DotSize, color, -1, task.lineType)
-            Next
-            Dim origin = New cv.Point(dst3.Width \ 2, dst3.Height \ 2)
-            Dim tip = New cv.Point(CInt(origin.X + shiftXY.X), CInt(origin.Y + shiftXY.Y))
-            Line(dst3, origin, tip, white, task.lineWidth + 1, task.lineType)
-            Circle(dst3, tip, task.DotSize, white, -1, task.lineType)
+    '        dst3 = task.color.Clone
+    '        For i = 0 To samples.Count - 1
+    '            Dim color = If(inlier(i), task.highlight, Scalar.Gray)
+    '            Line(dst3, samples(i).pref, samples(i).pnow, color, task.lineWidth, task.lineType)
+    '            Circle(dst3, samples(i).pnow, task.DotSize, color, -1, task.lineType)
+    '        Next
+    '        Dim origin = New cv.Point(dst3.Width \ 2, dst3.Height \ 2)
+    '        Dim tip = New cv.Point(CInt(origin.X + shiftXY.X), CInt(origin.Y + shiftXY.Y))
+    '        Line(dst3, origin, tip, white, task.lineWidth + 1, task.lineType)
+    '        Circle(dst3, tip, task.DotSize, white, -1, task.lineType)
 
-            labels(2) = featMap.labels(2)
-            If agreeCount >= minAgree Then
-                labels(3) = "Camera motion x=" + shiftXY.X.ToString(fmt1) + " y=" + shiftXY.Y.ToString(fmt1) +
-                            " rotation=" + rotateAngle.ToString(fmt1) + " deg from " + CStr(agreeCount) + " cells"
-            Else
-                labels(3) = CStr(agreeCount) + " cells share a displacement since heartBeatLT"
-            End If
-        End Sub
-    End Class
-
-
+    '        labels(2) = featMap.labels(2)
+    '        If agreeCount >= minAgree Then
+    '            labels(3) = "Camera motion x=" + shiftXY.X.ToString(fmt1) + " y=" + shiftXY.Y.ToString(fmt1) +
+    '                        " rotation=" + rotateAngle.ToString(fmt1) + " deg from " + CStr(agreeCount) + " cells"
+    '        Else
+    '            labels(3) = CStr(agreeCount) + " cells share a displacement since heartBeatLT"
+    '        End If
+    '    End Sub
+    'End Class
 
 
 
-    Public Class FeatureMap_Tracker : Inherits TaskParent
-        Dim featMap As New FeatureMap_Basics
-        Dim rcSnap As New List(Of rcData)
-        Public Sub New()
-            desc = "Track the features since the last heartbeat to find a trend."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            featMap.Run(src)
-            dst2 = featMap.dst2
-            labels(2) = featMap.labels(2)
-
-            If task.heartBeatLT Then
-                rcSnap = New List(Of rcData)(featMap.rcList)
-            End If
 
 
-        End Sub
-    End Class
+    'Public Class FeatureMap_Tracker : Inherits TaskParent
+    '    Dim featMap As New FeatureMap_Basics
+    '    Dim rcSnap As New List(Of rcData)
+    '    Public Sub New()
+    '        desc = "Track the features since the last heartbeat to find a trend."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        featMap.Run(src)
+    '        dst2 = featMap.dst2
+    '        labels(2) = featMap.labels(2)
+
+    '        If task.heartBeatLT Then
+    '            rcSnap = New List(Of rcData)(featMap.rcList)
+    '        End If
+
+
+    '    End Sub
+    'End Class
 End Namespace

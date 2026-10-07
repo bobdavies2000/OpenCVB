@@ -322,10 +322,8 @@ Namespace VBClasses
 
 
 
-
-
     Public Class Feature_Delaunay : Inherits TaskParent
-        Dim delaunay As New Delaunay_Contours
+        Public delaunay As New Delaunay_Contours
         Public feat As New Feature_Basics
         Dim options As New Options_Features
         Public Sub New()
@@ -1285,4 +1283,24 @@ Namespace VBClasses
             If matcher IsNot Nothing Then matcher.Dispose()
         End Sub
     End Class
+
+
+
+
+    Public Class Feature_Tracker : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Public Sub New()
+            desc = "Observe the stability of the feature_basics points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(src)
+            dst2 = feat.dst2
+
+            dst3.SetTo(0)
+            For Each pt In feat.features
+                Circle(dst3, pt, task.DotSize, task.highlight, -1)
+            Next
+        End Sub
+    End Class
+
 End Namespace

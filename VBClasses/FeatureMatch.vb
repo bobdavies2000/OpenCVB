@@ -349,7 +349,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Tracker : Inherits TaskParent
+    Public Class FeatureMatch_Tracker : Inherits TaskParent
         Dim feat As New FeatureMatch_Basics
         Const maxSamples As Integer = 30
         Public tracks As New List(Of List(Of cv.Point))
@@ -423,7 +423,7 @@ Namespace VBClasses
 
 
     Public Class Feature_WarpAlign : Inherits TaskParent
-        Dim tracker As New Feature_Tracker
+        Dim tracker As New FeatureMatch_Tracker
         Dim heartImage As Mat
         Public Sub New()
             desc = "Cursor.ai: Use Feature_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
