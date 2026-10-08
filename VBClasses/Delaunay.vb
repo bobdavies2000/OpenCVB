@@ -17,7 +17,7 @@ Namespace VBClasses
             If useFeatures Then
                 feat.Run(src)
                 ptList.Clear()
-                For Each pt In feat.features
+                For Each pt In feat.ptlist
                     ptList.Add(New cv.Point2f(pt.X, pt.Y))
                     If ptList.Count >= 255 Then Exit For ' CV_8U limit...
                 Next

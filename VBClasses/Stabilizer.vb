@@ -52,10 +52,10 @@ Namespace VBClasses
                 dst2 = feat.dst2
                 labels(2) = feat.labels(2)
 
-                knn.ptListQuery = feat.features
+                knn.ptListQuery = feat.ptList
                 knn.ptListTrain = feat.lastFeatures
-                If feat.lastFeatures.Count = 0 Then knn.ptListTrain = feat.features
-                If feat.features.Count > 0 And feat.lastFeatures.Count > 0 Then
+                If feat.lastFeatures.Count = 0 Then knn.ptListTrain = feat.ptList
+                If feat.ptList.Count > 0 And feat.lastFeatures.Count > 0 Then
                     knn.Run(emptyMat)
 
                     dst3.SetTo(0)

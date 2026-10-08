@@ -42,7 +42,7 @@ Namespace VBClasses
             If task.optionsChanged Then cornerHistory.Clear()
 
             Dim histCount = task.fOptions.FrameHistoryCount.Value
-            cornerHistory.Add(feat.features)
+            cornerHistory.Add(feat.ptList)
 
             Dim lastIndex = cornerHistory.Count - 1
             knn.ptListTrain = New List(Of cv.Point)(cornerHistory.ElementAt(0))

@@ -287,7 +287,7 @@ Namespace VBClasses
             Dim maxDistance = distSlider.Value
 
             knn.queries.Clear()
-            For Each pt In feat.features
+            For Each pt In feat.ptlist
                 knn.queries.Add(pt)
             Next
             knn.Run(src)
@@ -658,7 +658,7 @@ Namespace VBClasses
 
             If task.heartBeatLT Then
                 feat.Run(src)
-                ptLast = New List(Of cv.Point2f)(feat.features)
+                ptLast = New List(Of cv.Point2f)(feat.ptlist)
                 lastM = Mat.Eye(2, 3, MatType.CV_64FC1)
             End If
 
@@ -771,7 +771,7 @@ Namespace VBClasses
                 feat.Run(src)
                 dst1 = src.Clone
                 labels(2) = feat.labels(2)
-                ptList = feat.features
+                ptList = feat.ptlist
 
                 Dim sorted As New SortedList(Of Single, ptData)(New compareAllowIdenticalSingleInverted)
                 For i = 0 To ptList.Count - 1
@@ -837,7 +837,7 @@ Namespace VBClasses
                 Static feat As New Feature_Basics
                 feat.Run(src)
                 ptList.Clear()
-                For Each pt In feat.features
+                For Each pt In feat.ptlist
                     ptList.Add(New cv.Point2f(pt.X, pt.Y))
                 Next
             End If

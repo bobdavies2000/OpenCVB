@@ -17,7 +17,7 @@ Namespace VBClasses
 
             feat.Run(src)
             ptInput.Clear()
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
             Next
 

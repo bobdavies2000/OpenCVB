@@ -319,7 +319,7 @@ Namespace VBClasses
 
             perif.Run(src)
             dst3 = perif.dst3
-            If perif.fcs.feat.features.Count = 0 Then Exit Sub
+            If perif.fcs.feat.ptList.Count = 0 Then Exit Sub
 
             knn.queries = perif.ptOutside
             knn.trainInput = knn.queries
@@ -332,7 +332,7 @@ Namespace VBClasses
                 Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
             Next
 
-            labels(2) = "There were " + CStr(perif.fcs.feat.features.Count) + " features and " +
+            labels(2) = "There were " + CStr(perif.fcs.feat.ptList.Count) + " features and " +
                                     CStr(knn.queries.Count) + " were on the periphery."
         End Sub
     End Class
@@ -356,17 +356,17 @@ Namespace VBClasses
             feat.Run(task.gray)
             labels = feat.labels
 
-            If feat.features.Count = 0 Then Exit Sub
+            If feat.ptList.Count = 0 Then Exit Sub
 
-            knn.ptListQuery = New List(Of cv.Point)(feat.features)
+            knn.ptListQuery = New List(Of cv.Point)(feat.ptList)
             knn.ptListTrain = knn.ptListQuery
             knn.Run(src)
 
             dst3.SetTo(0)
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Circle(dst3, pt, task.DotSize, Scalar.White, -1, task.lineType)
             Next
-            labels(3) = "There were " + CStr(feat.features.Count) + " points in the input"
+            labels(3) = "There were " + CStr(feat.ptList.Count) + " points in the input"
 
             Dim tooClose As New List(Of (Point2f, Point2f))
             For i = 0 To knn.result.GetUpperBound(0)

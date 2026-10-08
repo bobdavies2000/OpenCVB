@@ -32,13 +32,13 @@ Namespace VBClasses
             labels = feat.labels
 
             dst2 = task.color.Clone
-            Static lastFeatures As New List(Of cv.Point)(feat.features)
-            buildCorrelations(lastFeatures, feat.features)
+            Static lastFeatures As New List(Of cv.Point)(feat.ptList)
+            buildCorrelations(lastFeatures, feat.ptList)
 
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            lastFeatures = New List(Of cv.Point)(feat.features)
+            lastFeatures = New List(Of cv.Point)(feat.ptList)
         End Sub
     End Class
 
@@ -66,7 +66,7 @@ Namespace VBClasses
 
             Static lastGray As Mat = task.gray.Clone
             features.Clear()
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 features.Add(pt)
             Next
             Dim features1 = Mat.FromPixelData(features.Count, 1, MatType.CV_32FC2, features.ToArray)

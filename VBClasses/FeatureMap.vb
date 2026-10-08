@@ -15,14 +15,14 @@ Namespace VBClasses
     '        rcLastList = New List(Of rcData)(rcList)
     '        featD.Run(src)
 
-    '        If featD.feat.features.Count = 0 Then
+    '        If featD.feat.ptList.Count = 0 Then
     '            rcList.Clear()
     '            indexMap.SetTo(0)
     '            Exit Sub
     '        End If
 
     '        delaunay.ptList.Clear()
-    '        For Each pt In featD.feat.features
+    '        For Each pt In featD.feat.ptList
     '            delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
     '        Next
 
@@ -42,7 +42,7 @@ Namespace VBClasses
     '            Dim mask = featD.delaunay.dst3(rect).Clone
     '            InRange(mask, i, i, mask)
 
-    '            Dim rc As New rcData(mask, rect, 255) With {.index = i, .id = i, .pt = featD.feat.features(i)}
+    '            Dim rc As New rcData(mask, rect, 255) With {.index = i, .id = i, .pt = featD.feat.ptList(i)}
 
     '            Dim ptPrev = rc.maxDist
     '            Dim indexPrev = indexMapLast.Get(Of Byte)(ptPrev.Y, ptPrev.X)
@@ -173,7 +173,7 @@ Namespace VBClasses
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
             Dim features As New List(Of Point2f)
-            For Each pt In feat.features
+            For Each pt In feat.ptlist
                 features.Add(pt)
             Next
             subdiv.Insert(features)
@@ -183,8 +183,8 @@ Namespace VBClasses
 
             fpList.Clear()
             dst2.SetTo(0)
-            For i = 0 To Math.Min(feat.features.Count, facets.Length) - 1
-                Dim fp As New fpData With {.pt = feat.features(i), .index = i}
+            For i = 0 To Math.Min(feat.ptlist.Count, facets.Length) - 1
+                Dim fp As New fpData With {.pt = feat.ptlist(i), .index = i}
                 fp.ptHistory.Add(fp.pt)
 
                 Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
@@ -217,7 +217,7 @@ Namespace VBClasses
             Next
 
             If standalone And task.fpD IsNot Nothing Then XR_FeatureMap_Basics.fpCellContour(task.fpD, task.color)
-            If task.heartBeat Then labels(2) = traceName + ": " + feat.features.Count.ToString("000") + " cells found " +
+            If task.heartBeat Then labels(2) = traceName + ": " + feat.ptlist.Count.ToString("000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
         End Sub
     End Class
@@ -241,7 +241,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(src)
-            featMap.feat.features = New List(Of cv.Point)(bPoint.ptList)
+            featMap.feat.ptlist = New List(Of cv.Point)(bPoint.ptList)
 
             featMap.Run(src)
             dst2 = featMap.dst2

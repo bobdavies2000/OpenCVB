@@ -193,9 +193,11 @@ Feature_BRISK
 Feature_CheckAll
 Feature_Delaunay
 Feature_GoodFeatures
+Feature_GoodQuality
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightAKaze
+Feature_PlusRotation
 Feature_PointsPath
 Feature_StableVisual
 Feature_SteadyCam

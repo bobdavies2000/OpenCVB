@@ -10,10 +10,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.gray)
 
-            If feat.features.Count < 3 Then Exit Sub
+            If feat.ptList.Count < 3 Then Exit Sub
             mesh.ptList.Clear()
 
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 mesh.ptList.Add(pt)
             Next
             mesh.Run(src)
@@ -22,7 +22,7 @@ Namespace VBClasses
 
             Dim pad = task.gridWH / 2
             Dim depthMiss As Integer
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If depth = 0 Then
                     Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.gridWH, task.gridWH))
@@ -56,7 +56,7 @@ Namespace VBClasses
             dst2 = src
             If task.heartBeat And standaloneTest() Then
                 ptList.Clear()
-                For Each pt In feat.features
+                For Each pt In feat.ptList
                     ptList.Add(pt)
                 Next
             End If

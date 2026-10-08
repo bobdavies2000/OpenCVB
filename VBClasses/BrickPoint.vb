@@ -454,7 +454,7 @@ Namespace VBClasses
 
     Public Class XR_BrickPoint_MaxSobel : Inherits TaskParent
         Public sobel As New Edge_Sobel
-        Public features As New List(Of cv.Point)
+        Public ptList As New List(Of cv.Point)
         Public options As New Options_Sobel
         Public Sub New()
             labels(3) = "Sobel input to BrickPoint_Basics"
@@ -466,17 +466,17 @@ Namespace VBClasses
             sobel.Run(task.gray)
             dst3 = sobel.dst2
 
-            features.Clear()
+            ptList.Clear()
             For Each rect In task.gridRects
                 Dim mm = GetMinMax(sobel.dst2(rect))
                 If mm.maxVal >= options.sobelThreshold Then
                     Dim pt = mm.maxLoc + rect.TopLeft
-                    features.Add(pt)
+                    ptList.Add(pt)
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 End If
             Next
 
-            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
+            labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
                             " had brickpoint intensity >= " + CStr(options.sobelThreshold)
         End Sub
     End Class
@@ -567,7 +567,7 @@ Namespace VBClasses
             bricks.Run(src)
 
             featureBricks.Clear()
-            Dim featList As New List(Of cv.Point)(feat.features)
+            Dim featList As New List(Of cv.Point)(feat.ptList)
             For Each pt In featList
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 featureBricks.Add(task.gridRects(index))

@@ -267,7 +267,7 @@ Namespace VBClasses
             dst2 = contours.dst2
 
             dst3.SetTo(0)
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
                 Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
@@ -275,7 +275,7 @@ Namespace VBClasses
                 SetTrueText(correlation.ToString(fmt1), pt, 3)
             Next
             labels(2) = "There are " + CStr(contours.tourList.Count) + " contours and " +
-                        CStr(feat.features.Count) + " features."
+                        CStr(feat.ptList.Count) + " features."
         End Sub
     End Class
 

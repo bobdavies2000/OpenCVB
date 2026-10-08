@@ -902,7 +902,7 @@ Namespace VBClasses
 
             feat.Run(dst2)
 
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Circle(dst2, pt, task.DotSize + 2, task.highlight, -1)
             Next
 

@@ -53,7 +53,7 @@ Namespace VBClasses
             dst2 = fcs.dst3
             labels(2) = fcs.labels(2)
 
-            For Each pt In fcs.feat.features
+            For Each pt In fcs.feat.ptList
                 Circle(dst2, pt, task.DotSize, task.highlight, -1)
             Next
 

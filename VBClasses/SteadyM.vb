@@ -17,7 +17,7 @@ Namespace VBClasses
             If validList.Count < 3 Then
                 dst1.SetTo(0)
                 Dim index = 1
-                ptList = New List(Of cv.Point)(feat.features)
+                ptList = New List(Of cv.Point)(feat.ptList)
                 For Each pt In ptList
                     Circle(dst1, pt, task.DotSize * 5, cv.Scalar.All(index), -1, cv.LineTypes.Link8)
                     index += 1
@@ -27,7 +27,7 @@ Namespace VBClasses
 
             validList.Clear()
             indexList.Clear()
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then
@@ -94,7 +94,7 @@ Namespace VBClasses
             Next
 
             WarpAffine(dst1, dst3, task.steadyCam.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            ptListLast = New List(Of cv.Point)(delaunay.feat.features)
+            ptListLast = New List(Of cv.Point)(delaunay.feat.ptList)
         End Sub
     End Class
 
@@ -323,7 +323,7 @@ Namespace VBClasses
 
             If validList.Count < 3 Then
                 dst1.SetTo(0)
-                ptList = New List(Of cv.Point)(feat.features)
+                ptList = New List(Of cv.Point)(feat.ptList)
 
                 delaunay.ptList.Clear()
                 For Each pt In ptList
@@ -338,7 +338,7 @@ Namespace VBClasses
 
             validList.Clear()
             indexList.Clear()
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
                 If index <> 0 Then

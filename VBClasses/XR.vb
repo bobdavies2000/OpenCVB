@@ -1062,8 +1062,8 @@ Namespace VBClasses
             dst2 = feat.dst2
             labels(2) = feat.labels(2)
 
-            knn.ptListQuery = New List(Of cv.Point)(feat.features)
-            knn.ptListTrain = New List(Of cv.Point)(feat.features)
+            knn.ptListQuery = New List(Of cv.Point)(feat.ptlist)
+            knn.ptListTrain = New List(Of cv.Point)(feat.ptlist)
             knn.Run(src)
 
             dst3 = src.Clone
@@ -1103,8 +1103,8 @@ Namespace VBClasses
             Static distSlider = OptionParent.FindSlider("Max feature travel distance")
             Dim maxDistance = distSlider.Value
 
-            knn.ptListQuery = New List(Of cv.Point)(feat.features)
-            knn.ptListTrain = New List(Of cv.Point)(feat.features)
+            knn.ptListQuery = New List(Of cv.Point)(feat.ptlist)
+            knn.ptListTrain = New List(Of cv.Point)(feat.ptlist)
             knn.Run(src)
 
             featureList.Clear()
@@ -1697,7 +1697,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             good.Run(src)
             facetGen.ptList.Clear()
-            For Each pt In good.feat.features
+            For Each pt In good.feat.ptlist
                 facetGen.ptList.Add(pt)
             Next
 
@@ -1958,7 +1958,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             good.Run(src)
-            For Each pt In good.feat.features
+            For Each pt In good.feat.ptlist
                 facetGen.ptList.Add(pt)
             Next
 

@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim lastFrame As Mat
         Dim lastKeyPoints As KeyPoint()
         Dim lastDesc As New Mat
-        Public features As New List(Of cv.Point)
+        Public ptList As New List(Of cv.Point)
         Public lastFeatures As New List(Of cv.Point)
         Public Sub New()
             akaze = XFeatures2D.AKAZE.Create()
@@ -71,7 +71,7 @@ Namespace VBClasses
 
             dst2 = FeatureMatch_Basics.displayMatches(keyPoints)
 
-            features.Clear()
+            ptList.Clear()
             lastFeatures.Clear()
             If Not lastDesc.Empty() AndAlso Not descMat.Empty() AndAlso
                lastKeyPoints IsNot Nothing AndAlso lastKeyPoints.Length > 0 AndAlso
@@ -81,7 +81,7 @@ Namespace VBClasses
                 Dim matches = FeatureMatch_Basics.getMatches(knn)
 
                 dst3 = lastFrame.Clone
-                FeatureMatch_Basics.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, features, lastFeatures)
+                FeatureMatch_Basics.DisplayMatches(dst3, matches, lastKeyPoints, keyPoints, ptList, lastFeatures)
 
                 labels(2) = CStr(If(keyPoints Is Nothing, 0, keyPoints.Length)) + " AKAZE keypoints (max " +
                             CStr(maxFeat) + ") on current frame"
@@ -379,7 +379,7 @@ Namespace VBClasses
             labels(2) = feat.labels(2)
 
             Dim newTracks As New List(Of List(Of cv.Point))
-            If feat.lastFeatures.Count > 0 AndAlso feat.features.Count = feat.lastFeatures.Count Then
+            If feat.lastFeatures.Count > 0 AndAlso feat.ptList.Count = feat.lastFeatures.Count Then
                 Dim used(feat.lastFeatures.Count - 1) As Boolean
 
                 For Each track In tracks
@@ -387,14 +387,14 @@ Namespace VBClasses
                     If idx < 0 Then Continue For ' lost track — drop history
 
                     used(idx) = True
-                    track.Add(feat.features(idx))
+                    track.Add(feat.ptList(idx))
                     If track.Count > maxSamples Then track.RemoveAt(1) ' keep track(0) as the origin
                     newTracks.Add(track)
                 Next
 
                 For i = 0 To feat.lastFeatures.Count - 1
                     If used(i) Then Continue For
-                    Dim track As New List(Of cv.Point)({feat.lastFeatures(i), feat.features(i)})
+                    Dim track As New List(Of cv.Point)({feat.lastFeatures(i), feat.ptList(i)})
                     newTracks.Add(track)
                 Next
             End If
@@ -433,10 +433,10 @@ Namespace VBClasses
 
             If task.heartBeat Then dst2.SetTo(0)
 
-            For Each pt In feat.features
+            For Each pt In feat.ptList
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
-            labels(2) = CStr(feat.features.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
+            labels(2) = CStr(feat.ptList.Count) + " targets were present with " + CStr(task.fOptions.FeatureSizeSlider.Value) + " requested."
         End Sub
     End Class
 End Namespace
