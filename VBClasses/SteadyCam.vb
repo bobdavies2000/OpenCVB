@@ -1,6 +1,31 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class SteadyCam_Basics_TA : Inherits TaskParent
+        Dim feat As New Feature_WithRotation
+        Public shiftXY As cv.Point
+        Public rotateAngle As Single
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public Sub New()
+            desc = "Use Feature_WithRotation to determine the offset and rotation due to camera motion."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            feat.Run(src)
+            dst2 = feat.dst2
+            dst3 = feat.dst3
+            labels = feat.labels
+            shiftXY = feat.shiftXY
+            rotateAngle = feat.rotateAngle
+            M = feat.M
+            InvertAffineTransform(M, inverseM)
+        End Sub
+    End Class
+
+
+
+
+    Public Class SteadyCam_BasicsMatch : Inherits TaskParent
         Dim match As New Match_CenterRect
         Public shiftXY As cv.Point
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
@@ -116,30 +141,6 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyCam_WarpAffine : Inherits TaskParent
-        Public Sub New()
-            desc = "Cursor.ai: Use SteadyCam_Basics shift output as WarpAffine input, then rotate with verticalizeAngle."
-            labels = {"", "", "SteadyCam_Basics match", "Original gray with rotation + shift"}
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.steadyCam.dst2
-
-            Dim angle = task.verticalizeAngle
-            Dim center = New Point2f(task.steadyCam.dst3.Width / 2.0F, task.steadyCam.dst3.Height / 2.0F)
-            Dim M = GetRotationMatrix2D(center, -angle, 1.0)
-
-            ' Rotate the shift-aligned SteadyCam_Basics output so dst3 reflects both shift and rotation.
-            WarpAffine(task.steadyCam.dst3, dst3, M, task.steadyCam.dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-            labels(2) = task.steadyCam.labels(2)
-            labels(3) = "angle=" + angle.ToString(fmt2) + " deg after shiftXY "
-        End Sub
-    End Class
-
-
-
-
-
     Public Class SteadyCam_LongestLine : Inherits TaskParent
         Dim matcher As New Line_Match
         Public shiftXY As cv.Point2f
@@ -222,6 +223,31 @@ Namespace VBClasses
 
             lines.Run(dst2)
             dst3 = lines.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class SteadyCam_WarpAffine : Inherits TaskParent
+        Public Sub New()
+            desc = "Cursor.ai: Use SteadyCam_Basics shift output as WarpAffine input, then rotate with verticalizeAngle."
+            labels = {"", "", "SteadyCam_Basics match", "Original gray with rotation + shift"}
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.steadyCam.dst2
+
+            Dim angle = task.verticalizeAngle
+            Dim center = New Point2f(task.steadyCam.dst3.Width / 2.0F, task.steadyCam.dst3.Height / 2.0F)
+            Dim M = GetRotationMatrix2D(center, -angle, 1.0)
+
+            ' Rotate the shift-aligned SteadyCam_Basics output so dst3 reflects both shift and rotation.
+            WarpAffine(task.steadyCam.dst3, dst3, M, task.steadyCam.dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            labels(2) = task.steadyCam.labels(2)
+            labels(3) = "angle=" + angle.ToString(fmt2) + " deg after shiftXY "
         End Sub
     End Class
 End Namespace

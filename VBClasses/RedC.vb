@@ -650,4 +650,22 @@ Namespace VBClasses
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
         End Sub
     End Class
+
+
+
+
+    Public Class RedC_SteadyCam : Inherits TaskParent
+        Dim redC As New RedC_Basics
+        Public Sub New()
+            desc = "Build a steadycam image of the RedC output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(task.gray)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            WarpAffine(dst2, dst3, task.steadyCam.M, dst2.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+        End Sub
+    End Class
+
 End Namespace

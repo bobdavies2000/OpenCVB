@@ -198,8 +198,9 @@ Feature_LeftRight
 Feature_LeftRightAKaze
 Feature_PointsPath
 Feature_StableVisual
-Feature_Tracker
+Feature_SteadyCam
 Feature_WarpAlign
+Feature_WithRotation
 FeatureFlow_Basics
 FeatureFlow_LucasKanade
 FeatureLess_Basics
@@ -605,6 +606,7 @@ RedC_Features
 RedC_FloodToRC
 RedC_MergeCells
 RedC_NeighborHist
+RedC_SteadyCam
 RedCloud_Basics
 RedCloud_Core
 RedColor_Basics
@@ -663,6 +665,7 @@ StableLine_Basics
 StDev_Highest
 StDev_Range
 SteadyCam_Basics_TA
+SteadyCam_BasicsMatch
 SteadyCam_BasicsOriginal
 SteadyCam_FindLines
 SteadyCam_Kalman

@@ -1287,20 +1287,289 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Tracker : Inherits TaskParent
-        Dim feat As New Feature_Basics
+    Public Class Feature_WarpAlign : Inherits TaskParent
+        Dim tracker As New FeatureMatch_Tracker
+        Dim heartImage As Mat
         Public Sub New()
-            desc = "Observe the stability of the feature_basics points."
+            desc = "Cursor.ai: Use Feature_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(src)
-            dst2 = feat.dst2
+            Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
 
-            dst3.SetTo(0)
-            For Each pt In feat.features
-                Circle(dst3, pt, task.DotSize, task.highlight, -1)
+            If task.heartBeatLT OrElse heartImage Is Nothing OrElse task.optionsChanged Then
+                heartImage = color.Clone
+                tracker.tracks.Clear()
+            End If
+
+            tracker.Run(src)
+            dst2 = heartImage.Clone
+
+            Dim srcPts As New List(Of Point2f)
+            Dim dstPts As New List(Of Point2f)
+            For Each track In tracker.tracks
+                If track.Count < 2 Then Continue For
+                Dim p0 = track(0)
+                Dim p1 = track.Last
+                srcPts.Add(New Point2f(p1.X, p1.Y)) ' current
+                dstPts.Add(New Point2f(p0.X, p0.Y)) ' heartbeat / track origin
+                Line(dst2, p0, p1, task.highlight, task.lineWidth, task.lineType)
+                Circle(dst2, p0, task.DotSize, task.highlight, -1, task.lineType)
+                Circle(dst2, p1, task.DotSize + 1, Scalar.Red, -1, task.lineType)
             Next
+
+            If srcPts.Count < 3 Then
+                dst3 = color.Clone
+                labels(2) = "Heartbeat image — need at least 3 tracks to warp"
+                labels(3) = CStr(srcPts.Count) + " track(s) available"
+                Exit Sub
+            End If
+
+            Dim fromMat = Mat.FromPixelData(srcPts.Count, 1, MatType.CV_32FC2, srcPts.ToArray())
+            Dim toMat = Mat.FromPixelData(dstPts.Count, 1, MatType.CV_32FC2, dstPts.ToArray())
+            Dim inliers As New Mat
+            Dim affine = EstimateAffinePartial2D(fromMat, toMat, inliers)
+
+            If affine Is Nothing OrElse affine.Empty() Then
+                dst3 = color.Clone
+                labels(3) = "Affine estimate failed"
+                Exit Sub
+            End If
+
+            WarpAffine(color, dst1, affine, color.Size(), InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+            Dim dx = affine.Get(Of Double)(0, 2)
+            Dim dy = affine.Get(Of Double)(1, 2)
+            Dim da = Math.Atan2(affine.Get(Of Double)(1, 0), affine.Get(Of Double)(0, 0)) * 180 / Math.PI
+            Dim inlierCount = If(inliers.Empty(), 0, CountNonZero(inliers))
+
+            If Math.Abs(dx) > 0.1 Or Math.Abs(dy) > 0.1 Or Math.Abs(da) > 0.1 Then dst1.CopyTo(dst3)
+
+            labels(2) = "Heartbeat image with " + CStr(srcPts.Count) + " travel vectors"
+            labels(3) = "Warped to heartbeat — inliers " + CStr(inlierCount) + "/" + CStr(srcPts.Count) +
+                    ", dx=" + dx.ToString(fmt1) + " dy=" + dy.ToString(fmt1) + " deg=" + da.ToString(fmt1)
         End Sub
     End Class
 
+
+
+    Public Class Feature_SteadyCam : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Dim delaunay As New Delaunay_Basics
+        Dim ptList As New List(Of cv.Point)
+        Dim matchList As New List(Of cv.Point)
+        Public shiftXY As cv.Point2f
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Match features between images using their delaunay cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim ptLastList = New List(Of cv.Point)(ptList)
+
+            feat.Run(src)
+
+            delaunay.ptList.Clear()
+            For Each pt In feat.features
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+
+            delaunay.Run(src)
+
+            Dim indexMap = delaunay.dst3
+
+            If task.heartBeatLT Then shiftXY = New cv.Point2f
+
+            Dim indexList As New List(Of Byte)
+            For Each pt In ptLastList
+                indexList.Add(indexMap.Get(Of Byte)(pt.Y, pt.X))
+            Next
+
+            ptList.Clear()
+            matchList.Clear()
+            Dim deltaX As New List(Of Single)
+            Dim deltaY As New List(Of Single)
+            For Each pt In delaunay.ptList
+                Dim index = indexMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim ptPrevIndex = indexList.IndexOf(index)
+                If ptPrevIndex >= 0 Then
+                    Dim ptPrev = ptLastList(ptPrevIndex)
+                    Dim testIndex = indexMap.Get(Of Byte)(ptPrev.Y, ptPrev.X)
+                    If testIndex = index Then ' they are in the same cell
+                        ' Circle(dst3, pt, task.DotSize + 2, white, -1)
+                        ' Circle(dst3, ptPrev, task.DotSize, grayColor, -1)
+                        Dim delta = pt.DistanceTo(ptPrev)
+                        If delta < 5 Then
+                            deltaX.Add(pt.X - ptPrev.X)
+                            deltaY.Add(pt.Y - ptPrev.Y)
+                        End If
+                        ' Line(dst3, pt, ptPrev, white, task.lineWidth, task.lineType)
+                        matchList.Add(pt)
+                    End If
+                End If
+                ptList.Add(pt)
+            Next
+
+            labels(2) = "Of the " + CStr(ptList.Count) + " features " + CStr(matchList.Count) + " were matched with Delaunay."
+            If deltaX.Count > 0 And deltaY.Count > 0 Then
+                shiftXY = New cv.Point2f(shiftXY.X - deltaX.Average, shiftXY.Y - deltaY.Average)
+                labels(3) = "Shift X/Y = " + shiftXY.X.ToString("F1") + "/" + shiftXY.Y.ToString("F1")
+            End If
+
+            dst3.SetTo(0)
+            Dim lpList As New List(Of lpData)
+            Dim angles As New List(Of Single)
+            For Each pt In matchList
+                Dim ptPrev = New cv.Point2f(pt.X - shiftXY.X, pt.Y - shiftXY.Y)
+                lpList.Add(New lpData(pt, ptPrev))
+                angles.Add(lpList.Last.angle)
+                Line(dst3, pt, ptPrev, white, task.lineWidth, task.lineType)
+                Circle(dst3, pt, task.DotSize, grayColor, -1)
+            Next
+
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            If standaloneTest() Then
+                WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Feature_WithRotation : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Dim delaunay As New Delaunay_Basics
+        Dim ptList As New List(Of cv.Point)
+        Dim matchList As New List(Of cv.Point)
+        Public shiftXY As cv.Point2f
+        Public rotateAngle As Single
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public Sub New()
+            M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
+            M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Cursor.ai: Feature_SteadyCam X/Y shift plus rotation about the image center."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim ptLastList = New List(Of cv.Point)(ptList)
+
+            feat.Run(src)
+
+            delaunay.ptList.Clear()
+            For Each pt In feat.features
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+
+            delaunay.Run(src)
+
+            Dim indexMap = delaunay.dst3
+
+            If task.heartBeatLT Then
+                shiftXY = New cv.Point2f
+                rotateAngle = 0
+            End If
+
+            Dim indexList As New List(Of Byte)
+            For Each pt In ptLastList
+                indexList.Add(indexMap.Get(Of Byte)(pt.Y, pt.X))
+            Next
+
+            ptList.Clear()
+            matchList.Clear()
+            Dim deltaX As New List(Of Single)
+            Dim deltaY As New List(Of Single)
+            For Each pt In delaunay.ptList
+                Dim index = indexMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim ptPrevIndex = indexList.IndexOf(index)
+                If ptPrevIndex >= 0 Then
+                    Dim ptPrev = ptLastList(ptPrevIndex)
+                    Dim testIndex = indexMap.Get(Of Byte)(ptPrev.Y, ptPrev.X)
+                    If testIndex = index Then
+                        Dim delta = pt.DistanceTo(ptPrev)
+                        If delta < 5 Then
+                            deltaX.Add(pt.X - ptPrev.X)
+                            deltaY.Add(pt.Y - ptPrev.Y)
+                        End If
+                        matchList.Add(pt)
+                    End If
+                End If
+                ptList.Add(pt)
+            Next
+
+            labels(2) = "Of the " + CStr(ptList.Count) + " features " + CStr(matchList.Count) + " were matched with Delaunay."
+            If deltaX.Count > 0 And deltaY.Count > 0 Then
+                shiftXY = New cv.Point2f(shiftXY.X - deltaX.Average, shiftXY.Y - deltaY.Average)
+            End If
+
+            ' Same-cell matches stay inside a few pixels, so a turn makes their angle zero.
+            ' Pair each feature with its nearest previous feature so the outer points are included.
+            If ptLastList.Count > 0 AndAlso delaunay.ptList.Count > 0 Then
+                Dim ranked As New List(Of (d As Single, ip As Integer, ic As Integer))
+                For ic = 0 To delaunay.ptList.Count - 1
+                    For ip = 0 To ptLastList.Count - 1
+                        Dim dd = CSng(delaunay.ptList(ic).DistanceTo(ptLastList(ip)))
+                        If dd < 80 Then ranked.Add((dd, ip, ic))
+                    Next
+                Next
+                ranked.Sort(Function(a, b) a.d.CompareTo(b.d))
+
+                Dim usedPrev(ptLastList.Count - 1) As Boolean
+                Dim usedCurr(delaunay.ptList.Count - 1) As Boolean
+                Dim rotPrev As New List(Of cv.Point2f)
+                Dim rotCurr As New List(Of cv.Point2f)
+                For Each item In ranked
+                    If usedPrev(item.ip) Or usedCurr(item.ic) Then Continue For
+                    usedPrev(item.ip) = True
+                    usedCurr(item.ic) = True
+                    Dim prevPt = ptLastList(item.ip)
+                    rotPrev.Add(New cv.Point2f(prevPt.X, prevPt.Y))
+                    rotCurr.Add(delaunay.ptList(item.ic))
+                Next
+
+                Dim meanX = If(deltaX.Count > 0, deltaX.Average, 0.0F)
+                Dim meanY = If(deltaY.Count > 0, deltaY.Average, 0.0F)
+                Dim cx = src.Width / 2.0F
+                Dim cy = src.Height / 2.0F
+                Dim angles As New List(Of Double)
+                For i = 0 To rotPrev.Count - 1
+                    Dim rx = CDbl(rotPrev(i).X - cx)
+                    Dim ry = CDbl(rotPrev(i).Y - cy)
+                    If rx * rx + ry * ry < 900 Then Continue For
+                    Dim vx = rx + (rotCurr(i).X - rotPrev(i).X - meanX)
+                    Dim vy = ry + (rotCurr(i).Y - rotPrev(i).Y - meanY)
+                    If vx * vx + vy * vy < 900 Then Continue For
+                    angles.Add(Math.Atan2(rx * vy - ry * vx, rx * vx + ry * vy))
+                Next
+                If angles.Count > 0 Then
+                    angles.Sort()
+                    rotateAngle += CSng(angles(angles.Count \ 2) * (180.0 / Math.PI))
+                End If
+            End If
+
+            Dim rotationCenter = New cv.Point2f(src.Width / 2.0F, src.Height / 2.0F)
+            M = GetRotationMatrix2D(rotationCenter, rotateAngle, 1.0)
+            M.Set(Of Double)(0, 2, M.Get(Of Double)(0, 2) + shiftXY.X)
+            M.Set(Of Double)(1, 2, M.Get(Of Double)(1, 2) + shiftXY.Y)
+
+            dst3.SetTo(0)
+            For Each pt In matchList
+                Dim x = M.Get(Of Double)(0, 0) * pt.X + M.Get(Of Double)(0, 1) * pt.Y + M.Get(Of Double)(0, 2)
+                Dim y = M.Get(Of Double)(1, 0) * pt.X + M.Get(Of Double)(1, 1) * pt.Y + M.Get(Of Double)(1, 2)
+                Dim ptWarped = New cv.Point2f(CSng(x), CSng(y))
+                Line(dst3, pt, ptWarped, white, task.lineWidth, task.lineType)
+                Circle(dst3, pt, task.DotSize, grayColor, -1)
+            Next
+
+            labels(3) = "Shift X/Y = " + shiftXY.X.ToString("F1") + "/" + shiftXY.Y.ToString("F1") +
+                        "  rotation = " + rotateAngle.ToString("F1") + " deg"
+
+            If standaloneTest() Then
+                WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            End If
+        End Sub
+    End Class
 End Namespace

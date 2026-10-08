@@ -26,8 +26,6 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            ' If template.Size <> src.Size Then Exit Sub
-
             correlationMat = New cv.Mat
             MatchTemplate(template, src, correlationMat, TemplateMatchModes.CCoeffNormed)
             mm = GetMinMax(correlationMat)
