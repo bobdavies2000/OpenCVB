@@ -197,10 +197,9 @@ Feature_GoodQuality
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightAKaze
-Feature_PlusRotation
 Feature_PointsPath
-Feature_StableVisual
-Feature_SteadyCam
+Feature_SteadyRotate
+Feature_SteadyXY
 Feature_WarpAlign
 Feature_WithRotation
 FeatureFlow_Basics

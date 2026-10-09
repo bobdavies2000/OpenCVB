@@ -104,6 +104,14 @@ Namespace VBClasses
             If standalone Or task.cpu.displayObjectName = traceName Or task.gOptions.DebugCheckBox.Checked Then Return True
             Return False
         End Function
+        Public Shared Function heartbeatLTX() As Boolean
+            If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then Return True
+            Return False
+        End Function
+        Public Shared Function heartbeatX() As Boolean
+            If task.heartBeat And task.gOptions.DebugCheckBox.Checked = False Then Return True
+            Return False
+        End Function
         Public Shared Function Palettize(input As Mat, Optional firstEntry As Byte = 1) As Mat
             If firstEntry = 0 Then
                 task.colorMap.Set(Of Vec3b)(0, 0, New Vec3b(0, 0, 0)) ' set the first entry to zero.
