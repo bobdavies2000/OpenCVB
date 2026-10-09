@@ -1427,30 +1427,31 @@ Namespace VBClasses
             Dim indexMap = delaunay.dst3
             Static hbIndexList As New List(Of Integer)
             Static hbIndexMap As cv.Mat
-            If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then
+            'If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then
+            If task.heartBeat Or task.frameCount Mod 30 = 0 Then
                 shiftXY = New cv.Point2f
                 hbColor = src.Clone
                 hbIndexMap = indexMap.Clone
-                hbIndexList.Clear()
-                For Each pt In delaunay.ptList
-                    Dim testIndex = indexMap.Get(Of Byte)(pt.Y, pt.X)
-                    hbIndexList.Add(testIndex) ' use this to verify that the points are same as the heartbeat list
-                    If hbIndexList.Count >= ptCountMax Then Exit For ' top X features are enough to estimate the shift
-                Next
+                'hbIndexList.Clear()
+                'For Each pt In delaunay.ptList
+                '    Dim testIndex = indexMap.Get(Of Byte)(pt.Y, pt.X)
+                '    hbIndexList.Add(testIndex) ' use this to verify that the points are same as the heartbeat list
+                '    If hbIndexList.Count >= ptCountMax Then Exit For ' top X features are enough to estimate the shift
+                'Next
             End If
 
-            Dim inputList As New List(Of cv.Point2f)
-            Dim hbRemove As New List(Of Integer)(hbIndexList)
-            For Each pt In delaunay.ptList
-                Dim ptPrev = validatePoint(New cv.Point2f(pt.X - shiftXY.X, pt.Y - shiftXY.Y))
-                Dim testIndex = hbIndexMap.Get(Of Byte)(ptPrev.Y, ptPrev.X)
-                Dim hbTestIndex = hbRemove.IndexOf(testIndex)
-                If hbTestIndex >= 0 Then
-                    inputList.Add(pt)
-                    hbRemove.RemoveAt(hbTestIndex) ' only one point per delaunay cell.
-                End If
-                If inputList.Count >= hbIndexList.Count Then Exit For ' top X features are enough to estimate the shift
-            Next
+            'Dim inputList As New List(Of cv.Point2f)
+            'Dim hbRemove As New List(Of Integer)(hbIndexList)
+            'For Each pt In delaunay.ptList
+            '    Dim ptPrev = validatePoint(New cv.Point2f(pt.X - shiftXY.X, pt.Y - shiftXY.Y))
+            '    Dim testIndex = hbIndexMap.Get(Of Byte)(ptPrev.Y, ptPrev.X)
+            '    Dim hbTestIndex = hbRemove.IndexOf(testIndex)
+            '    If hbTestIndex >= 0 Then
+            '        inputList.Add(pt)
+            '        hbRemove.RemoveAt(hbTestIndex) ' only one point per delaunay cell.
+            '    End If
+            '    If inputList.Count >= hbIndexList.Count Then Exit For ' top X features are enough to estimate the shift
+            'Next
 
             Dim indexList As New List(Of Byte)
             For Each pt In ptLastList
@@ -1475,9 +1476,10 @@ Namespace VBClasses
                     End If
                 End If
                 ptList.Add(pt)
+                If ptList.Count > ptCountMax Then Exit For
             Next
 
-            labels(2) = "The top " + CStr(inputList.Count) + " of " + CStr(delaunay.ptList.Count)
+            labels(2) = "The top " + CStr(ptCountMax) + " of " + CStr(delaunay.ptList.Count)
             If matchList.Count > 0 Then
                 shiftXY = New cv.Point2f(shiftXY.X - (deltaXY.X / matchList.Count),
                                          shiftXY.Y - (deltaXY.Y / matchList.Count))
@@ -1501,7 +1503,7 @@ Namespace VBClasses
             M.Set(Of Double)(1, 2, shiftXY.Y)
 
             If standaloneTest() Then
-                For Each pt In inputList
+                For Each pt In matchList
                     Circle(src, pt, task.DotSize + 2, task.highlight, -1)
                 Next
                 WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
