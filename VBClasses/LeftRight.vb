@@ -278,6 +278,7 @@ Namespace VBClasses
         Public rightList As New List(Of lpData)
         Dim linesRight As New Line_Core
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."

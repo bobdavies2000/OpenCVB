@@ -303,6 +303,7 @@ Namespace VBClasses
     Public Class RedC_CellLines : Inherits TaskParent
         Dim redC As New RedC_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find any lines connected to a cell contour."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

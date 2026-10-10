@@ -77,6 +77,10 @@ Namespace VBClasses
                     ptLatest = harris.features
                     strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
                 Case "LineInput"
+                    If task.lines Is Nothing Then
+                        task.lines = New Line_Basics_TA
+                        task.lines.Run(src)
+                    End If
                     For Each lp In task.lines.lpList
                         ptLatest.Add(lp.ptCenter)
                     Next
@@ -150,7 +154,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_GoodFeatures : Inherits TaskParent
+    Public Class XR_Feature_GoodFeatures : Inherits TaskParent
         Public options As New Options_Features
         Public features As New List(Of cv.Point)
         Public Sub New()
@@ -188,6 +192,7 @@ Namespace VBClasses
         Public options As New Options_Features
         Public features As New List(Of Point2f)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -754,6 +759,7 @@ Namespace VBClasses
         Public features As New List(Of cv.Point)
         Dim feat As New Feature_Bricks
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             task.gOptions.LineWidth.Value = 3
             desc = "Find the lines implied in the grid square points."
         End Sub

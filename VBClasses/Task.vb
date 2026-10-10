@@ -56,7 +56,7 @@ Namespace VBClasses
             task.stableGray = New StableGray_Basics_TA
 
             task.grid = New Grid_Basics_TA
-            task.lines = New Line_Basics_TA
+            ' task.lines = New Line_Basics_TA
 
             task.filterBasics = New Filter_Basics_TA
             task.foreground = New Foreground_Basics_TA
@@ -201,7 +201,7 @@ Namespace VBClasses
             task.colorizer.Run(src)
 
             task.gravityBasics.Run(src.Clone)
-            task.lines.Run(gray)
+            If task.lines IsNot Nothing Then task.lines.Run(gray)
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
             task.foreground.Run(New cv.Mat)

@@ -192,13 +192,11 @@ Feature_Bricks
 Feature_BRISK
 Feature_CheckAll
 Feature_Delaunay
-Feature_GoodFeatures
 Feature_GoodQuality
 Feature_KNN
 Feature_LeftRight
 Feature_LeftRightAKaze
 Feature_PointsPath
-Feature_SteadyRotate
 Feature_SteadyXY
 Feature_WarpAlign
 Feature_WithRotation
@@ -646,7 +644,7 @@ Sort_Integer
 Stabilizer_Basics
 Stabilizer_IMU
 Stabilizer_OrientationPRY
-Stabilizer_PRY
+Stabilizer_PRYaw
 StableDepth_Basics_TA
 StableDepth_Max
 StableGray_Basics_TA

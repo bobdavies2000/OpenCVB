@@ -1076,6 +1076,7 @@ Namespace VBClasses
     Public Class XR_Brick_Search : Inherits TaskParent
         Dim lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             task.fOptions.MatchCorrSlider.Value = 0.8
             desc = "Search the previous image for the endpoints of the top 10 lines."
         End Sub

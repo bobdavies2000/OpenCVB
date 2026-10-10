@@ -132,6 +132,7 @@ Namespace VBClasses
     Public Class XR_SuperPixel_WithLineDetector : Inherits TaskParent
         Dim pixels As New SuperPixel_Basics_CPP
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(3) = "Input to superpixel basics."
             desc = "Create SuperPixels using RGBDepth image."
         End Sub

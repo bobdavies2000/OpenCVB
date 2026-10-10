@@ -44,6 +44,7 @@ Namespace VBClasses
         Public angleOffset As Double
         Dim center As cv.Point2f
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             center = New Point2f(dst2.Width / 2, dst2.Height / 2)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",
@@ -100,6 +101,7 @@ Namespace VBClasses
         Public angleOffset As Double
         Dim center As cv.Point2f
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             center = New Point2f(dst2.Width / 2, dst2.Height / 2)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "", "AbsDiff of inverse vs original lines (jagged residual)"}
@@ -305,6 +307,7 @@ Namespace VBClasses
     Public Class XR_GravityRGB_LineRotate : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
             desc = "Cursor.ai: Rotate each line in task.lines.lpList with GravityRGB_Basics.rotateRGB and draw on 8UC1 dst2."
         End Sub
@@ -343,6 +346,7 @@ Namespace VBClasses
         Dim vert As New GravityRGB_Vertical
         Public rotateAngle As Double
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Cursor.ai: Rotate GravityRGB_Vertical lines by avgAngleToVertical, average residual to make p1.X = p2.X, rotate task.gray."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -393,6 +397,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public avgAngleToVertical As Single
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Cursor.ai: Find all lines in task.lines.lpList that are nearly parallel to the IMU gravity vector."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -439,6 +444,7 @@ Namespace VBClasses
         Public angleOffset As Double
         Dim center As cv.Point2f
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             center = New Point2f(dst2.Width / 2, dst2.Height / 2)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Inverse WarpAffine result", "Lines rotated at corrected gravity angle",

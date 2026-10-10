@@ -1500,6 +1500,7 @@ Namespace VBClasses
         Dim rightPoints As New List(Of cv.Point)
         Dim bricks As New Brick_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the lines that are consistent in both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

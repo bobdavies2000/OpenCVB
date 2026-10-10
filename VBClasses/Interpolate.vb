@@ -117,6 +117,7 @@ Namespace VBClasses
     Public Class XR_Interpolate_Lines : Inherits TaskParent
         Dim inter As New Interpolate_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             OptionParent.FindSlider("Interpolation Resize %").Value = 80
             OptionParent.FindSlider("Interpolation threshold").Value = 100
             desc = "Detect lines in interpolation sharedResults.images.."

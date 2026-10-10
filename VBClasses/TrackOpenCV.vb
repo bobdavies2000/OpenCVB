@@ -81,6 +81,7 @@ Namespace VBClasses
     Public Class XR_Track_LongestLine : Inherits TaskParent
         Dim track As New TrackOpenCV_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Track the longest RGB line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -106,6 +107,7 @@ Namespace VBClasses
     Public Class XR_Track_GridRect : Inherits TaskParent
         Dim track As New TrackOpenCV_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Track the gravity RGB vector"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -139,6 +141,7 @@ Namespace VBClasses
     Public Class XR_Track_Lines : Inherits TaskParent
         Dim track(4) As TrackOpenCV_Basics_QT
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             For i = 0 To track.Length - 1
                 track(i) = New TrackOpenCV_Basics_QT
             Next

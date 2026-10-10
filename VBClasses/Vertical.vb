@@ -4,6 +4,7 @@ Namespace VBClasses
         Dim lines As New LineSeg_Core
         Dim lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find all the vertical and horizontal lines in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -80,6 +81,7 @@ Namespace VBClasses
     Public Class Vertical_Longest : Inherits TaskParent
         Public longestLine As lpData
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels = {"", "", "Longest line", "longest line aligned with Gravity"}

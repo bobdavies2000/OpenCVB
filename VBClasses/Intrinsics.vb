@@ -55,6 +55,7 @@ Namespace VBClasses
 
     Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             task.gOptions.highlight.SelectedItem = "red"
             task.gOptions.LineWidth.Value += 1
             labels(3) = "The left image with the lines that can be translated on both ends."
@@ -254,6 +255,7 @@ Namespace VBClasses
     Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Map a cv.Point from the left image to the right image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

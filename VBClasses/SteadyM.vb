@@ -158,6 +158,7 @@ Namespace VBClasses
         Dim longest As lpData
         Dim retained As New List(Of Integer)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(3) = "steadyCam map of longest line."
             desc = "Use M in SteadyCam_Basics to track the longest line."
         End Sub
@@ -205,6 +206,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim retained As New List(Of Integer)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(3) = "steadyCam map of longest line."
             desc = "Cursor.ai: Keep the saved longest line when longest.rect still matches the stored template above MatchCorrSlider."
         End Sub
@@ -266,6 +268,7 @@ Namespace VBClasses
         Dim lpList As New List(Of lpData)
         Dim validList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "steadyCam map of lines.  It is updated when < X lines are found."
             desc = "Use M in SteadyCam_Basics to track lines."
@@ -371,6 +374,7 @@ Namespace VBClasses
         Dim validList As New List(Of lpData)
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "steadyCam map of lines."

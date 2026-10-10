@@ -441,6 +441,7 @@ Namespace VBClasses
     Public Class WarpAffine_Line : Inherits TaskParent
         Dim matcher As New Line_Match
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Use the Line_Match to identify the warpAffine parameters and apply affine transformation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

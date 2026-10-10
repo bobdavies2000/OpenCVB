@@ -287,6 +287,7 @@ Namespace VBClasses
     Public Class Correlation_LinesSimple : Inherits TaskParent
         Dim correlation As Single = 0
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Test the correlation of the current line image to the previous."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

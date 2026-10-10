@@ -149,6 +149,7 @@ Namespace VBClasses
         Dim snapshot As cv.Mat
         Dim refLine As lpData
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Cursor.ai: Snapshot gray at heartBeatLT; match the current image to that snapshot using the longest line."
             labels = {"", "", "Longest line match vs heartBeatLT snapshot", "Current gray aligned to snapshot"}
         End Sub

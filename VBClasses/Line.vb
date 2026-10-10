@@ -250,6 +250,7 @@ Namespace VBClasses
         Public tops As New List(Of lpData)
         Public bottoms As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find all the lines that intersect the top AND bottom of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -276,6 +277,7 @@ Namespace VBClasses
         Public lefts As New List(Of lpData)
         Public rights As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find all the lines that intersect the top AND bottom of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -545,71 +547,6 @@ Namespace VBClasses
 
 
 
-
-
-    'Public Class XR_Line_Parallel : Inherits TaskParent
-    '    Public classes() As List(Of Integer) ' groups of lines that are parallel
-    '    Public unParallel As New List(Of Integer) ' lines which are not parallel
-    '    Public Sub New()
-    '        labels(2) = "Text shows the parallel Class With 0 being unparallel."
-    '        desc = "Identify lines that are parallel (Or nearly so), perpendicular, And Not parallel."
-    '    End Sub
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        dst2 = src.Clone
-    '        Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-    '        For Each lp In task.lines.lpList
-    '            parallels.Add(lp.angle, lp.index)
-    '        Next
-
-    '        If parallels.Count <= 1 Then Exit Sub ' no lines...
-
-    '        ReDim classes(task.lines.lpList.Count - 1)
-    '        Dim index As Integer, j As Integer
-    '        unParallel.Clear()
-    '        For i = 0 To parallels.Count - 1
-    '            Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value - 1)
-    '            For j = i + 1 To parallels.Count - 1
-    '                Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value - 1)
-    '                If Math.Abs(lp1.angle - lp2.angle) < AngleThreshold Then
-    '                    If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
-    '                    classes(index).Add(lp2.index)
-    '                Else
-    '                    Exit For
-    '                End If
-    '            Next
-    '            If classes(index) Is Nothing Then unParallel.Add(lp1.index)
-    '            If j > i + 1 Then index += 1
-    '            i = j - 1
-    '        Next
-
-    '        dst2 = src
-    '        Dim colorIndex As Integer = 1
-    '        For i = 0 To classes.Length - 1
-    '            If classes(i) Is Nothing Then Exit For
-    '            For j = 0 To classes(i).Count - 1
-    '                Dim lp = task.lines.lpList(classes(i).ElementAt(j) - 1)
-    '                Line(dst2, lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
-    '                SetTrueText(CStr(colorIndex), lp.ptCenter)
-    '            Next
-    '            colorIndex += 1
-    '        Next
-
-    '        For Each index In unParallel
-    '            Dim lp = task.lines.lpList(index - 1)
-    '            Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-    '            SetTrueText("0", lp.ptCenter)
-    '        Next
-
-    '        dst3 = task.lines.dst2
-    '        labels(3) = task.lines.labels(2)
-    '    End Sub
-    'End Class
-
-
-
-
-
-
     Public Class XR_Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
@@ -682,6 +619,7 @@ Namespace VBClasses
     Public Class XR_Line_LeftRightMotion : Inherits TaskParent
         Public linesRight As New Line_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels = {"", "", "Left image lines", "Right image lines"}
             desc = "Find the lines In the Left And Right images."
         End Sub
@@ -705,6 +643,7 @@ Namespace VBClasses
         Public lpLeft As New List(Of lpData)
         Public lpRight As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find just the vertical lines In the left And right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -762,6 +701,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim motionLeft As New Motion_Basics_TA
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
             desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
@@ -856,6 +796,7 @@ Namespace VBClasses
         Dim options As New Options_LeftRightCorrelation
         Dim lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Track lines in the left image."
         End Sub
@@ -888,6 +829,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Dim options As New Options_LeftRightCorrelation
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(3) = "Find the line's bricks containing the line."
             dst3 = New Mat(dst0.Size, MatType.CV_8U, 0)
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -970,6 +912,7 @@ Namespace VBClasses
     Public Class XR_Line_BrickListTest : Inherits TaskParent
         Dim brickLines As New XR_Line_BrickList
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the brick list for each line in the lines.lplist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -990,6 +933,7 @@ Namespace VBClasses
         Public pointCloud As New Mat
         Dim depthToWorld As New XR_Cloud_DepthToWorld
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
@@ -1074,6 +1018,7 @@ Namespace VBClasses
 
     Public Class XR_Line_Map : Inherits TaskParent
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
             labels(3) = "Each rectangle is divided into 2 regions defined by the line."
@@ -1130,6 +1075,7 @@ Namespace VBClasses
         Dim lines As New Line_Basics
         Public lpListRight As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Translate lines from the color (left for ZED) image to the right image.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1181,6 +1127,7 @@ Namespace VBClasses
     Public Class XR_Line_EdgeLineCompare : Inherits TaskParent
         Dim edgeLine As New EdgeLine_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
             labels(3) = "Lines where EdgeLine_Basics and Line_Basics agree."
             desc = "Compare the output of EdgeLine_Basics and Line_Basics"
@@ -1200,6 +1147,7 @@ Namespace VBClasses
 
     Public Class XR_Line_Longest : Inherits TaskParent
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Compare the longest lines of the current and previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1341,6 +1289,7 @@ Namespace VBClasses
     Public Class XR_Line_Brick : Inherits TaskParent
         Dim lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the bricks that clearly have lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1435,6 +1384,7 @@ Namespace VBClasses
         Public trainInput As New List(Of Vec4f)
         Public queries As New List(Of Vec4f)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(3) = "The vertical lines found in the previous heartbeat image."
             desc = "Track the vertical lines on the heartbeat."
         End Sub
@@ -1578,6 +1528,7 @@ Namespace VBClasses
     Public Class XR_Line_LongestTest : Inherits TaskParent
         Dim lpLast As New lpData
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Check to see that the longest line is always present."
         End Sub
@@ -1796,6 +1747,7 @@ Namespace VBClasses
     Public Class Line_Depth : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Get the best measure of depth for the end points of each line."
         End Sub

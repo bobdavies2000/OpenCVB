@@ -215,11 +215,10 @@ Namespace VBClasses
 
         Private frameHistory As New Queue(Of Mat)
         Private maskHistory As New Queue(Of Mat)
-
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Cursor.ai: Fuse gravity vector and LineTrack_Basics_TA.lpCurr to stabilize grayscale."
         End Sub
-
         Private Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
             Dim x = pt.X
             Dim y = pt.Y
@@ -227,13 +226,11 @@ Namespace VBClasses
             Dim yOut = M.Get(Of Double)(1, 0) * x + M.Get(Of Double)(1, 1) * y + M.Get(Of Double)(1, 2)
             Return New Point2f(CSng(xOut), CSng(yOut))
         End Function
-
         Private Sub ResetState()
             refReady = False
             frameHistory.Clear()
             maskHistory.Clear()
         End Sub
-
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim graySrc = If(src.Channels = 1, src, task.gray)
             If graySrc.Empty Then Exit Sub
@@ -306,7 +303,7 @@ Namespace VBClasses
             Dim currP2 = WarpPoint(lpCurr.p2, M)
             Dim gravP1 = WarpPoint(lpGravity.p1, M)
             Dim gravP2 = WarpPoint(lpGravity.p2, M)
-            Line(dst3, currP1, currP2, Scalar.red, task.lineWidth + 1, task.lineType)
+            Line(dst3, currP1, currP2, Scalar.Red, task.lineWidth + 1, task.lineType)
             Line(dst3, gravP1, gravP2, Scalar.Yellow, task.lineWidth + 1, task.lineType)
 
             labels(2) = "Stabilized accumulation of last " + CStr(frameHistory.Count) + " frames."

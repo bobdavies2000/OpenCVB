@@ -7,6 +7,7 @@ Namespace VBClasses
         Dim matcher() As Line_Match
         Dim refreshCount As New List(Of Integer)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             task.fOptions.MatchCorrSlider.Value = 98 ' high threshold for validating the correlation of the endpoints.
             desc = "Identify the lines to track - the top X longest lines."
@@ -67,6 +68,7 @@ Namespace VBClasses
         Dim slices As New XR_LineTrack_Slices
         Public lpMapLast = task.lines.dst1.Clone
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -262,6 +264,7 @@ Namespace VBClasses
     Public Class XR_LineTrack_Tester : Inherits TaskParent
         Dim match As New LineTrack_Match
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             task.gOptions.DebugCheckBox.Checked = True
             desc = "Test the line match algorithm by just occasionally capturing the current state."
         End Sub
@@ -750,6 +753,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lpListLast As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Cursor.ai: Match lines between frames; lpList holds confirmed current matches."
         End Sub
         Private Shared Function MatchScore(curr As lpData, prev As lpData) As Single
@@ -821,60 +825,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    'Public Class LineTrack_Horizontal : Inherits TaskParent
-    '    Public lpCurr As New lpData
-    '    Public lineTrack As New LineTrack_Basics
-    '    Public Sub New()
-    '        desc = "Track the longest horizontal line (if available)"
-    '    End Sub
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        ' if no horizontal lines are available, then pick the second longest vertical
-    '        ' line and track the perpendicular.
-
-    '        Static lpSave As lpData
-    '        If lineTrack.presentCount > 0 Then
-    '            Dim foundHoriz As Boolean = False
-    '            For Each lp In task.lines.lpList
-    '                If lp.index = 1 Then Continue For ' longest is already being tracked.
-    '                If lp.ptE1.X = 0 Then
-    '                    lpSave = lp
-    '                    lineTrack.lpInput = lpSave
-    '                    foundHoriz = True
-    '                    Exit For
-    '                End If
-    '            Next
-
-    '            If foundHoriz = False Then
-    '                For Each lp In task.lines.lpList
-    '                    If lp.index = 1 Then Continue For ' longest is already being tracked.
-    '                    If lp.ptE1.Y = 0 Or lp.ptE2.Y = 0 Then
-    '                        lpSave = lp
-    '                        lineTrack.lpInput = Line_Perpendicular.computePerp(lpSave)
-    '                        foundHoriz = True
-    '                        Exit For
-    '                    End If
-    '                Next
-    '            End If
-    '        End If
-    '        lineTrack.Run(emptyMat)
-    '        labels(2) = lineTrack.labels(2)
-
-    '        lpCurr = task.lines.lplist(0)
-
-    '        If standaloneTest() Then
-    '            dst2 = lineTrack.dst2.Clone
-    '            dst2.Line(lpSave.p1, lpSave.p2, white, task.lineWidth)
-    '        End If
-
-    '        SetTrueText("The longest horizontal line is tracked until it is lost." + vbCrLf +
-    '                    "When that line is lost, the longest line is found and tracked.", 3)
-
-    '    End Sub
-    'End Class
 
 
 
