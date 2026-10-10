@@ -134,7 +134,7 @@ Namespace VBClasses
             End If
 
             task.filterBasics.Run(color.Clone)
-            task.gray = task.filterBasics.dst3
+            task.gray = task.filterBasics.dst3.Clone
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(New cv.Mat)

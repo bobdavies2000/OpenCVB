@@ -39,16 +39,17 @@ Namespace VBClasses
             Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
             rcList.Add(New rcData)
             dst1.SetTo(0)
+            Dim motionInput = task.motion.dst3.Clone
             For Each rc In sortList.Values
-                Dim motionMat = task.motion.dst2(rc.rect)
-                motionMat.SetTo(0, Not rc.mask)
-                rc.motionPercent = 100 * CountNonZero(motionMat) / rc.pixels
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
+                rc.pixels = CountNonZero(rc.mask)
+                Dim motionMat As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
+                motionInput(rc.rect).CopyTo(motionMat, rc.mask)
+                rc.motionPercent = 100 * CountNonZero(motionMat) / rc.pixels
                 SetTrueText(CStr(rc.index), rc.maxDist)
                 rcList.Add(rc)
             Next
-
             dst2 = Palettize(dst1, 0)
 
             If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist

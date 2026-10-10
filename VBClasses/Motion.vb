@@ -17,7 +17,6 @@ Namespace VBClasses
                         " to adjust accuracy of accumulated image.", 3)
 
             If src.Channels <> 1 Then src = task.gray.Clone
-            cv.Cv2.ImShow("src", src)
             If task.optionsChanged Or task.heartBeatLT Then
                 dst2 = src.Clone
                 motionSort.Clear()
@@ -35,7 +34,7 @@ Namespace VBClasses
             Next
 
             motionMask.SetTo(0)
-            ' The following loop adds the list4 Neighbors - it is an just a way to reduce artifacts.
+            ' The following loop adds the neighbors - it is a just a way to reduce artifacts.
             Dim nabeList As New HashSet(Of Integer)
             For Each index In motionSort
                 For Each nabeIndex In task.gridNabes(index)
@@ -54,7 +53,8 @@ Namespace VBClasses
                 labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: all of them."
             Else
                 dst3 = motionMask
-                labels(2) = "Image below is accumulated using motion mask.  Grid rects with motion: " + CStr(nabeList.Count)
+                labels(2) = "Image below is accumulated using motion mask.  " +
+                            "Grid rects with motion: " + CStr(nabeList.Count)
             End If
 
             'dst1 = task.rightView.Clone
