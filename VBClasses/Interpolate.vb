@@ -20,7 +20,6 @@ Namespace VBClasses
                     If saveSliderValue > 50 Then direction = -1
                     If saveSliderValue = 1 Then direction = 1
                 Else
-                    userGrab = True
                     saveSliderValue = iOptions.interpolationThreshold
                 End If
             Else

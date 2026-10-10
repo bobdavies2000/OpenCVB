@@ -1367,6 +1367,159 @@ Namespace VBClasses
 
 
 
+    'Public Class Feature_SteadyRotate : Inherits TaskParent
+    '    Dim steady As New Feature_SteadyXY
+    '    Dim ptList As New List(Of cv.Point)
+    '    Public Sub New()
+    '        If standalone Then task.gOptions.showMyDst1.Checked = True
+    '        labels(1) = "The points in the lower left shown here where they originated."
+    '        dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    '        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+    '        desc = "Match features between images using the accumulated offsets."
+    '    End Sub
+    '    Public Shared Function ComputeRotationCenter(original As List(Of cv.Point2f),
+    '                                          rotated As List(Of cv.Point2f),
+    '                                          angleDegrees As Single) As cv.Point2f
+
+    '        Dim theta As Double = angleDegrees * Math.PI / 180.0
+    '        Dim cosT As Double = Math.Cos(theta)
+    '        Dim sinT As Double = Math.Sin(theta)
+
+    '        ' Build matrices for least-squares:
+    '        ' A * C = b
+    '        Dim A As New List(Of Vec2d)()
+    '        Dim b As New List(Of Vec2d)()
+
+    '        For i = 0 To original.Count - 1
+    '            Dim p = original(i)
+    '            Dim q = rotated(i)
+
+    '            ' Rotation matrix minus identity
+    '            Dim a11 = cosT - 1.0
+    '            Dim a12 = -sinT
+    '            Dim a21 = sinT
+    '            Dim a22 = cosT - 1.0
+
+    '            ' Right-hand side: q - R*p
+    '            Dim rx = cosT * p.X - sinT * p.Y
+    '            Dim ry = sinT * p.X + cosT * p.Y
+
+    '            Dim bx = q.X - rx
+    '            Dim by = q.Y - ry
+
+    '            A.Add(New Vec2d(a11, a12))
+    '            b.Add(New Vec2d(bx, by))
+    '        Next
+
+    '        Dim AMat As New cv.Mat(A.Count, 2, MatType.CV_64F)
+    '        Dim bMat As New cv.Mat(b.Count, 2, MatType.CV_64F)
+
+    '        For i = 0 To A.Count - 1
+    '            AMat.Set(Of Double)(i, 0, A(i)(0))
+    '            AMat.Set(Of Double)(i, 1, A(i)(1))
+
+    '            bMat.Set(Of Double)(i, 0, b(i)(0))
+    '            bMat.Set(Of Double)(i, 1, b(i)(1))
+    '        Next
+    '        ' Solve least-squares for both x and y components
+    '        Dim centerMat = AMat.Clone
+    '        Dim centerX As Double = Cv2.Solve(AMat, bMat.Col(0), centerMat, DecompTypes.SVD)
+    '        Dim centerY As Double = Cv2.Solve(AMat, bMat.Col(1), centerMat, DecompTypes.SVD)
+
+    '        ' Return New Point2f(CSng(centerX), CSng(centerY))
+    '        Return New cv.Point2f
+    '    End Function
+
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        steady.Run(src)
+
+    '        Dim originalPts As New List(Of Point2f) From {New Point2f(100, 50),
+    '                                                      New Point2f(120, 80),
+    '                                                      New Point2f(140, 60)}
+
+    '        Dim rotatedPts As New List(Of Point2f) From {New Point2f(110, 70),
+    '                                                     New Point2f(130, 100),
+    '                                                     New Point2f(150, 80)}
+
+    '        Dim center As Point2f = ComputeRotationCenter(originalPts, rotatedPts, angleDegrees:=15.0)
+
+    '        Debug.WriteLine($"Center = ({center.X:F1}, {center.Y:F1})")
+
+    '        'ptList.Clear()
+    '        'Dim matchList As New List(Of cv.Point)
+    '        'shiftXY = New cv.Point
+    '        'For Each pt In feat.ptList
+    '        '    Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
+    '        '    If index = 0 Then Continue For
+    '        '    Dim ptPrev = ptOriginal(index - 1)
+    '        '    shiftX.Add(pt.X - ptPrev.X)
+    '        '    shiftY.Add(pt.Y - ptPrev.Y)
+    '        '    Circle(dst0, pt, task.DotSize + 2, index, -1)
+    '        '    matchList.Add(pt)
+    '        '    ptList.Add(pt)
+    '        'Next
+
+    '        'If shiftX.Count > 0 Then
+    '        '    shiftXY = New cv.Point2f(-shiftX.Average, -shiftY.Average)
+
+    '        '    dst3.SetTo(0)
+    '        '    Dim angles As New List(Of Single)
+    '        '    For Each pt In matchList
+    '        '        Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
+    '        '        lpList.Add(New lpData(pt, ptOriginal(index - 1)))
+    '        '        angles.Add(lpList.Last.angle)
+    '        '        Line(dst3, pt, ptOriginal(index - 1), white, task.lineWidth, task.lineType)
+    '        '    Next
+
+    '        '    Dim mean = angles.Average()
+    '        '    Dim std = Math.Sqrt(angles.Sum(Function(v) (v - mean) ^ 2) / angles.Count)
+
+    '        '    Dim filtered As New List(Of Single)
+    '        '    Dim removeList As New List(Of Integer)
+    '        '    For i = 0 To angles.Count - 1
+    '        '        Dim angle = angles(i)
+    '        '        If std = 0 Then
+    '        '            filtered.Add(angle)
+    '        '        Else
+    '        '            If Math.Abs(angle - mean) / std <= 3 Then filtered.Add(angle) Else removeList.Add(i)
+    '        '        End If
+    '        '    Next
+    '        '    For i = removeList.Count - 1 To 0 Step -1
+    '        '        matchList.RemoveAt(i)
+    '        '        Circle(dst0, ptList(i), task.DotSize + 5, 0, -1) ' remove point from future use...
+    '        '        ptList.RemoveAt(i)
+    '        '    Next
+
+    '        '    If filtered.Count > 0 Then
+    '        '        Dim angleAvg = filtered.Average()
+    '        '        labels(3) = "Shift X/Y = " + shiftXY.X.ToString("F1") + "/" + shiftXY.Y.ToString("F1") +
+    '        '                "  Angle average = " + angleAvg.ToString("F1")
+    '        '    End If
+    '        'End If
+
+    '        'labels(2) = CStr(matchList.Count) + " features of " + CStr(feat.ptList.Count) + " were tracked."
+
+    '        'Dim M = task.steadyCam.M
+    '        'M.Set(Of Double)(0, 2, shiftXY.X)
+    '        'M.Set(Of Double)(1, 2, shiftXY.Y)
+
+    '        'If standaloneTest() Then
+    '        '    For Each pt In matchList
+    '        '        Circle(src, pt, task.DotSize + 2, task.highlight, -1)
+    '        '    Next
+    '        '    WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
+    '        '    For Each pt In matchList
+    '        '        Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
+    '        '        Circle(dst1, ptOriginal(index - 1), task.DotSize + 2, task.highlight, -1)
+    '        '    Next
+    '        'End If
+    '    End Sub
+    'End Class
+
+
+
+
     Public Class XR_Feature_SteadyCam : Inherits TaskParent
         Dim feat As New Feature_GoodQuality
         Dim delaunay As New Delaunay_Basics
@@ -1694,7 +1847,7 @@ Namespace VBClasses
 
             Dim M = task.steadyCam.M
             M.Set(Of Double)(0, 2, shiftXY.X)
-            M.Set(Of Double)(1, 2, 0)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
 
             If standaloneTest() Then
                 For Each pt In matchList
@@ -1709,158 +1862,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-    'Public Class Feature_SteadyRotate : Inherits TaskParent
-    '    Dim steady As New Feature_SteadyXY
-    '    Dim ptList As New List(Of cv.Point)
-    '    Public Sub New()
-    '        If standalone Then task.gOptions.showMyDst1.Checked = True
-    '        labels(1) = "The points in the lower left shown here where they originated."
-    '        dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    '        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-    '        desc = "Match features between images using the accumulated offsets."
-    '    End Sub
-    '    Public Shared Function ComputeRotationCenter(original As List(Of cv.Point2f),
-    '                                          rotated As List(Of cv.Point2f),
-    '                                          angleDegrees As Single) As cv.Point2f
-
-    '        Dim theta As Double = angleDegrees * Math.PI / 180.0
-    '        Dim cosT As Double = Math.Cos(theta)
-    '        Dim sinT As Double = Math.Sin(theta)
-
-    '        ' Build matrices for least-squares:
-    '        ' A * C = b
-    '        Dim A As New List(Of Vec2d)()
-    '        Dim b As New List(Of Vec2d)()
-
-    '        For i = 0 To original.Count - 1
-    '            Dim p = original(i)
-    '            Dim q = rotated(i)
-
-    '            ' Rotation matrix minus identity
-    '            Dim a11 = cosT - 1.0
-    '            Dim a12 = -sinT
-    '            Dim a21 = sinT
-    '            Dim a22 = cosT - 1.0
-
-    '            ' Right-hand side: q - R*p
-    '            Dim rx = cosT * p.X - sinT * p.Y
-    '            Dim ry = sinT * p.X + cosT * p.Y
-
-    '            Dim bx = q.X - rx
-    '            Dim by = q.Y - ry
-
-    '            A.Add(New Vec2d(a11, a12))
-    '            b.Add(New Vec2d(bx, by))
-    '        Next
-
-    '        Dim AMat As New cv.Mat(A.Count, 2, MatType.CV_64F)
-    '        Dim bMat As New cv.Mat(b.Count, 2, MatType.CV_64F)
-
-    '        For i = 0 To A.Count - 1
-    '            AMat.Set(Of Double)(i, 0, A(i)(0))
-    '            AMat.Set(Of Double)(i, 1, A(i)(1))
-
-    '            bMat.Set(Of Double)(i, 0, b(i)(0))
-    '            bMat.Set(Of Double)(i, 1, b(i)(1))
-    '        Next
-    '        ' Solve least-squares for both x and y components
-    '        Dim centerMat = AMat.Clone
-    '        Dim centerX As Double = Cv2.Solve(AMat, bMat.Col(0), centerMat, DecompTypes.SVD)
-    '        Dim centerY As Double = Cv2.Solve(AMat, bMat.Col(1), centerMat, DecompTypes.SVD)
-
-    '        ' Return New Point2f(CSng(centerX), CSng(centerY))
-    '        Return New cv.Point2f
-    '    End Function
-
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        steady.Run(src)
-
-    '        Dim originalPts As New List(Of Point2f) From {New Point2f(100, 50),
-    '                                                      New Point2f(120, 80),
-    '                                                      New Point2f(140, 60)}
-
-    '        Dim rotatedPts As New List(Of Point2f) From {New Point2f(110, 70),
-    '                                                     New Point2f(130, 100),
-    '                                                     New Point2f(150, 80)}
-
-    '        Dim center As Point2f = ComputeRotationCenter(originalPts, rotatedPts, angleDegrees:=15.0)
-
-    '        Debug.WriteLine($"Center = ({center.X:F1}, {center.Y:F1})")
-
-    '        'ptList.Clear()
-    '        'Dim matchList As New List(Of cv.Point)
-    '        'shiftXY = New cv.Point
-    '        'For Each pt In feat.ptList
-    '        '    Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
-    '        '    If index = 0 Then Continue For
-    '        '    Dim ptPrev = ptOriginal(index - 1)
-    '        '    shiftX.Add(pt.X - ptPrev.X)
-    '        '    shiftY.Add(pt.Y - ptPrev.Y)
-    '        '    Circle(dst0, pt, task.DotSize + 2, index, -1)
-    '        '    matchList.Add(pt)
-    '        '    ptList.Add(pt)
-    '        'Next
-
-    '        'If shiftX.Count > 0 Then
-    '        '    shiftXY = New cv.Point2f(-shiftX.Average, -shiftY.Average)
-
-    '        '    dst3.SetTo(0)
-    '        '    Dim angles As New List(Of Single)
-    '        '    For Each pt In matchList
-    '        '        Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
-    '        '        lpList.Add(New lpData(pt, ptOriginal(index - 1)))
-    '        '        angles.Add(lpList.Last.angle)
-    '        '        Line(dst3, pt, ptOriginal(index - 1), white, task.lineWidth, task.lineType)
-    '        '    Next
-
-    '        '    Dim mean = angles.Average()
-    '        '    Dim std = Math.Sqrt(angles.Sum(Function(v) (v - mean) ^ 2) / angles.Count)
-
-    '        '    Dim filtered As New List(Of Single)
-    '        '    Dim removeList As New List(Of Integer)
-    '        '    For i = 0 To angles.Count - 1
-    '        '        Dim angle = angles(i)
-    '        '        If std = 0 Then
-    '        '            filtered.Add(angle)
-    '        '        Else
-    '        '            If Math.Abs(angle - mean) / std <= 3 Then filtered.Add(angle) Else removeList.Add(i)
-    '        '        End If
-    '        '    Next
-    '        '    For i = removeList.Count - 1 To 0 Step -1
-    '        '        matchList.RemoveAt(i)
-    '        '        Circle(dst0, ptList(i), task.DotSize + 5, 0, -1) ' remove point from future use...
-    '        '        ptList.RemoveAt(i)
-    '        '    Next
-
-    '        '    If filtered.Count > 0 Then
-    '        '        Dim angleAvg = filtered.Average()
-    '        '        labels(3) = "Shift X/Y = " + shiftXY.X.ToString("F1") + "/" + shiftXY.Y.ToString("F1") +
-    '        '                "  Angle average = " + angleAvg.ToString("F1")
-    '        '    End If
-    '        'End If
-
-    '        'labels(2) = CStr(matchList.Count) + " features of " + CStr(feat.ptList.Count) + " were tracked."
-
-    '        'Dim M = task.steadyCam.M
-    '        'M.Set(Of Double)(0, 2, shiftXY.X)
-    '        'M.Set(Of Double)(1, 2, shiftXY.Y)
-
-    '        'If standaloneTest() Then
-    '        '    For Each pt In matchList
-    '        '        Circle(src, pt, task.DotSize + 2, task.highlight, -1)
-    '        '    Next
-    '        '    WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-
-    '        '    For Each pt In matchList
-    '        '        Dim index = dst0.Get(Of Byte)(pt.Y, pt.X)
-    '        '        Circle(dst1, ptOriginal(index - 1), task.DotSize + 2, task.highlight, -1)
-    '        '    Next
-    '        'End If
-    '    End Sub
-    'End Class
 End Namespace

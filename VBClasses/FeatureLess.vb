@@ -1,4 +1,4 @@
-Imports System.Windows.Documents : Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
+Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
@@ -40,6 +40,9 @@ Namespace VBClasses
             rcList.Add(New rcData)
             dst1.SetTo(0)
             For Each rc In sortList.Values
+                Dim motionMat = task.motion.dst2(rc.rect)
+                motionMat.SetTo(0, Not rc.mask)
+                rc.motionPercent = 100 * CountNonZero(motionMat) / rc.pixels
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
                 SetTrueText(CStr(rc.index), rc.maxDist)
@@ -2016,4 +2019,70 @@ Namespace VBClasses
             labels(3) = "Heartbeat ID index map and cells.  Circles are the MaxDStable which can move if cell is lost."
         End Sub
     End Class
+
+
+
+
+    Public Class FeatureLess_Matching : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Dim match As New Match_Basics
+        Dim rect As New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        Dim originalCenter As cv.Point = Nothing
+        Dim rcMatch As rcData
+        Dim snapshot As cv.Mat = Nothing
+        Public Sub New()
+            task.fOptions.MatchCorrSlider.Value = 85
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Match a featureless cell to the previous image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fLess.Run(task.gray)
+            If fLess.rcList.Count = 0 Then Exit Sub
+
+            rcMatch = Nothing
+            For Each rc In fLess.rcList
+                If rc.index = 0 Then Continue For
+                If rc.rect.IntersectsWith(rect) Then
+                    rcMatch = rc
+                    Exit For
+                End If
+            Next
+            If rcMatch Is Nothing Then rcMatch = fLess.rcList(1)
+
+            If heartbeatLTX() Or match.correlation < task.fOptions.MatchCorrSlider.Value / 100 Then
+                dst1.SetTo(0)
+                dst3.SetTo(0)
+                rect = rcMatch.rect
+                Dim w = task.gridWH
+                rect = ValidateRect(New cv.Rect(rect.X - w, rect.Y - w,
+                                                rect.Width + 2 * w, rect.Height + 2 * w))
+                If rect.Width > dst2.Width \ 2 Then rect.Width \= 2
+                If rect.Height > dst2.Height \ 2 Then rect.Height \= 2
+                originalCenter = New cv.Point(rect.X + rect.Width \ 2, rect.Y + rect.Height \ 2)
+                match.template = task.gray(rect).Clone
+                dst3(rect) = task.gray(rect)
+                Rectangle(dst3, rect, white, task.lineWidth)
+                snapshot = task.grayOriginal.Clone
+            End If
+
+            match.Run(task.gray)
+            labels(2) = match.labels(2)
+
+            If standaloneTest() Then
+                Circle(dst1, match.newCenter, task.DotSize, white, -1)
+                Line(dst1, originalCenter, match.newCenter, grayColor,
+                     task.lineWidth, task.lineType)
+            End If
+
+            Dim shiftXY = New cv.Point2f()
+            Dim M = task.steadyCam.M
+            M.Set(Of Double)(0, 2, shiftXY.X)
+            M.Set(Of Double)(1, 2, shiftXY.Y)
+
+            WarpAffine(snapshot, dst2, M, snapshot.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+        End Sub
+    End Class
+
 End Namespace
