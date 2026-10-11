@@ -1775,7 +1775,6 @@ Namespace VBClasses
             dst1 = task.steadyCam.dst2
 
             fLess.Run(src)
-            labels(2) = fLess.labels(2)
 
             Static rcSnapshotList As List(Of rcData)
             If task.heartBeatLT Then
@@ -1829,12 +1828,15 @@ Namespace VBClasses
             End If
 
             strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
-            strOut += "In dst2 below: a circle with no cell shows a cell that is no longer present." + vbCrLf
+            SetTrueText(strOut, 1)
+
+            strOut = "In dst2 at left: " + vbCrLf + vbCrLf
+            strOut += "a circle with no cell shows a cell that is no longer present." + vbCrLf
             strOut += "A cell with no circle is a new cell." + vbCrLf
-            strOut += "All circles represent the new location of a cell at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
             strOut += "Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
             strOut += ""
-            SetTrueText(strOut, 1)
+            SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
             labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
