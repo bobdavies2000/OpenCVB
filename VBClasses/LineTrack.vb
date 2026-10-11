@@ -62,16 +62,20 @@ Namespace VBClasses
 
 
     Public Class LineTrack_Match : Inherits TaskParent
-        Public lpListLast As New List(Of lpData)(task.lines.lpList)
+        Public lpListLast As List(Of lpData)
         Public lpList As New List(Of lpData)
         Public lpMatches As New List(Of lpData)
         Dim slices As New XR_LineTrack_Slices
-        Public lpMapLast = task.lines.dst1.Clone
+        Public lpMapLast As cv.Mat
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If lpListLast Is Nothing Then
+                lpListLast = New List(Of lpData)(task.lines.lpList)
+                lpMapLast = task.lines.dst1.Clone
+            End If
             If task.lines.lpList.Count <= 1 Then Exit Sub
 
             slices.Run(emptyMat)

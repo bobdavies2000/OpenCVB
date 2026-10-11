@@ -4,8 +4,8 @@ Namespace VBClasses
     Public Class Grid_Basics_TA : Inherits TaskParent
         Public nabeRectSide As Integer
         Public Sub New()
-            task.gridMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
-            task.gridNabeMap = New Mat(dst2.Size, MatType.CV_32S, Scalar.All(0))
+            task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
+            task.gridNabeMap = New Mat(dst2.Size, MatType.CV_32S, 0)
             task.gridMask = New Mat(dst2.Size(), MatType.CV_8U)
             desc = "Create a grid of squares covering the entire image."
         End Sub
@@ -100,8 +100,8 @@ Namespace VBClasses
                     End If
                     If r.Width <> nabeRectSide Then r.Width = nabeRectSide
                     If r.Height <> nabeRectSide Then r.Height = nabeRectSide
-                    task.gridNabeMap(task.gridRects(nabeList(0))).SetTo(task.gridNabeRects.Count)
                     task.gridNabeRects.Add(r)
+                    task.gridNabeMap(task.gridRects(nabeList(0))).SetTo(task.gridNabeRects.Count)
                 Next
 
                 task.bricksPerCol = bricksPerCol

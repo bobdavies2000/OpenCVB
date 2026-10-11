@@ -470,6 +470,7 @@ Namespace VBClasses
         Dim feat As New Feature_Basics
         Dim redC As New RedC_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Ages for the top X lines..."
             desc = "Find the features in a RedC cell."

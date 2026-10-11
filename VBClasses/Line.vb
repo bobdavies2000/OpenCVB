@@ -107,6 +107,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public core As New Line_Core
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then
                 task.gOptions.showMyDst1.Checked = True
                 task.fOptions.FeatureSizeSlider.Value = 20
@@ -1986,6 +1987,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lpListLast As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the top 3 longest lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2015,6 +2017,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public interList As New SortedList(Of Integer, List(Of Integer))(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the parallel lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2111,6 +2114,7 @@ Namespace VBClasses
         Public closestLine2 As lpData
         Public lastList As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels = {"", "", "Input (white), closest (highlight), 2nd closest (red)", "task.lines.lastList candidates"}
             desc = "Cursor.ai: Identify the line in task.lines.lastList most likely to match the input line, and show the 2 closest."
         End Sub
@@ -2260,6 +2264,7 @@ Namespace VBClasses
         Dim matchP2 As New Match_Basics
         Public lp As lpData
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst3 = New cv.Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the longest vertical line on the heartbeat and track it using correlation."
@@ -2353,6 +2358,7 @@ Namespace VBClasses
 
     Public Class Line_Intersections : Inherits TaskParent
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "If an intersection point is close to an end point, extend the line to the intersection point."
         End Sub
@@ -2516,6 +2522,7 @@ Namespace VBClasses
         Public lp As lpData
         Dim match As New Match_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find the requested line on the heartbeat and track it using correlation. Default is longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

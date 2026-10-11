@@ -226,7 +226,7 @@ FindMinRect_Basics
 FindNonZero_Basics
 FindNonZero_Line3D
 FitEllipse_Basics
-FitLine_BasicsOld
+FitLine_Basics
 FitLine_Conventional
 Flood_Basics
 Flood_Edges

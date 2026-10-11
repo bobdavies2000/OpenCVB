@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FitLine_BasicsOld : Inherits TaskParent
+    Public Class FitLine_Basics : Inherits TaskParent
         Public ptList As New List(Of Point2f)
         Public lp As New lpData
         Public Sub New()
@@ -220,7 +220,7 @@ Namespace VBClasses
 
     Public Class XR_FitLine_Grid : Inherits TaskParent
         Dim nZero As New FindNonZero_Basics
-        Dim fitline As New FitLine_BasicsOld
+        Dim fitline As New FitLine_Basics
         Public Sub New()
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Find lines within each r."

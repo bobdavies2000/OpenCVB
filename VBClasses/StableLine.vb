@@ -4,6 +4,7 @@ Namespace VBClasses
         Public lp As lpData
         Public lpLast As lpData
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
         End Sub
         Public Shared Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
