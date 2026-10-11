@@ -14,7 +14,7 @@ Namespace VBClasses
                 task.gridROIclicked = task.gridMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             End If
 
-            If task.optionsChanged Then
+            If task.optionsChanged Or task.gridRects.Count = 0 Then
                 nabeRectSide = task.gridWH * 3
                 Dim bricksPerCol As Integer, bricksPerRow As Integer
                 task.gridNabeRects.Clear()
@@ -100,8 +100,8 @@ Namespace VBClasses
                     End If
                     If r.Width <> nabeRectSide Then r.Width = nabeRectSide
                     If r.Height <> nabeRectSide Then r.Height = nabeRectSide
-                    task.gridNabeRects.Add(r)
                     task.gridNabeMap(task.gridRects(nabeList(0))).SetTo(task.gridNabeRects.Count)
+                    task.gridNabeRects.Add(r)
                 Next
 
                 task.bricksPerCol = bricksPerCol
