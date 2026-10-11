@@ -1652,7 +1652,7 @@ Namespace VBClasses
 
             Dim indexMap = delaunay.dst3
 
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 shiftXY = New cv.Point2f
                 rotateAngle = 0
             End If

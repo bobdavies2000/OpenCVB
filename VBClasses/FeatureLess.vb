@@ -2028,14 +2028,19 @@ Namespace VBClasses
         Dim fLess As New FeatureLess_Basics
         Dim match As New Match_Basics
         Dim rect As New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Dim originalCenter As cv.Point = Nothing
+        Public originalCenter As cv.Point = Nothing
+        Public newCenter As cv.Point = Nothing
         Dim rcMatch As rcData
         Dim snapshot As cv.Mat = Nothing
+        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
+        Public verticalizeAngle As Double
         Public Sub New()
+            verticalizeAngle = task.verticalizeAngle
             task.fOptions.MatchCorrSlider.Value = 85
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            labels(1) = "Path of the rectangle center - match.newCenter."
             desc = "Match a featureless cell to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2052,7 +2057,8 @@ Namespace VBClasses
             Next
             If rcMatch Is Nothing Then rcMatch = fLess.rcList(1)
 
-            If heartbeatLTX() Or match.correlation < task.fOptions.MatchCorrSlider.Value / 100 Then
+            If heartbeatLTX() Or rcMatch.motionPercent >= 50 Or
+                match.correlation * 100 < task.fOptions.MatchCorrSlider.Value Then
                 dst1.SetTo(0)
                 dst3.SetTo(0)
                 rect = rcMatch.rect
@@ -2066,19 +2072,21 @@ Namespace VBClasses
                 dst3(rect) = task.gray(rect)
                 Rectangle(dst3, rect, white, task.lineWidth)
                 snapshot = task.grayOriginal.Clone
+                verticalizeAngle = task.verticalizeAngle
             End If
 
             match.Run(task.gray)
-            labels(2) = match.labels(2)
+            labels(2) = "Template is shown below after shift.  Correlation: " +
+                        match.correlation.ToString("F3")
 
+            newCenter = match.newCenter
             If standaloneTest() Then
-                Circle(dst1, match.newCenter, task.DotSize, white, -1)
-                Line(dst1, originalCenter, match.newCenter, grayColor,
-                     task.lineWidth, task.lineType)
+                Circle(dst1, newCenter, task.DotSize, white, -1)
+                Line(dst1, originalCenter, newCenter, grayColor, task.lineWidth, task.lineType)
             End If
 
             Dim shiftXY = New cv.Point2f()
-            Dim M = task.steadyCam.M
+            M = task.steadyCam.M
             M.Set(Of Double)(0, 2, shiftXY.X)
             M.Set(Of Double)(1, 2, shiftXY.Y)
 
@@ -2086,4 +2094,27 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class FeatureLess_Gravity : Inherits TaskParent
+        Dim match As New FeatureLess_Matching
+        Public Sub New()
+            desc = "Run FeatureLess_Matching to get shift and use gravity to rotate the image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            match.Run(task.gray)
+            dst2 = match.dst2
+            labels(2) = match.labels(2)
+
+            Dim rotateAngle As Double = task.verticalizeAngle - match.verticalizeAngle
+            Static rotateCenter As New Point2f(dst2.Width / 2, dst2.Height / 2)
+
+            Dim M = GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+            WarpAffine(dst2, dst3, M, dst2.Size(), InterpolationFlags.Nearest)
+            labels(3) = "Image at left rotated by " + rotateAngle.ToString("F2") +
+                        " degrees to verticalize the image."
+        End Sub
+    End Class
 End Namespace
