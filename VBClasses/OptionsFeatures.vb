@@ -1,8 +1,9 @@
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
-    Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics", "Hist3DColor_Basics",
-                                   "KMeans_Basics", "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
+    Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics",
+                                       "Hist3DColor_Basics", "KMeans_Basics", "LUT_Basics",
+                                       "Reduction_Basics", "PCA_NColor_CPP"}
     Public edgeList() As String = {"Bin4Way_Sobel", "Edge_BinarizedReduction", "Edge_Canny", "Edge_Laplacian", "Edge_Sobel",
                                    "EdgeLine_Basics"}
     Public featureList() As String = {"AGAST", "AKAZE", "BrickPoint_Basics", "Corner_Basics", "Corner_HarrisDetector_CPP",
@@ -32,7 +33,7 @@ Public Class OptionsFeatures
             GrayGroup.Controls.Add(cb)
             grayCheckbox(i) = cb
         Next
-        grayCheckbox(0).Checked = True
+        grayCheckbox(6).Checked = True ' Intensity_Basics for improved segmentation.
 
         ReDim colorCheckbox(vbc.task.filterBasics.filterList.Length - 1)
         For i = 0 To vbc.task.filterBasics.filterList.Length - 1
@@ -83,6 +84,7 @@ Public Class OptionsFeatures
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
         vbc.task.optionsChanged = True
+        task.filterBasics.grayFilter.filterIndex = -1
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
         vbc.task.optionsChanged = True

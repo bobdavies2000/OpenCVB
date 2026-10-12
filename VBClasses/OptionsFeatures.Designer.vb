@@ -166,14 +166,14 @@ Partial Class OptionsFeatures
         GrayGroup.Margin = New Padding(4)
         GrayGroup.Name = "GrayGroup"
         GrayGroup.Padding = New Padding(4)
-        GrayGroup.Size = New Size(347, 294)
+        GrayGroup.Size = New Size(347, 324)
         GrayGroup.TabIndex = 16
         GrayGroup.TabStop = False
         GrayGroup.Text = "Grayscale source inputs"
         ' 
         ' ColorGroup
         ' 
-        ColorGroup.Location = New Point(845, 315)
+        ColorGroup.Location = New Point(845, 345)
         ColorGroup.Margin = New Padding(4)
         ColorGroup.Name = "ColorGroup"
         ColorGroup.Padding = New Padding(4)
