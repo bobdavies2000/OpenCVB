@@ -8015,4 +8015,37 @@ Namespace VBClasses
             thinningType = radioChoices(findRadioIndex(frm.check))
         End Sub
     End Class
+
+
+
+
+
+    Public Class Options_Octree : Inherits OptionParent
+        Public maxDepth As Integer = 6
+        Public stepSize As Integer = 4
+        Public knnCount As Integer = 8
+        Public radiusCm As Integer = 10
+        Public depthBreakCm As Integer = 8
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Octree depth", 1, 10, maxDepth)
+                sliders.setupTrackBar("Octree step", 2, 16, stepSize)
+                sliders.setupTrackBar("Octree KNN", 1, 32, knnCount)
+                sliders.setupTrackBar("Octree radius cm", 1, 50, radiusCm)
+                sliders.setupTrackBar("Octree break cm", 1, 50, depthBreakCm)
+            End If
+        End Sub
+        Public Sub Run()
+            Static depthSlider = OptionParent.FindSlider("Octree depth")
+            Static stepSlider = OptionParent.FindSlider("Octree step")
+            Static knnSlider = OptionParent.FindSlider("Octree KNN")
+            Static radiusSlider = OptionParent.FindSlider("Octree radius cm")
+            Static breakSlider = OptionParent.FindSlider("Octree break cm")
+            maxDepth = depthSlider.Value
+            stepSize = stepSlider.Value
+            knnCount = knnSlider.Value
+            radiusCm = radiusSlider.Value
+            depthBreakCm = breakSlider.Value
+        End Sub
+    End Class
 End Namespace

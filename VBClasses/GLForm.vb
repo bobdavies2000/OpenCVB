@@ -376,6 +376,48 @@ Namespace VBClasses
                     gl.End()
                     gl.DeleteTextures(1, textureID)
                     label = CStr(triangleCount) + " triangles were sent to OpenGL."
+
+                Case oCase.octreeTriangles
+                    If dataBuffer Is Nothing OrElse dataBuffer.Count = 0 Then
+                        label = "No octree mesh."
+                        Exit Select
+                    End If
+                    Dim triCount = CInt(dataBuffer(0)(0))
+                    Dim nabeCount = CInt(dataBuffer(0)(1))
+                    Dim showQuery = dataBuffer(0)(2) <> 0
+                    Dim idx = 1
+                    gl.Begin(OpenGL.GL_TRIANGLES)
+                    For t = 0 To triCount - 1
+                        If idx + 5 >= dataBuffer.Count Then Exit For
+                        For k = 0 To 2
+                            Dim col = dataBuffer(idx)
+                            Dim vec = dataBuffer(idx + 1)
+                            gl.Color(col(2), col(1), col(0))
+                            gl.Vertex(vec(0), -vec(1), -vec(2))
+                            idx += 2
+                        Next
+                    Next
+                    gl.End()
+
+                    gl.PointSize(Math.Max(options.pointSize, 8))
+                    gl.Begin(OpenGL.GL_POINTS)
+                    gl.Color(1.0F, 1.0F, 0.0F)
+                    For i = 0 To nabeCount - 1
+                        If idx >= dataBuffer.Count Then Exit For
+                        Dim vec = dataBuffer(idx)
+                        gl.Vertex(vec(0), -vec(1), -vec(2))
+                        idx += 1
+                    Next
+                    If showQuery And idx < dataBuffer.Count Then
+                        gl.End()
+                        gl.PointSize(Math.Max(options.pointSize, 14))
+                        gl.Begin(OpenGL.GL_POINTS)
+                        gl.Color(1.0F, 0.0F, 0.0F)
+                        Dim vec = dataBuffer(idx)
+                        gl.Vertex(vec(0), -vec(1), -vec(2))
+                    End If
+                    gl.End()
+                    label = CStr(triCount) + " octree triangles and " + CStr(nabeCount) + " neighbors were sent to OpenGL."
             End Select
 
             gl.Flush()

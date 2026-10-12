@@ -249,7 +249,9 @@ GL_Basics
 GL_BasicsLineMap
 GL_DisplayPC
 GL_DrawLineDepth
+GL_Octree
 GL_PlotHist
+GL_Rasterize
 GrabCut_Basics
 Gradient_Basics
 Gradient_CartToPolar
@@ -356,6 +358,7 @@ IMU_Vertical
 Indexer_Basics
 Indexer_Corners
 InPaint_Basics
+Intensity_Basics
 Interpolate_Basics
 Interpolate_Kalman
 Intrinsics_Basics
@@ -499,6 +502,8 @@ MSER_Left
 MSER_Right
 MSER_SyntheticInput
 Neighbor_Basics
+Octree_Basics
+Octree_Rasterize
 OEX_CalcBackProject_Demo1
 OEX_PointPolygon
 OpAuto_Peaks2D

@@ -1768,7 +1768,7 @@ Namespace VBClasses
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            ' Hungarian Assignment algorithm solution.
+            ' Hungarian Assignment algorithm - visual solution.
             desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1831,11 +1831,10 @@ Namespace VBClasses
             SetTrueText(strOut, 1)
 
             strOut = "In dst2 at left: " + vbCrLf + vbCrLf
-            strOut += "a circle with no cell shows a cell that is no longer present." + vbCrLf
-            strOut += "A cell with no circle is a new cell." + vbCrLf
-            strOut += "All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
-            strOut += "Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
-            strOut += ""
+            strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
+            strOut += "- A cell with no circle is a new cell." + vbCrLf
+            strOut += "- All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."

@@ -90,14 +90,14 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
-            For i = 1 To redC.rcList.Count - 1
-                If rcOwner(i) = 0 Then
-                    rc = redC.rcList(i)
-                    rc.index = rcList.Count
-                    rcList.Add(rc)
-                    FillConvexPoly(idMap(rc.rect), rc.contour, rc.index, cv.LineTypes.Link4)
-                End If
-            Next
+            'For i = 1 To redC.rcList.Count - 1
+            '    If rcOwner(i) = 0 Then
+            '        rc = redC.rcList(i)
+            '        rc.index = rcList.Count
+            '        rcList.Add(rc)
+            '        FillConvexPoly(idMap(rc.rect), rc.contour, rc.index, cv.LineTypes.Link4)
+            '    End If
+            'Next
 
             dst2 = Palettize(idMap, 0)
 

@@ -28,6 +28,7 @@ Namespace VBClasses
         readLines
         colorTriangles
         imageTriangles
+        octreeTriangles
     End Enum
     Public Class GL_Basics : Inherits TaskParent
         Public Sub New()
@@ -746,6 +747,66 @@ Namespace VBClasses
             labels(2) = lineDepth.labels(2)
 
             strOut = task.sharpGL.RunSharp(oCase.draw3DLines, lineDepth.dst3, task.color, lineDepth.lpList)
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_Octree : Inherits TaskParent
+        Dim octree As New Octree_Basics
+        Public Sub New()
+            desc = "Display the Octree_Basics mesh and nearest neighbors in SharpGL."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            octree.Run(src)
+            dst2 = octree.dst2
+            dst3 = octree.dst3
+            labels(2) = octree.labels(2)
+            labels(3) = octree.labels(3)
+
+            Dim buf As New List(Of Vec3f)
+            Dim triCount = octree.meshVerts.Count \ 3
+            buf.Add(New Vec3f(triCount, octree.neighbors.Count, If(octree.hasQuery, 1, 0)))
+            For i = 0 To octree.meshVerts.Count - 1
+                Dim c = octree.meshColors(i)
+                Dim v = octree.meshVerts(i)
+                buf.Add(New Vec3f(c.X, c.Y, c.Z))
+                buf.Add(New Vec3f(v.X, v.Y, v.Z))
+            Next
+            For Each p In octree.neighbors
+                buf.Add(New Vec3f(p.X, p.Y, p.Z))
+            Next
+            If octree.hasQuery Then buf.Add(New Vec3f(octree.queryPt.X, octree.queryPt.Y, octree.queryPt.Z))
+
+            strOut = task.sharpGL.RunTriangles(oCase.octreeTriangles, buf)
+            SetTrueText(strOut, 2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_Rasterize : Inherits TaskParent
+        Dim raster As New Octree_Rasterize
+        Public Sub New()
+            desc = "Display the Octree_Rasterize triangle in SharpGL."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            raster.Run(src)
+            dst2 = raster.dst2
+            labels(2) = raster.labels(2)
+
+            Dim buf As New List(Of Vec3f)
+            Dim triCount = raster.tri3D.Count \ 3
+            buf.Add(New Vec3f(triCount, 0, 0))
+            For Each v In raster.tri3D
+                buf.Add(New Vec3f(raster.triBGR.X, raster.triBGR.Y, raster.triBGR.Z))
+                buf.Add(New Vec3f(v.X, v.Y, v.Z))
+            Next
+
+            strOut = task.sharpGL.RunTriangles(oCase.octreeTriangles, buf)
             SetTrueText(strOut, 3)
         End Sub
     End Class

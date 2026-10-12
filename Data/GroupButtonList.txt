@@ -91,6 +91,7 @@ Hull
 IMU
 Indexer
 InPaint
+Intensity
 Interpolate
 Intrinsics
 Kalman
@@ -123,6 +124,7 @@ Motion
 Mouse
 MSER
 Neighbor
+Octree
 OEX
 OpAuto
 Open3D
