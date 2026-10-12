@@ -94,6 +94,7 @@ Delaunay_Generations
 Delaunay_LineSelect
 Delaunay_Map
 Depth_Basics
+Depth_GuidedFilter
 Depth_Holes
 Depth_InRange
 Depth_NotMissing
@@ -241,6 +242,7 @@ Fractal_MandelbrotZoom
 Fractal_MandelbrotZoomColor
 FrameRate_Basics
 FREAK_Basics
+Fuzzy_Basics
 Gabor_Basics
 GeneticDrawing_Basics
 Gif_Basics

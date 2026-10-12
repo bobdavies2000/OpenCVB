@@ -15,7 +15,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("Intensity gamma x100", 10, 300, 50)
                 sliders.setupTrackBar("BIMEF exposure x100", 50, 300, 150)
             End If
-            desc = "Apply cv::intensity_transform through Cv2.IntensityTransform."
+            desc = "Cursor.ai: Apply cv::intensity_transform through Cv2.IntensityTransform."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> MatType.CV_8UC3 Then src = task.color.Clone

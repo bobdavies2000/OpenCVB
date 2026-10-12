@@ -62,6 +62,7 @@ Foreground
 Fractal
 FrameRate
 FREAK
+Fuzzy
 Gabor
 GeneticDrawing
 Gif

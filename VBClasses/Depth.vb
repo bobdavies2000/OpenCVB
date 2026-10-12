@@ -1607,4 +1607,48 @@ Namespace VBClasses
             labels(3) = "There were " + CStr(count) + " lines that appear parallel using the cross product"
         End Sub
     End Class
+
+
+
+
+
+
+    ' https://docs.opencv.org/4.x/da/d17/group__ximgproc__filters.html
+    Public Class Depth_GuidedFilter : Inherits TaskParent
+        Dim colorizer As New DepthColorizer_CPP
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Guided filter radius", 1, 64, 8)
+                sliders.setupTrackBar("Guided filter eps X10000", 1, 1000, 100)
+            End If
+            labels(2) = "Prepared floating-point depth"
+            labels(3) = "Colorized guided-filter depth"
+            desc = "Cursor.ai: Enhance depth with ximgproc guidedFilter, using the color image as the guide."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static radiusSlider = OptionParent.FindSlider("Guided filter radius")
+            Static epsSlider = OptionParent.FindSlider("Guided filter eps X10000")
+            Dim radius As Integer = radiusSlider.Value
+            Dim eps As Double = epsSlider.Value / 10000.0
+
+            Dim depth32f = task.pcSplit(2).Clone()
+
+            ' Guide is normalized to 0..1 so eps stays on the same scale as the color image.
+            Dim guideSrc As Mat = src
+            If guideSrc.Channels() <> 3 Then guideSrc = task.color
+            Dim guide As New Mat
+            guideSrc.ConvertTo(guide, MatType.CV_32FC3, 1.0 / 255.0)
+            If guide.Size <> depth32f.Size Then Resize(guide, guide, depth32f.Size)
+
+            Dim filtered As New Mat
+            XImgProc.GuidedFilter(guide, depth32f, filtered, radius, eps, -1)
+            Threshold(filtered, filtered, 0, 0, ThresholdTypes.Tozero)
+            Threshold(filtered, filtered, task.MaxZmeters, task.MaxZmeters, ThresholdTypes.Trunc)
+
+            dst2 = filtered
+            colorizer.Run(filtered)
+            dst3 = colorizer.dst2
+            labels(2) = "Prepared 32F depth  radius=" + CStr(radius) + "  eps=" + eps.ToString(fmt3)
+        End Sub
+    End Class
 End Namespace

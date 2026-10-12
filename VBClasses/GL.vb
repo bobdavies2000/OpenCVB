@@ -757,7 +757,7 @@ Namespace VBClasses
     Public Class GL_Octree : Inherits TaskParent
         Dim octree As New Octree_Basics
         Public Sub New()
-            desc = "Display the Octree_Basics mesh and nearest neighbors in SharpGL."
+            desc = "Cursor.ai: Display the Octree_Basics mesh and nearest neighbors in SharpGL."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             octree.Run(src)
@@ -791,7 +791,7 @@ Namespace VBClasses
     Public Class GL_Rasterize : Inherits TaskParent
         Dim raster As New Octree_Rasterize
         Public Sub New()
-            desc = "Display the Octree_Rasterize triangle in SharpGL."
+            desc = "Cursor.ai: Display the Octree_Rasterize triangle in SharpGL."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             raster.Run(src)

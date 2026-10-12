@@ -129,8 +129,8 @@ Module UI_Generator
 
             Console.WriteLine()
             Console.WriteLine()
-            Console.WriteLine($"{displayClasses.Count} classes will be visible in the user interface.")
-            Console.WriteLine($"Total source lines for visible classes: " + totalLinesRead.ToString("N0"))
+            Console.WriteLine($"{displayClasses.Count} algorithms will be visible in the user interface.")
+            Console.WriteLine($"Total source lines for algorithms classes: " + totalLinesRead.ToString("N0"))
             Console.WriteLine($"Unused but compiling Reference algorithms: " + xrClasses.Count.ToString("N0"))
             Console.WriteLine($"Cursor.ai algorithms: " + cursorClasses.Count.ToString("N0"))
             Console.WriteLine($"Total algorithms in development: " + allClasses.Count.ToString("N0"))

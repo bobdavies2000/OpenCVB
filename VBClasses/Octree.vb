@@ -16,7 +16,7 @@ Namespace VBClasses
             world2cam.Set(Of Double)(1, 1, -1)
             world2cam.Set(Of Double)(2, 2, -1)
             world2cam.Set(Of Double)(3, 3, 1)
-            desc = "Build an octree from the point cloud and rasterize a mesh of those points."
+            desc = "Cursor.ai: Build an octree from the point cloud and rasterize a mesh of those points."
         End Sub
         Private Shared Function PointCount(m As Mat) As Integer
             If m Is Nothing OrElse m.Empty Then Return 0
@@ -356,7 +356,7 @@ Namespace VBClasses
         Public triBGR As Point3f
         Public Sub New()
             triBGR = New Point3f(0, 0, 1)
-            desc = "Synthetic example of building an Octree and rasterizing it."
+            desc = "Cursor.ai: Synthetic example of rasterizing a 3D object."
         End Sub
         Private Shared Function ToWorld(pt As cv.Point) As Point3f
             Dim x = Math.Min(Math.Max(pt.X, 0), task.workRes.Width - 1)
