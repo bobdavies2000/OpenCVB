@@ -36,7 +36,7 @@
 
 **FeatureLess_Tracker:** *The lower left image shows the identified featureless cells. The lower right image overlays the featureless cells on a Delaunay subdivision of the image using the maxDist for each cell. MaxDist is defined as the interior point farthest from the edges of the cell. The Delaunay cells allow each featureless cell to be tracked during camera and scene motion. The Delaunay cells are updated on the heartbeat.*
 
-![](media/c6c467a523d329b7aa345f4d0311627c.png)**RedC_Basics:** *The lower left image maps all the featureless cells as well as air gap between featureless cells. The air gap is segmented by color as in previous versions. The colors of the featureless cells is much more consistent while all other cells frequently change color and shape as in previous versions. The age is shown for featureless cells.*
+![](media/c6c467a523d329b7aa345f4d0311627c.png)**RedC_Basics:** *The lower left image maps all the featureless cells as well as air gap between featureless cells. The air gap is segmented by color as in previous versions. The colors of the featureless cells are much more consistent while all other cells frequently change color and shape as in previous versions. The age is shown for featureless cells.*
 
 **September 30, 2026 – Lines, Debug Checkbox, SteadyCam M**
 
