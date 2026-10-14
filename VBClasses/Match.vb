@@ -837,8 +837,7 @@ Namespace VBClasses
         Dim knn As New KNN_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            task.gOptions.DebugCheckBox.Checked = True
-            desc = "Use steadyCam.M to translate features from the current image to the steadyCam image."
+            desc = "Use SteadyCam.M to translate features from the current image to the steadyCam image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then

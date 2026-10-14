@@ -187,6 +187,183 @@ Namespace VBClasses
 
 
 
+            dst3.SetTo(0)
+            Dim count As Integer
+    For Each rc In redC.rcList
+    If rc.age > Math.Min(10, task.frameCount) Then
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                    count += 1
+                End If
+    Next
+            labels(3) = CStr(count) + " were consistently present."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_RedC_Sizes : Inherits TaskParent
+        Dim redC As New RedC_BasicsOld
+        Public Sub New()
+            If standalone Then task.gOptions.DebugSlider.Value = 32
+            desc = "Use the debug slider to display cells of X pixels or less."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            If task.heartBeat Then dst3.SetTo(0)
+            Dim count As Integer
+            For Each rc In redC.rcList
+                If rc.pixels <= task.gOptions.DebugSlider.Value Then
+                    Dim vec = dst2.Get(Of Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                    dst3(rc.rect).SetTo(vec, rc.mask)
+                    count += 1
+                End If
+            Next
+
+            labels(3) = CStr(count) + " cells smaller than " + CStr(task.gOptions.DebugSlider.Value) + " pixels."
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XR_RedC_Hulls : Inherits TaskParent
+        Dim redC As New RedC_BasicsOld
+        Public rcList As New List(Of rcDataOld)
+        Public Sub New()
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Display the hull for each cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            For i = 0 To redC.rcList.Count - 1
+                Dim rc = redC.rcList(i)
+                If rc.hull IsNot Nothing Then FillPoly(dst1(rc.rect), {rc.hull}, rc.mapID)
+            Next
+
+            rcList = New List(Of rcDataOld)(redC.rcList)
+            dst3 = Palettize(dst1)
+            labels(3) = CStr(redC.rcList.Count) + " hulls with the smallest on top."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedC_TrackHull : Inherits TaskParent
+        Dim redC As New RedC_BasicsOld
+        Dim lastCenter As cv.Point
+        Dim lastMapID As Byte
+        Dim lastRect As cv.Rect
+        Public Sub New()
+            task.gOptions.showMyDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+            desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Then dst1.SetTo(0)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst0.SetTo(0)
+            For i = redC.rcList.Count - 1 To 0 Step -1
+                Dim rc = redC.rcList(i)
+                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+            Next
+
+            SetTrueText(RedC_BasicsOld.displayCell(redC.rcList, redC.rcIndexMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+
+            dst3.SetTo(0)
+            task.color(task.rcDold.rect).SetTo(white, task.rcDold.mask)
+            FillPoly(dst3(task.rcDold.rect), {task.rcDold.hull}, task.scalarColors(task.rcDold.mapID + 1))
+            dst3(task.rcDold.rect).SetTo(task.scalarColors(task.rcDold.mapID), task.rcDold.mask)
+            Rectangle(dst2, task.rcDold.rect, task.highlight, task.lineWidth)
+            Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
+            SetTrueText(task.rcDold.displayCell() + vbCrLf, 1)
+
+            lastCenter = Utility_Basics.ComputeHullCentroid(task.rcDold.hull.ToArray, task.rcDold)
+            lastMapID = task.rcDold.mapID
+            lastRect = task.rcDold.rect
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XR_RedC_NeighborHulls : Inherits TaskParent
+        Dim redC As New RedC_BasicsOld
+        Dim clickPoint As cv.Point
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
+            desc = "Find the neighbors for the selected cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            dst0.SetTo(0)
+            For i = redC.rcList.Count - 1 To 0 Step -1
+                Dim rc = redC.rcList(i)
+                If rc.hull IsNot Nothing Then FillPoly(dst0(rc.rect), {rc.hull}, rc.index)
+            Next
+
+            Dim index As Integer
+            If task.mouseClickFlag Then clickPoint = task.clickPoint
+            index = dst0.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+
+            Dim rcD = redC.rcList(index)
+            SetTrueText(rcD.displayCell() + vbCrLf, 1)
+
+            Dim neighbors As New List(Of Integer)
+            For Each pt In rcD.contour
+                pt.X += rcD.rect.X
+                pt.Y += rcD.rect.Y
+                Dim rect = ValidateRect(New cv.Rect(pt.X - task.gridWH / 2, pt.Y - task.gridWH / 2, task.gridWH, task.gridWH))
+                Dim pixels(rect.Width * rect.Height - 1) As Integer
+                Dim tmp = dst0(rect).Clone
+                Marshal.Copy(tmp.Data, pixels, 0, pixels.Length)
+
+                For i = 0 To pixels.Length - 1
+                    If pixels(i) = 0 Then Continue For
+                    If neighbors.Contains(pixels(i)) = False Then neighbors.Add(pixels(i))
+                Next
+            Next
+
+            dst3.SetTo(0)
+            dst3(rcD.rect).SetTo(task.scalarColors(rcD.mapID), rcD.mask)
+            For i = 0 To neighbors.Count - 1
+                Dim rc = redC.rcList(neighbors(i))
+                dst3(rc.rect).SetTo(task.scalarColors(rc.mapID), rc.mask)
+            Next
+
+            dst3(rcD.rect).SetTo(task.highlight, rcD.mask)
+            Circle(dst3, clickPoint, task.DotSize + 2, white, -1)
+            labels(3) = CStr(neighbors.Count) + " neighbors were present."
+        End Sub
+    End Class
+
+
+
+
+
+
+
     Public Class RedC_MergeCells : Inherits TaskParent
         Dim nabe As New RedC_NeighborHist
         Public merged As New rcData
