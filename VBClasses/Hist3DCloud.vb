@@ -143,7 +143,7 @@ Namespace VBClasses
             Marshal.Copy(samples, 0, histogram.Data, samples.Length)
             CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
-            If task.heartBeat Then maskval += 1
+            if heartbeatx() then  maskval += 1
 
             If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
             Dim index = sortedHist.ElementAt(maskval).Value

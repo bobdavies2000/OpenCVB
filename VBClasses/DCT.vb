@@ -147,7 +147,7 @@ Namespace VBClasses
     '        desc = "Find plane equation for a featureless surface - debugging one region for now."
     '    End Sub
     '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        ' If task.heartBeat Then flow.msgs.Clear()
+    '        ' if heartbeatx() then  flow.msgs.Clear()
 
     '        mats.mat(0) = src.Clone
     '        mats.mat(0).SetTo(white, task.gridMask)

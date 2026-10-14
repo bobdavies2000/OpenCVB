@@ -33,7 +33,7 @@ Namespace VBClasses
                     rects.Add(r)
                 End If
             Next
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " r's had above average standard deviation (average = " +
                                     stdevList.Average.ToString(fmt1) + ")"
             End If
@@ -305,7 +305,7 @@ Namespace VBClasses
 
             Static saveCorrs As New List(Of Single)(correlations)
             Static saveRects As New List(Of cv.Rect)(gather.rects)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 saveCorrs = New List(Of Single)(correlations)
                 saveRects = New List(Of cv.Rect)(gather.rects)
 
@@ -407,7 +407,7 @@ Namespace VBClasses
                     Dim index = corr.IndexOf(maxCorr)
                     Dim rectRight = New cv.Rect(index, r.Y, r.Width, r.Height)
                     Dim offset = r.X - rectRight.X
-                    If task.heartBeat Then
+                    if heartbeatx() then 
                         strOut = "CoeffNormed max correlation = " + maxCorr.ToString(fmt3) + vbCrLf
                         strOut += "Left Mean = " + gather.meanList(gridIndex).ToString(fmt3) + " Left stdev = " + gather.stdevList(gridIndex).ToString(fmt3) + vbCrLf
                         Dim mean As Scalar, stdev As Scalar

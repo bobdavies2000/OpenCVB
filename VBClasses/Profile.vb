@@ -84,7 +84,7 @@
 '                Circle(dst3, corners(i), task.DotSize + 2, cornerColors(i), -1, task.lineType)
 '            Next
 
-'            If task.heartBeat Then
+'            if heartbeatx() then 
 '                strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
 '                Dim w = task.gridWH
 '                For i = 0 To corners.Count - 1

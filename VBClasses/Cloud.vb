@@ -718,7 +718,7 @@ Namespace VBClasses
 
     Public Class XR_Cloud_Templates : Inherits TaskParent
         Public templateX As New Mat, templateY As New Mat
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
             templateX = New Mat(task.workRes, MatType.CV_32F)
             templateY = New Mat(task.workRes, MatType.CV_32F)

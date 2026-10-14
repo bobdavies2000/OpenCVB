@@ -160,7 +160,7 @@ Namespace VBClasses
             desc = "A way to test the fitline using 3D data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.heartBeat = False Then Exit Sub
+            If standalone And heartbeatX() = False Then Exit Sub
             noisyLine.Run(src)
             dst2 = noisyLine.dst2
 
@@ -190,7 +190,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static noisyLine As New Eigen_Input3D
-                If task.heartBeat = False Then Exit Sub
+                If heartbeatX() = False Then Exit Sub
                 noisyLine.Run(src)
                 dst2.SetTo(0)
                 ptList.Clear()

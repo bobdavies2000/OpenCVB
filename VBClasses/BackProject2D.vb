@@ -268,13 +268,10 @@ Namespace VBClasses
             dst3.SetTo(Scalar.Yellow, dst1)
             dst0.SetTo(0, dst1)
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 Dim count = Sum(histData(rect))
                 labels(3) = "Selected " + selection + " = " + CStr(CountNonZero(histData(rect))) +
                         " non-zero histogram entries representing total pixels of " + CStr(count)
-            End If
-
-            If task.heartBeat Then
                 strOut = "Use Global Algorithm Option 'grid Square Size' to control the 2D histogram." + vbCrLf +
                          "Move mouse in 2D histogram to select a row or column to backproject."
             End If

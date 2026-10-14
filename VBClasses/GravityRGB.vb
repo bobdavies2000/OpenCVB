@@ -108,7 +108,7 @@ Namespace VBClasses
             desc = "Cursor.ai: Correct the gravity WarpAffine using jagged edges in task.lines.dst3: rotateRGB, inverse WarpAffine, compare to original."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lines = task.lines.dst3
+            Dim lines = task.lines.dst1
 
             Dim reconstructed As New Mat
             Dim diff As New Mat
@@ -189,7 +189,7 @@ Namespace VBClasses
             Next
 
             If indexList Is Nothing Then Exit Sub ' no parallel vertical lines found
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
             For Each index In indexList
                 Dim lp = lines.lpList(index)
                 Line(dst3, lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.AntiAlias)
@@ -260,13 +260,13 @@ Namespace VBClasses
             If vert.lpList.Count = 0 Then
                 labels(3) = "No vertical lines - fallback rotateAngle = " + rotateAngle.ToString(fmt2) + " deg"
                 SetTrueText("No GravityRGB_Vertical lines; using verticalizeAngle", 3)
-                If task.heartBeat Then
+                if heartbeatx() then 
                     labels(2) = "No vertical lines - no avg/vertical diff"
                 End If
                 Return
             End If
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Vertical lines identified = " + CStr(vert.lpList.Count) + vbCrLf +
                              "Average line angle to vertical = " + avgAngle.ToString(fmt2) + " deg" + vbCrLf +
                              "verticalizeAngle = " + task.verticalizeAngle.ToString(fmt3) + " deg"
@@ -381,7 +381,7 @@ Namespace VBClasses
             lastRotateAngle = rotateAngle
             dst3 = GravityRGB_Basics.rotateRGB(task.gray, rotateAngle)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(vert.lpList.Count) + " vertical lines, avgAngleToVertical = " +
                             vert.avgAngleToVertical.ToString(fmt2) + " deg"
                 labels(3) = "Rotated gray by " + rotateAngle.ToString(fmt2) + " deg"

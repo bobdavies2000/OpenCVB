@@ -109,7 +109,7 @@ Namespace VBClasses
                 Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
                 Resize(tmp, mats.mat(i)(r), New Size(r.Width, r.Height))
 
-                If task.heartBeat Then
+                If heartbeatX() Then
                     Dim plus = mats.mat(i)(r).Width / 2
                     points(i) = Choose(i + 1, New cv.Point(bump + plus, bump), New cv.Point(bump + dst2.Width / 2 + plus, bump),
                                                       New cv.Point(bump + plus, bump + dst2.Height / 2),
@@ -336,7 +336,7 @@ Namespace VBClasses
             binary.Run(task.gray)
             Dim mask = binary.dst2.Clone
 
-            If task.heartBeat Then valley.Run(task.gray)
+            If heartbeatX() Then valley.Run(task.gray)
 
             InRange(task.gray, 0, valley.valleys(1) - 1, mats.mat(0))
             InRange(task.gray, valley.valleys(1), valley.valleys(2) - 1, mats.mat(1))
@@ -601,7 +601,7 @@ Namespace VBClasses
             binary.Run(task.gray)
             Dim mask = binary.dst2.Clone
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 midColor = binary.meanScalar(0)
                 topColor = Mean(task.gray, mask)(0)
                 botColor = Mean(task.gray, Not mask)(0)

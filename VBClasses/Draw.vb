@@ -38,7 +38,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
                     Dim nPoint = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -62,7 +62,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
                     Dim nPoint = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -88,7 +88,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(Scalar.Black)
                 For i = 0 To options.drawCount - 1
                     Dim nPoint1 = New Point2f(task.msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), task.msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -115,7 +115,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             Dim height = src.Height / 8
             Dim width = src.Width / 8
             Dim polyColor = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
@@ -200,7 +200,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(Scalar.Black)
                 Dim pt As New cv.Point
                 Dim center As New cv.Point(src.Width / 2, src.Height / 2)
@@ -262,7 +262,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 rect = InitRandomRect(options.saveMargin)
                 angle = task.msRNG.Next(0, 360)
                 colorIndex = task.msRNG.Next(0, 255)
@@ -393,7 +393,7 @@ Namespace VBClasses
             desc = "Test the external use of the Draw_Line algorithm - provide 2 points and draw the line..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 line.p1 = New cv.Point(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
                 line.p2 = New cv.Point(task.msRNG.Next(0, src.Width), task.msRNG.Next(0, src.Height))
             End If

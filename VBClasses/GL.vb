@@ -239,7 +239,7 @@ Namespace VBClasses
             If pointcloud.Type <> MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
 
             Static count As Integer
-            If task.heartBeat Then
+            If heartbeatX() Then
                 dst2.SetTo(0)
                 dst3.SetTo(0)
                 count = 0
@@ -247,7 +247,7 @@ Namespace VBClasses
 
             Dim mask = New Mat(dst2.Size, MatType.CV_8U, 0)
             For Each lp In task.lines.lpList
-                If lp.age = 1 Or task.heartBeat Then
+                If lp.age = 1 Or heartbeatX() Then
                     mask(lp.rect).SetTo(0)
                     Line(dst2, lp.p1, lp.p2, 255, task.lineWidth)
                     pointcloud(lp.rect).CopyTo(dst3(lp.rect), dst2(lp.rect))

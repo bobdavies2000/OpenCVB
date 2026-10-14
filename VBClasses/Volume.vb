@@ -40,7 +40,7 @@ Namespace VBClasses
             Dim meterFactor As Integer = 100
             Dim mString = If(meterFactor = 100, "centimeters", If(meterFactor = 1, "meters", "decimeters"))
             volume = (maxX - minX) * (maxY - minY) * (maxZ - minZ) * meterFactor * meterFactor * meterFactor
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Volume = " + volume.ToString(fmt0) + " cubic " + mString + vbCrLf + vbCrLf
                 strOut += "Min " + vbTab + "Max " + vbTab + "Range " + vbTab + " units=" + mString + vbCrLf
                 strOut += (minX * meterFactor).ToString(fmt0) + vbTab + (maxX * meterFactor).ToString(fmt0) + vbTab + ((maxX - minX) * meterFactor).ToString(fmt0) + vbTab + " X dimension" + vbCrLf

@@ -45,7 +45,7 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst0, 0)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
                         CStr(ptList.Count - validList.Count) + " were lost..."
             End If
@@ -296,7 +296,7 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst0, 0)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
                             CStr(lpList.Count - validList.Count) + " were lost..."
                 labels(1) = CStr(validList.Count) + " lines were found through the steadyCam map."
@@ -359,7 +359,7 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst0, 0)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
                         CStr(ptList.Count - validList.Count) + " were lost..."
             End If
@@ -412,7 +412,7 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(dst0, 0)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " lines were tracked while " +
                         CStr(task.lines.lpList.Count - validList.Count) + " were lost..."
             End If

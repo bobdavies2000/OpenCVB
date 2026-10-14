@@ -74,7 +74,7 @@ Namespace VBClasses
                 Rectangle(dst3, brick.rRect, task.highlight, task.lineWidth + 1)
             End If
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(2) = CStr(brickList.Count) + " bricks and " +
                         CStr(brickDepthCount) + " had depth.  Left camera image is below."
             End If
@@ -731,7 +731,7 @@ Namespace VBClasses
                 task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
             Next
             lastDepth = task.lowResDepth.Clone
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
                             "Cells that are flipping (with and without edges) are highlighted"
             End If
@@ -790,7 +790,7 @@ Namespace VBClasses
             motionLeft.Run(task.leftView)
 
             lines.Run(task.leftView)
-            dst2 = lines.dst2
+            dst2 = lines.dst1
 
             Dim count As Integer
             dst3.SetTo(0)
@@ -859,7 +859,7 @@ Namespace VBClasses
             motionLeft.Run(task.leftView)
 
             lines.Run(task.leftView)
-            dst2 = lines.dst2
+            dst2 = lines.dst1
 
             Dim count As Integer
             dst3.SetTo(0)
@@ -923,7 +923,7 @@ Namespace VBClasses
             Next
 
             lastDepthList = New List(Of Single)(depthList)
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(3) = CStr(depthJumpers.Count) + " grid squares had depth variability > " + options.meters.ToString(fmt3) + " meters"
             End If
         End Sub
@@ -1005,7 +1005,7 @@ Namespace VBClasses
             If Single.IsInfinity(mmDepth.maxVal) Then Exit Sub
 
             Static lastMouse As cv.Point = task.mouseMovePoint
-            If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
+            If heartbeatX() Or lastMouse <> task.mouseMovePoint Then
                 lastMouse = task.mouseMovePoint
                 If Math.Abs(mmDepth.maxVal - mmDepth.minVal) > 0 Then
                     plotHist.minRange = mmDepth.minVal

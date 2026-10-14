@@ -12,7 +12,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim bins = task.histogramBins
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 firstThird = 0
                 lastThird = 0
                 hist.Run(task.gray)

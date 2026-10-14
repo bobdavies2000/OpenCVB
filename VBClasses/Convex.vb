@@ -27,7 +27,7 @@ Namespace VBClasses
             End If
 
             If standaloneTest() Then
-                If Not task.heartBeat Then Exit Sub
+                If Not heartbeatX() Then Exit Sub
                 hullList = buildRandomHullPoints()
             End If
 

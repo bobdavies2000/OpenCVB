@@ -473,7 +473,7 @@ Namespace VBClasses
             desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Dim m As Mat = Mat.FromPixelData(3, 2, MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
                 Dim col_sum As New Mat, row_sum As New Mat
                 Reduce(m, col_sum, 0, ReduceTypes.Sum, MatType.CV_32F)
@@ -575,7 +575,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
 
-            If task.heartBeat Then ind += 1
+            if heartbeatx() then  ind += 1
             kernelSize = 3 + 2 * (ind Mod 5)
             Dim kernel As New Mat(kernelSize, kernelSize, MatType.CV_32F, Scalar.All(1 / (kernelSize * kernelSize)))
 

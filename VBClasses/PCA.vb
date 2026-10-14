@@ -775,7 +775,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 3 Then CvtColor(src, src, ColorConversionCodes.GRAY2BGR)
 
-            If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net
+            if heartbeatx() then  pcaPalette.Run(src) ' get the palette in VB.Net
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
             classCount = pcaPalette.options.desiredNcolors
 
@@ -817,7 +817,7 @@ Namespace VBClasses
             desc = "Create a faster version of the PCA_NColor algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then pcaPalette.Run(src) ' get the palette in VB.Net which is very fast.
+            if heartbeatx() then  pcaPalette.Run(src) ' get the palette in VB.Net which is very fast.
 
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
             Dim paletteImage = PCA_NColor.RgbToIndex(rgb, dst1.Width, dst1.Height, pcaPalette.palette, pcaPalette.options.desiredNcolors)

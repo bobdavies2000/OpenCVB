@@ -20,7 +20,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
+                if heartbeatx() then  splitIndex = (splitIndex + 1) Mod 3
                 Dim input As New Mat
                 ExtractChannel(src, input, splitIndex)
                 mm = GetMinMax(input)
@@ -496,7 +496,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If task.heartBeat Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
+                if heartbeatx() then  splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
                 colorName = Choose(splitIndex + 1, "Blue", "Green", "red")
                 Dim splitMats() As Mat = Split(src)
                 src = splitMats(splitIndex)
@@ -652,7 +652,7 @@ Namespace VBClasses
             comp.Run(src)
             dst2 = comp.dst2.Clone
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 ttLabels = New List(Of TrueText)(comp.trueData)
                 Dim histX = comp.histDiffAbs
                 comp.histK.hist.plotHist.Run(histX)
@@ -863,7 +863,7 @@ Namespace VBClasses
             Dim mm As mmData = GetMinMax(cloudY)
             Threshold(cloudY, cloudY, maxRange, mm.maxVal, ThresholdTypes.Trunc)
             Static saveMinVal As Single = mm.minVal, saveMaxVal As Single = mm.maxVal
-            If task.heartBeat Then
+            if heartbeatx() then 
                 saveMinVal = mm.minVal
                 saveMaxVal = mm.maxVal
             End If
@@ -904,7 +904,7 @@ Namespace VBClasses
 
             Dim actual = Sum(histogram)(0)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
                          "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
                          "The number of samples input is the expected value." + vbCrLf +
@@ -940,7 +940,7 @@ Namespace VBClasses
 
             Dim actual = Sum(hist.histogram)(0)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
                          "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
                          "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf +
@@ -971,7 +971,7 @@ Namespace VBClasses
             Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
             handleSrc.Free()
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Dim actual = CInt(Histogram_1D_Sum(cPtr))
                 strOut = "Expected sample count:" + vbTab + CStr(dst2.Total) + vbCrLf +
                          "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
@@ -1039,7 +1039,7 @@ Namespace VBClasses
             myPlotHist.Run(norm32f)
             dst2 = myPlotHist.dst2
             histArray = myPlotHist.plotHist.histArray
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Chart left = 0 " + vbCrLf + "Chart right = " + mm.maxVal.ToString(fmt0) + vbCrLf
                 labels(2) = "Shifted " + dimensionLabel + " Histogram Range = 0 to " + CStr(CInt(mm.maxVal))
             End If
@@ -1196,7 +1196,7 @@ Namespace VBClasses
             End If
 
             If src.Type <> MatType.CV_32FC1 Then src = task.pcSplit(index)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 mm = GetMinMax(src)
                 If index < 2 Then
                     mm.minVal -= 1

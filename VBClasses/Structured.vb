@@ -1,4 +1,5 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp.StructuredLight
 Namespace VBClasses
     Public Class Structured_Basics : Inherits TaskParent
         Public lpListX As New List(Of lpData)
@@ -519,7 +520,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Flat surface at: "
                 For i = 0 To surfaces.Count - 1
                     strOut += surfaces(i).ToString(fmt3) + ", "
@@ -871,5 +872,115 @@ Namespace VBClasses
                 Line(dst2, lp.p1, lp.p2, 255, task.lineWidth, LineTypes.Link8)
             Next
         End Sub
+    End Class
+
+
+
+
+
+
+    ' https://docs.opencv.org/4.x/d1/d90/classcv_1_1structured__light_1_1SinusoidalPattern.html
+    Public Class Structured_Sinusoidal : Inherits TaskParent
+        Dim sinus As SinusoidalPattern
+        Dim patternImages() As Mat
+        Dim phaseMap As New Mat
+        Dim shadowMask As New Mat
+        Dim cacheKey As String = ""
+        Public Sub New()
+            If radio.Setup(traceName) Then
+                radio.addRadio("FTP")
+                radio.addRadio("PSP")
+                radio.addRadio("FAPS")
+                radio.check(1).Checked = True
+            End If
+            If check.Setup(traceName) Then
+                check.addCheckBox("Horizontal stripes")
+            End If
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Sinusoidal periods", 4, 40, 16)
+                sliders.setupTrackBar("Sinusoidal pattern index", 0, 2, 0)
+            End If
+            labels(2) = "Sinusoidal structured-light pattern"
+            labels(3) = "Wrapped phase map"
+            desc = "Generate OpenCV's sinusoidal structured-light patterns and their wrapped phase map."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static periodSlider = OptionParent.FindSlider("Sinusoidal periods")
+            Static indexSlider = OptionParent.FindSlider("Sinusoidal pattern index")
+            Static ftpRadio = OptionParent.findRadio("FTP")
+            Static fapsRadio = OptionParent.findRadio("FAPS")
+            Static horizCheck = OptionParent.FindCheckBox("Horizontal stripes")
+
+            Dim method = SinusoidalPatternMethod.Psp
+            Dim methodName = "PSP"
+            If ftpRadio.Checked Then
+                method = SinusoidalPatternMethod.Ftp
+                methodName = "FTP"
+            ElseIf fapsRadio.Checked Then
+                method = SinusoidalPatternMethod.Faps
+                methodName = "FAPS"
+            End If
+
+            Dim horizontal As Boolean = horizCheck.Checked
+            ' ComputePhaseMap rejects sizes that are not already optimal DFT sizes, and sizes under 42.
+            Dim genWidth = DftSize(dst2.Width)
+            Dim genHeight = DftSize(dst2.Height)
+            Dim periods As Integer = Math.Max(3, CInt(periodSlider.Value))
+            Dim span = If(horizontal, genHeight, genWidth)
+            If periods > span Then periods = span
+
+            Dim key = methodName + "|" + CStr(periods) + "|" + CStr(horizontal) + "|" + CStr(genWidth) + "x" + CStr(genHeight)
+            If key <> cacheKey Then
+                Dim parameters As New SinusoidalPatternParams()
+                parameters.Width = genWidth
+                parameters.Height = genHeight
+                parameters.NumberOfPeriods = periods
+                parameters.ShiftValue = CSng(2 * Math.PI / 3)
+                parameters.Method = method
+                parameters.Horizontal = horizontal
+                parameters.SetMarkers = False
+                parameters.PixelsBetweenMarkers = 56
+
+                If sinus IsNot Nothing Then sinus.Dispose()
+                sinus = SinusoidalPattern.Create(parameters)
+                patternImages = sinus.Generate()
+                ' The phase destination has to be empty on every call.
+                phaseMap = New Mat()
+                shadowMask = New Mat()
+                sinus.ComputePhaseMap(patternImages, phaseMap, shadowMask, emptyMat)
+                cacheKey = key
+            End If
+
+            If patternImages Is Nothing OrElse patternImages.Length = 0 Then Exit Sub
+
+            Dim index As Integer = Math.Min(indexSlider.Value, patternImages.Length - 1)
+            Dim patternView = FitTo(patternImages(index), dst2.Size)
+            CvtColor(patternView, dst2, ColorConversionCodes.GRAY2BGR)
+
+            Dim phase8u As New Mat
+            Normalize(FitTo(phaseMap, dst3.Size), phase8u, 0, 255, NormTypes.MinMax)
+            phase8u.ConvertTo(phase8u, MatType.CV_8U)
+            ApplyColorMap(phase8u, dst3, ColormapTypes.Jet)
+            If shadowMask.Empty = False Then
+                Dim shadowView = FitTo(shadowMask, dst3.Size)
+                dst3.SetTo(0, shadowView.Equals(0))
+            End If
+
+            labels(2) = "Pattern " + CStr(index + 1) + " of " + CStr(patternImages.Length) +
+                        "  periods=" + CStr(periods) + If(horizontal, "  horizontal", "  vertical")
+            labels(3) = methodName + " wrapped phase map"
+        End Sub
+        Private Function DftSize(requested As Integer) As Integer
+            Return GetOptimalDFTSize(Math.Max(requested, 42))
+        End Function
+        Private Function FitTo(src As Mat, size As cv.Size) As Mat
+            If src.Size = size Then Return src
+            If src.Width >= size.Width AndAlso src.Height >= size.Height Then
+                Return src(New cv.Rect(0, 0, size.Width, size.Height))
+            End If
+            Dim fitted As New Mat
+            Resize(src, fitted, size)
+            Return fitted
+        End Function
     End Class
 End Namespace

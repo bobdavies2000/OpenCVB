@@ -489,7 +489,7 @@ Namespace VBClasses
             plotY.Run(src)
             dst3 = plotY.dst2.Clone
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(1) = "xDelta (pixels) =" + xDelta.ToString(fmt3)
                 labels(3) = "yDelta (pixels) =" + yDelta.ToString(fmt3)
             End If

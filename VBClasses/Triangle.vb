@@ -209,7 +209,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 srcPoints = New List(Of Point2f)(options.srcPoints)
             Else
                 If srcPoints.Count < 3 Then Exit Sub ' not enough points

@@ -30,12 +30,12 @@ Namespace VBClasses
                     task.quarter(i) = True
                 End If
             Next
-            If task.heartBeat Then ReDim task.quarter(4)
-            If task.heartBeat Then task.heartbeatFrame = task.frameCount
+            if heartbeatx() then  ReDim task.quarter(4)
+            if heartbeatx() then  task.heartbeatFrame = task.frameCount
 
             If task.frameCount = 1 Then task.heartBeat = True
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 task.heartBeatCount += 1
                 If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
             End If

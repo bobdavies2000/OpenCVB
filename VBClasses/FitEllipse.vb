@@ -14,7 +14,7 @@ Namespace VBClasses
             desc = "Use FitEllipse OpenCV API to draw around a set of points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             If standaloneTest() Then
                 options.Run()
                 inputPoints = options.srcPoints
@@ -52,7 +52,7 @@ Namespace VBClasses
             desc = "Use FitEllipse_AMS to draw around a set of points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             If standaloneTest() Then
                 options.Run()
                 inputPoints = options.srcPoints
@@ -97,7 +97,7 @@ Namespace VBClasses
             desc = "Use FitEllipse to draw around a set of points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             options.Run()
             Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
 
@@ -141,7 +141,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             SetTrueText(strOut, 3)
 
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
 
             redC.Run(src)
             dst2 = redC.dst2

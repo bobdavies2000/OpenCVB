@@ -66,24 +66,20 @@ Namespace VBClasses
             If saveSelection <> task.fOptions.EdgeMethods.Text Then
                 saveSelection = task.fOptions.EdgeMethods.Text
                 Select Case task.fOptions.EdgeMethods.Text
-                    Case "Canny"
+                    Case "Edge_Canny"
                         edges = New Edge_Canny
                     Case "Scharr"
                         edges = New XR_Edge_Scharr
-                    Case "Binarized Reduction"
+                    Case "Edge_BinarizedReduction"
                         edges = New Edge_BinarizedReduction
-                    Case "Binarized Sobel"
+                    Case "Bin4Way_Sobel"
                         edges = New Bin4Way_Sobel
-                    Case "Sobel"
-                        edges = New Edge_SobelNaive
-                    Case "Color Gap"
-                        edges = New XR_Edge_ColorGap_CPP
-                    Case "Deriche"
-                        edges = New Edge_Deriche_CPP
-                    Case "Laplacian"
+                    Case "Edge_Sobel"
+                        edges = New Edge_Sobel
+                    Case "EdgeLine_Basics"
+                        edges = New EdgeLine_Basics
+                    Case "Edge_Laplacian"
                         edges = New Edge_Laplacian
-                    Case "Resize and Add"
-                        edges = New Edge_ResizeAdd
                 End Select
             End If
             edges.run(src)
@@ -1173,9 +1169,16 @@ Namespace VBClasses
 
             canny.Run(LRMeanSub.dst2)
 
-            If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motion.motionMask)
+            If task.optionsChanged Then
+                dst2 = canny.dst2.Clone
+            Else
+                canny.dst2.CopyTo(dst2, task.motion.motionMask)
+            End If
 
-            If standaloneTest() Then dst3 = task.edges.dst2 - dst2
+            If standaloneTest() Then
+                dst3 = task.edges.dst2 - dst2
+                labels(3) = "Diff of mean subtraction canny image and normal canny"
+            End If
         End Sub
     End Class
 
@@ -1473,7 +1476,7 @@ Namespace VBClasses
 
             diff.lastFrame = dst2
             diff.Run(dst1)
-            diff.dst2.ConvertTo(dst3, MatType.CV_8U)
+            dst3 = diff.dst2
 
             labels(2) = "Accumulated edges over " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames."
         End Sub

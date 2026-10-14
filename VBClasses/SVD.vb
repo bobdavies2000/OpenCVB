@@ -59,7 +59,7 @@ Namespace VBClasses
             If redC.rcList.Count = 0 Then Exit Sub
             SetTrueText(redC.strOut, 1)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Dim m = Cv2.Moments(rc.mask, True)
                 Dim center = New Point2f(m.M10 / rc.pixels, m.M01 / rc.pixels)
                 Circle(task.color(rc.rect), center, task.DotSize, task.highlight, -1, task.lineType)

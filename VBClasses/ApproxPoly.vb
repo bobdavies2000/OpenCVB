@@ -14,7 +14,7 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                If task.heartBeat Then rotatedRect.Run(src)
+                If heartbeatX() Then rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
             End If
 

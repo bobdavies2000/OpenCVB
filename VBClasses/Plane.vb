@@ -177,7 +177,7 @@
 '            plane.Run(src)
 
 '            dst2 = plane.dst2
-'            If task.heartBeat Then addW.src2.SetTo(0)
+'            if heartbeatx() then  addW.src2.SetTo(0)
 
 '            Dim flatCount = 0
 '            For Each rc In plane.redC.rcList
@@ -309,7 +309,7 @@
 
 '            If count(index) > plane.equations.Count / 4 Then
 '                If kalman Is Nothing Then kalman = New Kalman_Basics
-'                If task.heartBeat Then
+'                if heartbeatx() then 
 '                    With kalman
 '                        .kInput = {pt(0), pt(1), pt(2), pt(3)}
 '                        .Run(src)
@@ -424,7 +424,7 @@
 '                Next
 '            End If
 
-'            If task.heartBeat Or needOutput Then
+'            If heartbeatx() Or needOutput Then
 '                ptList2D.Clear()
 '                equations.Clear()
 '                needOutput = False
@@ -572,7 +572,7 @@
 '                rc.eq = New Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
 '            End If
 '            If dotlist.Count Then
-'                If task.heartBeat Then
+'                if heartbeatx() then 
 '                    justEquation = rc.eq(0).ToString(fmt3) + "*X + " + rc.eq(1).ToString(fmt3) + "*Y + "
 '                    justEquation += rc.eq(2).ToString(fmt3) + "*Z + " + rc.eq(3).ToString(fmt3) + vbCrLf
 '                    If xList.Count > 0 Then

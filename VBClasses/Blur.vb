@@ -239,7 +239,7 @@ Namespace VBClasses
             myhist.Run(blurB.dst2)
             dst3 = myhist.dst2
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 If kernelSlider.value >= kernelSlider.maximum Then kernelSlider.value = 1
                 kernelSlider.value += 2
                 labels(3) = "Blur kernel size = " + CStr(kernelSlider.value)
@@ -367,7 +367,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             mblur.options.Run()
 
-            If task.heartBeat Then mblur.options.redoCheckBox.Checked = True
+            If heartbeatX() Then mblur.options.redoCheckBox.Checked = True
             If mblur.options.redoCheckBox.Checked Then
                 mblur.Run(src)
                 mblur.options.showDirection = False

@@ -20,7 +20,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lastDepth As Mat = task.pcSplit(2).Clone
-            If task.heartBeat Then
+            if heartbeatx() then 
                 pointcloud = task.pointCloud.Clone
             Else
                 task.pointCloud.CopyTo(pointcloud, task.motion.motionMask)
@@ -31,7 +31,7 @@ Namespace VBClasses
             Dim accumDepth As New Mat
             Min(pcSplit(2), lastDepth, accumDepth)
 
-            If task.heartBeat = False Then
+            If heartbeatX() = False Then
                 dst3 = updateXY(lastDepth, accumDepth)
                 task.pointCloud.CopyTo(pointcloud, dst3)
             End If
@@ -77,7 +77,7 @@ Namespace VBClasses
             End If
 
             Dim accumDepth As New Mat
-            If task.heartBeat Then
+            if heartbeatx() then 
                 pcSplit(2).CopyTo(lastDepth)
                 pcSplit(2).CopyTo(accumDepth)
             Else

@@ -13,7 +13,7 @@ Namespace VBClasses
             Dim depth = task.pcSplit(2).Clone
             depth.SetTo(task.MaxZmeters, task.noDepthMask)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Threshold(depth, depth, task.MaxZmeters + 0.001, task.MaxZmeters, cv.ThresholdTypes.Binary)
                 Dim columnVector = depth.Reshape(1, depth.Rows * depth.Cols)
                 Dim labelsMat As New Mat
@@ -40,7 +40,7 @@ Namespace VBClasses
 
                 labels(2) = "Foreground depth < " + splitValue.ToString(fmt3) + "m" + respectiveMeans
                 labels(3) = "Background depth >= " + splitValue.ToString(fmt3) + "m"
-                If task.heartBeat Then
+                if heartbeatx() then 
                     strOut = "splitValue = " + splitValue.ToString(fmt3) + "m" + vbCrLf +
                                  "fgMean = " + fgMean.ToString(fmt3) + "m" + vbCrLf +
                                  "bgMean = " + bgMean.ToString(fmt3) + "m"
@@ -70,7 +70,7 @@ Namespace VBClasses
             desc = "Create a histogram of depth and find foreground as X% of points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Or hist.histogram.Total = 0 Then
+            If heartbeatX() Or hist.histogram.Total = 0 Then
                 Threshold(task.pcSplit(2), dst1, task.MaxZmeters, 255, ThresholdTypes.BinaryInv)
                 ConvertScaleAbs(dst1, dst1)
                 dst1.SetTo(0, task.noDepthMask)

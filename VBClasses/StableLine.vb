@@ -56,10 +56,10 @@ Namespace VBClasses
                 WarpAffine(src, dst2, M, src.Size(), InterpolationFlags.Cubic)
                 lpLast = lp
             Else
-                If task.heartBeat Then dst2 = src.Clone
+                if heartbeatx() then  dst2 = src.Clone
             End If
 
-            If task.heartBeat Then lpLast = lp
+            if heartbeatx() then  lpLast = lp
 
             labels(2) = "Image after rotation by " + rotateAngle.ToString(fmt3) + " degrees.  Move camera to see impact."
         End Sub
@@ -116,6 +116,7 @@ Namespace VBClasses
     Public Class XR_StableLine_Lines : Inherits TaskParent
         Public basics As New XR_FeatureMap_StablePoints
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the line end points found in the BGR image and keep those that are stable."
         End Sub

@@ -44,7 +44,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = i18(index)
                 index += 1
                 If index >= i18.Count Then index = 0
@@ -259,7 +259,7 @@ Namespace VBClasses
             Return outstr
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 cell.input = New Mat(New Size(src.Width / 4, src.Height / 4), MatType.CV_8UC1, 0)
                 cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
 

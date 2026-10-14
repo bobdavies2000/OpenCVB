@@ -153,7 +153,7 @@ Namespace VBClasses
             Dim trackCount = Math.Min(track.Length, lpList.Count)
             dst2 = src
             For i = 0 To trackCount - 1
-                If task.heartBeat Then
+                if heartbeatx() then 
                     Dim gridIndex = task.gridMap.Get(Of Integer)(lpList(i).p1.Y, lpList(i).p1.X)
                     track(i).inputRect = task.gridNabeRects(gridIndex)
                 End If

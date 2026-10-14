@@ -123,7 +123,7 @@ Namespace VBClasses
             desc = "Compute the distance in meters between 3D points in the cv.Point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() And heartbeatX() Then
                 inPoint1 = New Point3f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, 10000))
                 inPoint2 = New Point3f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height), task.msRNG.Next(0, 10000))
 
@@ -175,7 +175,7 @@ Namespace VBClasses
             distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
             strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + distance.ToString(fmt1)
-            If standalone And task.heartBeat Then SetTrueText(strOut, New cv.Point(10, 10), 2)
+            If standalone And heartbeatX() Then SetTrueText(strOut, New cv.Point(10, 10), 2)
         End Sub
     End Class
 
@@ -330,7 +330,7 @@ Namespace VBClasses
             desc = "Distance algorithm for the regions with no depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat = False Then Exit Sub
+            If heartbeatX() = False Then Exit Sub
             labeller.Run(task.noDepthMask)
             dst2 = labeller.dst2
             dst3 = labeller.dst3
@@ -514,7 +514,7 @@ Namespace VBClasses
 
     Public Class XR_Distance_Contour : Inherits TaskParent
         Dim options As New Options_Distance
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New Contour_Finder
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
             If standalone Then task.gOptions.showMyDst1.Checked = True

@@ -120,7 +120,7 @@ Namespace VBClasses
             Dim labeled = 1
             Dim nonlabel = -1
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
@@ -186,7 +186,7 @@ Namespace VBClasses
             Dim labeled = 1
             Dim nonlabel = -1
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
@@ -248,7 +248,7 @@ Namespace VBClasses
                 rect.Width = width
             End If
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(0)
                 blueCount = 0
                 svm.points.Clear()

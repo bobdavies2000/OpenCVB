@@ -74,7 +74,7 @@ Namespace VBClasses
                 Circle(dst2, c, task.DotSize, plotColors(i), -1, task.lineType)
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, 1)
             End If
 
@@ -244,7 +244,7 @@ Namespace VBClasses
 
             If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Line(dst2, New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
             End If
 

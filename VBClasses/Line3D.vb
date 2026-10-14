@@ -34,7 +34,7 @@ Namespace VBClasses
 
             lines3DMat = Mat.FromPixelData(lines3D.Count / 2, 1, MatType.CV_32FC3, lines3D.ToArray)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = CStr(lines3D.Count / 2) + " 3D lines are prepared in lines3D." + vbCrLf +
                              CStr(task.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
             End If

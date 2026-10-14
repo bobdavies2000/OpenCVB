@@ -11,7 +11,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() And task.heartBeat And options.hMethod = HomographyMethods.None Then
+            If standaloneTest() And heartbeatX() And options.hMethod = HomographyMethods.None Then
                 random.Run(src)
                 corners1 = New List(Of Point2d)(random.PointList)
                 random.Run(src)

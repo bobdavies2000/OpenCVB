@@ -371,7 +371,7 @@ Namespace VBClasses
             If task.optionsChanged Then strList.Clear()
 
             ' only check no more than once a heartbeat..
-            If task.heartBeat Then
+            if heartbeatx() then 
 
                 Dim nextMsg As String
                 motionPlot.Run(task.gray.Clone)

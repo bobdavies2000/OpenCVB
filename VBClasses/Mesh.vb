@@ -54,9 +54,9 @@ Namespace VBClasses
             feat.Run(task.gray)
 
             dst2 = src
-            If task.heartBeat And standaloneTest() Then
+            If heartbeatX() And standaloneTest() Then
                 ptList.Clear()
-                For Each pt In feat.ptList
+                For Each pt In feat.ptlist
                     ptList.Add(pt)
                 Next
             End If

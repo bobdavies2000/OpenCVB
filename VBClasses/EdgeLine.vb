@@ -43,7 +43,7 @@ Namespace VBClasses
             rcList.Add(New rcData)
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
-                Dim mask = idMap(rects(i))
+                Dim mask = idMap(ValidateRect(rects(i)))
                 Dim rc = New rcData(mask, ValidateRect(rects(i)), index)
 
                 rcList.Add(rc)
@@ -272,7 +272,7 @@ Namespace VBClasses
             handleMask.Free()
 
             dst2 = Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8U, imagePtr)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines found while " +
                                             CStr(EdgeLine_GetSegCount(cPtr)) + " edge/lines were found on the current image."
                 labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."

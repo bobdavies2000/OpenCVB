@@ -16,7 +16,7 @@ Namespace VBClasses
 
             If task.optionsChanged Then bins = task.histogramBins
             Dim barWidth = dst2.Width / bins
-            If task.heartBeat Then
+            if heartbeatx() then 
                 If plotHist.histArray IsNot Nothing Then
                     For i = plotHist.histArray.Length - 1 To 0 Step -1
                         If plotHist.histArray(i) > 0 Then

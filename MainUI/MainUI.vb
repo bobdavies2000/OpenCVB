@@ -484,39 +484,6 @@ Namespace MainApp
 
             optionsForm.Dispose()
         End Sub
-        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            vbc.task.MainUI_Algorithm.Dispose()
-
-            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
-                        Format(vbc.task.fpsAlgorithm, "0") + "/" + Format(vbc.task.fpsCamera, "0"))
-
-            Static lastTime As DateTime = Now
-            Dim timeNow As DateTime = Now
-            Static lastWriteTime As DateTime = timeNow
-
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
-
-            lastWriteTime = timeNow
-            If fpsWriteCount = 5 Then
-                Debug.WriteLine("")
-                fpsWriteCount = 0
-            End If
-            fpsWriteCount += 1
-
-            ' the SharpGL code is not careful about releasing GDI handles.
-            Dim index = AvailableAlgorithms.SelectedIndex + 1
-            If AvailableAlgorithms.Items.Count <= index Then index = 0
-            If AvailableAlgorithms.Items(index) = " " Then index += 1
-            While AvailableAlgorithms.Items(index).StartsWith("GL_") Or
-                AvailableAlgorithms.Items(index).StartsWith("NR_GL_") Or
-                AvailableAlgorithms.Items(index).StartsWith("ImShow_")
-                index += 1
-            End While
-            Debug.WriteLine(vbCrLf + "Usage GDI/USER: " & CStr(GdiMonitor.GetGdiCount()) + "/" & CStr(GdiMonitor.GetUserCount()))
-
-            AvailableAlgorithms.SelectedIndex = index
-        End Sub
         Private Sub StartStopTask()
             isPlaying = Not isPlaying
 
@@ -543,6 +510,44 @@ Namespace MainApp
         Private Sub PixelViewer_Click(sender As Object, e As EventArgs) Handles PixelViewer.Click
             PixelViewer.Checked = Not PixelViewer.Checked
             vbc.task.pixelViewerOn = PixelViewer.Checked
+        End Sub
+        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            task.MainUI_Algorithm.Dispose()
+
+            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
+                        Format(task.fpsAlgorithm, "0") + "/" + Format(vbc.task.fpsCamera, "0"))
+
+            Static lastTime As DateTime = Now
+            Dim timeNow As DateTime = Now
+            Static lastWriteTime As DateTime = timeNow
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
+            lastWriteTime = timeNow
+            If fpsWriteCount = 5 Then
+                Debug.WriteLine("")
+                fpsWriteCount = 0
+            End If
+            fpsWriteCount += 1
+
+            ' the SharpGL code is not careful about releasing GDI handles.
+            Dim index = AvailableAlgorithms.SelectedIndex + 1
+            If AvailableAlgorithms.Items.Count <= index Then index = 0
+            If AvailableAlgorithms.Items(index) = " " Then index += 1
+            While AvailableAlgorithms.Items(index).StartsWith("GL_") Or
+                AvailableAlgorithms.Items(index).StartsWith("XR_")
+                AvailableAlgorithms.Items(index).StartsWith("ImShow_")
+
+                ' Yes, this looks like duplicate logic but it makes it easy to toggle.
+                ' uncomment this line to test the XR_ algorithms...
+                If AvailableAlgorithms.Items(index).StartsWith("XR_") Then Exit While
+                index += 1
+                If AvailableAlgorithms.Items.Count <= index Then index = 0
+            End While
+            Debug.WriteLine(vbCrLf + "Usage GDI/USER: " & CStr(GdiMonitor.GetGdiCount()) + "/" & CStr(GdiMonitor.GetUserCount()))
+
+            AvailableAlgorithms.SelectedIndex = index
         End Sub
     End Class
 End Namespace

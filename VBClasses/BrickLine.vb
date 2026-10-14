@@ -135,7 +135,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 dst2 = findCells.dst2.Clone
                 Dim debugMode = task.gOptions.DebugSlider.Value <> 0
                 For i = 0 To gapCells.Count - 1
@@ -159,6 +159,7 @@ Namespace VBClasses
     Public Class XR_BrickLine_DepthGaps : Inherits TaskParent
         Dim findCells As New XR_BrickLine_DepthGap
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
             desc = "Find cells that have a gap in depth from their neighbors."
@@ -184,6 +185,7 @@ Namespace VBClasses
     Public Class XR_BrickLine_Lines : Inherits TaskParent
         Dim findCells As New XR_BrickLine_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
             desc = "Find the cells containing lines."

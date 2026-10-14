@@ -10,7 +10,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If Not task.heartBeat Then Exit Sub
+                If Not heartbeatX() Then Exit Sub
                 options.Run()
                 inputPoints = Rectangle_EnclosingPoints.quickRandomPoints(options.numPoints)
             End If

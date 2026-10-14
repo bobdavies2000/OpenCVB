@@ -332,9 +332,9 @@ Namespace VBClasses
 
     Public Class XR_BrickPoint_ContourCompare : Inherits TaskParent
         Dim fLess As New XR_BrickPoint_FeatureLess
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
-            desc = "Compare XR_Contour_BasicsOld to XR_BrickPoint_FeatureLess"
+            desc = "Compare Contour_Finder to XR_BrickPoint_FeatureLess"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(src)
@@ -354,7 +354,7 @@ Namespace VBClasses
 
     Public Class XR_BrickPoint_FeatureLess : Inherits TaskParent
         Public classCount As Integer
-        Public contours As New XR_Contour_BasicsOld
+        Public contours As New XR_Contour_Finder
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)  ' mask for the featureless regions.
             desc = "Identify each grid square as part of a contour or not."
@@ -380,6 +380,7 @@ Namespace VBClasses
         Dim knn As New KNN_Basics
         Public lplist As New List(Of lpData)
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Join the 2 nearest points to each grid square cv.Point to help find lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -587,7 +588,7 @@ Namespace VBClasses
                 dst3 = Not dst3
             End If
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 Dim flessCount = task.gridRects.Count - featureBricks.Count
                 labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
             End If

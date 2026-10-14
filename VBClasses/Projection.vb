@@ -50,7 +50,7 @@ Namespace VBClasses
             End If
             objectList.Clear()
             Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
-            If task.heartBeat Then strOut = ""
+            if heartbeatx() then  strOut = ""
             For Each rc In rclist
                 If rc.id = 0 Then Continue For
                 If viewType = "Side" Then
@@ -65,13 +65,13 @@ Namespace VBClasses
                     z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
                 End If
                 objectList.Add(New Vec4f(xy1, xy2, z1, z2))
-                If task.heartBeat Then
+                if heartbeatx() then 
                     strOut += "Object " + vbTab + CStr(rc.id) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
                                                z1.ToString(fmt1) + "m " + " to " + z2.ToString(fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
                 End If
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Dim check1 = Sum(src)(0)
                 Dim depthCount = CountNonZero(task.pcSplit(2))
                 strOut += "Sum above   " + vbTab + CStr(check2) + " pixels" + " (losses from histogram ranges?)" + vbCrLf
@@ -108,7 +108,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst1.SetTo(0)
                 dst3.SetTo(0)
             End If

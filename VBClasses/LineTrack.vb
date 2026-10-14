@@ -120,7 +120,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center "
                 labels(3) = CStr(lpMatches.Count) + " lines matched."
             End If
@@ -139,6 +139,7 @@ Namespace VBClasses
         Public diffX As Integer
         Public diffY As Integer
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Search for the requested line in the previous frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -181,6 +182,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Public correlation As Single
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Correlation measures how similar the previous template is to the current one."
             desc = "Concatenate the end cv.Point templates to return a single correlation to the previous frame."
@@ -229,10 +231,11 @@ Namespace VBClasses
         Public p1Correlation As Single
         Public p2Correlation As Single
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Compare area around end points of a line to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.heartBeat Then lpInput = task.lines.lpList(0)
+            If standalone And heartbeatX() Then lpInput = task.lines.lpList(0)
             Static lastImage = task.gray.Clone
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X)
@@ -388,7 +391,7 @@ Namespace VBClasses
 
             Dim inputPoints() As Point2f = {lpInput1.p1, lpInput1.p2, lpInput2.p1, lpInput2.p2}
             rotatedRect = MinAreaRect(inputPoints)
-            If standalone And task.heartBeat Then
+            If standalone And heartbeatX() Then
                 dst2.SetTo(0)
                 For Each pt In inputPoints
                     Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
@@ -414,6 +417,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Public options As New Options_LineRect
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -452,7 +456,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
                 labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
             End If
@@ -469,6 +473,7 @@ Namespace VBClasses
         Public options As New Options_LineRect
         Dim bricks As New Brick_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -493,7 +498,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(depthLines) + " external lines found with gaps in depth."
                 labels(3) = CStr(colorLines) + " internal lines found with similar depth on both sides"
             End If
@@ -518,7 +523,7 @@ Namespace VBClasses
 
             Static lastImage = task.gray.Clone
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 lpList.Clear()
                 For i = 0 To Math.Min(3, task.lines.lpList.Count) - 1
                     lpList.Add(task.lines.lpList(i))
@@ -633,6 +638,7 @@ Namespace VBClasses
 
     Public Class XR_LineTrack_Changes : Inherits TaskParent
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(2) = "Move camera or wave at camera to see the impact on the lines."
             labels(3) = "Current lines.  dst2 is the difference between lines in current vs. previous image."
             desc = "Track the changes in the lines."
@@ -696,6 +702,7 @@ Namespace VBClasses
         Dim match1 As New Match_Basics
         Dim match2 As New Match_Basics
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Compare area around end points of a line to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -840,6 +847,7 @@ Namespace VBClasses
         Public roll As Single
         Public yaw As Single
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Measure the camera motion using Line_Basics results"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -913,7 +921,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             triangle.Run(src)
 
-            If task.heartBeat Or task.optionsChanged Then
+            If heartbeatX() Or task.optionsChanged Then
                 warper.baselineRoll = task.accRadians.Z
                 warper.baselinePitch = task.accRadians.X
             End If

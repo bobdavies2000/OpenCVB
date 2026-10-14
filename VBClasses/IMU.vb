@@ -49,7 +49,7 @@ Namespace VBClasses
             noCameraMotion = Math.Abs(lastAcc.X - task.accRadians.X) < 0.02F And Math.Abs(lastAcc.Y - task.accRadians.Y) < 0.02F
             lastAcc = task.accRadians
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = "verticalize=" + task.verticalizeAngle.ToString(fmt2) + " deg  stable=" + CStr(noCameraMotion)
             End If
         End Sub
@@ -655,7 +655,7 @@ Namespace VBClasses
             If IMUtoCaptureEstimate < options.minDelayIMU Then IMUtoCaptureEstimate = options.minDelayIMU
 
             Static sampledIMUFrameTime = task.IMU_FrameTime
-            If task.heartBeat Then sampledIMUFrameTime = task.IMU_FrameTime
+            if heartbeatx() then  sampledIMUFrameTime = task.IMU_FrameTime
 
             histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
@@ -723,7 +723,7 @@ Namespace VBClasses
             Static sampledIMUDelay = imu.IMUtoCaptureEstimate
             Static sampledTotalDelay = totaldelay
             Static sampledSmooth = kalman.stateResult
-            If task.heartBeat Then
+            if heartbeatx() then 
                 sampledCPUDelay = host.HostInterruptDelayEstimate
                 sampledIMUDelay = imu.IMUtoCaptureEstimate
                 sampledTotalDelay = totaldelay
@@ -985,7 +985,7 @@ Namespace VBClasses
             dst2 = plot.dst2
             dst3 = plot.dst3
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Pitch X1000 (blue): " + vbTab + (task.pitchIMU * 1000).ToString(fmt1) + vbCrLf +
                          "Yaw X1000 (green): " + vbTab + (task.yawIMU * 1000).ToString(fmt1) + vbCrLf +
                          "Roll X1000 (red): " + vbTab + (task.rollIMU * 1000).ToString(fmt1)
@@ -1012,7 +1012,7 @@ Namespace VBClasses
             task.pitchIMU = task.IMU_AngularVelocity.X
             task.yawIMU = task.IMU_AngularVelocity.Y
             task.rollIMU = task.IMU_AngularVelocity.Z
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = "Pitch X1000 (blue): " + vbTab + (task.pitchIMU * 1000).ToString(fmt1) + vbCrLf +
                      "Yaw X1000 (green): " + vbTab + (task.yawIMU * 1000).ToString(fmt1) + vbCrLf +
                      "Roll X1000 (red): " + vbTab + (task.rollIMU * 1000).ToString(fmt1)
@@ -1064,7 +1064,7 @@ Namespace VBClasses
             If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
             Static sampledCPUFrameTime = task.CPU_FrameTime
-            If task.heartBeat Then sampledCPUFrameTime = task.CPU_FrameTime
+            if heartbeatx() then  sampledCPUFrameTime = task.CPU_FrameTime
 
             hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
@@ -1130,7 +1130,7 @@ Namespace VBClasses
             If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
             Static sampledCPUFrameTime = task.CPU_FrameTime
-            If task.heartBeat Then sampledCPUFrameTime = task.CPU_FrameTime
+            if heartbeatx() then  sampledCPUFrameTime = task.CPU_FrameTime
 
             If standaloneTest() Then
                 strOut = "IMU_TimeStamp (ms) " + task.IMU_TimeStamp.ToString("00") + vbCrLf +

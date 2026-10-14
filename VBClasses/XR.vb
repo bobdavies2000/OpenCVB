@@ -627,7 +627,7 @@ Namespace VBClasses
             desc = "Find all the points where depth X-component transitions from positive to negative"
         End Sub
         Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
             End If
 
@@ -959,7 +959,7 @@ Namespace VBClasses
             desc = "Identify and track the lines in an image as RedCloud Cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
             Dim index As Integer
             For Each lp In task.lines.lpList
                 Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -1360,13 +1360,12 @@ Namespace VBClasses
             dst1 = flood.dst2
             dst2 = flood.dst3
 
-            Dim labelMap = flood.dst1
-            Dim mm = GetMinMax(labelMap)
+            Dim mm = GetMinMax(flood.idMap)
             rcList.Clear()
             idMap.SetTo(0)
             For label = 1 To CInt(mm.maxVal)
                 Dim cellMask As New Mat
-                InRange(labelMap, label, label, cellMask)
+                InRange(flood.idMap, label, label, cellMask)
                 If CountNonZero(cellMask) = 0 Then Continue For
                 Dim nz As New Mat
                 FindNonZero(cellMask, nz)
@@ -1481,7 +1480,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
             Dim count As Integer
             For Each rc In redC.rcList
                 If rc.pixels <= task.gOptions.DebugSlider.Value Then
@@ -2051,7 +2050,7 @@ Namespace VBClasses
                 'End If
             Next
             motionPercent = 100 * motionCount / linkedCount
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = fcs.labels(2)
                 labels(3) = motionPercent.ToString(fmt1) + "% of linked cells had motion or " +
                             CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +

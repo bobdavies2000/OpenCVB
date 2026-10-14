@@ -63,7 +63,7 @@ Namespace VBClasses
             desc = "Yellow line shows the ground truth used to create random points.  Add more points to match the ground truth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat = False Then Exit Sub
+            If heartbeatX() = False Then Exit Sub
             noisyLine.Run(src)
             dst2 = noisyLine.dst2
             Dim pointCount = noisyLine.eigen3D.PointList.Count
@@ -94,8 +94,10 @@ Namespace VBClasses
             eigenInput(2) = eigenInput(1)
 
             Dim vec4f As New List(Of Point2f)
-            vec4f.Add(New Point2f(eigenInput(0), eigenInput(1)))
-            vec4f.Add(New Point2f(eigenInput(2), eigenInput(3)))
+            Dim ptx1 = New Point2f(eigenInput(0), eigenInput(1))
+            Dim ptx2 = New Point2f(eigenInput(2), eigenInput(3))
+            vec4f.Add(ptx1)
+            vec4f.Add(ptx2)
 
             Dim D = Mat.FromPixelData(2, 2, MatType.CV_32FC1, vec4f.ToArray)
             Eigen(D, eigenVal, eigenVec)
@@ -176,7 +178,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standalone And task.heartBeat = False Then Exit Sub
+            If standalone And heartbeatX() = False Then Exit Sub
             dst2.SetTo(0)
             Dim width = src.Width, height = src.Height, depth = src.Height
 

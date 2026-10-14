@@ -48,7 +48,7 @@ Namespace VBClasses
             desc = "Reset the image on every heartbeat"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 feat.Run(task.gray)
                 dst2 = feat.dst2
                 labels(2) = feat.labels(2)
@@ -85,7 +85,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim graySrc = If(src.Channels = 1, src, task.gray)
 
-            If task.optionsChanged Or task.heartBeat Then
+            If heartbeatX() Then
                 warper.baselineRoll = task.accRadians.Z
                 warper.baselinePitch = task.accRadians.X
             End If

@@ -137,7 +137,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim imagePtr = KMeans_MultiGaussian_RunCPP(cPtr, src.Rows, src.Cols)
-            If imagePtr <> 0 And task.heartBeat Then dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone()
+            If imagePtr <> 0 And heartbeatX() Then dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, imagePtr).Clone()
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = KMeans_MultiGaussian_Close(cPtr)
@@ -164,7 +164,7 @@ Namespace VBClasses
                 Static randslider = OptionParent.FindSlider("Random Pixel Count")
                 If task.firstPass Then randslider.Value = 50
                 If randslider.Value < k Then randslider.Value = k
-                If task.heartBeat Then random.Run(src)
+                if heartbeatx() then  random.Run(src)
 
                 Dim input As New List(Of Single)
                 For Each pt In random.PointList
@@ -328,7 +328,7 @@ Namespace VBClasses
                 masks.Add(mask)
                 counts.Add(CountNonZero(mask))
             Next
-            If task.heartBeat Then maskIndex += 1
+            if heartbeatx() then  maskIndex += 1
             If maskIndex >= masks.Count Then maskIndex = 0
             dst3 = masks(maskIndex)
         End Sub
@@ -496,7 +496,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
-            If task.heartBeat Then
+            if heartbeatx() then 
                 plot1D.Run(src)
                 dst3 = plot1D.dst2
                 labels(3) = "The 3D histogram of the RGB image stream in 1D - note the number of gaps"
@@ -527,7 +527,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
             If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-            If task.heartBeat Then
+            if heartbeatx() then 
                 plot1D.Run(src)
                 dst3 = plot1D.dst2
                 labels(3) = "The 3D histogram of the depth stream in 1D"

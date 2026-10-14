@@ -200,7 +200,7 @@ Namespace VBClasses
             desc = "Find the valleys in the depth histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 valley.Run(src)
                 dst2 = valley.dst2
 
@@ -330,7 +330,7 @@ Namespace VBClasses
             desc = "Isolate the different levels of gray using the histogram valleys."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 kalman.Run(src)
                 dst2 = kalman.dst2
                 histogram = kalman.hist.histogram.Clone
@@ -473,7 +473,7 @@ Namespace VBClasses
             desc = "Display the depth as tiers defined by the depth valleys in the histogram of depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             valleys.Run(src)
 
             dst2.SetTo(0)
@@ -506,7 +506,7 @@ Namespace VBClasses
             desc = "Find the histogram valleys for each of the colors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then splitIndex = (splitIndex + 1) Mod 3
+            if heartbeatx() then  splitIndex = (splitIndex + 1) Mod 3
             Dim nextChan As New Mat
             ExtractChannel(src, nextChan, splitIndex)
             hist.hist.plotHist.backgroundColor = Choose(splitIndex + 1, Scalar.Blue, Scalar.Green, Scalar.red)
@@ -650,7 +650,7 @@ Namespace VBClasses
             Dim histogram As New Mat
             CalcHist({src}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
 
-            If standaloneFlag And task.heartBeat Then
+            If standaloneFlag And heartbeatX() Then
                 plot.Run(histogram)
                 histogram = plot.histogram ' reflect any updates to the 0 entry...  
                 dst2 = plot.dst2
@@ -673,17 +673,17 @@ Namespace VBClasses
                     state = True
                     Dim p1 = New cv.Point(i * incr, 0)
                     Dim p2 = New cv.Point(i * incr, dst2.Height)
-                    If standaloneFlag And task.heartBeat Then Line(dst2, p1, p2, Scalar.white, task.lineWidth)
+                    If standaloneFlag And heartbeatX() Then Line(dst2, p1, p2, Scalar.White, task.lineWidth)
                 ElseIf state = True And count < threshold Then
                     state = False
                 End If
             Next
 
-            If standaloneFlag And task.heartBeat Then
+            If standaloneFlag And heartbeatX() Then
                 Dim y = dst2.Height * (maxVal - threshold) / maxVal
-                Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.white, task.lineWidth)
+                Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.White, task.lineWidth)
             End If
-            If task.heartBeat Then strOut = CStr(classCount) + " depth classes were found - " +
+            If heartbeatx() then  strOut = CStr(classCount) + " depth classes were found - " +
                                             "marked by vertical lines."
             SetTrueText(strOut, 3)
 

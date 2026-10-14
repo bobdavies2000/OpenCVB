@@ -32,7 +32,7 @@ Namespace VBClasses
             End If
             dst2 = entropy.dst2
             Rectangle(dst2, task.drawRect, white, task.lineWidth)
-            If task.heartBeat Then strOut = "Click anywhere to measure the entropy with cv.Rect(pt.x, pt.y, " +
+            if heartbeatx() then  strOut = "Click anywhere to measure the entropy with cv.Rect(pt.x, pt.y, " +
                                                  CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                                  entropy.entropyVal.ToString(fmt1) + vbCrLf + entropy.strOut
             SetTrueText(strOut, 3)

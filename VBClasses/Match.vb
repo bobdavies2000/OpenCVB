@@ -154,7 +154,7 @@ Namespace VBClasses
             If correlation > maxCorrelation Then maxCorrelation = correlation
             If standaloneTest() Then
                 dst2.SetTo(0)
-                If task.heartBeat Then
+                If heartbeatX() Then
                     labels(2) = "For " + CStr(template.Cols) + " test samples correlation = " + correlation.ToString(fmt2)
                 End If
                 flow.nextMsg = "Correlation = " + correlation.ToString("#,##0.00")
@@ -244,7 +244,7 @@ Namespace VBClasses
             dst3 = redC.dst2
             labels(3) = redC.labels(2)
 
-            If task.heartBeat Then dst2.SetTo(0)
+            If heartbeatX() Then dst2.SetTo(0)
             If task.optionsChanged Then frameList.Clear()
 
             dst0.SetTo(0)
@@ -663,7 +663,10 @@ Namespace VBClasses
 
             If task.heartBeatLT Then
                 feat.Run(src)
-                ptLast = New List(Of cv.Point2f)(feat.ptlist)
+                ptLast.Clear()
+                For Each pt In feat.ptlist
+                    ptLast.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
                 lastM = Mat.Eye(2, 3, MatType.CV_64FC1)
             End If
 

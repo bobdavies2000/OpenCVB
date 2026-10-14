@@ -40,7 +40,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2.SetTo(Scalar.Black)
                 rectangles.Clear()
                 rotatedRectangles.Clear()
@@ -166,7 +166,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If task.heartBeat Then
+                if heartbeatx() then 
                     rotatedCheck.Enabled = task.toggleOn
                     countSlider.Value = task.msRNG.Next(2, 10)
                     labels(2) = "Input rectangles = " + CStr(countSlider.Value)

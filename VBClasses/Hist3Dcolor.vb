@@ -17,7 +17,7 @@ Namespace VBClasses
             options.Run()
 
             If src.Type <> MatType.CV_8UC3 Then src = task.color
-            If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
+            If heartbeatX() Or alwaysRun Or histogram.Width = 0 Then
                 Dim bins = options.histogram3DBins
                 CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
 
@@ -296,7 +296,7 @@ Namespace VBClasses
 
             diff.Run(hColor.dst2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
             dst3 = dst3 Or diff.dst2
         End Sub
     End Class

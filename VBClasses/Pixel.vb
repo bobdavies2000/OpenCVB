@@ -284,7 +284,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If vbc.task.heartBeat Then
+                If heartbeatX() Then
                     Dim w = 25, h = 25
                     If vbc.task.drawRect <> New cv.Rect Then
                         random.range = vbc.task.drawRect
@@ -670,7 +670,7 @@ Namespace VBClasses
 
             Dim maxRegion = 20
 
-            If vbc.task.heartBeat Then
+            If heartbeatX() Then
                 pixelVector.Clear()
                 strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
                 For Each rc In redC.rcList
@@ -739,7 +739,7 @@ Namespace VBClasses
             desc = "Resize the input to a small image, convert to gray, and map gray to color"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If vbc.task.heartBeat Then
+            If heartbeatX() Then
                 Dim nSize = New Size(src.Width / 8, src.Height / 8)
                 Resize(src, dst1, nSize)
                 Dim samples(dst1.Total - 1) As Vec3b
@@ -816,7 +816,7 @@ Namespace VBClasses
             dst2 = mapper.dst2
 
             Static myColorMap As Mat = mapper.colorMap.Clone
-            If vbc.task.heartBeat Then
+            If heartbeatX() Then
                 Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
                 Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
@@ -874,7 +874,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If vbc.task.heartBeat Then
+                If heartbeatX() Then
                     If vbc.task.drawRect <> New cv.Rect Then
                         random.range = vbc.task.drawRect
                     Else
@@ -949,7 +949,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If vbc.task.heartBeat Then
+            If heartbeatX() Then
                 Dim mean As Scalar, stdev As Scalar
                 MeanStdDev(src(vbc.task.drawRect), mean, stdev)
                 Dim pt = New Vec3i(mean(0), mean(1), mean(2))
@@ -977,7 +977,7 @@ Namespace VBClasses
             dst2 = mapper.dst2
 
             Static myColorMap As Mat = mapper.colorMap.Clone
-            If vbc.task.heartBeat Then
+            If heartbeatX() Then
                 Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
                 Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 

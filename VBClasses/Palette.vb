@@ -129,7 +129,7 @@ Namespace VBClasses
             desc = "Create gradient image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 If standaloneTest() Then
                     ' every 30 frames try a different pair of random colors.
                     color1 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))

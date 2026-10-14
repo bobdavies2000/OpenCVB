@@ -112,7 +112,7 @@ Namespace VBClasses
             dst2 = diffColor.dst2
             If diffColor.diff.changedPixels = 0 Then noMotionFrames += 1
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
                             " or " + (noMotionFrames / task.fpsAlgorithm).ToString("0%")
                 flowText.Add(labels(2))
@@ -154,7 +154,7 @@ Namespace VBClasses
             Threshold(dst2, dst2, 2, 255, ThresholdTypes.Binary)
             dst3 = task.motion.dst2
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = "Diff of RGB.split has " + CStr(CountNonZero(dst2)) + " while gray has " + CStr(CountNonZero(dst3))
             End If
         End Sub
@@ -206,7 +206,7 @@ Namespace VBClasses
             Threshold(dst1, dst2, options.meters, 255, ThresholdTypes.Binary)
 
             lastFrame = src.Clone
-            If task.heartBeat Then
+            if heartbeatx() then 
                 labels(2) = "Depth difference from accumulated frame is > " + CStr(options.millimeters) + " mm's"
                 Dim count = CountNonZero(dst2)
                 labels(3) = CStr(count) + " pixels (" + (count / CountNonZero(task.depthmask)).ToString("0%") +

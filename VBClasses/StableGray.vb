@@ -12,7 +12,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             Static lastGray As Mat = src.Clone
 
-            ' If task.heartBeat Then lastGray = src.Clone
+            ' if heartbeatx() then  lastGray = src.Clone
 
             Min(src, lastGray, dst2)
             src.CopyTo(dst2, task.motion.motionMask)
@@ -39,7 +39,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             Static lastGray As Mat = src.Clone
 
-            ' If task.heartBeat Then lastGray = src.Clone
+            ' if heartbeatx() then  lastGray = src.Clone
 
             ' the following statement can be min as well as max.
             Min(src, lastGray, dst2)
@@ -65,7 +65,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
             Static lastGray As Mat = src.Clone
 
-            'If task.heartBeat Then lastGray = src.Clone
+            'if heartbeatx() then  lastGray = src.Clone
 
             Max(src, lastGray, dst2)
             src.CopyTo(dst2, task.motion.motionMask)
@@ -336,11 +336,11 @@ Namespace VBClasses
             If task.gOptions.stableDepthRGB.Checked Then
                 stableLeft.Run(task.leftView)
                 dst2 = stableLeft.dst2
-                If task.heartBeat Then labels(2) = stableLeft.labels(2)
+                if heartbeatx() then  labels(2) = stableLeft.labels(2)
 
                 stableRight.Run(task.rightView)
                 dst3 = stableRight.dst2
-                If task.heartBeat Then labels(3) = stableRight.labels(2)
+                if heartbeatx() then  labels(3) = stableRight.labels(2)
             Else
                 dst2 = task.leftView
                 dst3 = task.rightView
@@ -362,7 +362,7 @@ Namespace VBClasses
             If task.gOptions.stableDepthRGB.Checked Then
                 stableRight.Run(task.rightView)
                 dst3 = stableRight.dst2
-                If task.heartBeat Then labels(3) = stableRight.labels(2)
+                if heartbeatx() then  labels(3) = stableRight.labels(2)
             Else
                 dst2 = task.leftView
                 dst3 = task.rightView

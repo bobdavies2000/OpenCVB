@@ -107,6 +107,7 @@ LeftRight
 Line
 Line3D
 LinearRegression
+LineIterator
 LineSeg
 LineTrack
 LUT
@@ -201,3 +202,4 @@ WarpModel
 WarpPerspective
 Watershed
 XFeatures2D
+XR

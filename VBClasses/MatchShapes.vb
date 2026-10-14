@@ -83,7 +83,7 @@ Namespace VBClasses
             End If
 
             Static rcListLast As New List(Of rcData)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 rcListLast = New List(Of rcData)(redC.rcList)
                 dst3.SetTo(0)
             End If
@@ -140,7 +140,7 @@ Namespace VBClasses
 
             redC.Run(src)
             dst2 = redC.dst2
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
 
             If task.rcD IsNot Nothing Then
                 Dim rcX = task.rcD
@@ -179,7 +179,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            if heartbeatx() then  dst3.SetTo(0)
             SetTrueText(redC.strOut, 1)
 
             Dim rcX = task.rcD

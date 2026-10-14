@@ -21,7 +21,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Basics1 : Inherits TaskParent
+    Public Class XR_MSER_Basics1 : Inherits TaskParent
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
@@ -160,7 +160,7 @@ Namespace VBClasses
                 If i >= displaycount Then Exit For
             Next
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(2) = "Displaying the largest " + CStr(displaycount) + " rectangles out of " + CStr(boxes.Count) + " found"
                 ' displaycount += 1
                 If displaycount >= boxes.Count Then displaycount = 0
@@ -603,7 +603,7 @@ Namespace VBClasses
 
             If options.graySetting And src.Channels() = 3 Then src = task.gray
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 Dim cppData(src.Total - 1) As Vec3b
                 src.GetArray(Of Vec3b)(cppData)
                 Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)

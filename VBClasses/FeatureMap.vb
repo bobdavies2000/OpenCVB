@@ -89,7 +89,7 @@ Namespace VBClasses
     '            End If
     '        Next
 
-    '        If task.heartBeat Then
+    '        if heartbeatx() then 
     '            labels(2) = CStr(rcList.Count) + " cells from Feature_Delaunay, " + CStr(stableCount) +
     '                    " or " + (stableCount / rcList.Count).ToString("0%") + " kept the same color"
     '        End If
@@ -217,7 +217,7 @@ Namespace VBClasses
             Next
 
             If standalone And task.fpD IsNot Nothing Then XR_FeatureMap_Basics.fpCellContour(task.fpD, task.color)
-            If task.heartBeat Then labels(2) = traceName + ": " + feat.ptlist.Count.ToString("000") + " cells found " +
+            if heartbeatx() then  labels(2) = traceName + ": " + feat.ptlist.Count.ToString("000") + " cells found " +
                                            "using " + task.fOptions.FeatureMethod.Text
         End Sub
     End Class

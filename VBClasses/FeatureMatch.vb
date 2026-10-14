@@ -136,7 +136,7 @@ Namespace VBClasses
                 labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
             End If
 
-            If task.heartBeat Then FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+            if heartbeatx() then  FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
         End Sub
         Protected Overrides Sub Finalize()
             If brisk IsNot Nothing Then brisk.Dispose()
@@ -185,7 +185,7 @@ Namespace VBClasses
                 labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
             End If
 
-            If task.heartBeat Then FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+            if heartbeatx() then  FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
         End Sub
         Protected Overrides Sub Finalize()
             If sift IsNot Nothing Then sift.Dispose()
@@ -234,7 +234,7 @@ Namespace VBClasses
                 labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
             End If
 
-            If task.heartBeat Then FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+            if heartbeatx() then  FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
         End Sub
         Protected Overrides Sub Finalize()
             If surf IsNot Nothing Then surf.Dispose()
@@ -283,7 +283,7 @@ Namespace VBClasses
                 labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
             End If
 
-            If task.heartBeat Then FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+            if heartbeatx() then  FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
         End Sub
         Protected Overrides Sub Finalize()
             If kaze IsNot Nothing Then kaze.Dispose()
@@ -335,7 +335,7 @@ Namespace VBClasses
                 labels(3) = (matches.Count / lastKeyPoints.Length).ToString("0%") + " matched to previous frame."
             End If
 
-            If task.heartBeat Then FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
+            if heartbeatx() then  FeatureMatch_Basics.captureState(lastFrame, lastDesc, descMat, lastKeyPoints, keyPoints)
         End Sub
         Protected Overrides Sub Finalize()
             If orb IsNot Nothing Then orb.Dispose()
@@ -431,7 +431,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(task.gray)
 
-            If task.heartBeat Then dst2.SetTo(0)
+            if heartbeatx() then  dst2.SetTo(0)
 
             For Each pt In feat.ptList
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)

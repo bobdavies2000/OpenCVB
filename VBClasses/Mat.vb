@@ -156,7 +156,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_8UC3, img)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 If nextColor = New Vec3b(0, 0, 255) Then nextColor = New Vec3b(0, 255, 0) Else nextColor = New Vec3b(0, 0, 255)
             End If
             For i = 0 To img.Length - 1
@@ -353,7 +353,7 @@ Namespace VBClasses
                 For i = 0 To 1
                     Dim roi = Choose(i + 1, roiTop, roibot)
                     Dim resizedMat As Mat = dst2(roi)
-                    Resize(mat(i), resizedMat, nSize)
+                    If mat(i).Width > 0 Then Resize(mat(i), resizedMat, nSize)
                 Next
                 If lineSeparators Then
                     Line(dst2, New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, task.lineWidth + 1)

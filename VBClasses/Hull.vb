@@ -73,7 +73,7 @@ Namespace VBClasses
             Return ptList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
+            If (standaloneTest() And heartbeatX()) Or (useRandomPoints And heartbeatX()) Then
                 random.Run(src)
                 dst2.SetTo(0)
                 For Each pt In random.PointList
@@ -194,8 +194,8 @@ Namespace VBClasses
 
     Public Class XR_Hull_Contour : Inherits TaskParent
         Public hull As New List(Of cv.Point)
-        Public contours1 As New XR_Contour_BasicsOld
-        Public contours2 As New XR_Contour_BasicsOld
+        Public contours1 As New XR_Contour_FinderOld
+        Public contours2 As New XR_Contour_FinderOld
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Compare the hull to the contour of a contour cell"

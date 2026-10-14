@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class XR_ContourPlane_Basics : Inherits TaskParent
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
             desc = "Construct a simple plane at the average depth for each of the top contours"
@@ -27,7 +27,7 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_MaxDist : Inherits TaskParent
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
             desc = "Show the maxDist value in color (yellow) and in depth (blue)"
         End Sub
@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_RectX : Inherits TaskParent
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
             desc = "Assume the plane in a contour in X"
         End Sub
@@ -96,20 +96,20 @@ Namespace VBClasses
 
 
     Public Class XR_ContourPlane_X : Inherits TaskParent
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New Contour_Finder
         Public Sub New()
             desc = "Assume the plane in a contour in X"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             dst2 = contours.dst2
-            For Each contour In contours.tourList
-                Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
+            For Each rc In contours.rcList
+                Dim maxDist = Distance_Basics.GetMaxDistDepth(rc.mask, rc.rect)
 
-                Dim rleft = contour.rect, rRight = contour.rect
-                rleft.Width = maxDist.X - contour.rect.X
+                Dim rleft = rc.rect, rRight = rc.rect
+                rleft.Width = maxDist.X - rc.rect.X
                 rRight.X = rleft.X + rleft.Width
-                rRight.Width = contour.rect.Width - rleft.Width
+                rRight.Width = rc.rect.Width - rleft.Width
             Next
         End Sub
     End Class

@@ -108,7 +108,7 @@ Namespace VBClasses
 
     Public Class XR_LeftRight_ContourLeft : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New Contour_Finder
         Public Sub New()
             desc = "Segment the left view with contour_basics_List"
         End Sub
@@ -257,7 +257,7 @@ Namespace VBClasses
             motionRight.Run(task.rightView)
 
             Static lastRight As Mat = task.rightView.Clone
-            If task.heartBeat Then lastRight = task.rightView.Clone
+            if heartbeatx() then  lastRight = task.rightView.Clone
 
             Max(task.rightView, lastRight, dst3)
             task.rightView.CopyTo(dst3, motionRight.dst3)

@@ -1,6 +1,5 @@
 Imports System.IO
 Imports System.Threading
-
 Module UI_Generator
     Sub Main()
         ' Ensure only one instance can run at a time using a named Mutex
@@ -47,17 +46,12 @@ Module UI_Generator
                         toggleTotal = False
                         ' Parse the class name from lines like: "Public Class ClassName : Inherits " + parentName
                         currClassname = ExtractClassName(trimmedLine)
-                        If Not String.IsNullOrEmpty(currClassname) Then
-                            allClasses.Add(currClassname, currClassname)
-                            If currClassname.StartsWith("XR_") Then
-                                xrClasses.Add(currClassname, currClassname)
-
-                                ' comment both of these lines to remove XR_ algorithms.
-                                'displayClasses.Add(currClassname, currClassname)
-                                'toggleTotal = True
-                            ElseIf currClassname.StartsWith("XO_") Then
-                                ' skipping it now...
-                            Else
+                        If currClassname.StartsWith("XO_") = False Then
+                            If Not String.IsNullOrEmpty(currClassname) Then
+                                allClasses.Add(currClassname, currClassname)
+                                If currClassname.StartsWith("XR_") Then
+                                    xrClasses.Add(currClassname, currClassname)
+                                End If
                                 vbClasses.Add(currClassname, currClassname)
                                 displayClasses.Add(currClassname, currClassname)
                                 toggleTotal = True
@@ -130,10 +124,9 @@ Module UI_Generator
             Console.WriteLine()
             Console.WriteLine()
             Console.WriteLine($"{displayClasses.Count} algorithms will be visible in the user interface.")
-            Console.WriteLine($"Total source lines for algorithms classes: " + totalLinesRead.ToString("N0"))
-            Console.WriteLine($"Unused but compiling Reference algorithms: " + xrClasses.Count.ToString("N0"))
+            Console.WriteLine($"Total source lines for algorithms: " + totalLinesRead.ToString("N0"))
+            Console.WriteLine($"XR_ algorithms (Reference) algorithms: " + xrClasses.Count.ToString("N0"))
             Console.WriteLine($"Cursor.ai algorithms: " + cursorClasses.Count.ToString("N0"))
-            Console.WriteLine($"Total algorithms in development: " + allClasses.Count.ToString("N0"))
             Console.WriteLine($"Average lines per visible algorithm: " + (totalLinesRead \ displayClasses.Count).ToString())
             Console.WriteLine($"Algorithm groups: {groupTokens.Count}")
             Console.WriteLine()

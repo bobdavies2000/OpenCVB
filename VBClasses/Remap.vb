@@ -39,7 +39,7 @@ Namespace VBClasses
                     Remap(src, dst2, mapx3, mapy3, InterpolationFlags.Nearest)
             End Select
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 direction += 1
                 direction = direction Mod 4
             End If
@@ -67,7 +67,7 @@ Namespace VBClasses
                 Case 3 ' flip horizontally and vertically
                     Flip(src, dst2, FlipMode.XY)
             End Select
-            If task.heartBeat Then
+            if heartbeatx() then 
                 direction += 1
                 direction = direction Mod 4
             End If

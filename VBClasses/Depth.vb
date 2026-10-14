@@ -54,7 +54,7 @@ Namespace VBClasses
             Dim mm As mmData = GetMinMax(task.pcSplit(2), task.depthmask)
             task.depthRGB.CopyTo(dst2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            If heartbeatX() Then dst3.SetTo(0)
             labels(2) = "Min Depth " + mm.minVal.ToString(fmt1) + "m"
             identifyMinMax(mm.minLoc, labels(2))
 
@@ -153,7 +153,7 @@ Namespace VBClasses
                 ReDim maxPoint(task.gridRects.Count - 1)
             End If
 
-            If task.heartBeat Then dst3.SetTo(0)
+            If heartbeatX() Then dst3.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim mm As mmData = GetMinMax(task.pcSplit(2)(r), task.depthmask(r))
@@ -856,7 +856,7 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                If task.heartBeat Then dst3.SetTo(0)
+                If heartbeatX() Then dst3.SetTo(0)
                 dst3 = dst3 Or dst2
             End If
         End Sub
@@ -961,7 +961,7 @@ Namespace VBClasses
             Dim splitMats() As Mat
             If src.Type = MatType.CV_32FC3 Then splitMats = Split(src) Else splitMats = task.pcSplit
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 dst3 = splitMats(2)
                 filtered = 0
             End If
@@ -1091,7 +1091,7 @@ Namespace VBClasses
                     task.clickPoint = rc.maxDist
                     SetTrueText(redC.strOut, 3)
                 End If
-                If task.heartBeat Then
+                If heartbeatX() Then
                     If valley.classCount <= 1 Then
                         SetTrueText(CStr(valley.classCount) + " class", rc.maxDist)
                     Else
@@ -1101,7 +1101,7 @@ Namespace VBClasses
             Next
 
             Static saveTrueText As New List(Of TrueText)
-            If task.heartBeat Then saveTrueText = New List(Of TrueText)(trueData)
+            If heartbeatX() Then saveTrueText = New List(Of TrueText)(trueData)
             trueData = New List(Of TrueText)(saveTrueText)
         End Sub
     End Class
@@ -1360,7 +1360,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static maxDepth As Mat = task.pcSplit(2).Clone
-            If task.heartBeat Then
+            If heartbeatX() Then
                 maxDepth = task.pcSplit(2).Clone
             Else
                 task.pcSplit(2).CopyTo(maxDepth, task.motion.motionMask)
@@ -1389,7 +1389,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static minDepth As Mat = task.pcSplit(2).Clone
-            If task.heartBeat Then
+            If heartbeatX() Then
                 minDepth = task.pcSplit(2).Clone
             Else
                 task.pcSplit(2).CopyTo(minDepth, task.motion.motionMask)
@@ -1456,7 +1456,7 @@ Namespace VBClasses
             End If
             If src.Type <> MatType.CV_32F Then src = task.pcSplit(2)
 
-            If task.heartBeat Or everyFrame Then
+            If heartbeatX() Or everyFrame Then
                 CalcBackProject({src}, {0}, histogram, dst1, ranges)
                 dst1.ConvertTo(dst2, MatType.CV_8U)
                 dst3 = Palettize(dst2)
@@ -1550,7 +1550,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(2) = task.lines.labels(2)
                 labels(3) = CStr(count) + " were not consistently present after translation."
             End If

@@ -400,7 +400,7 @@ Namespace VBClasses
             dst2 = pyr.dst2
             labels(2) = pyr.labels(2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            If heartbeatX() Then dst3.SetTo(0)
 
             ptList.Clear()
             Dim stationary As Integer, motion As Integer
@@ -518,7 +518,7 @@ Namespace VBClasses
                 If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
             Next
 
-            If task.heartBeat Then
+            If heartbeatX() Then
                 features.Clear()
                 gens.Clear()
             End If
@@ -533,7 +533,7 @@ Namespace VBClasses
                 Circle(dst2, pt, task.DotSize, white, -1, task.lineType)
             Next
 
-            If task.heartBeat And gens.Count > 0 Then
+            If heartbeatX() And gens.Count > 0 Then
                 labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + gens.Average.ToString(fmt0) + " generations"
             End If
         End Sub
@@ -589,7 +589,7 @@ Namespace VBClasses
             Next
 
             If featureHistory.Count > task.fOptions.FrameHistoryCount.Value Then featureHistory.RemoveAt(0)
-            If task.heartBeat Then
+            If heartbeatX() Then
                 labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                             " red is a recent addition, yellow is present on previous " +
                             CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
@@ -671,7 +671,7 @@ Namespace VBClasses
             Static lastSrc As Mat = src.Clone
 
             Dim resync = features.Count / feat.ptlist.Count < options.resyncThreshold
-            If task.heartBeat Or task.optionsChanged Or resync Then
+            If heartbeatX() Or resync Then
                 features = New List(Of cv.Point)(feat.ptlist)
             End If
 
@@ -1550,7 +1550,7 @@ Namespace VBClasses
             Static hbIndexList As New List(Of Integer)
             Static hbIndexMap As cv.Mat
             'If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then
-            If task.heartBeat Or task.frameCount Mod 30 = 0 Then
+            If heartbeatX() Or task.frameCount Mod 30 = 0 Then
                 shiftXY = New cv.Point2f
                 hbColor = src.Clone
                 hbIndexMap = indexMap.Clone

@@ -24949,7 +24949,7 @@ End Class
 
 
     ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-    Public Class XR_MSER_Hulls : Inherits TaskParent
+    Public Class XO_MSER_Hulls : Inherits TaskParent
         Dim options As New Options_MSER
         Dim mser As New MSER_Basics
         Public Sub New()

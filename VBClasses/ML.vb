@@ -43,7 +43,7 @@ Namespace VBClasses
             Dim responseMat = Mat.FromPixelData(trainMats(0).Total, 1, MatType.CV_32F, trainResponse.Data)
 
             Dim respFormat = MatType.CV_32F
-            If task.heartBeat Or buildEveryPass Then
+            If heartbeatX() Or buildEveryPass Then
                 Select Case options.ML_Name
                     Case "NormalBayesClassifier"
                         normalBayes = ML.NormalBayesClassifier.Create()

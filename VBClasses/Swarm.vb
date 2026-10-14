@@ -72,7 +72,7 @@ Namespace VBClasses
 
             labels(3) = CStr(lpList.Count) + " points were matched to the previous set of features."
             distanceAvg = 0
-            If task.heartBeat Then distanceMax = 0
+            if heartbeatx() then  distanceMax = 0
             If disList.Count > 10 Then
                 distanceAvg = disList.Average
                 distanceMax = Math.Max(distanceMax, disList.Max)

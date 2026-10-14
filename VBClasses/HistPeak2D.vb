@@ -16,7 +16,7 @@ Namespace VBClasses
                 bgr.Run(src)
                 histogram = bgr.histogram02
             End If
-            If task.heartBeat Then
+            if heartbeatx() then 
                 auto.Run(histogram)
                 delaunay.inputPoints = New List(Of Point2f)(auto.clusterPoints)
                 delaunay.Run(src)

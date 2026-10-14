@@ -84,10 +84,10 @@ Namespace VBClasses
             maxSize = calcBrushSize(maxBrushRange)
 
             For i = 0 To options.strokeCount - 1
-                Dim e = New DNAentry
-                e.color = task.msRNG.Next(0, 255)
-                e.size = task.msRNG.NextDouble() * (maxSize - minSize) + minSize
-                e.pt = New cv.Point(r.X + task.msRNG.Next(r.Width), r.Y + task.msRNG.Next(r.Height))
+                Dim e = New DNAentry With {.color = task.msRNG.Next(0, 255),
+                                           .size = task.msRNG.NextDouble() * (maxSize - minSize) + minSize,
+                                           .pt = New cv.Point(r.X + task.msRNG.Next(r.Width),
+                                                              r.Y + task.msRNG.Next(r.Height))}
                 Dim localMagnitude = gradient.magnitude.Get(Of Single)(e.pt.Y, e.pt.X)
                 Dim localAngle = gradient.angle.Get(Of Single)(e.pt.Y, e.pt.X) + 90
                 e.rotation = (task.msRNG.Next(-180, 180) * (1 - localMagnitude) + localAngle)
@@ -218,9 +218,7 @@ Namespace VBClasses
             Merge(splitMats, dst3)
 
             For i = 0 To splitMats.Length - 1
-                Dim _cvtInline As New Mat
-                CvtColor(gDraw(i).dst2, _cvtInline, ColorConversionCodes.BGR2GRAY)
-                splitMats(i) = If(gDraw(i).dst2.Channels() = 1, gDraw(i).dst2, _cvtInline)
+                splitMats(i) = gDraw(i).dst2
             Next
             Merge(splitMats, dst2)
 

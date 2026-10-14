@@ -85,7 +85,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             deter.Run(src)
 
-            If task.heartBeat = False Then Exit Sub
+            If heartbeatX() = False Then Exit Sub
             dst3 = deter.dst3
 
             plothist.histMask = deter.dst3.Clone
@@ -113,7 +113,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             deter.Run(task.gray)
 
-            If task.heartBeat = False Then Exit Sub
+            If heartbeatX() = False Then Exit Sub
             dst3 = deter.dst3
 
             bProject.hist.histMask = deter.dst3.Clone

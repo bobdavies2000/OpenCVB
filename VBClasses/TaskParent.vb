@@ -101,15 +101,18 @@ Namespace VBClasses
             trueData.Add(strnext)
         End Sub
         Public Function standaloneTest() As Boolean
-            If standalone Or task.cpu.displayObjectName = traceName Or task.gOptions.DebugCheckBox.Checked Then Return True
+            If standalone Or task.cpu.displayObjectName = traceName Or
+                task.gOptions.DebugCheckBox.Checked Then Return True
             Return False
         End Function
         Public Shared Function heartbeatLTX() As Boolean
-            If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then Return True
+            If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Or
+                task.optionsChanged Then Return True
             Return False
         End Function
         Public Shared Function heartbeatX() As Boolean
-            If task.heartBeat And task.gOptions.DebugCheckBox.Checked = False Then Return True
+            If task.heartBeat And task.gOptions.DebugCheckBox.Checked = False Or
+                task.optionsChanged Then Return True
             Return False
         End Function
         Public Shared Function Palettize(input As Mat, Optional firstEntry As Byte = 1) As Mat

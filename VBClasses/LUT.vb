@@ -211,7 +211,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static colorSlider = OptionParent.FindSlider("Color transitions")
-            If task.optionsChanged Or task.heartBeat Then
+            If task.optionsChanged Or heartbeatX() Then
                 If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
                 saveColorCount = colorSlider.Value
                 gradMap.Run(src)

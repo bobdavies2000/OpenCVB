@@ -223,7 +223,7 @@ Namespace VBClasses
                     symShapes.Run(src)
                     dst2 = symShapes.dst2
                 Case "Draw cv.Point"
-                    If task.heartBeat Then
+                    if heartbeatx() then 
                         dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
                         Dim pt1 = New cv.Point(task.msRNG.Next(0, dst2.Width / 10), task.msRNG.Next(0, dst2.Height / 10))
                         Dim pt2 = New cv.Point(task.msRNG.Next(0, dst2.Width / 10), task.msRNG.Next(0, dst2.Height / 10))

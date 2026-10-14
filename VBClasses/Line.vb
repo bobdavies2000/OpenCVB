@@ -1420,6 +1420,7 @@ Namespace VBClasses
                     queries.Add(New Vec4f(lp.ptE1.X, lp.ptE1.Y, lp.ptE2.X, lp.ptE2.Y))
                 Next
 
+                If queries.Count = 0 Or trainInput.Count = 0 Then Exit Sub
                 Dim dimension = 4
                 knn.queryMat = Mat.FromPixelData(queries.Count, dimension, MatType.CV_32F, queries.ToArray)
                 knn.trainMat = Mat.FromPixelData(trainInput.Count, dimension, MatType.CV_32F, trainInput.ToArray)
@@ -1859,6 +1860,7 @@ Namespace VBClasses
         Public lpLastList As New List(Of lpData)
         Public matchCount As Integer
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels = {"", "", "Matched lines with age", "Unmatched lines from previous frame"}
             desc = "Cursor.ai: Match each line in lpList to lpLastList; matched lines get age+1 and are removed from lpLastList."
         End Sub
@@ -2195,7 +2197,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If task.heartBeat Or lpTracked Is Nothing Then lpTracked = vert.lpList(0)
+            If heartbeatX() Or lpTracked Is Nothing Then lpTracked = vert.lpList(0)
 
             lpFind.inputLine = lpTracked
             lpFind.Run(task.gray)
@@ -2232,7 +2234,7 @@ Namespace VBClasses
             End If
 
             Static r1 As cv.Rect, r2 As cv.Rect
-            If task.heartBeat Or lpTracked Is Nothing Then
+            If heartbeatX() Or lpTracked Is Nothing Then
                 lpTracked = vert.lpList(0)
                 Dim index1 = task.gridNabeMap.Get(Of Integer)(lpTracked.p1.Y, lpTracked.p1.X)
                 Dim index2 = task.gridNabeMap.Get(Of Integer)(lpTracked.p2.Y, lpTracked.p2.X)
@@ -2275,7 +2277,7 @@ Namespace VBClasses
             If task.lines.lpList.Count = 0 Then Exit Sub
             dst2 = task.color.Clone
 
-            If task.heartBeat Or lp Is Nothing Then
+            If heartbeatX() Or lp Is Nothing Then
                 If standalone Then lp = task.lines.lpList(0)
                 Dim index1 = task.gridNabeMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
                 Dim index2 = task.gridNabeMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)

@@ -91,7 +91,7 @@ Namespace VBClasses
             Next
             labels(2) = "Matched " + CStr(features.Count) + " points "
 
-            If task.heartBeat Then lastGray = src.Clone()
+            if heartbeatx() then  lastGray = src.Clone()
             lastGray = src.Clone()
         End Sub
     End Class

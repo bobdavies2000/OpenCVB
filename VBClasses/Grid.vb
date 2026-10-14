@@ -311,7 +311,7 @@ Namespace VBClasses
                 Rectangle(dst2, match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
                 Circle(dst2, center, task.DotSize, white, -1, task.lineType)
 
-                If task.heartBeat Then dst3.SetTo(0)
+                if heartbeatx() then  dst3.SetTo(0)
                 Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
                 SetTrueText(match.correlation.ToString(fmt3), center, 3)
 

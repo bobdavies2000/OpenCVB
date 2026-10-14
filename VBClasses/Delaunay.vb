@@ -60,7 +60,7 @@ Namespace VBClasses
             desc = "Use Delaunay to subdivide an image into triangles."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then If Not task.heartBeat Then Exit Sub
+            If standaloneTest() Then If Not heartbeatX() Then Exit Sub
             Dim subdiv As New Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
             random.Run(src)
             dst2.SetTo(0)
@@ -111,7 +111,7 @@ Namespace VBClasses
             desc = "Generate random points and divide the image around those points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub ' too fast otherwise...
+            If Not heartbeatX() Then Exit Sub ' too fast otherwise...
             dst2.SetTo(0)
             Dim points = Enumerable.Range(0, 100).Select(Of Point2f)(
                 Function(i)
@@ -169,7 +169,7 @@ Namespace VBClasses
             desc = "Create a region in an image for each cv.Point provided without using KNN."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() And heartbeatX() Then
                 random.Run(src)
                 inputPoints = New List(Of Point2f)(random.PointList)
             End If
@@ -275,7 +275,7 @@ Namespace VBClasses
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat And standalone Then
+            If heartbeatX() And standalone Then
                 randEnum.Run(src)
                 inputPoints = New List(Of Point2f)(randEnum.points)
             End If
@@ -481,7 +481,7 @@ Namespace VBClasses
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat And standalone Then
+            If heartbeatX() And standalone Then
                 Static random As New Random_Basics
                 random.Run(src)
                 inputPoints = New List(Of Point2f)(random.PointList)
@@ -584,7 +584,7 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             ' Generate random points if standalone
-            If task.heartBeat And standalone Then
+            If heartbeatX() And standalone Then
                 Static random As New Random_Basics
                 random.Run(src)
                 inputPoints = New List(Of Point2f)(random.PointList)

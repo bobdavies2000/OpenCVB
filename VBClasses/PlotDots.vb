@@ -46,7 +46,7 @@ Namespace VBClasses
             desc = "Plot the beats to validate things are working."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            plot.plotData(0) = If(task.heartBeat, 1, -1)
+            plot.plotData(0) = If(heartbeatX(), 1, -1)
             plot.plotData(1) = If(task.midHeartBeat, 2, -1)
             plot.plotData(2) = If(task.quarterBeat, 3, -1)
             plot.plotData(3) = If(task.almostHeartBeat, 4, -1)

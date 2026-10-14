@@ -17,7 +17,7 @@ Namespace VBClasses
                 Threshold(mats.mat(i), mats.mat(i), 0, 255, ThresholdTypes.Binary)
                 ConvertScaleAbs(mats.mat(i), mats.mat(i))
             Next
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = ""
                 For i = 0 To frameCounts.Length - 1
                     strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab
@@ -60,7 +60,7 @@ Namespace VBClasses
                 If count > 0 Then frameCounts(i) += 1
                 Threshold(mats.mat(i), mats.mat(i), 0, 255, ThresholdTypes.Binary)
             Next
-            If task.heartBeat Then
+            if heartbeatx() then 
                 strOut = ""
                 For i = 0 To frameCounts.Length - 1
                     strOut += Choose(i + 1, "Color", "Left", "Right", "Depth") + vbTab + " image frameCount = " + vbTab

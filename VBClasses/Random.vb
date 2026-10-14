@@ -173,7 +173,7 @@ Namespace VBClasses
             labels(3) = "kmeans run to get colors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Or task.frameCount < 10 Then
+            If heartbeatX() Or task.frameCount < 10 Then
                 random.Run(src)
                 lutMat = New Mat(New Size(1, 256), MatType.CV_8UC3, Scalar.All(0))
                 Dim lutIndex = 0
@@ -643,7 +643,7 @@ Namespace VBClasses
             desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeat Then Exit Sub
+            If Not heartbeatX() Then Exit Sub
             options.Run()
 
             Dim ptMat As New Mat(1, 1, MatType.CV_32FC2)

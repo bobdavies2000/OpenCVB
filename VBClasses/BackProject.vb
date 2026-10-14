@@ -393,7 +393,7 @@ Namespace VBClasses
             desc = "Backproject the depth data at 1 meter intervals without a histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            If heartbeatX() Then
                 Dim histData As New List(Of Single)
                 For i = 0 To task.histogramBins - 1
                     histData.Add(i + 1)
@@ -495,7 +495,7 @@ Namespace VBClasses
 
             If standalone Then
                 Static depthIndex As Integer
-                If task.heartBeat Then
+                If heartbeatX() Then
                     depthIndex += 1
                     If depthIndex > 10 Then depthIndex = 0
                     task.gOptions.DebugSlider.Value = depthIndex
@@ -517,7 +517,7 @@ Namespace VBClasses
             Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
             If index >= inputMatList.Count Then index = inputMatList.Count - 1
             Dim tmp As Mat = inputMatList(index)
-            If task.heartBeat Then strOut = CStr(CountNonZero(tmp)) + " mask pixels between " + CStr(incr * index) + " and " +
+            If heartbeatX() Then strOut = CStr(CountNonZero(tmp)) + " mask pixels between " + CStr(incr * index) + " and " +
                                         CStr(incr * (index + 1)) + " from " + CStr(CountNonZero(task.pcSplit(2))) + " depth pixels"
             plotHist.Run(histogramList(index))
             dst2 = plotHist.dst2
@@ -689,7 +689,7 @@ Namespace VBClasses
 
     Public Class XR_BackProject_FeatureLess : Inherits TaskParent
         Dim bProject As New BackProject_Basics
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New XR_Contour_Finder
         Public Sub New()
             labels(3) = "Move mouse over the histogram to backproject a column"
             desc = "Create a histogram of the featureless regions"

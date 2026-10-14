@@ -105,7 +105,7 @@ Namespace VBClasses
             desc = "Grabcut example using a single image.  Fix this."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat = False Then Exit Sub
+            If heartbeatX() = False Then Exit Sub
             Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
             dst2 = ImRead(fileInputName.FullName)
 
@@ -152,12 +152,13 @@ Namespace VBClasses
         Public Sub New()
             Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")
             image = ImRead(fileInputName.FullName)
+            Resize(image, image, task.workRes)
             desc = "Grabcut example using a single image. "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static bgModel As New Mat, fgModel As New Mat
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 dst2 = image
                 Dim _cvt1 As New Mat
                 CvtColor(dst2, _cvt1, ColorConversionCodes.BGR2GRAY)

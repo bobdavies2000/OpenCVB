@@ -98,7 +98,7 @@ Namespace VBClasses
             End If
 
             Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
-            If standaloneTest() Then
+            If standalone Then
                 SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
                 Exit Sub
             End If
@@ -150,9 +150,10 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim response = Mat.FromPixelData(trainMat.Rows, 1, MatType.CV_32S, Enumerable.Range(start:=0, trainMat.Rows).ToArray)
+            Dim response = Mat.FromPixelData(trainMat.Rows, 1, MatType.CV_32S,
+                                             Enumerable.Range(start:=0, trainMat.Rows).ToArray)
 
-            knn.Train(trainMat, ML.SampleTypes.RowSample, response)
+            If trainMat.Rows > 0 Then knn.Train(trainMat, ML.SampleTypes.RowSample, response)
         End Sub
         Protected Overrides Sub Finalize()
             If knn IsNot Nothing Then knn.Dispose()
@@ -467,7 +468,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim dimension = 2
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 random.Run(src)
                 trainInput = New List(Of Point2f)(random.PointList)
             End If

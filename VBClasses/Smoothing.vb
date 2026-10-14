@@ -79,7 +79,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 Static hull As New Convex_Basics
-                If task.heartBeat Then
+                if heartbeatx() then 
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)
@@ -156,7 +156,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If standaloneTest() Then
-                If task.heartBeat Then
+                if heartbeatx() then 
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)

@@ -77,7 +77,7 @@ Namespace VBClasses
                         ' DrawLine(dst2,lastpoints(i), klt.inputPoints(i), Scalar.Yellow, task.lineWidth + 1, task.lineType)
                         'Static lastFlowPoints() As Point2f = klt.inputPoints
                         ' DrawLine(dst3, lastFlowPoints(i), klt.inputPoints(i), Scalar.Yellow, task.lineWidth + 1, task.lineType)
-                        'If task.heartBeat Then lastFlowPoints = klt.inputPoints
+                        'if heartbeatx() then  lastFlowPoints = klt.inputPoints
                     End If
                 Next
             End If

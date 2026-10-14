@@ -23,7 +23,7 @@ Namespace VBClasses
 
             Dim optimalAngle = task.verticalizeAngle + 0.01 * sortScores.Values(0)
 
-            If task.heartBeat Then dst2.SetTo(0)
+            if heartbeatx() then  dst2.SetTo(0)
             lpList.Clear()
             For Each lp In lines.lpList
                 If Math.Abs(lp.p1.X - lp.p2.X) <= 1 Then
@@ -50,7 +50,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static index As Integer = -100
             Static startAngle As Double
-            If task.heartBeat Then startAngle = task.verticalizeAngle
+            if heartbeatx() then  startAngle = task.verticalizeAngle
             Dim angle = startAngle + 0.01 * index
             dst3 = GravityRGB_Basics.rotateRGB(task.gray, angle)
             lines.Run(dst3)

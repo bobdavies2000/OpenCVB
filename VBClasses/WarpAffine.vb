@@ -64,7 +64,7 @@ Namespace VBClasses
             options.Run()
             optionsWarp.Run()
 
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() And heartbeatX() Then
                 rotateAngle = optionsWarp.angle
                 rotateCenter.X = task.msRNG.Next(0, dst2.Width)
                 rotateCenter.Y = task.msRNG.Next(0, dst2.Height)
@@ -92,7 +92,7 @@ Namespace VBClasses
             desc = "Use WarpAffine to transform input images with no options."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() And heartbeatX() Then
                 SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
                 Exit Sub
             End If
@@ -210,7 +210,7 @@ Namespace VBClasses
             labels(3) = "Image with affine transform applied"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Dim triangles(1) As Mat
                 triangle.Run(src)
                 triangles(0) = triangle.triangle.Clone()
@@ -278,7 +278,7 @@ Namespace VBClasses
             labels(2) = "Color image with perspective transform applied"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
+            if heartbeatx() then 
                 options.Run()
                 mRect.inputPoints = options.srcPoints
 

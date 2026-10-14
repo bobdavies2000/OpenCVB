@@ -97,7 +97,7 @@ Namespace VBClasses
                         " savings = " + CStr(myFrameCount - updatedFrames) + " or " +
                         ((myFrameCount - updatedFrames) / myFrameCount).ToString("0%") + " diffCount = " + CStr(diffCount)
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 heartCount += 1
                 If heartCount Mod 10 = 0 Then
                     myFrameCount = 0
@@ -189,7 +189,7 @@ Namespace VBClasses
                 End If
             End If
 
-            If task.heartBeat Then
+            if heartbeatx() then 
                 Static heartCount As Integer
                 heartCount += 1
                 If heartCount Mod 3 = 0 Then

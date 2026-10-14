@@ -540,9 +540,9 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_Contours : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
-        Dim contours As New XR_Contour_BasicsOld
+        Dim contours As New Contour_Finder
         Public Sub New()
-            desc = "Use XR_Contour_BasicsOld to get the contour data for the top contours by size."
+            desc = "Use Contour_Finder to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.gray)
@@ -798,7 +798,7 @@ Namespace VBClasses
             labels(2) = fLess.labels(2)
 
             dst1.SetTo(0)
-            task.lines.dst1.CopyTo(dst1, fLess.dst2)
+            task.lines.dst1.CopyTo(dst1, fLess.dst1)
 
             Dim histogram As New Mat
             CalcHist({dst1}, {0}, New Mat, histogram, 1, {256}, ranges)
@@ -1034,7 +1034,7 @@ Namespace VBClasses
 
             rcList.Clear()
             For Each rc In sortList.Values
-                If task.heartBeat Or True Then
+                If heartbeatX() Then
                     rc.id = rcList.Count + 1
                 Else
                     Dim lastIndex = lastMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
@@ -1932,7 +1932,7 @@ Namespace VBClasses
             Dim rcLastList = New List(Of rcData)(rcList)
             fLess.Run(src)
 
-            If task.heartBeat Or task.optionsChanged Then
+            If heartbeatLTX() Then
                 rcList = New List(Of rcData)(fLess.rcList)
                 delaunay.ptList.Clear()
                 delaunay.ptList.Add(New cv.Point)
