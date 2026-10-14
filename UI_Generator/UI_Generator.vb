@@ -2,7 +2,7 @@ Imports System.IO
 Imports System.Threading
 
 Module Program
-    Sub Main()
+    Function Main() As Integer
         ' Ensure only one instance can run at a time using a named Mutex
         Dim mutexName As String = "Global\UI_Generator_SingleInstance"
         Dim createdNew As Boolean = False
@@ -10,7 +10,7 @@ Module Program
         Using mutex As New Mutex(True, mutexName, createdNew)
             If Not createdNew Then
                 Console.WriteLine("Another instance of UI_Generator is already running.")
-                Return
+                Return 0
             End If
 
             ' Use relative path from the executable's location
@@ -128,13 +128,13 @@ Module Program
             Console.WriteLine($"Total source lines for visible classes: {totalLinesRead}")
             Console.WriteLine($"XR_ Reference algorithm count: {xrClasses.Count}")
             Console.WriteLine($"Cursor.ai algorithms: {cursorClasses.Count}")
-            Console.WriteLine($"Total algorithms in development: { allClasses.Count}")
             Console.WriteLine($"Average lines per visible algorithm: " + (totalLinesRead \ displayClasses.Count).ToString())
             Console.WriteLine($"Algorithm groups: {groupTokens.Count}")
             Console.WriteLine()
             Console.WriteLine()
         End Using
-    End Sub
+        Return 0
+    End Function
 
     Function ExtractClassName(line As String) As String
         ' Line format: "Public Class ClassName : Inherits TaskParent"

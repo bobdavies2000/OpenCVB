@@ -879,35 +879,35 @@ Namespace VBClasses
 
 
     Public Class XR_Contour_Hulls : Inherits TaskParent
-        Public tourList As New List(Of contourData)
-        Public tourMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim contours As New XR_Contour_Finder
+        Public rcList As New List(Of rcData)
+        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Dim contours As New Contour_Finder
         Public Sub New()
             desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
         End Sub
-        Public Function getSelectedHull() As contourData
-            Dim id = tourMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            For Each task.contourD In contours.tourList
-                If id = task.contourD.ID Then Exit For
+        Public Function getSelectedHull() As rcData
+            Dim id = idMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            For Each task.rcD In contours.rcList
+                If id = task.rcD.id Then Exit For
             Next
-            Return task.contourD
+            Return task.rcD
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             labels(2) = contours.labels(2)
             dst2 = contours.dst2
 
-            tourMap.SetTo(0)
-            tourList.Clear()
-            For Each tour In contours.tourList
-                tour.hull = ConvexHull(tour.contour.ToArray, True).ToList
-                Dim index = contours.tourList.IndexOf(tour)
-                DrawTour(tourMap, tour.hull, tour.ID Mod 255, -1)
-                tourList.Add(tour)
+            idMap.SetTo(0)
+            rcList.Clear()
+            For Each rc In contours.rcList
+                Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
+                Dim index = contours.rcList.IndexOf(rc)
+                DrawTour(idMap, hull, rc.index Mod 255, -1)
+                rcList.Add(rc)
             Next
 
-            dst3 = Palettize(tourMap)
-            labels(3) = CStr(tourList.Count) + " hulls"
+            dst3 = Palettize(idMap)
+            labels(3) = CStr(rcList.Count) + " hulls"
         End Sub
     End Class
 

@@ -1480,7 +1480,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            if heartbeatx() then  dst3.SetTo(0)
+            If heartbeatX() Then dst3.SetTo(0)
             Dim count As Integer
             For Each rc In redC.rcList
                 If rc.pixels <= task.gOptions.DebugSlider.Value Then
@@ -1573,7 +1573,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_NeighborHulls : Inherits TaskParent
+    Public Class XR_RedC_NeighborHulls1 : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim clickPoint As cv.Point
         Public Sub New()
