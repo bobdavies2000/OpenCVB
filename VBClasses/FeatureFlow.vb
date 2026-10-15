@@ -2,43 +2,51 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim feat As New Feature_Basics
+        Public ptListConfirmed As New List(Of cv.Point)
+        Public plot As New PlotTime_Basics
         Public Sub New()
+            plot.maxScale = 50
+            plot.minScale = 0
+            plot.plotCount = 1
+            labels(3) = "Plot of the number of confirmed features over time..."
             desc = "Use correlations to confirm that points match the previous frame."
-        End Sub
-        Public Sub buildCorrelations(prevFeatures As List(Of cv.Point), currFeatures As List(Of cv.Point))
-            Dim correlationmat As New Mat
-            Dim pad = task.gridWH / 2
-            For Each p1 In prevFeatures
-                Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.gridWH, task.gridWH))
-                Dim correlations As New List(Of Single)
-                For Each p2 In currFeatures
-                    Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.gridWH),
-                                                                                 Math.Min(task.gridWH, rect.Height)))
-                    MatchTemplate(dst2(rect), dst3(r), correlationmat, TemplateMatchModes.CCoeffNormed)
-                    correlations.Add(correlationmat.Get(Of Single)(0, 0))
-                Next
-                Dim maxCorrelation = correlations.Max
-                If maxCorrelation >= task.fCorrThreshold Then
-                    Dim index = correlations.IndexOf(maxCorrelation)
-                    Dim lp = New lpData(p1, currFeatures(index))
-                    Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
-                End If
-            Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
             feat.Run(dst1)
 
-            labels = feat.labels
-
             dst2 = task.color.Clone
-            Static lastFeatures As New List(Of cv.Point)(feat.ptList)
-            buildCorrelations(lastFeatures, feat.ptList)
-
-            For Each pt In feat.ptList
-                Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Static prevFeatures As New List(Of cv.Point)(feat.ptlist)
+            Dim correlationmat As New Mat
+            Dim pad = task.gridWH
+            ptListConfirmed.Clear()
+            For Each p1 In prevFeatures
+                Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad,
+                                                    task.gridWH * 2, task.gridWH * 2))
+                Dim correlations As New List(Of Single)
+                For Each p2 In feat.ptlist
+                    Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad,
+                                         Math.Min(rect.Width, task.gridWH * 2),
+                                         Math.Min(rect.Height, task.gridWH * 2)))
+                    MatchTemplate(dst2(rect), dst0(r), correlationmat, TemplateMatchModes.CCoeffNormed)
+                    correlations.Add(correlationmat.Get(Of Single)(0, 0))
+                Next
+                Dim maxCorrelation = correlations.Max
+                If maxCorrelation >= task.fCorrThreshold Then
+                    Dim index = correlations.IndexOf(maxCorrelation)
+                    Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+                    SetTrueText(maxCorrelation.ToString("F3"), p1, 2)
+                    ptListConfirmed.Add(p1)
+                End If
             Next
-            lastFeatures = New List(Of cv.Point)(feat.ptList)
+
+            plot.plotData = New Scalar(ptListConfirmed.Count)
+            plot.Run(src)
+            dst3 = plot.dst2
+
+            prevFeatures = New List(Of cv.Point)(feat.ptlist)
+            dst0 = task.color.Clone
+            labels(2) = CStr(ptListConfirmed.Count) + " points were confirmed (matched to the previous frame)"
         End Sub
     End Class
 
