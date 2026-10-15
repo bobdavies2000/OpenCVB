@@ -384,18 +384,18 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_DepthMotion : Inherits TaskParent
-        Public fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public fLessNot As New List(Of cv.Rect)
         Public ptList As New HashSet(Of cv.Point)
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
+            task.fless.Run(src)
             If task.optionsChanged Then
-                dst2 = fLess.dst3.Clone
-                rcList = New List(Of rcData)(fLess.rcList)
+                dst2 = task.fless.dst3.Clone
+                rcList = New List(Of rcData)(task.fless.rcList)
             End If
 
             ptList.Clear()
@@ -407,7 +407,7 @@ Namespace VBClasses
                 ptList.Add(rc.rect.TopLeft)
             Next
 
-            For Each rc In fLess.rcList
+            For Each rc In task.fless.rcList
                 Dim val = task.motion.motionMask.Get(Of Byte)(rc.rect.Y, rc.rect.X)
                 If val = 0 Then
                     If ptList.Contains(rc.rect.TopLeft) = False Then
@@ -425,7 +425,7 @@ Namespace VBClasses
 
             If newList.Count > 0 Then rcList = New List(Of rcData)(newList)
 
-            labels(2) = fLess.labels(2)
+            labels(2) = task.fless.labels(2)
         End Sub
     End Class
 
@@ -751,14 +751,16 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureLess_Stabilized : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim diff As New Diff_Simple
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            labels(2) = "CV_8U version of the featureless cells."
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(src)
-            dst2 = fLess.dst1
+            task.fless.Run(src)
+            dst2 = task.fless.dst1
+            labels(3) = task.fless.labels(2)
 
             Static fLessLast = dst2.Clone
 
@@ -776,6 +778,7 @@ Namespace VBClasses
             Next
 
             fLessLast = dst2.Clone
+            dst3 = Palettize(dst2, 0)
         End Sub
     End Class
 
@@ -2118,4 +2121,18 @@ Namespace VBClasses
                         " degrees to verticalize the image."
         End Sub
     End Class
+
+
+
+
+
+    Public Class FeatureLess_Disection : Inherits TaskParent
+        Public Sub New()
+            desc = "Disect featureless cells to identify"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            CvtColor(src, src, cv.ColorConversionCodes.BGR2GRAY)
+        End Sub
+    End Class
+
 End Namespace

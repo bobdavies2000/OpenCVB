@@ -201,11 +201,11 @@ Feature_LeftRight
 Feature_LeftRightAKaze
 Feature_PointsPath
 Feature_SteadyXY
+Feature_Tracker
 Feature_WarpAlign
 Feature_WithRotation
-FeatureFlow_Basics
-FeatureFlow_LucasKanade
 FeatureLess_Basics
+FeatureLess_Disection
 FeatureLess_Gravity
 FeatureLess_Matching
 FeatureLess_Ordered
@@ -447,6 +447,7 @@ LineSeg_Top3
 LineTrack_Basics
 LineTrack_Match
 LineTrack_MatchLines
+LucasKanade_Basics
 LUT_Basics
 LUT_Equalized
 LUT_RedC
@@ -1125,7 +1126,6 @@ XR_Feature_GoodFeatures
 XR_Feature_History
 XR_Feature_LeftRight
 XR_Feature_LeftRightCorrelation
-XR_Feature_LucasKanade
 XR_Feature_Matching
 XR_Feature_NoMotionTest
 XR_Feature_RedC
@@ -1456,6 +1456,7 @@ XR_LineTrack_Slices
 XR_LineTrack_Tester
 XR_LineTrack_Top3
 XR_LineTrack_Triangle
+XR_LucasKanade_Basics
 XR_LUT_Create
 XR_LUT_Custom
 XR_LUT_Depth32f

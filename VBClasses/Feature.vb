@@ -388,43 +388,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Feature_LucasKanade : Inherits TaskParent
-        Dim pyr As New FeatureFlow_LucasKanade
-        Public ptList As New List(Of cv.Point)
-        Public ptLast As New List(Of cv.Point)
-        Public Sub New()
-            desc = "Provide a trace of the tracked features"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            pyr.Run(src)
-            dst2 = pyr.dst2
-            labels(2) = pyr.labels(2)
-
-            If heartbeatX() Then dst3.SetTo(0)
-
-            ptList.Clear()
-            Dim stationary As Integer, motion As Integer
-            For i = 0 To pyr.features.Count - 1
-                Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
-                ptList.Add(pt)
-                If ptLast.Contains(pt) Then
-                    Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
-                    stationary += 1
-                Else
-                    Line(dst3, pyr.lastFeatures(i), pyr.features(i), white, task.lineWidth, task.lineType)
-                    motion += 1
-                End If
-            Next
-
-            labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
-            ptLast = New List(Of cv.Point)(ptList)
-        End Sub
-    End Class
-
-
-
-
-
 
 
     Public Class XR_Feature_TraceDelaunay : Inherits TaskParent
@@ -1260,7 +1223,7 @@ Namespace VBClasses
         Dim tracker As New FeatureMatch_Tracker
         Dim heartImage As Mat
         Public Sub New()
-            desc = "Cursor.ai: Use Feature_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
+            desc = "Cursor.ai: Use FeatureMatch_Tracker travel to WarpAffine the current image onto the heartbeat image; unmapped edges are black."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim color = If(src.Channels() = 1, task.color.Clone, src.Clone)
@@ -1860,6 +1823,60 @@ Namespace VBClasses
                     Circle(dst1, ptOriginal(index - 1), task.DotSize + 2, task.highlight, -1)
                 Next
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Feature_Tracker : Inherits TaskParent
+        Dim feat As New Feature_Basics
+        Public ptListConfirmed As New List(Of cv.Point)
+        Public plot As New PlotTime_Basics
+        Public Sub New()
+            plot.maxScale = 50
+            plot.minScale = 0
+            plot.plotCount = 1
+            labels(3) = "Plot of the number of confirmed features over time..."
+            desc = "Use correlations to confirm that points match the previous frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
+            feat.Run(dst1)
+
+            dst2 = task.color.Clone
+            Static prevFeatures As New List(Of cv.Point)(feat.ptlist)
+            Dim correlationmat As New Mat
+            Dim pad = task.gridWH
+            ptListConfirmed.Clear()
+            For Each p1 In prevFeatures
+                Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad,
+                                                    task.gridWH * 2, task.gridWH * 2))
+                Dim correlations As New List(Of Single)
+                For Each p2 In feat.ptlist
+                    Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad,
+                                         Math.Min(rect.Width, task.gridWH * 2),
+                                         Math.Min(rect.Height, task.gridWH * 2)))
+                    MatchTemplate(dst2(rect), dst0(r), correlationmat, TemplateMatchModes.CCoeffNormed)
+                    correlations.Add(correlationmat.Get(Of Single)(0, 0))
+                Next
+                Dim maxCorrelation = correlations.Max
+                If maxCorrelation >= task.fCorrThreshold Then
+                    Dim index = correlations.IndexOf(maxCorrelation)
+                    Circle(dst2, p1, task.DotSize, task.highlight, -1, task.lineType)
+                    SetTrueText(maxCorrelation.ToString("F3"), p1, 2)
+                    ptListConfirmed.Add(p1)
+                End If
+            Next
+
+            plot.plotData = New Scalar(ptListConfirmed.Count)
+            plot.Run(src)
+            dst3 = plot.dst2
+
+            prevFeatures = New List(Of cv.Point)(feat.ptlist)
+            dst0 = task.color.Clone
+            labels(2) = CStr(ptListConfirmed.Count) + " points were confirmed (matched to the previous frame)"
         End Sub
     End Class
 End Namespace

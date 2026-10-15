@@ -47,7 +47,6 @@ Entropy
 Erode
 ExPhoto
 Feature
-FeatureFlow
 FeatureLess
 FeatureMap
 FeatureMatch
@@ -110,6 +109,7 @@ LinearRegression
 LineIterator
 LineSeg
 LineTrack
+LucasKanade
 LUT
 Mat
 Match
