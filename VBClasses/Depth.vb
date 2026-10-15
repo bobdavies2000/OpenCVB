@@ -82,13 +82,13 @@ Namespace VBClasses
             If shadow.dst3.Channels() = 3 Then CvtColor(shadow.dst3, shadow.dst3, ColorConversionCodes.BGR2GRAY)
             contours = FindContoursAsArray(shadow.dst3, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
 
-            Dim sortContours As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
+            Dim sortlist As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
             For Each c In contours
-                sortContours.Add(c.Length, c.ToList)
+                sortlist.Add(c.Length, c.ToList)
             Next
             dst3.SetTo(0)
-            For i = 0 To Math.Min(sortContours.Count, 10) - 1
-                Dim contour = sortContours.ElementAt(i).Value
+            For i = 0 To Math.Min(sortlist.Count, 10) - 1
+                Dim contour = sortlist.ElementAt(i).Value
                 Dim minRect = MinAreaRect(contour)
                 Dim nextColor = New Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
                 Rectangle_Basics.DrawRotatedRect(minRect, dst2, nextColor)

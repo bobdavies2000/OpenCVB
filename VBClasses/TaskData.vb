@@ -112,7 +112,6 @@ Namespace VBClasses
         Public rcD As rcData ' the currently selected redCloud Cell
         Public lpD As lpData ' the currently selected line pair
         Public fpD As fpData ' the currently selected feature cv.Point.
-        Public contourD As New contourData ' the currently selected contour
 
         Public bricksPerCol As Integer
         Public bricksPerRow As Integer

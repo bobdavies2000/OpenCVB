@@ -90,104 +90,6 @@ Namespace VBClasses
 
 
 
-
-    'Public Class XR_HullLine_EdgePoints : Inherits TaskParent
-    '    Dim hullLines As New XR_Hull_Lines
-    '    Public Sub New()
-    '        desc = "Find the edge points for the current and last frm for the hull lines."
-    '    End Sub
-    '    Public Shared Function EdgePointOffset(lpIn As lpData, offset As Integer) As lpData
-    '        Dim lp = New lpData(lpIn.p1, lpIn.p2)
-    '        If lp.ptE1.X <= 1 Then lp.ptE1.X += offset
-    '        If lp.ptE1.Y <= 1 Then lp.ptE1.Y += offset
-    '        If lp.ptE2.X <= 1 Then lp.ptE2.X += offset
-    '        If lp.ptE2.Y <= 1 Then lp.ptE2.Y += offset
-    '        If lp.ptE1.X >= task.workRes.Width - 1 Then lp.ptE1.X -= offset
-    '        If lp.ptE1.Y >= task.workRes.Height - 1 Then lp.ptE1.Y -= offset
-    '        If lp.ptE2.X >= task.workRes.Width - 1 Then lp.ptE2.X -= offset
-    '        If lp.ptE2.Y >= task.workRes.Height - 1 Then lp.ptE2.Y -= offset
-    '        Return lp
-    '    End Function
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        hullLines.Run(src)
-    '        dst3 = hullLines.dst2
-    '        labels(3) = hullLines.labels(3)
-
-    '        dst2 = src.Clone
-    '        For Each lpIn In hullLines.lpList
-    '            Dim lp = EdgePointOffset(lpIn, 1)
-    '            Circle(dst2, New cv.Point(CInt(lp.ptE1.X), CInt(lp.ptE1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-    '            Circle(dst2, New cv.Point(CInt(lp.ptE2.X), CInt(lp.ptE2.Y)), task.DotSize, task.highlight, -1, task.lineType)
-    '        Next
-    '        labels(2) = hullLines.labels(2)
-    '    End Sub
-    'End Class
-
-
-
-
-
-    'Public Class XR_HullLine_SelectHull : Inherits TaskParent
-    '    Dim hullLines As New XR_Hull_Lines
-    '    Public Sub New()
-    '        dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-    '        labels(3) = "Click on any hull to see it below with its edge points."
-    '        desc = "Display the contour hull selected."
-    '    End Sub
-    '    Public Overrides Sub RunAlg(src As cv.Mat)
-    '        hullLines.Run(src)
-
-    '        dst2 = hullLines.dst2
-    '        labels(2) = hullLines.labels(3)
-
-    '        Dim contour = hullLines.hulls.getSelectedHull()
-
-    '        dst1.SetTo(0)
-    '        DrawTour(dst1, contour.hull, (contour.ID) Mod 255, -1)
-    '        dst3 = Palettize(dst1, 0)
-    '    End Sub
-    'End Class
-
-
-
-
-    Public Class XR_Hull_Contour : Inherits TaskParent
-        Public hull As New List(Of cv.Point)
-        Public contours1 As New XR_Contour_FinderOld
-        Public contours2 As New XR_Contour_FinderOld
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Compare the hull to the contour of a contour cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            contours1.Run(src)
-            task.contourD = contours1.selectContour()
-
-            dst2.SetTo(0)
-            dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
-            contours2.Run(dst2)
-
-            dst3.SetTo(0)
-            If contours1.sortContours.allContours.Length > 0 Then
-                If contours1.sortContours.allContours(0).Length > 0 Then
-                    hull = ConvexHull(contours1.sortContours.allContours(0), True).ToList
-
-                    If contours2.sortContours.allContours.Length > 0 Then
-                        If contours1.sortContours.allContours(0).Length > 0 Then
-                            DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
-                            DrawTour(dst3, hull, white, task.lineWidth)
-                        End If
-                    End If
-                End If
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class Hull_Defect : Inherits TaskParent
         Public hull As New List(Of cv.Point)
         Public contour As cv.Point()
@@ -206,12 +108,13 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static hContour As New XR_Hull_Contour
-                hContour.Run(src)
-                dst2 = hContour.dst2
-                hull = hContour.hull
-                If hContour.contours1.sortContours.allContours.Length = 0 Then Exit Sub ' nothing to work on yet...
-                contour = hContour.contours1.sortContours.allContours(0)
+                Static redC As New RedC_Basics
+                redC.Run(task.gray)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                hull = redC.rcList(0).contour
+
+                contour = redC.rcList(0).contour.ToArray
             End If
 
             Dim contourList = contour.ToList()
@@ -219,21 +122,23 @@ Namespace VBClasses
             contourList = Convex_RedCDefects.checkDefects(contourList, defects)
             contour = contourList.ToArray()
 
-            Dim lastV As Integer = -1
-            Dim newC As New List(Of cv.Point)
-            For Each v In defects
-                If v(0) <> lastV And lastV >= 0 Then
-                    For i = lastV To v(0) - 1
-                        newC.Add(contour(i))
-                    Next
-                End If
-                newC.Add(contour(v(0)))
-                newC.Add(contour(v(2)))
-                newC.Add(contour(v(1)))
-                lastV = v(1)
-            Next
-            dst3.SetTo(0)
-            DrawTour(dst3, newC, white)
+            If contour.Length > 0 Then
+                Dim lastV As Integer = -1
+                Dim newC As New List(Of cv.Point)
+                For Each v In defects
+                    If v(0) <> lastV And lastV >= 0 Then
+                        For i = lastV To v(0) - 1
+                            newC.Add(contour(i))
+                        Next
+                    End If
+                    newC.Add(contour(v(0)))
+                    newC.Add(contour(v(2)))
+                    newC.Add(contour(v(1)))
+                    lastV = v(1)
+                Next
+                dst3.SetTo(0)
+                DrawTour(dst3, newC, white)
+            End If
         End Sub
     End Class
 

@@ -743,7 +743,7 @@ Namespace VBClasses
             contours.Run(src)
             If standalone Then
                 src = New Mat(dst1.Size, MatType.CV_32F, 0)
-                For Each contour In contours.tourList
+                For Each contour In contours.rcList
                     If contour.depth = 0 Then Continue For
                     contour.depth = Mean(task.pcSplit(2)(contour.rect), contour.mask)
                     src(contour.rect).SetTo(contour.depth, contour.mask)

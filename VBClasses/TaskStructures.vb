@@ -327,41 +327,6 @@ Namespace VBClasses
 
 
 
-
-        Public Class contourData
-            Public age As Integer
-            Public depth As Single
-            Public hull As List(Of cv.Point)
-            Public ID As Integer
-            Public mask As New cv.Mat
-            Public maxDist As cv.Point
-            Public pixels As Integer
-            Public contour As New List(Of cv.Point)
-            Public rect As New cv.Rect(0, 0, 1, 1)
-            Public Function GetMaxDistBuild() As cv.Point
-                Dim maskTest = mask.Clone
-                Rectangle(mask, New cv.Rect(0, 0, mask.Width, mask.Height), cv.Scalar.All(0), 1)
-                Dim distance32f As New cv.Mat
-                DistanceTransform(mask, distance32f, cv.DistanceTypes.L1, cv.DistanceTransformMasks.Precise, cv.MatType.CV_32F)
-                Dim mm As mmData = GetMinMax(distance32f)
-                mm.maxLoc.X += rect.X
-                mm.maxLoc.Y += rect.Y
-                Return mm.maxLoc
-            End Function
-            Public Sub New()
-            End Sub
-            Public Function displayData() As String
-                Dim cDesc As String = ""
-                cDesc += "ID = " + CStr(ID) + " (grid index of maxDist)" + vbCrLf
-                cDesc += "Depth = " + depth.ToString(fmt1) + " m" + vbCrLf
-                cDesc += "Number of pixels in the mask: " + CStr(pixels) + vbCrLf
-                cDesc += "MaxDist cv.Point = " + maxDist.ToString + vbCrLf
-                Return cDesc
-            End Function
-        End Class
-
-
-
         Public Class ptData
             Public age As Integer = 1
             Public pt As cv.Point

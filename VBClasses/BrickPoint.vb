@@ -364,9 +364,9 @@ Namespace VBClasses
             dst1 = contours.dst3
             dst2 = contours.dst2
             dst3 = ShowAddweighted(dst2, src, labels(3))
-            classCount = contours.tourList.Count
+            classCount = contours.rcList.Count
             labels(2) = contours.labels(2)
-            labels(3) = "Of the " + CStr(contours.tourList.Count) + " contours " + CStr(classCount) +
+            labels(3) = "Of the " + CStr(contours.rcList.Count) + " contours " + CStr(classCount) +
                             " have complete bricks inside them."
         End Sub
     End Class

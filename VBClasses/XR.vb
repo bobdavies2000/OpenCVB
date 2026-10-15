@@ -338,7 +338,7 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Dim options As New Options_Contours
         Public contours As cv.Point()()
-        Public sortContours As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
+        Public sortlist As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
             Dim floodRadio = OptionParent.findRadio("FloodFill")
             If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
@@ -372,7 +372,7 @@ Namespace VBClasses
             End If
             contours = FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
 
-            sortContours.Clear()
+            sortlist.Clear()
             For i = 0 To contours.Length - 1
                 ' get this region's ID
                 Dim maskID As Integer = 0
@@ -389,12 +389,12 @@ Namespace VBClasses
                     Next
                     If maskID <> 0 Then Exit For
                 Next
-                sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+                sortlist.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
             dst1 = Palettize(dst2 + 1, 0)
             dst1.SetTo(0, dst3)
-            labels(1) = "There were " + CStr(sortContours.Count) + " contour > 100 points."
+            labels(1) = "There were " + CStr(sortlist.Count) + " contour > 100 points."
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Fuzzy_Close(cPtr)
@@ -410,7 +410,7 @@ Namespace VBClasses
         Dim kernel As Mat
         Dim reduction As New Reduction_Basics
         Public contours As cv.Point()()
-        Public sortContours As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
+        Public sortlist As New SortedList(Of Integer, Vec2i)(New compareAllowIdenticalIntegerInverted)
         Dim options As New Options_Contours
         Public Sub New()
             Dim array() As Single = {1, 1, 1, 1, 1, 1, 1, 1, 1}
@@ -440,7 +440,7 @@ Namespace VBClasses
                 contours = FindContoursAsArray(dst3, options.retrievalMode, options.ApproximationMode)
             End If
 
-            sortContours.Clear()
+            sortlist.Clear()
             For i = 0 To contours.Length - 1
                 Dim maskID As Integer = 0
                 Dim pt = contours(i)(0)
@@ -456,7 +456,7 @@ Namespace VBClasses
                     Next
                     If maskID <> 0 Then Exit For
                 Next
-                sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+                sortlist.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
             dst2 = Palettize(reduction.dst2)
@@ -555,7 +555,7 @@ Namespace VBClasses
                 'InRange(tracker.fuzzy.dst2, highlightRegion, highlightRegion + 1, dst1)
                 'dst3.SetTo(Scalar.Yellow, dst1)
             End If
-            labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
+            labels(2) = CStr(tracker.fuzzy.sortlist.Count) + " regions were found in the image."
         End Sub
     End Class
 
@@ -589,7 +589,7 @@ Namespace VBClasses
             layoutColor.Clear()
             Dim minX As Double, maxX As Double
             Dim minY As Double, maxY As Double
-            For Each vec In fuzzy.sortContours.Values
+            For Each vec In fuzzy.sortlist.Values
                 Dim contours = fuzzy.contours(vec(0))
                 Dim points = Mat.FromPixelData(contours.Length, 1, MatType.CV_32SC2, contours.ToArray)
                 Dim center = Sum(points)
@@ -611,7 +611,7 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(2) = CStr(fuzzy.sortContours.Count) + " regions were found in the image."
+            labels(2) = CStr(fuzzy.sortlist.Count) + " regions were found in the image."
         End Sub
     End Class
 

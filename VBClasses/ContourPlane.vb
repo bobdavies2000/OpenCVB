@@ -12,7 +12,7 @@ Namespace VBClasses
             labels(2) = contours.labels(2)
 
             dst1.SetTo(0)
-            For Each contour In contours.tourList
+            For Each contour In contours.rcList
                 Dim depth = Mean(task.pcSplit(2)(contour.rect), contour.mask)
                 dst1(contour.rect).SetTo(depth, contour.mask)
             Next
@@ -34,7 +34,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             dst2 = contours.dst2
-            For Each contour In contours.tourList
+            For Each contour In contours.rcList
                 Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
                 Circle(dst2, maxDist, task.DotSize, task.highlight, -1, task.lineType)
                 maxDist = Distance_Basics.GetMaxDist(contour.mask, contour.rect)
@@ -57,7 +57,7 @@ Namespace VBClasses
             contours.Run(src)
             dst2 = contours.dst2
             labels(2) = contours.labels(2)
-            For Each contour In contours.tourList
+            For Each contour In contours.rcList
                 Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
 
                 Dim rleft = contour.rect, rRight = contour.rect
@@ -65,7 +65,7 @@ Namespace VBClasses
                 rRight.X = rleft.X + rleft.Width
                 rRight.Width = contour.rect.Width - rleft.Width
 
-                Dim index = contours.tourList.IndexOf(contour)
+                Dim index = contours.rcList.IndexOf(contour)
                 If index = 1 Then
                     dst3 = src
                     If task.toggleOn Then
