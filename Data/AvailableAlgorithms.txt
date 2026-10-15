@@ -207,7 +207,8 @@ Feature_WithRotation
 FeatureLess_Basics
 FeatureLess_DisectHLine
 FeatureLess_Disection
-FeatureLess_DisectionOld
+FeatureLess_DisectionOriginal
+FeatureLess_DisectionPlane
 FeatureLess_DisectVLine
 FeatureLess_Gravity
 FeatureLess_Matching
@@ -257,6 +258,7 @@ GL_BasicsLineMap
 GL_DisplayPC
 GL_DrawLineDepth
 GL_Octree
+GL_Planes
 GL_PlotHist
 GL_Rasterize
 GrabCut_Basics

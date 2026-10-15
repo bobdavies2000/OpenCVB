@@ -29,6 +29,7 @@ Namespace VBClasses
         colorTriangles
         imageTriangles
         octreeTriangles
+        drawPlanes
     End Enum
     Public Class GL_Basics : Inherits TaskParent
         Public Sub New()
@@ -808,6 +809,166 @@ Namespace VBClasses
 
             strOut = task.sharpGL.RunTriangles(oCase.octreeTriangles, buf)
             SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_Planes : Inherits TaskParent
+        Dim planeAlg As New FeatureLess_DisectionPlane
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            desc = "Cursor.ai: Display the FeatureLess_Basics cell planes in SharpGL."
+        End Sub
+        Private Function depthBand(rc As rcData, slot As Integer) As (z0 As Single, lo As Single, hi As Single)
+            If slot >= 0 AndAlso slot < planeAlg.heldStill.Count AndAlso planeAlg.heldStill(slot) AndAlso
+               planeAlg.anchorDepth(slot) > 0 Then
+                Return (planeAlg.anchorDepth(slot), 0.001F, Single.MaxValue)
+            End If
+
+            Dim z0 As Single
+            If rc.maxDist.X >= 0 AndAlso rc.maxDist.Y >= 0 AndAlso
+               rc.maxDist.X < task.pcSplit(2).Cols AndAlso rc.maxDist.Y < task.pcSplit(2).Rows Then
+                Dim z = task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                If z > 0 AndAlso Single.IsFinite(z) Then z0 = z
+            End If
+
+            Dim lo = z0
+            Dim hi = z0
+            Dim seeded = z0 > 0
+            Dim count As Integer
+            Dim sum As Double
+            If slot >= 0 Then
+                For k = 0 To 1
+                    Dim samples = planeAlg.disect.depthList(slot * 2 + k)
+                    If samples Is Nothing Then Continue For
+                    For Each sample In samples
+                        If sample <= 0 OrElse Single.IsFinite(sample) = False Then Continue For
+                        If seeded = False OrElse sample < lo Then lo = sample
+                        If seeded = False OrElse sample > hi Then hi = sample
+                        seeded = True
+                        sum += sample
+                        count += 1
+                    Next
+                Next
+            End If
+            If z0 <= 0 AndAlso count > 0 Then z0 = CSng(sum / count)
+            If z0 <= 0 AndAlso rc.depth > 0 AndAlso Single.IsFinite(rc.depth) Then z0 = rc.depth
+            If z0 <= 0 Then Return (0, 0, 0)
+            If count = 0 Then
+                lo = z0
+                hi = z0
+            End If
+            Dim pad = Math.Max(0.25F, hi - lo)
+            Return (z0, Math.Max(0.001F, lo - pad), hi + pad)
+        End Function
+        Private Function planeCorner(u As Integer, v As Integer, plane As Vec4f, z0 As Single, lo As Single, hi As Single) As Point3f
+            Dim z = z0
+            Dim denom = plane(0) * (u - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fx +
+                        plane(1) * (v - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy + plane(2)
+            If Math.Abs(denom) >= 0.00001 Then
+                Dim hit = plane(3) / denom
+                If hit >= lo AndAlso hit <= hi Then z = CSng(hit)
+            End If
+            Return Cloud_Basics.worldCoordinates(u, v, z)
+        End Function
+        Private Function maskRuns(mask As cv.Mat, row As Integer, bytes As Byte()) As List(Of cv.Rect)
+            Dim runs As New List(Of cv.Rect)
+            Dim cols = mask.Cols
+            Dim x = 0
+            While x < cols
+                If bytes(row * cols + x) = 0 Then
+                    x += 1
+                    Continue While
+                End If
+                Dim start = x
+                While x < cols AndAlso bytes(row * cols + x) <> 0
+                    x += 1
+                End While
+                runs.Add(New cv.Rect(start, row, x - start, 1))
+            End While
+            Return runs
+        End Function
+        Private Sub addPlaneRect(buf As List(Of Vec3f), color As Vec3f, plane As Vec4f,
+                                 x0 As Integer, y0 As Integer, x1 As Integer, y1 As Integer,
+                                 z0 As Single, lo As Single, hi As Single)
+            buf.Add(color)
+            Dim corners = {planeCorner(x0, y0, plane, z0, lo, hi), planeCorner(x1, y0, plane, z0, lo, hi),
+                           planeCorner(x1, y1, plane, z0, lo, hi), planeCorner(x0, y1, plane, z0, lo, hi)}
+            For Each corner In corners
+                buf.Add(New Vec3f(corner.X, corner.Y, corner.Z))
+            Next
+        End Sub
+        Private Sub addCellMask(buf As List(Of Vec3f), rc As rcData, plane As Vec4f, color As Vec3f,
+                                z0 As Single, lo As Single, hi As Single)
+            Dim mask = rc.mask
+            If mask Is Nothing OrElse mask.Rows < 1 OrElse mask.Cols < 1 Then Exit Sub
+            If mask.IsContinuous = False Then mask = mask.Clone()
+            Dim bytes(CInt(mask.Total) - 1) As Byte
+            If bytes.Length = 0 Then Exit Sub
+            mask.GetArray(Of Byte)(bytes)
+
+            Dim active As New List(Of cv.Rect)
+            For row = 0 To mask.Rows - 1
+                Dim runs = maskRuns(mask, row, bytes)
+                Dim used(Math.Max(runs.Count, 1) - 1) As Boolean
+                Dim nextActive As New List(Of cv.Rect)
+                For Each span In active
+                    Dim match = -1
+                    For i = 0 To runs.Count - 1
+                        If used(i) Then Continue For
+                        If runs(i).X = span.X AndAlso runs(i).Width = span.Width Then
+                            match = i
+                            Exit For
+                        End If
+                    Next
+                    If match >= 0 Then
+                        used(match) = True
+                        nextActive.Add(span)
+                    Else
+                        addPlaneRect(buf, color, plane, rc.rect.X + span.X, rc.rect.Y + span.Y,
+                                     rc.rect.X + span.X + span.Width, rc.rect.Y + row, z0, lo, hi)
+                    End If
+                Next
+                For i = 0 To runs.Count - 1
+                    If used(i) Then Continue For
+                    nextActive.Add(runs(i))
+                Next
+                active = nextActive
+            Next
+            For Each span In active
+                addPlaneRect(buf, color, plane, rc.rect.X + span.X, rc.rect.Y + span.Y,
+                             rc.rect.X + span.X + span.Width, rc.rect.Y + mask.Rows, z0, lo, hi)
+            Next
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            planeAlg.Run(src)
+            dst2 = planeAlg.dst2
+            labels(2) = planeAlg.labels(2)
+
+            Dim buf As New List(Of Vec3f)
+            Dim cellCount As Integer
+            For Each rc In task.fless.rcList
+                If rc.index = 0 Or rc.rect.Width < 2 Or rc.rect.Height < 2 Then Continue For
+                Dim slot = planeAlg.disect.indexList.IndexOf(rc.index)
+                Dim band = depthBand(rc, slot)
+                If band.z0 <= 0 Then Continue For
+
+                Dim plane As Vec4f
+                If slot >= 0 Then plane = planeAlg.planeList(slot)
+                If plane(0) = 0 And plane(1) = 0 And plane(2) = 0 Then plane = New Vec4f(0, 0, 1, band.z0)
+
+                Dim cellColor = task.vecColors(rc.index Mod task.vecColors.Length)
+                Dim color = New Vec3f(cellColor(0) / 255, cellColor(1) / 255, cellColor(2) / 255)
+                Dim before = buf.Count
+                addCellMask(buf, rc, plane, color, band.z0, band.lo, band.hi)
+                If buf.Count > before Then cellCount += 1
+            Next
+
+            strOut = task.sharpGL.RunTriangles(oCase.drawPlanes, buf)
+            SetTrueText(strOut, 3)
+            labels(3) = CStr(cellCount) + " featureless cells. " + strOut
         End Sub
     End Class
 End Namespace

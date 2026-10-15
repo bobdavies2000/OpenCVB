@@ -377,6 +377,25 @@ Namespace VBClasses
                     gl.DeleteTextures(1, textureID)
                     label = CStr(triangleCount) + " triangles were sent to OpenGL."
 
+                Case oCase.drawPlanes
+                    If dataBuffer Is Nothing OrElse dataBuffer.Count < 5 Then
+                        label = "No featureless planes."
+                        Exit Select
+                    End If
+                    gl.Begin(OpenGL.GL_QUADS)
+                    Dim planeCount As Integer
+                    For i = 0 To dataBuffer.Count - 5 Step 5
+                        Dim col = dataBuffer(i)
+                        gl.Color(col(2), col(1), col(0))
+                        For k = 1 To 4
+                            Dim vec = dataBuffer(i + k)
+                            gl.Vertex(vec(0), -vec(1), -vec(2))
+                        Next
+                        planeCount += 1
+                    Next
+                    gl.End()
+                    label = CStr(planeCount) + " rectangles were sent to OpenGL."
+
                 Case oCase.octreeTriangles
                     If dataBuffer Is Nothing OrElse dataBuffer.Count = 0 Then
                         label = "No octree mesh."

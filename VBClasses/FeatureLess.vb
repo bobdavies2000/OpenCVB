@@ -47,7 +47,7 @@ Namespace VBClasses
                 Dim motionMat As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
                 motionInput(rc.rect).CopyTo(motionMat, rc.mask)
                 rc.motionPercent = 100 * CountNonZero(motionMat) / rc.pixels
-                SetTrueText(CStr(rc.index), rc.maxDist)
+                SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
                 rcList.Add(rc)
             Next
             dst2 = Palettize(dst1, 0)
@@ -2116,6 +2116,53 @@ Namespace VBClasses
 
 
 
+    Public Class FeatureLess_DisectionOriginal : Inherits TaskParent
+        ' Each cell adds the horizontal line depths, then the vertical line depths.
+        Public depthList As New List(Of List(Of Single))
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.fless.dst2.Clone
+            labels(2) = task.fless.labels(2)
+
+            depthList.Clear()
+            For Each rc In task.fless.rcList
+                If rc.index = 0 Then Continue For
+
+                Dim lineMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+                Line(lineMask, New cv.Point(0, pt.Y), New cv.Point(lineMask.Width - 1, pt.Y), 255, 1)
+                Line(lineMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, lineMask.Height - 1), 255, 1)
+                BitwiseAnd(lineMask, rc.mask, lineMask)
+
+                Dim hDepth As New List(Of Single)
+                For x = 0 To lineMask.Width - 1
+                    If lineMask.Get(Of Byte)(pt.Y, x) = 0 Then Continue For
+                    hDepth.Add(task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.rect.X + x))
+                Next
+
+                Dim vDepth As New List(Of Single)
+                For y = 0 To lineMask.Height - 1
+                    If lineMask.Get(Of Byte)(y, pt.X) = 0 Then Continue For
+                    vDepth.Add(task.pcSplit(2).Get(Of Single)(rc.rect.Y + y, rc.maxDist.X))
+                Next
+                depthList.Add(hDepth)
+                depthList.Add(vDepth)
+
+                Dim drawMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                Line(drawMask, New cv.Point(0, pt.Y), New cv.Point(drawMask.Width - 1, pt.Y), 255, task.lineWidth)
+                Line(drawMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, drawMask.Height - 1), 255, task.lineWidth)
+                BitwiseAnd(drawMask, rc.mask, drawMask)
+                dst2(rc.rect).SetTo(task.highlight, drawMask)
+            Next
+        End Sub
+    End Class
+
+
+
+
     Public Class FeatureLess_Disection : Inherits TaskParent
         ' Each cell adds the horizontal line depths, then the vertical line depths.
         Public depthList As New List(Of List(Of Single))
@@ -2130,7 +2177,7 @@ Namespace VBClasses
             Dim iter As New LineIterator(task.pcSplit(2), p1, p2, PixelConnectivity.Connectivity8, False)
             For Each pt In iter
                 Dim depth = pt.GetValue(Of Single)()
-                If depth <= 0 Then Continue For
+                If depth <= 0 OrElse Single.IsFinite(depth) = False Then Continue For
                 Dim x = pt.Pos.X - rc.rect.X
                 Dim y = pt.Pos.Y - rc.rect.Y
                 If x < 0 Or y < 0 Or x >= rc.mask.Width Or y >= rc.mask.Height Then Continue For
@@ -2147,15 +2194,18 @@ Namespace VBClasses
             ptList.Clear()
             indexList.Clear()
             For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
+                If rc.index = 0 Or rc.mask.Width < 2 Or rc.mask.Height < 2 Then Continue For
 
                 Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
-                If pt.X < 0 Or pt.Y < 0 Or pt.X >= rc.mask.Width Or pt.Y >= rc.mask.Height Then Continue For
+                pt.X = Math.Max(0, Math.Min(rc.mask.Width - 1, pt.X))
+                pt.Y = Math.Max(0, Math.Min(rc.mask.Height - 1, pt.Y))
+                Dim cx = Math.Max(0, Math.Min(dst2.Width - 1, rc.rect.X + pt.X))
+                Dim cy = Math.Max(0, Math.Min(dst2.Height - 1, rc.rect.Y + pt.Y))
 
-                Dim h1 = New cv.Point(rc.rect.X, rc.maxDist.Y)
-                Dim h2 = New cv.Point(rc.rect.X + rc.rect.Width - 1, rc.maxDist.Y)
-                Dim v1 = New cv.Point(rc.maxDist.X, rc.rect.Y)
-                Dim v2 = New cv.Point(rc.maxDist.X, rc.rect.Y + rc.rect.Height - 1)
+                Dim h1 = New cv.Point(Math.Max(0, rc.rect.X), cy)
+                Dim h2 = New cv.Point(Math.Min(dst2.Width - 1, rc.rect.X + rc.rect.Width - 1), cy)
+                Dim v1 = New cv.Point(cx, Math.Max(0, rc.rect.Y))
+                Dim v2 = New cv.Point(cx, Math.Min(dst2.Height - 1, rc.rect.Y + rc.rect.Height - 1))
 
                 Dim hDepth As New List(Of Single), hPts As New List(Of cv.Point)
                 Dim vDepth As New List(Of Single), vPts As New List(Of cv.Point)
@@ -2285,48 +2335,225 @@ Namespace VBClasses
 
 
 
-
-    Public Class FeatureLess_DisectionOld : Inherits TaskParent
-        ' Each cell adds the horizontal line depths, then the vertical line depths.
-        Public depthList As New List(Of List(Of Single))
+    Public Class FeatureLess_DisectionPlane : Inherits TaskParent
+        Public disect As New FeatureLess_Disection
+        ' planeList(i) matches disect.indexList(i): ax + by + cz = d
+        Public planeList As New List(Of Vec4f)
+        ' Parallel to planeList. Held entries keep the last equation and depth while the cell has no motion.
+        Public anchorDepth As New List(Of Single)
+        Public heldStill As New List(Of Boolean)
+        Private Class stillPlane
+            Public plane As Vec4f
+            Public depth As Single
+            Public maxDist As cv.Point
+        End Class
+        Private stillList As New List(Of stillPlane)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
-            desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
+            desc = "Cursor.ai: Build a plane equation from a cell's horizontal/vertical lines."
         End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fless.dst2.Clone
-            labels(2) = task.fless.labels(2)
-
-            depthList.Clear()
-            For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
-
-                Dim lineMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-                Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
-                Line(lineMask, New cv.Point(0, pt.Y), New cv.Point(lineMask.Width - 1, pt.Y), 255, 1)
-                Line(lineMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, lineMask.Height - 1), 255, 1)
-                BitwiseAnd(lineMask, rc.mask, lineMask)
-
-                Dim hDepth As New List(Of Single)
-                For x = 0 To lineMask.Width - 1
-                    If lineMask.Get(Of Byte)(pt.Y, x) = 0 Then Continue For
-                    hDepth.Add(task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.rect.X + x))
-                Next
-
-                Dim vDepth As New List(Of Single)
-                For y = 0 To lineMask.Height - 1
-                    If lineMask.Get(Of Byte)(y, pt.X) = 0 Then Continue For
-                    vDepth.Add(task.pcSplit(2).Get(Of Single)(rc.rect.Y + y, rc.maxDist.X))
-                Next
-                depthList.Add(hDepth)
-                depthList.Add(vDepth)
-
-                Dim drawMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-                Line(drawMask, New cv.Point(0, pt.Y), New cv.Point(drawMask.Width - 1, pt.Y), 255, task.lineWidth)
-                Line(drawMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, drawMask.Height - 1), 255, task.lineWidth)
-                BitwiseAnd(drawMask, rc.mask, drawMask)
-                dst2(rc.rect).SetTo(task.highlight, drawMask)
+        Private Function worldCloud(depths As List(Of Single), pts As List(Of cv.Point)) As List(Of Point3f)
+            Dim cloud As New List(Of Point3f)
+            If depths Is Nothing OrElse pts Is Nothing Then Return cloud
+            For i = 0 To Math.Min(depths.Count, pts.Count) - 1
+                If depths(i) <= 0 OrElse Single.IsFinite(depths(i)) = False Then Continue For
+                cloud.Add(Cloud_Basics.worldCoordinates(pts(i), depths(i)))
             Next
+            Return cloud
+        End Function
+        Private Function crossProduct(v1 As Point3f, v2 As Point3f) As Point3f
+            Return New Point3f(v1.Y * v2.Z - v1.Z * v2.Y,
+                               v1.Z * v2.X - v1.X * v2.Z,
+                               v1.X * v2.Y - v1.Y * v2.X)
+        End Function
+        Private Function formatPlane(a As Double, b As Double, c As Double, d As Double) As String
+            Dim s1 = If(b < 0, " - ", " + ")
+            Dim s2 = If(c < 0, " - ", " + ")
+            Return a.ToString(fmt3) + "x" + s1 + Math.Abs(b).ToString(fmt3) + "y" + s2 +
+                   Math.Abs(c).ToString(fmt3) + "z = " + d.ToString(fmt3)
+        End Function
+        Private Function anchorPoint(rc As rcData, hCloud As List(Of Point3f), vCloud As List(Of Point3f)) As Point3f
+            If rc IsNot Nothing AndAlso rc.maxDist.X >= 0 AndAlso rc.maxDist.Y >= 0 AndAlso
+               rc.maxDist.X < task.pcSplit(2).Cols AndAlso rc.maxDist.Y < task.pcSplit(2).Rows Then
+                Dim depth = task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                If depth > 0 AndAlso Single.IsFinite(depth) Then Return Cloud_Basics.worldCoordinates(rc.maxDist, depth)
+            End If
+
+            Dim count As Integer
+            Dim x As Double, y As Double, z As Double
+            For Each cloud In {hCloud, vCloud}
+                If cloud Is Nothing Then Continue For
+                For Each p In cloud
+                    If p.Z <= 0 OrElse Single.IsFinite(p.Z) = False Then Continue For
+                    x += p.X
+                    y += p.Y
+                    z += p.Z
+                    count += 1
+                Next
+            Next
+            If count > 0 Then Return New Point3f(CSng(x / count), CSng(y / count), CSng(z / count))
+            If rc IsNot Nothing AndAlso rc.depth > 0 AndAlso Single.IsFinite(rc.depth) Then
+                Return Cloud_Basics.worldCoordinates(rc.maxDist, rc.depth)
+            End If
+            Return New Point3f
+        End Function
+        Private Function flatPlane(cellIndex As Integer, anchor As Point3f, reason As String) As (plane As Vec4f, depth As Single, text As String)
+            Dim plane = New Vec4f(0, 0, 1, anchor.Z)
+            Dim text = "Cell " + CStr(cellIndex) + " plane" + vbCrLf
+            text += reason + vbCrLf + vbCrLf
+            text += formatPlane(plane(0), plane(1), plane(2), plane(3)) + vbCrLf + vbCrLf
+            text += "normal = (0, 0, 1)"
+            Return (plane, anchor.Z, text)
+        End Function
+        Private Function heldText(cellIndex As Integer, plane As Vec4f, depth As Single) As String
+            Dim text = "Cell " + CStr(cellIndex) + " plane held (no motion)" + vbCrLf
+            text += "depth = " + depth.ToString(fmt3) + vbCrLf + vbCrLf
+            text += formatPlane(plane(0), plane(1), plane(2), plane(3))
+            Return text
+        End Function
+        Private Function findStill(rc As rcData, used As Boolean()) As Integer
+            If rc Is Nothing OrElse rc.mask Is Nothing OrElse used Is Nothing Then Return -1
+            Dim best = -1
+            Dim bestDist = Integer.MaxValue
+            For i = 0 To stillList.Count - 1
+                If used(i) Then Continue For
+                Dim x = stillList(i).maxDist.X - rc.rect.X
+                Dim y = stillList(i).maxDist.Y - rc.rect.Y
+                If x < 0 OrElse y < 0 OrElse x >= rc.mask.Width OrElse y >= rc.mask.Height Then Continue For
+                If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
+                Dim dx = stillList(i).maxDist.X - rc.maxDist.X
+                Dim dy = stillList(i).maxDist.Y - rc.maxDist.Y
+                Dim dist = dx * dx + dy * dy
+                If dist < bestDist Then
+                    bestDist = dist
+                    best = i
+                End If
+            Next
+            Return best
+        End Function
+        Private Function buildPlane(cellIndex As Integer, rc As rcData, hDepths As List(Of Single), hPts As List(Of cv.Point),
+                                    vDepths As List(Of Single), vPts As List(Of cv.Point)) As (plane As Vec4f, depth As Single, text As String)
+            Dim hCloud = worldCloud(hDepths, hPts)
+            Dim vCloud = worldCloud(vDepths, vPts)
+            Dim anchor = anchorPoint(rc, hCloud, vCloud)
+            If anchor.Z <= 0 Then
+                Return (New Vec4f, 0, "Cell " + CStr(cellIndex) + " has no depth.")
+            End If
+            If hCloud.Count < 2 Or vCloud.Count < 2 Then
+                Return flatPlane(cellIndex, anchor, "Constant depth: one dissecting line has too few depth samples.")
+            End If
+
+            Dim hLine = FitLine(hCloud, DistanceTypes.L2, 0, 0.01, 0.01)
+            Dim vLine = FitLine(vCloud, DistanceTypes.L2, 0, 0.01, 0.01)
+            Dim normal = crossProduct(New Point3f(hLine.Vx, hLine.Vy, hLine.Vz),
+                                      New Point3f(vLine.Vx, vLine.Vy, vLine.Vz))
+            Dim magnitude = Math.Sqrt(normal.X * normal.X + normal.Y * normal.Y + normal.Z * normal.Z)
+            If magnitude < 0.001 OrElse Double.IsFinite(magnitude) = False Then
+                Return flatPlane(cellIndex, anchor, "Constant depth: the dissecting lines are parallel.")
+            End If
+
+            normal = New Point3f(normal.X / magnitude, normal.Y / magnitude, normal.Z / magnitude)
+            If Single.IsFinite(normal.X) = False OrElse Single.IsFinite(normal.Y) = False OrElse
+               Single.IsFinite(normal.Z) = False Then
+                Return flatPlane(cellIndex, anchor, "Constant depth: the plane fit was not finite.")
+            End If
+            If normal.Z < 0 Then normal = New Point3f(-normal.X, -normal.Y, -normal.Z)
+
+            Dim d = normal.X * anchor.X + normal.Y * anchor.Y + normal.Z * anchor.Z
+            Dim plane = New Vec4f(normal.X, normal.Y, normal.Z, d)
+            Dim text = "Cell " + CStr(cellIndex) + " plane" + vbCrLf
+            text += CStr(hCloud.Count) + " horizontal points, " + CStr(vCloud.Count) + " vertical points, meters" + vbCrLf + vbCrLf
+            text += formatPlane(plane(0), plane(1), plane(2), plane(3)) + vbCrLf + vbCrLf
+            text += "normal = (" + normal.X.ToString(fmt3) + ", " + normal.Y.ToString(fmt3) + ", " + normal.Z.ToString(fmt3) + ")"
+            Return (plane, anchor.Z, text)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            disect.Run(src)
+            dst2 = disect.dst2.Clone
+            labels(2) = disect.labels(2)
+            If task.firstPass Or task.optionsChanged Then stillList.Clear()
+            planeList.Clear()
+            anchorDepth.Clear()
+            heldStill.Clear()
+
+            Dim nextStill As New List(Of stillPlane)
+            Dim used As Boolean() = Nothing
+            If stillList.Count > 0 Then used = New Boolean(stillList.Count - 1) {}
+
+            Static selected As Integer = -1
+            If selected < 0 Or task.firstPass Or (task.mouseClickFlag And task.mousePicTag = 2) Then
+                Dim clickPt = task.clickPoint
+                If clickPt.X >= 0 And clickPt.Y >= 0 And clickPt.X < task.fless.dst1.Width And
+                   clickPt.Y < task.fless.dst1.Height Then
+                    selected = task.fless.dst1.Get(Of Byte)(clickPt.Y, clickPt.X)
+                End If
+            End If
+
+            Dim selectedText = ""
+            For i = 0 To disect.indexList.Count - 1
+                Dim cell = disect.indexList(i)
+                Dim rc As rcData = Nothing
+                For Each candidate In task.fless.rcList
+                    If candidate.index = cell Then
+                        rc = candidate
+                        Exit For
+                    End If
+                Next
+
+                Dim resultPlane As Vec4f
+                Dim resultDepth As Single
+                Dim resultText As String
+                Dim hold = False
+                If rc IsNot Nothing AndAlso rc.motionPercent <= 0 Then
+                    Dim heldSlot = findStill(rc, used)
+                    If heldSlot >= 0 AndAlso stillList(heldSlot).depth > 0 Then
+                        used(heldSlot) = True
+                        hold = True
+                        resultPlane = stillList(heldSlot).plane
+                        resultDepth = stillList(heldSlot).depth
+                        resultText = heldText(cell, resultPlane, resultDepth)
+                    End If
+                End If
+                If hold = False Then
+                    Dim built = buildPlane(cell, rc, disect.depthList(i * 2), disect.ptList(i * 2),
+                                            disect.depthList(i * 2 + 1), disect.ptList(i * 2 + 1))
+                    resultPlane = built.plane
+                    resultDepth = built.depth
+                    resultText = built.text
+                End If
+
+                planeList.Add(resultPlane)
+                anchorDepth.Add(resultDepth)
+                heldStill.Add(hold)
+                If rc IsNot Nothing AndAlso resultDepth > 0 Then
+                    Dim entry As New stillPlane
+                    entry.plane = resultPlane
+                    entry.depth = resultDepth
+                    entry.maxDist = rc.maxDist
+                    nextStill.Add(entry)
+                End If
+                If cell <> selected Then Continue For
+
+                selectedText = resultText
+                If rc Is Nothing Then Continue For
+                Rectangle(dst2, rc.rect, white, task.lineWidth)
+                Dim hPts = disect.ptList(i * 2)
+                Dim vPts = disect.ptList(i * 2 + 1)
+                If hPts.Count >= 2 Then Line(dst2, hPts(0), hPts(hPts.Count - 1), white, task.lineWidth + 1, task.lineType)
+                If vPts.Count >= 2 Then Line(dst2, vPts(0), vPts(vPts.Count - 1), white, task.lineWidth + 1, task.lineType)
+                Circle(dst2, rc.maxDist, task.DotSize, white, -1, task.lineType)
+            Next
+
+            If selected <= 0 Then
+                labels(3) = "Click a featureless cell in dst2."
+                SetTrueText(labels(3), 3)
+            ElseIf selectedText = "" Then
+                labels(3) = "Cell " + CStr(selected) + " has no dissecting lines."
+                SetTrueText(labels(3), 3)
+            Else
+                labels(3) = "Plane equation for cell " + CStr(selected) + "."
+                SetTrueText(selectedText, 3)
+            End If
+            stillList = nextStill
         End Sub
     End Class
 End Namespace
