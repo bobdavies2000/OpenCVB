@@ -824,11 +824,11 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_LeftRight : Inherits TaskParent
-        Dim redLeft As New RedColor_Basicsap
-        Dim redRight As New RedColor_Basicsap
+        Dim redLeft As New RedColor_FLessBasics
+        Dim redRight As New RedColor_FLessBasics
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            desc = "Display the RedColor_Basicsap output for both the left and right images."
+            desc = "Display the RedColor_FLessBasics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
@@ -851,7 +851,7 @@ Namespace VBClasses
 
     Public Class XR_RedColor_NWay : Inherits TaskParent
         Dim binN As New BinNWay_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Run RedColor on the output of the BinNWay_Basics"
         End Sub
@@ -874,7 +874,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Attach an color8u class to each r."
@@ -959,7 +959,7 @@ Namespace VBClasses
             desc = "Identify and track the lines in an image as RedCloud Cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            if heartbeatx() then  dst3.SetTo(0)
+            If heartbeatX() Then dst3.SetTo(0)
             Dim index As Integer
             For Each lp In task.lines.lpList
                 Line(dst3, lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
@@ -1185,7 +1185,7 @@ Namespace VBClasses
     ''' Click a cell (task.rcD) when available to override the auto-picked subject.
     ''' </summary>
     Public Class XR_RedColor_Isolate : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Cursor.ai: Isolate subject via RedColor cells: auto-pick center cell (non-background size); use selected cell if set."
         End Sub
@@ -1286,7 +1286,7 @@ Namespace VBClasses
             labels(2) = "Subject index=" + CStr(subject.id) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
             labels(3) = "white = kept region. Select another cell with RedColor UI to retarget."
-            strOut = "Uses RedCloud color flood cells (RedColor_Basicsap). Auto-pick avoids cells covering most of the frame." + vbCrLf +
+            strOut = "Uses RedCloud color flood cells (RedColor_FLessBasics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
                  "For iPhone-like quality you would need a learned segmenter; this is a fast geometric proxy."
             SetTrueText(strOut, 3)
         End Sub
@@ -1302,7 +1302,7 @@ Namespace VBClasses
         Dim fLess As New XR_FeatureLess_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use the output of the FeatureLess_BasicsOld as input the RedColor_Basicsap."
+            desc = "Use the output of the FeatureLess_BasicsOld as input the RedColor_FLessBasics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)
@@ -1323,7 +1323,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_Contour : Inherits TaskParent
-        Public redC As New RedColor_Basicsap
+        Public redC As New RedColor_FLessBasics
         Public Sub New()
             If New Size(task.workRes.Width, task.workRes.Height) <> New Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
             desc = "Get stats on each RedColor cell."

@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Namespace VBClasses
     Public Class Smoothing_Basics : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "ApproxPoly is an interior and hull is an exterior"

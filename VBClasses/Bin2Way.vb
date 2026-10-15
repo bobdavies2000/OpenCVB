@@ -74,7 +74,7 @@ Namespace VBClasses
 
     Public Class XR_Bin2Way_RedC : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify 4 gradations of light and combine them for input to RedColor"
@@ -241,13 +241,13 @@ Namespace VBClasses
 
     Public Class XR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
         Dim recurse As New XR_Bin2Way_RecurseOnce
-        Dim redCs(3) As RedColor_Basicsap
+        Dim redCs(3) As RedColor_FLessBasics
         Dim mats As New Mat_4to1
         Dim rclist As New List(Of rcData)
         Dim idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             For i = 0 To redCs.Length - 1
-                redCs(i) = New RedColor_Basicsap
+                redCs(i) = New RedColor_FLessBasics
             Next
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "4 separate RedColor runs - darkest to lightest."

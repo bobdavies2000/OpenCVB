@@ -134,7 +134,7 @@ Namespace VBClasses
 
     Public Class XR_FitEllipse_RedC : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Create an ellipse from a contour"
         End Sub

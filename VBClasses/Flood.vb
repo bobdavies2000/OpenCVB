@@ -259,7 +259,7 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_Basicsap
+        Public redC As New RedColor_FLessBasics
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
@@ -288,7 +288,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Dim edges As New Edge_Basics_TA
         Public Sub New()
             desc = "Match flooded cells with FeatureLess clusters"
@@ -316,7 +316,7 @@ Namespace VBClasses
 
 
     Public Class XR_Flood_DarkLight : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Dim options As New Options_CComp
         Public Sub New()
             desc = "FloodFill the light half of the image."

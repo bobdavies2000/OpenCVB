@@ -567,7 +567,7 @@ Namespace VBClasses
 
     Public Class XR_Feature_RedC : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Show the feature points in the RedC output."
         End Sub

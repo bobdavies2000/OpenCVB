@@ -591,7 +591,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
@@ -623,7 +623,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."

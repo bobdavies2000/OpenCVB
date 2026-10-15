@@ -232,7 +232,7 @@ Namespace VBClasses
 
     Public Class XR_Match_TraceRedC : Inherits TaskParent
         Dim frameList As New List(Of Mat)
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
             dst1 = New Mat(dst1.Size(), MatType.CV_32S, 0)
@@ -691,7 +691,7 @@ Namespace VBClasses
 
 
     Public Class Match_RedC : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Dim matchFeat As New Match_Features
         Public Sub New()
             desc = "Create a stable RedC output image."

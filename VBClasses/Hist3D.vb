@@ -91,7 +91,7 @@ Namespace VBClasses
 
     Public Class XR_Hist3D_RedC : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Run RedFlood_List on the combined Hist3D color/cloud output."
@@ -118,9 +118,9 @@ Namespace VBClasses
 
     Public Class XR_Hist3D_RedC1 : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
-            desc = "Use the Hist3D color classes to segment the image with RedColor_Basicsap"
+            desc = "Use the Hist3D color classes to segment the image with RedColor_FLessBasics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hColor.Run(src)

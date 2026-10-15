@@ -3,7 +3,7 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public redC As New RedColor_Basicsap
+        Public redC As New RedColor_FLessBasics
         Public Sub New()
             labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
@@ -25,7 +25,7 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
-        Public redC As New RedColor_Basicsap
+        Public redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
@@ -585,7 +585,7 @@ Namespace VBClasses
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()

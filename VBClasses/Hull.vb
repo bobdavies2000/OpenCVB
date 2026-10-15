@@ -34,7 +34,7 @@ Namespace VBClasses
 
 
     Public Class Hull_Edges : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             desc = "Match hull edges that are also real edges."
         End Sub
@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
     Public Class Hull_Contour : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Contour is in white and hull is highlighted."
@@ -216,7 +216,7 @@ Namespace VBClasses
 
 
     Public Class Hull_RedC : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)

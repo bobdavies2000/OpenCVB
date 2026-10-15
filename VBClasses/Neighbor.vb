@@ -3,7 +3,7 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public nabes As New List(Of Integer)
         Public Sub New()
             desc = "Find all the neighbors with CalcHist and the neighborMask"

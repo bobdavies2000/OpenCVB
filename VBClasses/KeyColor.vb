@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
     Public Class XR_KeyColor_OverColor : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Dim keyColors As New XR_KeyColor_Contours
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)

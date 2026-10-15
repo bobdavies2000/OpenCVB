@@ -63,7 +63,7 @@ Namespace VBClasses
         Public similarCells As New List(Of rcData)
         Public rc As New rcData
         Dim options As New Options_MatchShapes
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             labels(3) = "All the shapes that match since the last heartbeat."
             desc = "Find similar shapes in the redC cells."
@@ -165,7 +165,7 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             OptionParent.FindSlider("Match Threshold %").Value = 3

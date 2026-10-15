@@ -392,7 +392,6 @@ Namespace VBClasses
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.fless.Run(src)
             If task.optionsChanged Then
                 dst2 = task.fless.dst3.Clone
                 rcList = New List(Of rcData)(task.fless.rcList)
@@ -758,7 +757,6 @@ Namespace VBClasses
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.fless.Run(src)
             dst2 = task.fless.dst1
             labels(3) = task.fless.labels(2)
 
@@ -1659,15 +1657,14 @@ Namespace VBClasses
         Dim knn As New KNN_Minimal
         Dim dimension As Integer = 5
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Try to keep the featureless region index consistent from frame to frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static fLess As New FeatureLess_Basics
-            fLess.Run(task.gray)
-            dst2 = fLess.dst2
-            labels(2) = fLess.labels(2)
+            dst2 = task.fless.dst2
+            labels(2) = task.fless.labels(2)
 
-            rcList = fLess.rcList
+            rcList = task.fless.rcList
 
             Static queries As New List(Of Single)
             Dim trainInput = New List(Of Single)(queries)
@@ -1703,9 +1700,9 @@ Namespace VBClasses
 
     Public Class FeatureLess_Ordered : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim fLess As New FeatureLess_Basics
         Dim tracked As New List(Of rcData)
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Keep the rc.index assigned the first time each FeatureLess_Basics cell appears."
         End Sub
@@ -1716,12 +1713,10 @@ Namespace VBClasses
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-
             Dim claimed As New List(Of Integer)
             rcList.Clear()
-            rcList.Add(fLess.rcList(0))
-            For Each rc In fLess.rcList
+            rcList.Add(task.fless.rcList(0))
+            For Each rc In task.fless.rcList
                 If rc.index = 0 Then Continue For
 
                 Dim matched As rcData = Nothing
@@ -1766,10 +1761,10 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm - visual solution.
             desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
@@ -1777,13 +1772,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = task.steadyCam.dst2
 
-            fLess.Run(src)
-
             Static rcSnapshotList As List(Of rcData)
             If task.heartBeatLT Then
-                rcSnapshotList = New List(Of rcData)(fLess.rcList)
+                rcSnapshotList = New List(Of rcData)(task.fless.rcList)
                 rcSnapshotList.RemoveAt(0)
-                dst3 = fLess.dst3
+                dst3 = task.fless.dst3
             End If
 
             idMap.SetTo(0)
@@ -1792,7 +1785,7 @@ Namespace VBClasses
             Dim usedList As New List(Of Integer)
             For Each rcPrev In rcSnapshotList
                 Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
-                For Each rc In fLess.rcList
+                For Each rc In task.fless.rcList
                     If rc.index = 0 Then Continue For
                     If rc.rect.Contains(pt) Then
                         If usedList.Contains(rc.index) = False Then
@@ -1806,9 +1799,9 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim unusedCount = fLess.rcList.Count - usedList.Count
-            Dim nextSlot As Integer = fLess.rcList.Count
-            For Each rc In fLess.rcList
+            Dim unusedCount = task.fless.rcList.Count - usedList.Count
+            Dim nextSlot As Integer = task.fless.rcList.Count
+            For Each rc In task.fless.rcList
                 If rc.index = 0 Then Continue For
                 If usedList.Contains(rc.index) = False Then
                     rc.index = nextSlot
@@ -1851,15 +1844,14 @@ Namespace VBClasses
     Public Class XR_FeatureLess_Delaunay : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim delaunay As New Delaunay_Basics
-        Dim fLess As New FeatureLess_Basics
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Create a map for the featureless cells with Delaunay triangulation"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-            rcList = fLess.rcList
-            dst2 = fLess.dst2
-            labels(2) = fLess.labels(2)
+            rcList = task.fless.rcList
+            dst2 = task.fless.dst2
+            labels(2) = task.fless.labels(2)
 
             If task.heartBeatLT Or task.optionsChanged Then
                 delaunay.ptList.Clear()
@@ -1925,18 +1917,17 @@ Namespace VBClasses
 
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public delaunay As New Delaunay_Basics
-        Dim fLess As New FeatureLess_Basics
         Public rcList As New List(Of rcData)
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Use Delaunay to manage the rc.index and keep the featureless cells unique."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcLastList = New List(Of rcData)(rcList)
-            fLess.Run(src)
 
             If heartbeatLTX() Then
-                rcList = New List(Of rcData)(fLess.rcList)
+                rcList = New List(Of rcData)(task.fless.rcList)
                 delaunay.ptList.Clear()
                 delaunay.ptList.Add(New cv.Point)
                 For Each rc In rcList
@@ -1951,7 +1942,7 @@ Namespace VBClasses
                 labels(3) = delaunay.labels(2)
 
                 Dim usedList As New List(Of Byte)
-                Dim nextSlot As Integer = fLess.rcList.Count
+                Dim nextSlot As Integer = task.fless.rcList.Count
                 For Each rc In rcList
                     rc.id = dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If usedList.Contains(rc.id) Then
@@ -1985,7 +1976,7 @@ Namespace VBClasses
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
             Else
-                rcList = New List(Of rcData)(fLess.rcList)
+                rcList = New List(Of rcData)(task.fless.rcList)
 
                 For Each rc In rcList
                     If rc.index = 0 Then Continue For
@@ -2029,7 +2020,6 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Matching : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
         Dim match As New Match_Basics
         Dim rect As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public originalCenter As cv.Point = Nothing
@@ -2039,6 +2029,7 @@ Namespace VBClasses
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public verticalizeAngle As Double
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             verticalizeAngle = task.verticalizeAngle
             task.fOptions.MatchCorrSlider.Value = 85
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -2048,18 +2039,17 @@ Namespace VBClasses
             desc = "Match a featureless cell to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-            If fLess.rcList.Count = 0 Then Exit Sub
+            If task.fless.rcList.Count = 0 Then Exit Sub
 
             rcMatch = Nothing
-            For Each rc In fLess.rcList
+            For Each rc In task.fless.rcList
                 If rc.index = 0 Then Continue For
                 If rc.rect.IntersectsWith(rect) Then
                     rcMatch = rc
                     Exit For
                 End If
             Next
-            If rcMatch Is Nothing Then rcMatch = fLess.rcList(1)
+            If rcMatch Is Nothing Then rcMatch = task.fless.rcList(1)
 
             If heartbeatLTX() Or rcMatch.motionPercent >= 50 Or
                 match.correlation * 100 < task.fOptions.MatchCorrSlider.Value Then

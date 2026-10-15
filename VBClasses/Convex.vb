@@ -58,7 +58,7 @@ Namespace VBClasses
 
     Public Class XR_Convex_RedC : Inherits TaskParent
         Dim convex As New Convex_Basics
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
             desc = "Get lots of odd shapes from the Convex_Basics output and use ConvexHull to simplify them."
@@ -87,7 +87,7 @@ Namespace VBClasses
 
     Public Class Convex_RedCDefects : Inherits TaskParent
         Dim contours As New Contour_Largest
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."

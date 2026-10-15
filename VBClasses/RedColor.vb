@@ -121,13 +121,13 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Basicsap : Inherits TaskParent
+    Public Class RedColor_FLessBasics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim fLess As New FeatureLess_Basics
         Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "The output of FeatureLess_BasicsOld.  Note that cell colors match the RedColor output."
+            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
             desc = "Use the FeatureLess regions to improve the RedColor output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -137,15 +137,13 @@ Namespace VBClasses
                 src = color8U.dst2
             End If
 
-            fLess.Run(task.gray)
-
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In fLess.brickList
+            For Each r In task.fless.brickList
                 Dim val = mask(r).Get(Of Byte)(0, 0)
                 If val = 0 Then
-                    Dim index As Integer = fLess.dst1(r).Get(Of Byte)(0, 0)
+                    Dim index As Integer = task.fless.dst1(r).Get(Of Byte)(0, 0)
                     If index > 0 Then
                         Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
                         Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
@@ -185,7 +183,7 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(idMap, 0)
-            dst3 = fLess.dst2
+            dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
         End Sub
@@ -197,7 +195,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_GridRects : Inherits TaskParent
-        Dim redC As New RedColor_Basicsap
+        Dim redC As New RedColor_FLessBasics
         Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
         Public Sub New()
             labels(3) = "RedColor output mapped into the gridRects."
@@ -230,11 +228,11 @@ Namespace VBClasses
     Public Class RedColor_InRange : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_Basicsap
+        Public redC As New RedColor_FLessBasics
         Dim color8U As New Color8U_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-            desc = "Use InRange to prepare an 8U input image for RedColor_Basicsap"
+            desc = "Use InRange to prepare an 8U input image for RedColor_FLessBasics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
