@@ -205,7 +205,10 @@ Feature_Tracker
 Feature_WarpAlign
 Feature_WithRotation
 FeatureLess_Basics
+FeatureLess_DisectHLine
 FeatureLess_Disection
+FeatureLess_DisectionOld
+FeatureLess_DisectVLine
 FeatureLess_Gravity
 FeatureLess_Matching
 FeatureLess_Ordered

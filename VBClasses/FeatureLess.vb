@@ -5,7 +5,7 @@ Namespace VBClasses
         Public brickList As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless gridrects that also have depth."
+            desc = "Identify featureless gridrects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
@@ -2117,12 +2117,216 @@ Namespace VBClasses
 
 
     Public Class FeatureLess_Disection : Inherits TaskParent
+        ' Each cell adds the horizontal line depths, then the vertical line depths.
+        Public depthList As New List(Of List(Of Single))
+        Public ptList As New List(Of List(Of cv.Point))
+        Public indexList As New List(Of Integer)
         Public Sub New()
-            desc = "Disect featureless cells to identify"
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
+        End Sub
+        Private Sub depthAlongLine(rc As rcData, p1 As cv.Point, p2 As cv.Point,
+                                   depths As List(Of Single), pts As List(Of cv.Point))
+            Dim iter As New LineIterator(task.pcSplit(2), p1, p2, PixelConnectivity.Connectivity8, False)
+            For Each pt In iter
+                Dim depth = pt.GetValue(Of Single)()
+                If depth <= 0 Then Continue For
+                Dim x = pt.Pos.X - rc.rect.X
+                Dim y = pt.Pos.Y - rc.rect.Y
+                If x < 0 Or y < 0 Or x >= rc.mask.Width Or y >= rc.mask.Height Then Continue For
+                If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
+                depths.Add(depth)
+                pts.Add(pt.Pos)
+            Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            CvtColor(src, src, cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = task.fless.dst2.Clone
+            labels(2) = task.fless.labels(2)
+
+            depthList.Clear()
+            ptList.Clear()
+            indexList.Clear()
+            For Each rc In task.fless.rcList
+                If rc.index = 0 Then Continue For
+
+                Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+                If pt.X < 0 Or pt.Y < 0 Or pt.X >= rc.mask.Width Or pt.Y >= rc.mask.Height Then Continue For
+
+                Dim h1 = New cv.Point(rc.rect.X, rc.maxDist.Y)
+                Dim h2 = New cv.Point(rc.rect.X + rc.rect.Width - 1, rc.maxDist.Y)
+                Dim v1 = New cv.Point(rc.maxDist.X, rc.rect.Y)
+                Dim v2 = New cv.Point(rc.maxDist.X, rc.rect.Y + rc.rect.Height - 1)
+
+                Dim hDepth As New List(Of Single), hPts As New List(Of cv.Point)
+                Dim vDepth As New List(Of Single), vPts As New List(Of cv.Point)
+                depthAlongLine(rc, h1, h2, hDepth, hPts)
+                depthAlongLine(rc, v1, v2, vDepth, vPts)
+                depthList.Add(hDepth)
+                depthList.Add(vDepth)
+                ptList.Add(hPts)
+                ptList.Add(vPts)
+                indexList.Add(rc.index)
+
+                Dim drawMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                Line(drawMask, New cv.Point(0, pt.Y), New cv.Point(drawMask.Width - 1, pt.Y), 255, task.lineWidth)
+                Line(drawMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, drawMask.Height - 1), 255, task.lineWidth)
+                BitwiseAnd(drawMask, rc.mask, drawMask)
+                dst2(rc.rect).SetTo(task.highlight, drawMask)
+            Next
+        End Sub
+        Private Shared Function signedTerm(value As Double) As String
+            If value < 0 Then Return " - " + Math.Abs(value).ToString(fmt3) + "t"
+            Return " + " + value.ToString(fmt3) + "t"
+        End Function
+        Private Shared Function axisEquation(name As String, origin As Double, direction As Double) As String
+            If Math.Abs(direction) < 0.0001 Then Return name + " = " + origin.ToString(fmt3)
+            If origin < 0 Then
+                Return "(" + name + " + " + Math.Abs(origin).ToString(fmt3) + ") / " + direction.ToString(fmt3)
+            End If
+            Return "(" + name + " - " + origin.ToString(fmt3) + ") / " + direction.ToString(fmt3)
+        End Function
+        Public Shared Function LineEquation(depths As List(Of Single), pts As List(Of cv.Point),
+                                            kind As String, cellIndex As Integer) As String
+            If depths Is Nothing OrElse pts Is Nothing OrElse Math.Min(depths.Count, pts.Count) < 2 Then
+                Return "Cell " + CStr(cellIndex) + " does not have enough " + kind + " depth points to fit a 3D line."
+            End If
+
+            Dim cloud As New List(Of Point3f)
+            For i = 0 To Math.Min(depths.Count, pts.Count) - 1
+                cloud.Add(Cloud_Basics.worldCoordinates(pts(i), depths(i)))
+            Next
+            Dim line = FitLine(cloud, DistanceTypes.L2, 0, 0.01, 0.01)
+
+            Dim strOut = "Cell " + CStr(cellIndex) + " " + kind + " 3D line" + vbCrLf
+            strOut += CStr(cloud.Count) + " points, meters" + vbCrLf + vbCrLf
+            strOut += "x = " + line.X1.ToString(fmt3) + signedTerm(line.Vx) + vbCrLf
+            strOut += "y = " + line.Y1.ToString(fmt3) + signedTerm(line.Vy) + vbCrLf
+            strOut += "z = " + line.Z1.ToString(fmt3) + signedTerm(line.Vz) + vbCrLf + vbCrLf
+            strOut += axisEquation("x", line.X1, line.Vx) + " =" + vbCrLf
+            strOut += axisEquation("y", line.Y1, line.Vy) + " =" + vbCrLf
+            strOut += axisEquation("z", line.Z1, line.Vz)
+            Return strOut
+        End Function
+        Public Shared Sub ShowClickedLine(alg As TaskParent, disect As FeatureLess_Disection, vertical As Boolean)
+            alg.dst2 = disect.dst2.Clone
+            alg.labels(2) = disect.labels(2)
+            alg.dst3.SetTo(0)
+
+            Static selected As Integer = -1
+            If selected < 0 Or task.firstPass Or (task.mouseClickFlag And task.mousePicTag = 2) Then
+                Dim clickPt = task.clickPoint
+                If clickPt.X >= 0 And clickPt.Y >= 0 And clickPt.X < task.fless.dst1.Width And
+                   clickPt.Y < task.fless.dst1.Height Then
+                    selected = task.fless.dst1.Get(Of Byte)(clickPt.Y, clickPt.X)
+                End If
+            End If
+
+            Dim kind = If(vertical, "vertical", "horizontal")
+            If selected <= 0 Then
+                alg.labels(3) = "Click a featureless cell in dst2."
+                alg.SetTrueText(alg.labels(3), 3)
+                Exit Sub
+            End If
+
+            Dim slot = disect.indexList.IndexOf(selected)
+            If slot < 0 Then
+                alg.labels(3) = "Cell " + CStr(selected) + " has no " + kind + " line."
+                alg.SetTrueText(alg.labels(3), 3)
+                Exit Sub
+            End If
+
+            Dim listIndex = slot * 2 + If(vertical, 1, 0)
+            Dim depths = disect.depthList(listIndex)
+            Dim pts = disect.ptList(listIndex)
+
+            For Each rc In task.fless.rcList
+                If rc.index <> selected Then Continue For
+                Rectangle(alg.dst2, rc.rect, white, task.lineWidth)
+                If pts.Count >= 2 Then
+                    Line(alg.dst2, pts(0), pts(pts.Count - 1), white, task.lineWidth + 1, task.lineType)
+                End If
+                Circle(alg.dst2, rc.maxDist, task.DotSize, white, -1, task.lineType)
+                Exit For
+            Next
+
+            alg.labels(3) = "3D " + kind + " line for cell " + CStr(selected) + "."
+            alg.SetTrueText(LineEquation(depths, pts, kind, selected), 3)
         End Sub
     End Class
 
+
+
+
+    Public Class FeatureLess_DisectHLine : Inherits TaskParent
+        Dim disect As New FeatureLess_Disection
+        Public Sub New()
+            desc = "Cursor.ai: Fit a 3D line to the horizontal depth samples of the clicked featureless cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            disect.Run(src)
+            FeatureLess_Disection.ShowClickedLine(Me, disect, False)
+        End Sub
+    End Class
+
+
+
+
+    Public Class FeatureLess_DisectVLine : Inherits TaskParent
+        Dim disect As New FeatureLess_Disection
+        Public Sub New()
+            desc = "Cursor.ai: Fit a 3D line to the vertical depth samples of the clicked featureless cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            disect.Run(src)
+            FeatureLess_Disection.ShowClickedLine(Me, disect, True)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_DisectionOld : Inherits TaskParent
+        ' Each cell adds the horizontal line depths, then the vertical line depths.
+        Public depthList As New List(Of List(Of Single))
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.fless.dst2.Clone
+            labels(2) = task.fless.labels(2)
+
+            depthList.Clear()
+            For Each rc In task.fless.rcList
+                If rc.index = 0 Then Continue For
+
+                Dim lineMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+                Line(lineMask, New cv.Point(0, pt.Y), New cv.Point(lineMask.Width - 1, pt.Y), 255, 1)
+                Line(lineMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, lineMask.Height - 1), 255, 1)
+                BitwiseAnd(lineMask, rc.mask, lineMask)
+
+                Dim hDepth As New List(Of Single)
+                For x = 0 To lineMask.Width - 1
+                    If lineMask.Get(Of Byte)(pt.Y, x) = 0 Then Continue For
+                    hDepth.Add(task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.rect.X + x))
+                Next
+
+                Dim vDepth As New List(Of Single)
+                For y = 0 To lineMask.Height - 1
+                    If lineMask.Get(Of Byte)(y, pt.X) = 0 Then Continue For
+                    vDepth.Add(task.pcSplit(2).Get(Of Single)(rc.rect.Y + y, rc.maxDist.X))
+                Next
+                depthList.Add(hDepth)
+                depthList.Add(vDepth)
+
+                Dim drawMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                Line(drawMask, New cv.Point(0, pt.Y), New cv.Point(drawMask.Width - 1, pt.Y), 255, task.lineWidth)
+                Line(drawMask, New cv.Point(pt.X, 0), New cv.Point(pt.X, drawMask.Height - 1), 255, task.lineWidth)
+                BitwiseAnd(drawMask, rc.mask, drawMask)
+                dst2(rc.rect).SetTo(task.highlight, drawMask)
+            Next
+        End Sub
+    End Class
 End Namespace
