@@ -110,6 +110,7 @@ Namespace VBClasses
             If standalone Then
                 Static redC As New RedC_Basics
                 redC.Run(task.gray)
+                If redC.rcList.Count <= 1 Then Exit Sub
                 dst2 = redC.dst2
                 labels(2) = redC.labels(2)
                 hull = redC.rcList(0).contour
@@ -156,6 +157,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            If redC.rcList.Count <= 1 Then Exit Sub
 
             Dim rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(1)

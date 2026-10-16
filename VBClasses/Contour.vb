@@ -634,6 +634,7 @@ Namespace VBClasses
 
             redC.Run(src)
             dst2 = redC.dst2
+            If redC.rcList.Count <= 1 Then Exit Sub
 
             Dim rc = task.rcD
             If rc Is Nothing Then rc = redC.rcList(1)

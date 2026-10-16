@@ -1928,6 +1928,7 @@ Namespace VBClasses
 
             If heartbeatLTX() Then
                 rcList = New List(Of rcData)(task.fless.rcList)
+                If rcList.Count <= 1 Then Exit Sub
                 delaunay.ptList.Clear()
                 delaunay.ptList.Add(New cv.Point)
                 For Each rc In rcList

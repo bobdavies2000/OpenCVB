@@ -524,7 +524,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             contours.Run(src)
+            If contours.rcList.Count = 0 Then Exit Sub
 
+            task.rcD = contours.rcList.Last
             dst2 = contours.dst2
             labels(2) = contours.labels(2)
 
@@ -532,9 +534,9 @@ Namespace VBClasses
             dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
 
             dst1.SetTo(255)
-            dst1(task.rcD.rect).SetTo(0, task.rcD.mask)
 
-            DistanceTransform(dst1, dst0, options.distanceType, DistanceTransformMasks.Precise, MatType.CV_32F)
+            DistanceTransform(dst1(task.rcD.rect), dst0(task.rcD.rect), options.distanceType, DistanceTransformMasks.Precise, MatType.CV_32F)
+            dst1(task.rcD.rect).SetTo(0, task.rcD.mask)
         End Sub
     End Class
 End Namespace

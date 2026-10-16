@@ -327,6 +327,7 @@ Namespace VBClasses
         Public ySlices As New List(Of List(Of Byte))
         Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             labels(2) = "white lines are slices used to find previous line locations."
             desc = "Build slices in X and Y from the previous image near the each line's center."
         End Sub
@@ -573,6 +574,7 @@ Namespace VBClasses
         Dim lastImage As Mat
         Dim searchCount As Integer = 9
         Public Sub New()
+            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             dst1 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
