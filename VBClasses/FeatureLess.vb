@@ -2173,7 +2173,7 @@ Namespace VBClasses
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
         End Sub
-        Private Sub depthAlongLine(rc As rcData, p1 As cv.Point, p2 As cv.Point,
+        Private Shared Sub depthAlongLine(rc As rcData, p1 As cv.Point, p2 As cv.Point,
                                    depths As List(Of Single), pts As List(Of cv.Point))
             Dim iter As New LineIterator(task.pcSplit(2), p1, p2, PixelConnectivity.Connectivity8, False)
             For Each pt In iter
@@ -2352,7 +2352,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Cursor.ai: Build a plane equation from a cell's horizontal/vertical lines."
         End Sub
-        Private Function worldCloud(depths As List(Of Single), pts As List(Of cv.Point)) As List(Of Point3f)
+        Private Shared Function worldCloud(depths As List(Of Single), pts As List(Of cv.Point)) As List(Of Point3f)
             Dim cloud As New List(Of Point3f)
             If depths Is Nothing OrElse pts Is Nothing Then Return cloud
             For i = 0 To Math.Min(depths.Count, pts.Count) - 1
@@ -2361,18 +2361,18 @@ Namespace VBClasses
             Next
             Return cloud
         End Function
-        Private Function crossProduct(v1 As Point3f, v2 As Point3f) As Point3f
+        Private Shared Function crossProduct(v1 As Point3f, v2 As Point3f) As Point3f
             Return New Point3f(v1.Y * v2.Z - v1.Z * v2.Y,
                                v1.Z * v2.X - v1.X * v2.Z,
                                v1.X * v2.Y - v1.Y * v2.X)
         End Function
-        Private Function formatPlane(a As Double, b As Double, c As Double, d As Double) As String
+        Private Shared Function formatPlane(a As Double, b As Double, c As Double, d As Double) As String
             Dim s1 = If(b < 0, " - ", " + ")
             Dim s2 = If(c < 0, " - ", " + ")
             Return a.ToString(fmt3) + "x" + s1 + Math.Abs(b).ToString(fmt3) + "y" + s2 +
                    Math.Abs(c).ToString(fmt3) + "z = " + d.ToString(fmt3)
         End Function
-        Private Function anchorPoint(rc As rcData, hCloud As List(Of Point3f), vCloud As List(Of Point3f)) As Point3f
+        Private Shared Function anchorPoint(rc As rcData, hCloud As List(Of Point3f), vCloud As List(Of Point3f)) As Point3f
             If rc IsNot Nothing AndAlso rc.maxDist.X >= 0 AndAlso rc.maxDist.Y >= 0 AndAlso
                rc.maxDist.X < task.pcSplit(2).Cols AndAlso rc.maxDist.Y < task.pcSplit(2).Rows Then
                 Dim depth = task.pcSplit(2).Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
@@ -2397,7 +2397,7 @@ Namespace VBClasses
             End If
             Return New Point3f
         End Function
-        Private Function flatPlane(cellIndex As Integer, anchor As Point3f, reason As String) As (plane As Vec4f, depth As Single, text As String)
+        Private Shared Function flatPlane(cellIndex As Integer, anchor As Point3f, reason As String) As (plane As Vec4f, depth As Single, text As String)
             Dim plane = New Vec4f(0, 0, 1, anchor.Z)
             Dim text = "Cell " + CStr(cellIndex) + " plane" + vbCrLf
             text += reason + vbCrLf + vbCrLf
@@ -2405,7 +2405,7 @@ Namespace VBClasses
             text += "normal = (0, 0, 1)"
             Return (plane, anchor.Z, text)
         End Function
-        Private Function heldText(cellIndex As Integer, plane As Vec4f, depth As Single) As String
+        Private Shared Function heldText(cellIndex As Integer, plane As Vec4f, depth As Single) As String
             Dim text = "Cell " + CStr(cellIndex) + " plane held (no motion)" + vbCrLf
             text += "depth = " + depth.ToString(fmt3) + vbCrLf + vbCrLf
             text += formatPlane(plane(0), plane(1), plane(2), plane(3))
@@ -2431,7 +2431,7 @@ Namespace VBClasses
             Next
             Return best
         End Function
-        Private Function buildPlane(cellIndex As Integer, rc As rcData, hDepths As List(Of Single), hPts As List(Of cv.Point),
+        Private Shared Function buildPlane(cellIndex As Integer, rc As rcData, hDepths As List(Of Single), hPts As List(Of cv.Point),
                                     vDepths As List(Of Single), vPts As List(Of cv.Point)) As (plane As Vec4f, depth As Single, text As String)
             Dim hCloud = worldCloud(hDepths, hPts)
             Dim vCloud = worldCloud(vDepths, vPts)
@@ -2502,7 +2502,7 @@ Namespace VBClasses
 
                 Dim resultPlane As Vec4f
                 Dim resultDepth As Single
-                Dim resultText As String
+                Dim resultText As String = ""
                 Dim hold = False
                 If rc IsNot Nothing AndAlso rc.motionPercent <= 0 Then
                     Dim heldSlot = findStill(rc, used)
@@ -2526,10 +2526,8 @@ Namespace VBClasses
                 anchorDepth.Add(resultDepth)
                 heldStill.Add(hold)
                 If rc IsNot Nothing AndAlso resultDepth > 0 Then
-                    Dim entry As New stillPlane
-                    entry.plane = resultPlane
-                    entry.depth = resultDepth
-                    entry.maxDist = rc.maxDist
+                    Dim entry As New stillPlane With {.plane = resultPlane, .depth = resultDepth,
+                                                      .maxDist = rc.maxDist}
                     nextStill.Add(entry)
                 End If
                 If cell <> selected Then Continue For

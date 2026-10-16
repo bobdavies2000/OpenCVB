@@ -52,10 +52,10 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, redC.rcList.Count)}
             Dim histogram As New Mat
 
-            rcList = New List(Of rcData)(redC.tracker.rcList)
+            Dim rcFLess = New List(Of rcData)(redC.tracker.rcList)
             Dim rcOwner(redC.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
-            For Each rc In rcList
+            For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
 
                 CalcHist({redC.idMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redC.rcList.Count}, ranges)
@@ -69,7 +69,7 @@ Namespace VBClasses
             Next
 
             idMap.SetTo(0)
-            For Each rc In rcList
+            For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
                 For i = 1 To redC.rcList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
@@ -81,8 +81,9 @@ Namespace VBClasses
                 Next
             Next
 
-            ' update all the rc.mask's in rcList with the merged cells.
-            For Each rc In rcList
+            ' update all the rc.mask's with the merged cells.
+            rcList.Clear()
+            For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
                 InRange(idMap(rc.rect), rc.index, rc.index, rc.mask)
                 rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
@@ -90,16 +91,8 @@ Namespace VBClasses
                 Dim val2 = idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Then rc.maxDStable = rc.maxDist
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
+                rcList.Add(rc)
             Next
-
-            'For i = 1 To redC.rcList.Count - 1
-            '    If rcOwner(i) = 0 Then
-            '        rc = redC.rcList(i)
-            '        rc.index = rcList.Count
-            '        rcList.Add(rc)
-            '        FillConvexPoly(idMap(rc.rect), rc.contour, rc.index, cv.LineTypes.Link4)
-            '    End If
-            'Next
 
             dst2 = Palettize(idMap, 0)
 
