@@ -62,7 +62,9 @@ Namespace VBClasses
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
-                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.index
+                    If histArray(i) > 0 And rcOwner(i) = 0 Then
+                        rcOwner(i) = rc.index
+                    End If
                 Next
             Next
 

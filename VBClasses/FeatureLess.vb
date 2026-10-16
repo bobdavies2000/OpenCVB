@@ -1926,7 +1926,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcLastList = New List(Of rcData)(rcList)
 
-            If heartbeatLTX() Then
+            If heartbeatLTX() Or task.frameCount = 2 Then
                 rcList = New List(Of rcData)(task.fless.rcList)
                 If rcList.Count <= 1 Then Exit Sub
                 delaunay.ptList.Clear()

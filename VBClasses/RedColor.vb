@@ -30,14 +30,20 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            idMap(rc.rect).SetTo(index, rc.mask)
+                            Dim rc = New rcData(dst1(rect), rect, index)
                             rcList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
+            Next
+
+            Dim usedList As New List(Of Integer)
+            For Each rc In rcList
+                rc.index = tracker.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                If usedList.Contains(rc.index) = False Then usedList.Add(rc.index)
             Next
 
             dst3 = Palettize(idMap, 0)
@@ -51,8 +57,7 @@ Namespace VBClasses
                 SetTrueText(rc.displayCell, 1)
             End If
 
-            labels(1) = tracker.labels(2)
-            labels(3) = CStr(rcList.Count) + " cells in the Color8U output."
+            labels(3) = CStr(usedList.Count) + " featureless cells color " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
                 MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
             End If
