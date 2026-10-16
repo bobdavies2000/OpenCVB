@@ -2,6 +2,7 @@ Namespace VBClasses
     Public Class CPUTime
         ' TreeView and trace Data.
         Public callTrace As List(Of String)
+        Public algList As List(Of String)
         Public algorithm_msMain As New List(Of Single)
         Public algorithmNamesMain As New List(Of String)
         Public algorithm_ms As New List(Of Single)

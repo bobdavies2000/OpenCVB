@@ -39,6 +39,7 @@ Namespace VBClasses
             task.treeView = New TreeViewForm
 
             task.cpu.callTrace = New List(Of String)
+            task.cpu.algList = New List(Of String)
             task.gravityCloud = New Mat(task.workRes, MatType.CV_32FC3, 0)
             task.noDepthMask = New Mat(task.workRes, MatType.CV_8U, 0)
             task.depthmask = New Mat(task.workRes, MatType.CV_8U, 0)
@@ -218,14 +219,8 @@ Namespace VBClasses
 
 
             Dim displayObject = task.MainUI_Algorithm
-            Dim index As Integer = 0
             If task.cpu.displayObjectName <> displayObject.traceName Then
-                For Each td In task.cpu.activeObjects
-                    If td.traceName.endswith(task.cpu.displayObjectName) Then
-                        index = task.cpu.activeObjects.IndexOf(td)
-                        Exit For
-                    End If
-                Next
+                Dim index = task.cpu.algList.IndexOf(task.cpu.displayObjectName)
                 displayObject = cpu.activeObjects(index)
             End If
 

@@ -40,7 +40,6 @@ Namespace VBClasses
                 task.cpu.callTrace.Add(task.Settings.algorithm + "\")
             End If
 
-            labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace
             Dim lines() = stackTrace.Split(vbCrLf)
             Dim callStack As String = ""
@@ -72,9 +71,8 @@ Namespace VBClasses
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
 
-            'If callStack.StartsWith(task.Settings.algorithm) = False Then
-            '    callStack = task.Settings.algorithm + "\" + task.Settings.algorithm + "\" + callStack
-            'End If
+            Dim algSplit = callStack.Split("\")
+            task.cpu.algList.Add(algSplit(algSplit.Length - 2))
 
             If task.cpu.callTrace.Contains(callStack) = False Then task.cpu.callTrace.Add(callStack)
 
@@ -87,6 +85,7 @@ Namespace VBClasses
             task.cpu.callTrace = newCallTrace
             task.cpu.activeObjects.Add(Me)
 
+            labels = {"", "", traceName, ""}
             If standalone Then task.cpu.initialize(traceName)
         End Sub
         Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
