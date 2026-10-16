@@ -39,7 +39,6 @@ Namespace VBClasses
             task.treeView = New TreeViewForm
 
             task.cpu.callTrace = New List(Of String)
-            task.cpu.algList = New List(Of String)
             task.gravityCloud = New Mat(task.workRes, MatType.CV_32FC3, 0)
             task.noDepthMask = New Mat(task.workRes, MatType.CV_8U, 0)
             task.depthmask = New Mat(task.workRes, MatType.CV_8U, 0)
@@ -220,8 +219,7 @@ Namespace VBClasses
 
             Dim displayObject = task.MainUI_Algorithm
             If task.cpu.displayObjectName <> displayObject.traceName Then
-                Dim index = task.cpu.algList.IndexOf(task.cpu.displayObjectName)
-                displayObject = cpu.activeObjects(index)
+                displayObject = cpu.activeObjects(task.cpu.displayObjectIndex)
             End If
 
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData

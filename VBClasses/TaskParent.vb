@@ -71,19 +71,10 @@ Namespace VBClasses
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
 
-            Dim algSplit = callStack.Split("\")
-            task.cpu.algList.Add(algSplit(algSplit.Length - 2))
-
-            If task.cpu.callTrace.Contains(callStack) = False Then task.cpu.callTrace.Add(callStack)
-
-            Dim newCallTrace As New List(Of String)({task.cpu.callTrace(0)})
-            For i = 1 To task.cpu.callTrace.Count - 1
-                If task.cpu.callTrace(i) = task.cpu.callTrace(0) Then Continue For
-                newCallTrace.Add(task.cpu.callTrace(i))
-            Next
-
-            task.cpu.callTrace = newCallTrace
             task.cpu.activeObjects.Add(Me)
+            If task.cpu.callTrace.Contains(callStack) = False Then
+                task.cpu.callTrace.Add(callStack)
+            End If
 
             labels = {"", "", traceName, ""}
             If standalone Then task.cpu.initialize(traceName)

@@ -1,8 +1,6 @@
 Public Class TreeviewForm
-    Dim botDistance As Integer
     Dim treeData As New List(Of String) ' treedata is used to trigger a rebuild of the tree nodes.
     Dim nodeList As New List(Of String) ' this is used to define the tag but is not referenced later.
-    Dim taskIndices As New List(Of Integer)
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -15,23 +13,6 @@ Public Class TreeviewForm
         task.Settings.TreeViewWidth = Me.Width
         task.Settings.TreeViewHeight = Me.Height
     End Sub
-    Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
-        Dim tn As TreeNode
-        For Each tn In tNode.Nodes
-            If tn.Tag = name Then Return tn
-            Dim rnode = FindRecursive(tn, name)
-            If rnode IsNot Nothing Then Return rnode
-        Next
-        Return Nothing
-    End Function
-    Private Function getNode(tv As TreeView, name As String) As TreeNode
-        For Each n In tv.Nodes
-            If n.tag = name Then Return n
-            Dim rnode = FindRecursive(n, name)
-            If rnode IsNot Nothing Then Return rnode
-        Next
-        Return Nothing
-    End Function
     Public Sub BuildTreeView(tree As TreeView, paths As IEnumerable(Of String))
         tree.BeginUpdate()
         tree.Nodes.Clear()
@@ -57,6 +38,7 @@ Public Class TreeviewForm
                 ' Create if missing, or always create at leaf to allow duplicate names
                 If found Is Nothing Then
                     found = currentNodes.Add(part)
+                    found.ToolTipText = path + "\"
                     nodeList.Add(found.Text)
                 End If
 
@@ -95,7 +77,12 @@ Public Class TreeviewForm
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        task.cpu.displayObjectName = e.Node.Text
+        If e.Node.Text = task.Settings.algorithm Then
+            task.cpu.displayObjectName = task.Settings.algorithm
+        Else
+            task.cpu.displayObjectName = e.Node.Text
+            task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(e.Node.ToolTipText)
+        End If
         Timer2_Tick(sender, e)
     End Sub
 End Class
