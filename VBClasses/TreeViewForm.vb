@@ -56,9 +56,6 @@ Public Class TreeviewForm
             treeData.Clear()
             For Each td In task.cpu.callTrace
                 If td.EndsWith("\"c) Then td = td.Substring(0, td.Length - 1)
-                If td.StartsWith(task.Settings.algorithm) = False Then
-                    td = task.Settings.algorithm + "\" + td
-                End If
                 treeData.Add(td)
             Next
             BuildTreeView(TreeView1, treeData)

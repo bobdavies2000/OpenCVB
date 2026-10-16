@@ -5,7 +5,6 @@ Namespace VBClasses
     Public Class Delaunay_Basics : Inherits TaskParent
         Public ptList As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
-        Public feat As New Feature_Basics
         Public useFeatures As Boolean
         Dim subdiv As New Subdiv2D
         Public Sub New()
@@ -15,6 +14,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If useFeatures Then
+                Static feat As New Feature_Basics
                 feat.Run(src)
                 ptList.Clear()
                 For Each pt In feat.ptlist

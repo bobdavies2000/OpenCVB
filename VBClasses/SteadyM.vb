@@ -94,7 +94,7 @@ Namespace VBClasses
             Next
 
             WarpAffine(dst1, dst3, task.steadyCam.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            ptListLast = New List(Of cv.Point)(delaunay.feat.ptList)
+            ptListLast = New List(Of cv.Point)(delaunay.ptList)
         End Sub
     End Class
 

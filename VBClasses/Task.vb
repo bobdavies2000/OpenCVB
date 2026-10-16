@@ -64,11 +64,6 @@ Namespace VBClasses
             task.leftRightBrightness = New LeftRight_Brightness_TA
             task.steadyCam = New SteadyCam_Basics_TA
 
-            ' all the algorithms in the list are task algorithms that are children of the algorithm.
-            For i = 1 To task.cpu.callTrace.Count - 1
-                task.cpu.callTrace(i) = settings.algorithm + "\" + task.cpu.callTrace(i)
-            Next
-
             HeartBeat_Basics_TA.setHeartBeat()
             task.fOptions.Show()
             task.gOptions.Show()
