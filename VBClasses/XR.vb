@@ -1544,6 +1544,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            If redC.rcList.Count = 0 Then Exit Sub
 
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
@@ -1551,7 +1552,7 @@ Namespace VBClasses
                 Dim nextHull = Cv2.ConvexHull(rc.contour.ToArray)
                 If nextHull IsNot Nothing Then FillPoly(dst0(rc.rect), {nextHull}, rc.index)
             Next
-
+            If task.rcD Is Nothing Then Exit Sub
             SetTrueText(RedC_Basics.displayCell(redC.rcList, redC.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             dst3.SetTo(0)
@@ -1585,6 +1586,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+            If redC.rcList.Count = 0 Then Exit Sub
 
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
@@ -1596,8 +1598,9 @@ Namespace VBClasses
             Dim index As Integer
             If task.mouseClickFlag Then clickPoint = task.clickPoint
             index = dst0.Get(Of Integer)(clickPoint.Y, clickPoint.X)
+            If index = 0 Then Exit Sub
 
-            Dim rcD = redC.rcList(index)
+            Dim rcD = redC.rcList(index - 1)
             SetTrueText(rcD.displayCell() + vbCrLf, 1)
 
             Dim neighbors As New List(Of Integer)
@@ -1618,7 +1621,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             dst3(rcD.rect).SetTo(task.scalarColors(rcD.id), rcD.mask)
             For i = 0 To neighbors.Count - 1
-                Dim rc = redC.rcList(neighbors(i))
+                Dim rc = redC.rcList(neighbors(i) - 1)
                 dst3(rc.rect).SetTo(task.scalarColors(rc.id), rc.mask)
             Next
 

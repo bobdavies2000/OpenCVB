@@ -57,8 +57,8 @@ Namespace VBClasses
 
 
     Public Class SteadyM_Delaunay : Inherits TaskParent
-        Dim ptList As New List(Of cv.Point)
-        Dim ptListLast As New List(Of cv.Point)
+        Dim ptList As New List(Of cv.Point2f)
+        Dim ptListLast As New List(Of cv.Point2f)
         Dim indexList As New List(Of Integer)
         Public delaunay As New Delaunay_Basics
         Public Sub New()
@@ -71,7 +71,7 @@ Namespace VBClasses
 
             ptList.Clear()
             indexList.Clear()
-            Dim newPoints As New List(Of cv.Point)
+            Dim newPoints As New List(Of cv.Point2f)
             For Each pt In ptListLast
                 Dim ptAligned = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)
                 Dim index = dst1.Get(Of Byte)(ptAligned.Y, ptAligned.X)
@@ -94,7 +94,7 @@ Namespace VBClasses
             Next
 
             WarpAffine(dst1, dst3, task.steadyCam.M, dst3.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            ptListLast = New List(Of cv.Point)(delaunay.ptList)
+            ptListLast = New List(Of cv.Point2f)(delaunay.ptList)
         End Sub
     End Class
 

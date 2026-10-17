@@ -74,12 +74,8 @@ Public Class TreeviewForm
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        If e.Node.Text = task.Settings.algorithm Then
-            task.cpu.displayObjectName = task.Settings.algorithm
-        Else
-            task.cpu.displayObjectName = e.Node.Text
-            task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(e.Node.ToolTipText)
-        End If
+        task.cpu.displayObjectName = e.Node.Text
+        task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(e.Node.ToolTipText)
         Timer2_Tick(sender, e)
     End Sub
 End Class
