@@ -198,12 +198,11 @@ Namespace VBClasses
 
             task.gravityBasics.Run(src.Clone)
             If task.lines IsNot Nothing Then task.lines.Run(gray)
-            If task.fless IsNot Nothing Then task.fless.Run(gray)
 
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
-
             task.foreground.Run(New cv.Mat)
             task.edges.Run(task.gray)
+            If task.fless IsNot Nothing Then task.fless.Run(gray)
 
 
 

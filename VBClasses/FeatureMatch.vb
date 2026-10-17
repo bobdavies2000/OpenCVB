@@ -352,9 +352,9 @@ Namespace VBClasses
     Public Class FeatureMatch_Tracker : Inherits TaskParent
         Dim feat As New FeatureMatch_Basics
         Const maxSamples As Integer = 30
-        Public tracks As New List(Of List(Of cv.Point))
+        Public ptLists As New List(Of List(Of cv.Point))
         Public Sub New()
-            labels = {"", "", "AKAZE features", "Feature tracks (up to 30 samples; dropped on lost track)"}
+            labels = {"", "", "AKAZE features", "Feature ptLists (up to 30 samples; dropped on lost track)"}
             desc = "Cursor.ai: Track FeatureMatch_Basics features for up to 30 samples; drop a track and its history when matching is lost."
         End Sub
         Private Shared Function findPairIndex(tip As cv.Point, lastFeatures As List(Of cv.Point), used() As Boolean) As Integer
@@ -372,49 +372,49 @@ Namespace VBClasses
             Return -1
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then tracks.Clear()
+            If task.optionsChanged Then ptLists.Clear()
 
             feat.Run(src)
             dst2 = feat.dst2
             labels(2) = feat.labels(2)
 
-            Dim newTracks As New List(Of List(Of cv.Point))
+            Dim ptListsNew As New List(Of List(Of cv.Point))
             If feat.lastFeatures.Count > 0 AndAlso feat.ptList.Count = feat.lastFeatures.Count Then
                 Dim used(feat.lastFeatures.Count - 1) As Boolean
 
-                For Each track In tracks
-                    Dim idx = findPairIndex(track(track.Count - 1), feat.lastFeatures, used)
-                    If idx < 0 Then Continue For ' lost track — drop history
+                For Each ptList In ptLists
+                    Dim idx = findPairIndex(ptList(ptList.Count - 1), feat.lastFeatures, used)
+                    If idx < 0 Then Continue For ' lost ptList — drop history
 
                     used(idx) = True
-                    track.Add(feat.ptList(idx))
-                    If track.Count > maxSamples Then track.RemoveAt(1) ' keep track(0) as the origin
-                    newTracks.Add(track)
+                    ptList.Add(feat.ptList(idx))
+                    If ptList.Count > maxSamples Then ptList.RemoveAt(1) ' keep ptList(0) as the origin
+                    ptListsNew.Add(ptList)
                 Next
 
                 For i = 0 To feat.lastFeatures.Count - 1
                     If used(i) Then Continue For
-                    Dim track As New List(Of cv.Point)({feat.lastFeatures(i), feat.ptList(i)})
-                    newTracks.Add(track)
+                    Dim ptList As New List(Of cv.Point)({feat.lastFeatures(i), feat.ptList(i)})
+                    ptListsNew.Add(ptList)
                 Next
             End If
-            tracks = newTracks
+            ptLists = ptListsNew
 
             dst3 = task.color.Clone
             Dim longTracks As Integer
             Dim averageDistance As Double
-            For Each track In tracks
-                Dim color = task.scalarColors(track.Count Mod 255)
-                For j = 1 To track.Count - 1
-                    Line(dst3, track(j - 1), track(j), color, task.lineWidth, task.lineType)
+            For Each ptList In ptLists
+                Dim color = task.scalarColors(ptList.Count Mod 255)
+                For j = 1 To ptList.Count - 1
+                    Line(dst3, ptList(j - 1), ptList(j), color, task.lineWidth, task.lineType)
                 Next
-                Circle(dst3, track(track.Count - 1), task.DotSize + 1, color, -1, task.lineType)
-                If track.Count >= maxSamples Then longTracks += 1
-                averageDistance += track(0).DistanceTo(track(track.Count - 1))
+                Circle(dst3, ptList(ptList.Count - 1), task.DotSize + 1, color, -1, task.lineType)
+                If ptList.Count >= maxSamples Then longTracks += 1
+                averageDistance += ptList(0).DistanceTo(ptList(ptList.Count - 1))
             Next
-            If tracks.Count > 0 Then averageDistance /= tracks.Count
+            If ptLists.Count > 0 Then averageDistance /= ptLists.Count
 
-            labels(3) = CStr(tracks.Count) + " tracks, " + CStr(longTracks) + " at " + CStr(maxSamples) +
+            labels(3) = CStr(ptLists.Count) + " ptLists, " + CStr(longTracks) + " at " + CStr(maxSamples) +
                     " samples, avg start-to-end = " + averageDistance.ToString(fmt1) + " px"
         End Sub
     End Class

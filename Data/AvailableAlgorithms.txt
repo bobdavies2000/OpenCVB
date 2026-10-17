@@ -201,7 +201,8 @@ Feature_LeftRight
 Feature_LeftRightAKaze
 Feature_PointsPath
 Feature_SteadyXY
-Feature_Tracker
+Feature_TrackerDelaunay
+Feature_TrackerRect
 Feature_WarpAlign
 Feature_WithRotation
 FeatureLess_Basics
@@ -215,10 +216,8 @@ FeatureLess_Matching
 FeatureLess_Ordered
 FeatureLess_OrderKNN
 FeatureLess_SteadyCam
+FeatureLess_SteadyCamOld
 FeatureLess_Tracker
-FeatureMap_ByDepth
-FeatureMap_CreateList
-FeatureMap_Periphery
 FeatureMatch_Basics
 FeatureMatch_BRISK
 FeatureMatch_KAZE
@@ -468,7 +467,6 @@ Match_DrawRect
 Match_Features
 Match_Lines
 Match_LinesKNN
-Match_Points
 Match_Quadrants
 Match_RedC
 MatchShapes_Basics
@@ -1176,17 +1174,11 @@ XR_FeatureLess_Unique3Pixels
 XR_FeatureLess_UniquePixels
 XR_FeatureLess_XLines
 XR_FeatureLess_YLines
-XR_FeatureMap_Basics
-XR_FeatureMap_BestAge
 XR_FeatureMap_BrickPoints
-XR_FeatureMap_Edges
-XR_FeatureMap_Motion
-XR_FeatureMap_MotionDirection
-XR_FeatureMap_PeripheryNot
 XR_FeatureMap_StablePoints
+XR_FeatureMap_Test
 XR_FeatureMap_ViewLeft
 XR_FeatureMap_ViewRight
-XR_FeatureMap_WithAge
 XR_Fibonacci_Basics
 XR_Fibonacci_Yield
 XR_Filter_Maximum
@@ -1398,7 +1390,6 @@ XR_KMeans_SimKDepth
 XR_KMeans_Simple_CPP
 XR_KMeans_Valleys
 XR_KNN_Grid
-XR_KNN_MaxDistance
 XR_LaneFinder_Edges
 XR_LaneFinder_ROI
 XR_Laplacian_Blur

@@ -305,43 +305,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_KNN_MaxDistance : Inherits TaskParent
-        Dim knn As New KNN_Basics
-        Public outputPoints As New List(Of (Point2f, Point2f))
-        Public options As New Options_KNN
-        Dim perif As New FeatureMap_Periphery
-        Public Sub New()
-            desc = "Use the feature points on the periphery and find the points farthest from each."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Static pairList As New List(Of (Point2f, Point2f))
-
-            perif.Run(src)
-            dst3 = perif.dst3
-            If perif.fcs.feat.ptList.Count = 0 Then Exit Sub
-
-            knn.queries = perif.ptOutside
-            knn.trainInput = knn.queries
-            knn.Run(emptyMat)
-
-            dst2 = src
-            For i = 0 To knn.result.GetUpperBound(0)
-                Dim lp = New lpData(knn.queries(knn.result(i, knn.queries.Count - 1)),
-                                knn.queries(knn.result(i, 0)))
-                Line(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth)
-            Next
-
-            labels(2) = "There were " + CStr(perif.fcs.feat.ptList.Count) + " features and " +
-                                    CStr(knn.queries.Count) + " were on the periphery."
-        End Sub
-    End Class
-
-
-
-
-
     Public Class KNN_MinDistance : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public outputPoints2f As New List(Of Point2f)

@@ -2395,7 +2395,6 @@ Namespace VBClasses
 
                 dst0 = dst1.Clone
                 delaunay.Run(emptyMat)
-                dst1 = delaunay.dst3
                 If task.firstPass Then dst0 = delaunay.dst3.Clone
 
                 labels(3) = delaunay.labels(2)
@@ -2482,14 +2481,15 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_SteadyCam : Inherits TaskParent
+    Public Class FeatureLess_SteadyCamOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm - visual solution.
-            desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells.  No cost function needed."
+            desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells." +
+                   "  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = task.steadyCam.dst2
@@ -2559,4 +2559,125 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class FeatureLess_SteadyCam : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim ptList As New List(Of cv.Point2f)
+        Dim delaunay As New Delaunay_Basics
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMyDst0.Checked = True
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "Track the FeatureLess cells points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then dst1.SetTo(0)
+            Dim nextList As New List(Of cv.Point2f)
+            For Each rc In task.fless.rcList
+                If rc.index = 0 Then Continue For
+                nextList.Add(rc.maxDStable)
+            Next
+
+            If heartbeatLTX() Then
+                delaunay.ptList = New List(Of cv.Point2f)(nextList)
+                ptList = New List(Of cv.Point2f)(nextList)
+
+                delaunay.Run(emptyMat)
+                dst1.SetTo(0)
+                For i = 0 To delaunay.facetList.Count - 1
+                    If task.fless.rcList(i).index = 0 Then Continue For
+                    FillConvexPoly(dst1, delaunay.facetList(i), task.fless.rcList(i).index, LineTypes.Link4)
+                Next
+
+                ' run before palettize
+                For Each rc In task.fless.rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    DrawContours(dst1(rc.rect), {rc.contour}, 0, rc.index - 1, -1)
+                Next
+
+                dst0 = Palettize(dst1)
+
+                ' run after palettize
+                For Each rc In task.fless.rcList
+                    If rc.index = 0 Then Continue For
+                    DrawContours(dst0(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                    Circle(dst0, rc.maxDStable, task.DotSize, task.highlight, -1)
+                Next
+            End If
+
+            dst3.SetTo(0)
+            For Each pt In nextList
+                Dim ptx = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.inverseM)
+                ptx = validatePoint(ptx)
+                Line(dst3, pt, ptx, white, task.lineWidth)
+                Dim index = dst1.Get(Of Byte)(ptx.Y, ptx.X)
+                SetTrueText(CStr(index), pt, 3)
+                SetTrueText(CStr(index), ptx, 0)
+                SetTrueText(CStr(index), ptx, 1)
+            Next
+
+
+
+            'idMap.SetTo(0)
+            'rcList.Clear()
+            'rcList.Add(New rcData())
+            'Dim usedList As New List(Of Integer)
+            'For Each rcPrev In rcSnapshotList
+            '    Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
+            '    For Each rc In task.fless.rcList
+            '        If rc.index = 0 Then Continue For
+            '        If rc.rect.Contains(pt) Then
+            '            If usedList.Contains(rc.index) = False Then
+            '                rc.index = rcPrev.index
+            '                idMap(rc.rect).SetTo(rc.index, rc.mask)
+            '                rcList.Add(rc)
+            '                usedList.Add(rc.index)
+            '                Exit For
+            '            End If
+            '        End If
+            '    Next
+            'Next
+
+            'Dim unusedCount = task.fless.rcList.Count - usedList.Count
+            'Dim nextSlot As Integer = task.fless.rcList.Count
+            'For Each rc In task.fless.rcList
+            '    If rc.index = 0 Then Continue For
+            '    If usedList.Contains(rc.index) = False Then
+            '        rc.index = nextSlot
+            '        nextSlot += 1
+            '        idMap(rc.rect).SetTo(rc.index, rc.mask)
+            '        rcList.Add(rc)
+            '    End If
+            'Next
+
+            'If standaloneTest() Then
+            '    dst2 = Palettize(idMap, 0)
+
+            '    For Each rc In rcSnapshotList
+            '        If rc.index <> 0 Then
+            '            Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+            '            Circle(dst2, pt, task.DotSize + 2, black, -1)
+            '            Circle(dst2, pt, task.DotSize, task.highlight, -1)
+            '        End If
+            '    Next
+            'End If
+
+            ''strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
+
+            'strOut = "In dst2 at left: " + vbCrLf + vbCrLf
+            'strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
+            'strOut += "- A cell with no circle is a new cell." + vbCrLf
+            'strOut += "- All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
+            'strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
+            'SetTrueText(strOut, 3)
+
+            'labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
+            'labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+        End Sub
+    End Class
 End Namespace

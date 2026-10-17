@@ -48,7 +48,6 @@ Erode
 ExPhoto
 Feature
 FeatureLess
-FeatureMap
 FeatureMatch
 Filter
 FindMinRect

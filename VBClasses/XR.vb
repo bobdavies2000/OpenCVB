@@ -627,7 +627,7 @@ Namespace VBClasses
             desc = "Find all the points where depth X-component transitions from positive to negative"
         End Sub
         Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
-            if heartbeatx() then 
+            If heartbeatx() Then
                 If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
             End If
 
@@ -1635,27 +1635,13 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureMap_Basics : Inherits TaskParent
+    Public Class XR_FeatureMap_Test : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public basics As New XR_FeatureMap_StablePoints
         Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Public Sub New()
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Track the stable good features found in the BGR image."
-        End Sub
-        'Public Shared Sub fpDSet()
-        '    If fcs.fplist.Count = 0 Then Exit Sub
-        '    Dim brickIndex = task.fpMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-        '    Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
-        '    If fpIndex >= 0 Then task.fpD = fcs.fplist(fpIndex)
-        'End Sub
-        Public Shared Sub fpCellContour(fp As fpData, dst As Mat, Optional colorIndex As Integer = 0)
-            Dim color = Choose(colorIndex + 1, Scalar.White, Scalar.Black)
-            For i = 0 To fp.facets.Count - 1
-                Dim p1 = fp.facets(i)
-                Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-                Line(dst, p1, p2, color, task.lineWidth, task.lineType)
-            Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
@@ -1753,7 +1739,7 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureMap_ViewLeft : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
+        Dim fcs As New Feature_TrackerDelaunay
         Public Sub New()
             desc = "Build an FCS for left view."
         End Sub
@@ -1773,7 +1759,7 @@ Namespace VBClasses
 
 
     Public Class XR_FeatureMap_ViewRight : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
+        Dim fcs As New Feature_TrackerDelaunay
         Public Sub New()
             desc = "Build an FCS for right view."
         End Sub
@@ -1785,168 +1771,6 @@ Namespace VBClasses
             labels = fcs.labels
         End Sub
     End Class
-
-
-
-
-
-    Public Class XR_FeatureMap_Edges : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Public Sub New()
-            desc = "Use edges to connect feature points to their neighbors."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(src)
-            dst2 = src
-
-            CvtColor(task.edges.dst2, dst3, ColorConversionCodes.GRAY2BGR)
-            For Each fp In fcs.fpList
-                If fp.depth Then
-                    Circle(dst2, fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
-                    Circle(dst3, fp.pt, task.DotSize + 3, task.highlight, -1, task.lineType)
-                End If
-            Next
-            labels = fcs.labels
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class XR_FeatureMap_WithAge : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Public Sub New()
-            desc = "Display the age of each cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(task.gray)
-            dst2 = fcs.dst2
-            labels = fcs.labels
-
-            dst3.SetTo(0)
-            For Each fp In fcs.fpList
-                Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
-                If fp.age >= 1000 Then fp.age = 2
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class XR_FeatureMap_BestAge : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Public Sub New()
-            labels(3) = "Ages are kept below 1000 to make the output more readable..."
-            desc = "Display the top X oldest (best) cells."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(task.gray)
-            dst2 = fcs.dst2
-            labels(2) = fcs.labels(2)
-
-            Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each fp In fcs.fpList
-                fpSorted.Add(fp.age, fp.index)
-            Next
-
-            dst3.SetTo(0)
-            Dim maxIndex As Integer = 0
-            For Each index In fpSorted.Values
-                Dim fp = fcs.fpList(index)
-                Circle(dst3, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
-                If fp.age >= 1000 Then fp.age = 2
-                maxIndex += 1
-                If maxIndex >= 10 Then Exit For
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureMap_MotionDirection : Inherits TaskParent
-        Dim fcsM As New XR_FeatureMap_Motion
-        Dim plothist As New PlotBar_Basics
-        Dim mats As New Mat_4Click
-        Dim range As Integer, rangeText As String
-        Public Sub New()
-            plothist.createHistogram = True
-            plothist.addLabels = False
-            task.gOptions.setHistogramBins(64) ' should this be an odd number.
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Using all the feature points with motion, determine any with a common direction."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcsM.Run(src)
-            mats.mat(2) = fcsM.dst2
-            mats.mat(3) = fcsM.dst3
-
-            plothist.maxRange = task.histogramBins / 2 Or 1
-            plothist.minRange = -plothist.maxRange
-            rangeText = " ranging from " + CStr(plothist.minRange) + " to " + CStr(plothist.maxRange)
-            range = Math.Abs(plothist.maxRange - plothist.minRange)
-
-            Dim incr = range / task.histogramBins
-
-            plothist.Run(Mat.FromPixelData(fcsM.xDist.Count, 1, MatType.CV_32F, fcsM.xDist.ToArray))
-            Dim xDist As New List(Of Single)(plothist.histArray)
-            task.motionFeatures.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
-            mats.mat(0) = plothist.dst2.Clone
-
-            plothist.Run(Mat.FromPixelData(fcsM.yDist.Count, 1, MatType.CV_32F, fcsM.yDist.ToArray))
-            Dim yDist As New List(Of Single)(plothist.histArray)
-            task.motionFeatures.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
-            mats.mat(1) = plothist.dst2.Clone
-
-            mats.Run(emptyMat)
-            dst2 = mats.dst2
-            dst3 = mats.dst3
-
-            If fcsM.motionPercent < 50 Then
-                task.motionFeatures.X = 0
-                task.motionFeatures.Y = 0
-            End If
-
-            strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
-            strOut += "Displacement in X: " + CStr(task.motionFeatures.X) + vbCrLf
-            strOut += "Displacement in Y: " + CStr(task.motionFeatures.Y) + vbCrLf
-
-            SetTrueText(strOut, 1)
-            SetTrueText("X distances" + rangeText, 2)
-            SetTrueText("Y distances " + rangeText, New cv.Point(dst2.Width / 2 + 2, 0), 2)
-            labels = fcsM.labels
-            ' FeatureMap_Basics.fpDSet()
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class XR_FeatureMap_PeripheryNot : Inherits TaskParent
-        Dim perif As New FeatureMap_Periphery
-        Public Sub New()
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-            desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            perif.Run(task.gray)
-            dst2 = perif.dst3
-
-            dst3.SetTo(0)
-            For Each fp In perif.fcs.fpList
-                If fp.periph = False Then FillConvexPoly(dst3, fp.facets, 255, task.lineType)
-            Next
-            ' FeatureMap_Basics.fpDSet()
-            labels = perif.labels
-        End Sub
-    End Class
-
 
 
 
@@ -2004,67 +1828,6 @@ Namespace VBClasses
             Next
             labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                         " generations."
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureMap_Motion : Inherits TaskParent
-        Dim fcs As New FeatureMap_CreateList
-        Dim plot As New PlotTime_Basics
-        Public xDist As New List(Of Single), yDist As New List(Of Single)
-        Public motionPercent As Single
-        Public Sub New()
-            plot.maxScale = 100
-            plot.minScale = 0
-            plot.plotCount = 1
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(1) = "Plot of % of cells that moved - move camera to see value."
-            desc = "Highlight the motion of each feature identified in the current and previous frame"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(task.gray)
-            dst2 = fcs.dst2
-
-            For Each fp In fcs.fpList
-                If fp.depth > 0 Then Circle(dst2, fp.pt, task.DotSize, task.highlight, -1, task.lineType)
-            Next
-
-            Dim motionCount As Integer, linkedCount As Integer
-            xDist.Clear()
-            yDist.Clear()
-            xDist.Add(0)
-            yDist.Add(0)
-            dst3.SetTo(0)
-            For Each fp In fcs.fpList
-                'Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                'Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
-                'If fpIndex >= 0 Then
-                '    linkedCount += 1
-                '    dst3.Line(fp.pt, fp.ptLast, task.highlight, task.lineWidth, task.lineType)
-                'End If
-                'If fp.ptLast <> new cv.Point Then
-                '    motionCount += 1
-                '    xDist.Add(fp.ptLast.X - fp.pt.X)
-                '    yDist.Add(fp.ptLast.Y - fp.pt.Y)
-                'End If
-            Next
-            motionPercent = 100 * motionCount / linkedCount
-            if heartbeatx() then 
-                labels(2) = fcs.labels(2)
-                labels(3) = motionPercent.ToString(fmt1) + "% of linked cells had motion or " +
-                            CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
-                            xDist.Average.ToString(fmt1) + "/" + yDist.Average.ToString(fmt1) +
-                            " pixels."
-            End If
-
-            plot.plotData = New Scalar(motionPercent, 0, 0)
-            plot.Run(src)
-            dst1 = plot.dst2
-            ' FeatureMap_Basics.fpDSet()
         End Sub
     End Class
 End Namespace

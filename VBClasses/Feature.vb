@@ -1230,7 +1230,7 @@ Namespace VBClasses
 
             If task.heartBeatLT OrElse heartImage Is Nothing OrElse task.optionsChanged Then
                 heartImage = color.Clone
-                tracker.tracks.Clear()
+                tracker.ptLists.Clear()
             End If
 
             tracker.Run(src)
@@ -1238,7 +1238,7 @@ Namespace VBClasses
 
             Dim srcPts As New List(Of Point2f)
             Dim dstPts As New List(Of Point2f)
-            For Each track In tracker.tracks
+            For Each track In tracker.ptLists
                 If track.Count < 2 Then Continue For
                 Dim p0 = track(0)
                 Dim p1 = track.Last
@@ -1829,8 +1829,62 @@ Namespace VBClasses
 
 
 
+    Public Class Feature_TrackerDelaunay : Inherits TaskParent
+        Dim subdiv As New Subdiv2D
+        Public feat As New Feature_Basics
+        Dim bricks As New Brick_Basics
+        Public facetList As New List(Of List(Of cv.Point))
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            labels(3) = "Visualization of the map of feature points."
+            desc = "Subdivide an image based on the points provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks.Run(src)
 
-    Public Class Feature_Tracker : Inherits TaskParent
+            feat.Run(task.gray)
+
+            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            Dim features As New List(Of Point2f)
+            For Each pt In feat.ptlist
+                features.Add(pt)
+            Next
+            subdiv.Insert(features)
+
+            Dim facets = New Point2f()() {Nothing}
+            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+            facetList.Clear()
+            For i = 0 To facets.Length - 1
+                Dim nextFacet As New List(Of cv.Point)
+                If facets(i) IsNot Nothing Then
+                    For j = 0 To facets(i).Length - 1
+                        nextFacet.Add(New cv.Point(CInt(facets(i)(j).X), CInt(facets(i)(j).Y)))
+                    Next
+                End If
+                facetList.Add(nextFacet)
+            Next
+
+            dst2.SetTo(0)
+            For i = 0 To Math.Min(feat.ptlist.Count, facetList.Count) - 1
+                If facetList(i).Count >= 3 Then FillConvexPoly(dst2, facetList(i), i Mod 256, task.lineType)
+            Next
+
+            dst3 = Palettize(dst2)
+
+            For Each pt In feat.ptlist
+                Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+            Next
+
+            If heartbeatX() Then labels(2) = traceName + ": " + feat.ptlist.Count.ToString("000") + " cells found " +
+                                             "using " + task.fOptions.FeatureMethod.Text
+        End Sub
+    End Class
+
+
+
+
+    Public Class Feature_TrackerRect : Inherits TaskParent
         Dim feat As New Feature_Basics
         Public ptListConfirmed As New List(Of cv.Point)
         Public plot As New PlotTime_Basics
