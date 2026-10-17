@@ -380,7 +380,6 @@ Kalman_Single
 Kalman_VB
 Kalman_VB_Basics
 Keyboard_Basics
-KeyColor_Basics
 KLT_Basics
 KMeans_Basics
 KMeans_Depth
@@ -1374,10 +1373,6 @@ XR_Kalman_Depth32f
 XR_Kalman_DepthSmall
 XR_Kalman_MousePredict
 XR_Kalman_RotatingPoint
-XR_KeyColor_Contours
-XR_KeyColor_OverColor
-XR_KeyColor_OverDepth
-XR_KeyColor_Straight
 XR_KLT_OpticalFlow
 XR_KMeans_CompareMulti
 XR_KMeans_CustomData
