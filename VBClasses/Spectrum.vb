@@ -2,7 +2,7 @@
 'Namespace VBClasses
 '    Public Class XR_Spectrum_X : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -34,7 +34,7 @@
 
 '    Public Class XR_Spectrum_Y : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -66,7 +66,7 @@
 
 '    Public Class XR_Spectrum_Z : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -102,7 +102,7 @@
 '        Dim specX As New XR_Spectrum_X
 '        Dim specY As New XR_Spectrum_Y
 '        Dim specZ As New XR_Spectrum_Z
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the cv.Point cloud."
@@ -141,7 +141,7 @@
 '        Dim options As New Options_Spectrum
 '        Dim gSpec As New XR_Spectrum_Gray
 '        Dim sCloud As New XR_Spectrum_Cloud
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the cv.Point cloud."
@@ -176,7 +176,7 @@
 '    Public Class XR_Spectrum_RGB : Inherits TaskParent
 '        Dim options As New Options_Spectrum
 '        Dim gSpec As New XR_Spectrum_Gray
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Create a spectrum of the RGB values for a given RedCloud cell."
@@ -331,7 +331,7 @@
 
 '    Public Class XR_Spectrum_RedCloud : Inherits TaskParent
 '        Dim breakdown As New XR_Spectrum_Breakdown
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            desc = "Breakdown each cell in rclist."
 '        End Sub
@@ -381,7 +381,7 @@
 '    Public Class XR_Spectrum_Gray : Inherits TaskParent
 '        Dim options As New Options_Spectrum
 '        Public typeSpec As String = "GrayScale"
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."

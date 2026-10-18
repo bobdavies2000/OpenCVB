@@ -613,7 +613,6 @@ Rectangle_Quadrants
 Rectangle_Rotated
 RedC_Basics
 RedC_CellLines
-RedC_Core
 RedC_Depth
 RedC_Features
 RedC_FloodToRC
@@ -1608,6 +1607,7 @@ XR_RecursiveBilateralFilter_CPP
 XR_RedC_CellDepthHistogram
 XR_RedC_CellMerge1
 XR_RedC_Core
+XR_RedC_CoreOld
 XR_RedC_DepthMerge
 XR_RedC_FeatureLessTestSingle
 XR_RedC_Hulls

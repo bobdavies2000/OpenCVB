@@ -77,7 +77,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Core : Inherits TaskParent
+    Public Class XR_RedC_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim redColor As New RedColor_Basics
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -173,7 +173,7 @@ Namespace VBClasses
 
             dst2 = Palettize(idMap, 0)
 
-            SetTrueText(RedC_Core.showCell(rcList, dst1, dst2), 1)
+            SetTrueText(XR_RedC_Core.showCell(rcList, dst1, dst2), 1)
 
             labels(2) = CStr(redColor.rcList.Count) + " input cells merged into the " +
                         CStr(rcList.Count - 1) + " featureless cells.  Age is shown."
@@ -184,7 +184,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_Core : Inherits TaskParent
+    Public Class XR_RedC_CoreOld : Inherits TaskParent
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
@@ -357,7 +357,7 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
 
             If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(RedC_Core.displayCell(redColor.rcList, redColor.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -373,7 +373,7 @@ Namespace VBClasses
 
 
     Public Class RedC_CellLines : Inherits TaskParent
-        Dim redC As New RedC_Core
+        Dim redC As New XR_RedC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             desc = "Find any lines connected to a cell contour."
@@ -414,7 +414,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_DepthMerge : Inherits TaskParent
-        Public redC As New RedC_Core
+        Public redC As New XR_RedC_Core
         Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             labels(3) = "idMap version of cells"
@@ -522,7 +522,7 @@ Namespace VBClasses
             Next
 
             Dim mm = cellDepthRange(task.rcD)
-            strOut = RedC_Core.displayCell(redC.rcList, redC.idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            strOut = XR_RedC_Core.displayCell(redC.rcList, redC.idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             SetTrueText(strOut + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m" + vbCrLf +
                         "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
                         mm.maxVal.ToString(fmt2) + "m", 1)
@@ -540,7 +540,7 @@ Namespace VBClasses
 
     Public Class RedC_Features : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedC_Core
+        Dim redC As New XR_RedC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -570,7 +570,7 @@ Namespace VBClasses
 
 
     Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_Core
+        Public redC As New XR_RedC_Core
         Public neighbors As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -705,7 +705,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -729,7 +729,7 @@ Namespace VBClasses
 
 
     Public Class RedC_SteadyCam : Inherits TaskParent
-        Dim redC As New RedC_Core
+        Dim redC As New XR_RedC_Core
         Public Sub New()
             desc = "Build a steadycam image of the RedC output"
         End Sub

@@ -1826,7 +1826,7 @@ Namespace VBClasses
 
             dst2 = Palettize(idMap, 0)
 
-            strOut = RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
+            strOut = XR_RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -2545,7 +2545,7 @@ Namespace VBClasses
                 Next
             End If
 
-            'strOut = RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
+            'strOut = XR_RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
 
             strOut = "In dst2 at left: " + vbCrLf + vbCrLf
             strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf

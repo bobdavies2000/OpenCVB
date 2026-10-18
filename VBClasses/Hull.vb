@@ -108,14 +108,14 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static redC As New RedC_Core
-                redC.Run(task.gray)
-                If redC.rcList.Count <= 1 Then Exit Sub
-                dst2 = redC.dst2
-                labels(2) = redC.labels(2)
-                hull = redC.rcList(0).contour
+                Static redCore As New XR_RedC_Core
+                redCore.Run(task.gray)
+                If redCore.rcList.Count <= 1 Then Exit Sub
+                dst2 = redCore.dst2
+                labels(2) = redCore.labels(2)
+                hull = redCore.rcList(0).contour
 
-                contour = redC.rcList(0).contour.ToArray
+                contour = redCore.rcList(0).contour.ToArray
             End If
 
             Dim contourList = contour.ToList()

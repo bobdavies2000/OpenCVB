@@ -1,7 +1,7 @@
 'Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 'Namespace VBClasses
 '    Public Class Track_Basics : Inherits TaskParent
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Public Sub New()
 '            desc = "Track the selected cell."
 '        End Sub
@@ -41,7 +41,7 @@
 
 
 '    Public Class Track_Simple : Inherits TaskParent
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Dim lostCell As Boolean
 '        Public Sub New()
 '            desc = "Track the selected cell."
@@ -88,7 +88,7 @@
 
 
 '    Public Class Track_FindNearest : Inherits TaskParent
-'        Dim redC As New RedC_Core
+'        Dim redC As New XR_RedC_Core
 '        Dim knn As New KNN_Basics
 '        Public Sub New()
 '            desc = "Find the nearest cell with the same id."
@@ -130,7 +130,7 @@
 
 '            For i = 0 To knn.queries.Count - 1
 '                Dim index = indexList(knn.result(0, i))
-'                Dim rc = RedC_Core.rcIndexFind(redC.rcList, index)
+'                Dim rc = XR_RedC_Core.rcIndexFind(redC.rcList, index)
 '                Circle(dst2, rc.maxDist, task.DotSize + 1, task.highlight, -1)
 '                SetTrueText(CStr(knn.result(0, i)), rc.maxDist)
 '                SetTrueText(CStr(knn.result(0, i)), rc.maxDist, 3)

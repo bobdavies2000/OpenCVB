@@ -229,7 +229,7 @@ Namespace VBClasses
 
     Public Class LUT_RedC : Inherits TaskParent
         Dim sort3 As New Sort_3Channel
-        Dim redC As New RedC_Core
+        Dim redC As New XR_RedC_Core
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Use LUT on the grayscale image after masking with rc.mask"
