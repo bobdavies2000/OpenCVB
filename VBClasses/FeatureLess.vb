@@ -2481,7 +2481,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_BasicsOld : Inherits TaskParent
+    Public Class FeatureLess_Cells : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -2566,9 +2566,9 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim delaunay As New Delaunay_Basics
-        Dim redCore As New RedC_Core
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            If task.redC Is Nothing Then task.redC = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -2607,13 +2607,13 @@ Namespace VBClasses
                 Next
             End If
 
-            redCore.Run(task.gray)
+            task.redC.Run(task.gray)
 
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In redCore.rcList
+            For Each rc In task.redC.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
@@ -2626,6 +2626,8 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst0, 0)
+            labels(2) = CStr(task.redC.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(3) = CStr(task.redC.rcList.Count) + " cells were found"
         End Sub
     End Class
 End Namespace

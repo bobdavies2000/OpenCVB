@@ -6,7 +6,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Build a list of cells for each floodfill region in the Color8U input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -40,16 +39,23 @@ Namespace VBClasses
                 Next
             Next
 
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In rcList
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList = New List(Of rcData)(sortList.Values)
+
             dst3 = Palettize(idMap, 0)
 
-            If standaloneTest() Then
-                Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-                Dim rc = rcList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                dst2(rc.rect).SetTo(white, rc.mask)
-                SetTrueText(CStr(clickIndex), rc.maxDist)
-                SetTrueText(rc.displayCell, 1)
-            End If
+            'If standaloneTest() Then
+            '    Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            '    Dim rc = rcList(clickIndex)
+            '    Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+            '    dst2(rc.rect).SetTo(white, rc.mask)
+            '    SetTrueText(CStr(clickIndex), rc.maxDist)
+            '    SetTrueText(rc.displayCell, 1)
+            'End If
 
             labels(3) = CStr(rcList.Count) + " cells found"
             If rcList.Count > 255 Then
