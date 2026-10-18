@@ -124,7 +124,7 @@ Module Program
 
             Console.WriteLine()
             Console.WriteLine()
-            Console.WriteLine($"{displayClasses.Count} classes will be visible in the ComboBox:")
+            Console.WriteLine($"{displayClasses.Count} classes will be visible in the user interface")
             Console.WriteLine($"Total source lines for visible classes: {totalLinesRead}")
             Console.WriteLine($"XR_ Reference algorithm count: {xrClasses.Count}")
             Console.WriteLine($"Cursor.ai algorithms: {cursorClasses.Count}")

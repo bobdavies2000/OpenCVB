@@ -718,7 +718,7 @@ Namespace VBClasses
 
 
     Public Class XR_Match_ClickPoint : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Dim redColor As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Once a second, the SteadyCam M factor is updated and this image will match the current cells."
@@ -731,25 +731,25 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2) + "  Click on any featureless cell to track it."
+            redColor.Run(src)
+            dst2 = redColor.dst2
+            labels(2) = redColor.labels(2) + "  Click on any featureless cell to track it."
 
             Static clickIndex As Integer
             If task.mouseClickFlag Then
-                clickIndex = redC.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                clickIndex = redColor.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             Else
                 clickIndex = 1
             End If
 
-            task.rcD = findCell(redC.rcList, clickIndex)
-            If task.rcD Is Nothing Then task.rcD = redC.rcList(1)
+            task.rcD = findCell(redColor.rcList, clickIndex)
+            If task.rcD Is Nothing Then task.rcD = redColor.rcList(1)
 
-            SetTrueText(RedC_Basics.displayCell(redC.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
+            SetTrueText(RedC_Core.displayCell(redColor.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            WarpAffine(redC.idMap, redC.idMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redColor.idMap, redColor.idMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class

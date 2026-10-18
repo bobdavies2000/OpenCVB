@@ -424,7 +424,7 @@ Namespace VBClasses
 
 
     Public Class XR_SteadyM_Cells : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)

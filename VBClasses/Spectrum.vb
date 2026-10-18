@@ -2,7 +2,7 @@
 'Namespace VBClasses
 '    Public Class XR_Spectrum_X : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -18,7 +18,7 @@
 '                SetTrueText(redC.strOut, 1)
 '            End If
 
-'            If heartbeatx() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
+'            If heartbeatX() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
 '                Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
 '                strOut = options.strOut
 '            End If
@@ -34,7 +34,7 @@
 
 '    Public Class XR_Spectrum_Y : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -50,7 +50,7 @@
 '                SetTrueText(redC.strOut, 1)
 '            End If
 
-'            If heartbeatx() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
+'            If heartbeatX() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
 '                Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
 '                strOut = options.strOut
 '            End If
@@ -66,7 +66,7 @@
 
 '    Public Class XR_Spectrum_Z : Inherits TaskParent
 '        Public options As New Options_Spectrum
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the depth ranges."
@@ -81,7 +81,7 @@
 '                SetTrueText(redC.strOut, 1)
 '            End If
 
-'            If heartbeatx() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
+'            If heartbeatX() AndAlso task.rcD IsNot Nothing AndAlso task.rcD.mapID > 0 Then
 '                Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
 '                strOut = options.strOut
 '            End If
@@ -102,7 +102,7 @@
 '        Dim specX As New XR_Spectrum_X
 '        Dim specY As New XR_Spectrum_Y
 '        Dim specZ As New XR_Spectrum_Z
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the cv.Point cloud."
@@ -118,7 +118,7 @@
 '                SetTrueText(redC.strOut, 1)
 '            End If
 
-'            If heartbeatx() Then
+'            If heartbeatX() Then
 '                specX.Run(src)
 '                strOut = specX.strOut + vbCrLf
 '                specY.Run(src)
@@ -141,7 +141,7 @@
 '        Dim options As New Options_Spectrum
 '        Dim gSpec As New XR_Spectrum_Gray
 '        Dim sCloud As New XR_Spectrum_Cloud
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the ranges for X, Y, and Z in the cv.Point cloud."
@@ -157,7 +157,7 @@
 '                SetTrueText(redC.strOut, 1)
 '            End If
 
-'            If heartbeatx() Then
+'            If heartbeatX() Then
 '                sCloud.Run(src)
 '                strOut = sCloud.strOut + vbCrLf
 '                gSpec.Run(src)
@@ -176,7 +176,7 @@
 '    Public Class XR_Spectrum_RGB : Inherits TaskParent
 '        Dim options As New Options_Spectrum
 '        Dim gSpec As New XR_Spectrum_Gray
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Create a spectrum of the RGB values for a given RedCloud cell."
@@ -195,15 +195,15 @@
 '            Dim splitMats() As Mat = Split(src)
 '            gSpec.typeSpec = " blue "
 '            gSpec.Run(splitMats(0))
-'            If heartbeatx() Then strOut = gSpec.strOut + vbCrLf
+'            If heartbeatX() Then strOut = gSpec.strOut + vbCrLf
 
 '            gSpec.typeSpec = " green "
 '            gSpec.Run(splitMats(1))
-'            If heartbeatx() Then strOut += gSpec.strOut + vbCrLf
+'            If heartbeatX() Then strOut += gSpec.strOut + vbCrLf
 
 '            gSpec.typeSpec = " red "
 '            gSpec.Run(splitMats(2))
-'            If heartbeatx() Then strOut += gSpec.strOut
+'            If heartbeatX() Then strOut += gSpec.strOut
 
 '            SetTrueText(strOut, 3)
 '        End Sub
@@ -232,7 +232,7 @@
 '            dst2 = redC.dst2
 '            labels(2) = redC.labels(2)
 
-'            If heartbeatx() Then
+'            If heartbeatX() Then
 '                breakdown.Run(src)
 '                SetTrueText(breakdown.strOut, 1)
 
@@ -331,7 +331,7 @@
 
 '    Public Class XR_Spectrum_RedCloud : Inherits TaskParent
 '        Dim breakdown As New XR_Spectrum_Breakdown
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            desc = "Breakdown each cell in rclist."
 '        End Sub
@@ -367,7 +367,7 @@
 '            gSpec.Run(src)
 '            dst2 = gSpec.dst2
 '            labels(2) = gSpec.labels(2)
-'            If heartbeatx() Then strOut = gSpec.strOut
+'            If heartbeatX() Then strOut = gSpec.strOut
 '            SetTrueText(strOut, 3)
 '        End Sub
 '    End Class
@@ -381,7 +381,7 @@
 '    Public Class XR_Spectrum_Gray : Inherits TaskParent
 '        Dim options As New Options_Spectrum
 '        Public typeSpec As String = "GrayScale"
-'        Dim redC As New RedC_Basics
+'        Dim redC As New RedC_Core
 '        Public Sub New()
 '            If standalone Then task.gOptions.displayDst1.Checked = True
 '            desc = "Given a RedCloud cell, create a spectrum that contains the color ranges."

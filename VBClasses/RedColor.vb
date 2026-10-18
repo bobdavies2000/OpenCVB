@@ -97,7 +97,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(RedC_Basics.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)

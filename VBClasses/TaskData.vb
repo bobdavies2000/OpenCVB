@@ -74,7 +74,7 @@ Namespace VBClasses
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public filterBasics As Filter_Basics_TA
         Public fless As FeatureLess_Basics
-        Public redC As RedC_Basics
+        Public redC As RedColor_Basics
         Public foreground As Foreground_Basics_TA
         Public gravityBasics As Gravity_Basics_TA
         Public gravityMatrix As IMU_GMatrix_TA

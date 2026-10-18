@@ -3,18 +3,18 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Hull_Basics : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Dim redColor As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare hulls and contours for the redC cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            redColor.Run(src)
+            dst2 = redColor.dst2
+            labels(2) = redColor.labels(2)
 
             Dim rc = task.rcD
-            If rc Is Nothing Then rc = redC.rcList(1)
+            If rc Is Nothing Then rc = redColor.rcList(1)
             If rc.contour Is Nothing Then Exit Sub
 
             dst1.SetTo(0)
@@ -108,7 +108,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static redC As New RedC_Basics
+                Static redC As New RedC_Core
                 redC.Run(task.gray)
                 If redC.rcList.Count <= 1 Then Exit Sub
                 dst2 = redC.dst2

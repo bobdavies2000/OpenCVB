@@ -253,7 +253,7 @@ Namespace VBClasses
 
     Public Class XR_Image_RedC : Inherits TaskParent
         Public images As New XR_Image_Series
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Dim reduction As New Reduction_Basics
         Public Sub New()
             task.fOptions.ReductionColor.Value = 50
@@ -913,7 +913,7 @@ Namespace VBClasses
     Public Class XR_RedColor_Hulls : Inherits TaskParent
         Public rclist As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
             desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -1157,19 +1157,19 @@ Namespace VBClasses
 
     Public Class XR_RedColor_DelaunayMap : Inherits TaskParent
         Public dMap As New Delaunay_Map
-        Dim redC As New RedColor_Basics
+        Dim redColor As New RedColor_Basics
         Public Sub New()
             desc = "Run RedColor as usual but use the Delaunay map to select cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            redColor.Run(src)
+            dst2 = redColor.dst2
+            labels(2) = redColor.labels(2)
 
-            dMap.rcList = New List(Of rcData)(redC.rcList)
+            dMap.rcList = New List(Of rcData)(redColor.rcList)
             dMap.Run(task.gray)
             dst3 = dMap.dst3
-            SetTrueText(redC.strOut, 3)
+            SetTrueText(redColor.strOut, 3)
         End Sub
     End Class
 
@@ -1298,7 +1298,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_FeatureLess : Inherits TaskParent
-        Public redC As New RedC_Basics
+        Public redC As New RedC_Core
         Dim fLess As New XR_FeatureLess_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -1349,11 +1349,11 @@ Namespace VBClasses
     Public Class XR_RedC_CellMerge1 : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Dim flood As New RedC_Basics
+        Dim flood As New RedC_Core
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "idMap from RedC_Basics dst3 labels"
-            desc = "Cursor.ai: Build rcList and idMap from the RedC_Basics dst3 output."
+            labels(3) = "idMap from RedC_Core dst3 labels"
+            desc = "Cursor.ai: Build rcList and idMap from the RedC_Core dst3 output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             flood.Run(src)
@@ -1380,13 +1380,13 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(idMap, 0)
-            SetTrueText(RedC_Basics.displayCell(rcList, idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(rcList, idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
             If task.rcD IsNot Nothing Then
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
                 Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
             End If
             labels(2) = flood.labels(3)
-            labels(3) = CStr(rcList.Count) + " cells built from RedC_Basics"
+            labels(3) = CStr(rcList.Count) + " cells built from RedC_Core"
         End Sub
     End Class
 
@@ -1394,7 +1394,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_SteadyCam : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Dim color8U As New Color8U_Basics
         Public Sub New()
             desc = "Build the RedC cells using the GravityRGB_SteadyXY output."
@@ -1417,7 +1417,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_Smoothing : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Reduce the rc.contours points if the distance to the next is < X"
@@ -1444,7 +1444,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_Reliable : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             desc = "Display only those cells that are consistently present since the last heartbeat."
         End Sub
@@ -1470,7 +1470,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_Sizes : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             If standalone Then task.gOptions.DebugSlider.Value = 32
             desc = "Use the debug slider to display cells of X pixels or less."
@@ -1501,7 +1501,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_Hulls : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public rcList As New List(Of rcData)
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1530,7 +1530,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_TrackHull : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Dim lastCenter As cv.Point
         Dim lastid As Byte
         Dim lastRect As cv.Rect
@@ -1553,7 +1553,7 @@ Namespace VBClasses
                 If nextHull IsNot Nothing Then FillPoly(dst0(rc.rect), {nextHull}, rc.index)
             Next
             If task.rcD Is Nothing Then Exit Sub
-            SetTrueText(RedC_Basics.displayCell(redC.rcList, redC.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(redC.rcList, redC.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             dst3.SetTo(0)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -1575,7 +1575,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_NeighborHulls1 : Inherits TaskParent
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Dim clickPoint As cv.Point
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

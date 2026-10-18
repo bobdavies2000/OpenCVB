@@ -8048,4 +8048,183 @@ Namespace VBClasses
             depthBreakCm = breakSlider.Value
         End Sub
     End Class
+
+
+
+
+
+
+    'Public Class Options_Spectrum : Inherits OptionParent
+    '    Public gapDepth As Integer = 1
+    '    Public gapGray As Integer = 1
+    '    Public sampleThreshold As Integer = 10
+    '    Public Sub New()
+    '        If sliders.Setup(traceName) Then
+    '            sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
+    '            sliders.setupTrackBar("Gap in gray spectrum", 1, 50, gapGray)
+    '            sliders.setupTrackBar("Sample count threshold", 1, 50, sampleThreshold)
+    '        End If
+    '    End Sub
+    '    Public Function buildDepthRanges(input As cv.Mat, typeSpec As String) As List(Of rangeData)
+    '        Dim ranges As New List(Of rangeData)
+    '        Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
+    '        Dim pixels As New List(Of Integer)
+    '        Dim counts As New List(Of Integer)
+
+    '        Dim rc = task.rcD
+    '        Dim mask = rc.mask.Clone
+    '        mask.SetTo(0, task.noDepthMask(rc.rect))
+    '        For y = 0 To input.Height - 1
+    '            For x = 0 To input.Width - 1
+    '                If mask.Get(Of Byte)(y, x) > 0 Then
+    '                    Dim val = input.Get(Of Single)(y, x)
+    '                    If val > 0 And val < 100 Then
+    '                        Dim nextVal = CInt(val * 100) ' * 100 to convert to integer and cm's
+    '                        Dim index = pixels.IndexOf(nextVal)
+    '                        If index >= 0 Then
+    '                            counts(index) += 1
+    '                        Else
+    '                            pixels.Add(nextVal)
+    '                            counts.Add(1)
+    '                        End If
+    '                    End If
+    '                End If
+    '            Next
+    '        Next
+
+    '        Dim totalCount As Integer = 0
+    '        For i = 0 To pixels.Count - 1
+    '            sorted.Add(pixels(i), counts(i))
+    '            totalCount += counts(i)
+    '        Next
+
+    '        strOut = "For the selected " + typeSpec + " cell:" + vbCrLf
+
+    '        If sorted.Count = 0 Then
+    '            strOut = "There is no depth data for that cell."
+    '            Return ranges
+    '        End If
+
+    '        Dim rStart As Integer = sorted.ElementAt(0).Key
+    '        Dim rEnd As Integer = rStart
+    '        Dim count As Integer = sorted.ElementAt(0).Value
+    '        Dim trimCount As Integer = 0
+    '        For i = 0 To sorted.Count - 2
+    '            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapDepth Then
+    '                rEnd = sorted.ElementAt(i).Key
+    '                If count > sampleThreshold Then
+    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+    '                Else
+    '                    trimCount += count
+    '                End If
+    '                rStart = sorted.ElementAt(i + 1).Key
+    '                count = sorted.ElementAt(i + 1).Value
+    '            Else
+    '                count += sorted.ElementAt(i + 1).Value
+    '            End If
+    '        Next
+
+    '        If count > sampleThreshold Then
+    '            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
+    '                If count > sampleThreshold Then
+    '                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
+    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+    '                End If
+    '            End If
+    '        End If
+
+    '        strOut += CStr(ranges.Count) + " " + typeSpec
+    '        If ranges.Count > 1 Then strOut += " ranges were " Else strOut += " range was "
+    '        strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
+    '        Return ranges
+    '    End Function
+    '    Public Function buildColorRanges(input As cv.Mat, typespec As String) As List(Of rangeData)
+    '        Dim ranges As New List(Of rangeData)
+    '        Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
+    '        Dim pixels As New List(Of Integer)
+    '        Dim counts As New List(Of Integer)
+
+    '        Dim rc = task.rcD
+    '        For y = 0 To input.Height - 1
+    '            For x = 0 To input.Width - 1
+    '                If rc.mask.Get(Of Byte)(y, x) > 0 Then
+    '                    Dim val = input.Get(Of Byte)(y, x)
+    '                    If val <> 0 Then
+    '                        Dim index = pixels.IndexOf(val)
+    '                        If index >= 0 Then
+    '                            counts(index) += 1
+    '                        Else
+    '                            pixels.Add(val)
+    '                            counts.Add(1)
+    '                        End If
+    '                    End If
+    '                End If
+    '            Next
+    '        Next
+
+    '        If pixels.Count = 0 Then
+    '            strOut = typespec + " data is missing."
+    '            Return ranges
+    '        End If
+
+    '        Dim totalCount As Integer = 0
+    '        For i = 0 To pixels.Count - 1
+    '            sorted.Add(pixels(i), counts(i))
+    '            totalCount += counts(i)
+    '        Next
+
+    '        strOut = "For the selected " + typespec + " cell:" + vbCrLf
+
+    '        Dim rStart As Integer = sorted.ElementAt(0).Key
+    '        Dim rEnd As Integer = rStart
+    '        Dim count As Integer = sorted.ElementAt(0).Value
+    '        Dim trimCount As Integer = 0
+    '        For i = 0 To sorted.Count - 2
+    '            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapGray Then
+    '                rEnd = sorted.ElementAt(i).Key
+    '                If count > sampleThreshold Then
+    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
+    '                Else
+    '                    trimCount += count
+    '                End If
+    '                rStart = sorted.ElementAt(i + 1).Key
+    '                count = sorted.ElementAt(i + 1).Value
+    '            Else
+    '                count += sorted.ElementAt(i + 1).Value
+    '            End If
+    '        Next
+
+    '        If count > sampleThreshold Then
+    '            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
+    '                If count > sampleThreshold Then
+    '                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
+    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
+    '                End If
+    '            End If
+    '        End If
+
+    '        strOut += CStr(ranges.Count) + typespec + " cells:" + vbCrLf
+    '        If ranges.Count > 1 Then strOut += " ranges were " Else strOut += " range was "
+    '        strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
+    '        Return ranges
+    '    End Function
+    '    Public Sub Run()
+    '        Static frmSliders = FindFrm("Options_Spectrum Sliders")
+    '        Static gapDSlider = OptionParent.FindSlider("Gap in depth spectrum (cm's)")
+    '        Static gapGSlider = OptionParent.FindSlider("Gap in gray spectrum")
+    '        Static countSlider = OptionParent.FindSlider("Sample count threshold")
+    '        gapDepth = gapDSlider.value
+    '        gapGray = gapGSlider.value
+    '        sampleThreshold = countSlider.value
+
+    '        If task.firstPass Then
+    '            frmSliders.Left = task.gOptions.Width / 2
+    '            frmSliders.top = task.gOptions.Height / 2
+    '        End If
+    '    End Sub
+    'End Class
 End Namespace

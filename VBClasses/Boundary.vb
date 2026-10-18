@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Boundary_Basics : Inherits TaskParent
-        Public redC As New RedC_Basics
+        Public redC As New RedC_Core
         Dim color8U As New Color8U_Basics
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"

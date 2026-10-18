@@ -117,7 +117,7 @@ Namespace VBClasses
 
     Public Class XR_RedC_CellDepthHistogram : Inherits TaskParent
         Dim plot As New PlotBar_Basics
-        Dim redC As New RedC_Basics
+        Dim redC As New RedC_Core
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             If standalone Then task.gOptions.showMyDst1.Checked = True

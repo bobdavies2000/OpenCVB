@@ -1826,7 +1826,7 @@ Namespace VBClasses
 
             dst2 = Palettize(idMap, 0)
 
-            strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
+            strOut = RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -2481,7 +2481,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_SteadyCamOld : Inherits TaskParent
+    Public Class RedC_BasicsOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -2545,7 +2545,7 @@ Namespace VBClasses
                 Next
             End If
 
-            'strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
+            'strOut = RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
 
             strOut = "In dst2 at left: " + vbCrLf + vbCrLf
             strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
@@ -2566,13 +2566,12 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim delaunay As New Delaunay_Basics
+        Dim redCore As New RedC_Core
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
-            If task.redC Is Nothing Then task.redC = New RedC_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            ' Hungarian Assignment algorithm - visual solution.
             desc = "Track the FeatureLess cells points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2608,11 +2607,13 @@ Namespace VBClasses
                 Next
             End If
 
+            redCore.Run(task.gray)
+
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In task.redC.rcList
+            For Each rc In redCore.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
@@ -2625,18 +2626,6 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst0, 0)
-
-            ''strOut = RedC_Basics.showCell(rcList, idMap, dst2) + vbCrLf
-
-            'strOut = "In dst2 at left: " + vbCrLf + vbCrLf
-            'strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
-            'strOut += "- A cell with no circle is a new cell." + vbCrLf
-            'strOut += "- All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
-            'strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
-            'SetTrueText(strOut, 3)
-
-            'labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
-            'labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
 End Namespace
