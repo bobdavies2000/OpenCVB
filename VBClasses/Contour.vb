@@ -8,10 +8,6 @@ Namespace VBClasses
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then
-                task.gOptions.showMyDst1.Checked = True
-                labels(3) = "Use the debugslider to display different cells."
-            End If
             desc = "Create an idMap of the contours using the colors indicated by KMeans"
         End Sub
         Public Shared Function clickContour(idMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
@@ -40,7 +36,6 @@ Namespace VBClasses
             idMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
-                rc.id = color8U.dst2.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
@@ -48,17 +43,6 @@ Namespace VBClasses
 
             task.color = clickContour(idMap, rcList, color8U.dst2)
 
-            If standalone And heartbeatX() Then
-                Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-                dst3.SetTo(0)
-                If index < rcList.Count Then
-                    Dim rc = rcList(index)
-                    dst3(rc.rect).SetTo(white, rc.mask)
-                    strOut = rc.displayCell
-                Else
-                    strOut = "No cell with that index..."
-                End If
-            End If
             SetTrueText(strOut, 1)
 
             labels(2) = CStr(rcList.Count) + " contour cells were found"
@@ -168,9 +152,8 @@ Namespace VBClasses
             For i = 0 To sortedList.Count - 1
                 Dim rc = sortedList.Values(i)
                 rc.index = i + 1
-                rc.id = rc.index Mod 255
                 rcList.Add(rc)
-                dst1(rc.rect).SetTo(rc.id Mod 255, rc.mask)
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)

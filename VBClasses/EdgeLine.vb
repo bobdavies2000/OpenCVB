@@ -77,7 +77,7 @@ Namespace VBClasses
             Dim n = rc.contour.Count - 1
             nextList.Clear()
             nextList.Add(rc.contour)
-            Polylines(dst2(rc.rect), nextList, False, Scalar.All(rc.id), task.lineWidth, task.lineType)
+            Polylines(dst2(rc.rect), nextList, False, Scalar.All(rc.index), task.lineWidth, task.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New Mat
@@ -95,7 +95,7 @@ Namespace VBClasses
                 For i = 1 To histarray.Length - 1
                     If histarray(i) = 0 Then
                         Dim rc = edgeLine.rcList(i - 1)
-                        rc.id = newList.Count + 1
+                        rc.index = newList.Count + 1
                         newList.Add(rc)
 
                         If rc.contour IsNot Nothing Then rcDataDraw(rc)
@@ -115,10 +115,10 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each rc In edgeLine.rcList
-                If rc.id > 0 Then
-                    If histarray(rc.id - 1) > 0 And rc.contour.Count > 0 Then
+                If rc.index > 0 Then
+                    If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
                         count += 1
-                        rc.id = newList.Count + 1
+                        rc.index = newList.Count + 1
                         newList.Add(rc)
 
                         rcDataDraw(rc)

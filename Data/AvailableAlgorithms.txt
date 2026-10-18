@@ -207,7 +207,6 @@ Feature_TrackerRect
 Feature_WarpAlign
 Feature_WithRotation
 FeatureLess_Basics
-FeatureLess_Cells
 FeatureLess_DisectHLine
 FeatureLess_Disection
 FeatureLess_DisectionOriginal
@@ -219,6 +218,7 @@ FeatureLess_Ordered
 FeatureLess_OrderKNN
 FeatureLess_SteadyCam
 FeatureLess_Tracker
+FeatureLess_TrackerOld
 FeatureMatch_Basics
 FeatureMatch_BRISK
 FeatureMatch_KAZE
@@ -809,7 +809,6 @@ XR_Bin2Way_KMeans
 XR_Bin2Way_RecurseOnce
 XR_Bin2Way_RedCloudDarkest
 XR_Bin2Way_RedCloudLight
-XR_Bin2Way_RedCloudLightToDark
 XR_Bin3Way_RedColorDarkest
 XR_Bin3Way_RedColorLightest
 XR_Bin3Way_RedColorOther
@@ -1142,7 +1141,6 @@ XR_FeatureLess_BasicsOldTest
 XR_FeatureLess_BasicsOldTest2
 XR_FeatureLess_BrickList
 XR_FeatureLess_Cells
-XR_FeatureLess_ClusterFlood
 XR_FeatureLess_ClustersHist2D
 XR_FeatureLess_Contours
 XR_FeatureLess_Core
@@ -1167,7 +1165,6 @@ XR_FeatureLess_NotImages
 XR_FeatureLess_Predict
 XR_FeatureLess_Sobel
 XR_FeatureLess_Stabilized
-XR_FeatureLess_ToList
 XR_FeatureLess_TrackerOriginal
 XR_FeatureLess_Unique3Pixels
 XR_FeatureLess_UniquePixels

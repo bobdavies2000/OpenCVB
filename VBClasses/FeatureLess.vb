@@ -981,129 +981,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_ToList : Inherits TaskParent
-        Dim clusters As New XR_FeatureLess_ClusterFlood
-        Public clusterX As New List(Of List(Of Integer))
-        Public clusterY As New List(Of List(Of Integer))
-        Public rcList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Create a RedCloud rcList from FeatureLess_Cluster output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap As Mat = idMap.Clone
-            Dim rcLastList As New List(Of rcData)(rcList)
-
-            clusters.Run(task.gray)
-            dst2 = clusters.dst2.Clone
-            labels(2) = clusters.labels(3)
-
-            If clusters.floodPoints.Count <= 1 Then Exit Sub ' nothing to work on...
-
-            clusterX.Clear()
-            clusterY.Clear()
-            For i = 0 To clusters.floodPoints.Count ' adding one extra for the zero class...
-                clusterX.Add(New List(Of Integer))
-                clusterY.Add(New List(Of Integer))
-            Next
-
-            rcList.Clear()
-            idMap.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
-                Dim cIndex = dst2.Get(Of Byte)(r.Y, r.X)
-                If cIndex = 0 Then Continue For
-
-                clusterX(cIndex).Add(r.X)
-                clusterY(cIndex).Add(r.Y)
-            Next
-
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 1 To clusterX.Count - 1
-                Dim minX = clusterX(i).Min
-                Dim minY = clusterY(i).Min
-                Dim w = clusterX(i).Max - minX + task.gridWH
-                Dim h = clusterY(i).Max - minY + task.gridWH
-                Dim rect = ValidateRect(New cv.Rect(minX, minY, w, h))
-
-                Dim pt = New cv.Point(clusterX(i)(0), clusterY(i)(0))
-                Dim val = dst2.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = New rcData(dst2(rect), rect, val)
-                sortList.Add(rc.pixels, rc)
-            Next
-
-            rcList.Clear()
-            For Each rc In sortList.Values
-                If heartbeatX() Then
-                    rc.id = rcList.Count + 1
-                Else
-                    Dim lastIndex = lastMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                    rc.id = rcList.Count + 1
-                    If lastIndex > 0 And lastIndex < rcLastList.Count Then
-                        rc.id = lastIndex
-                        rc.age = rcLastList(lastIndex).age + 1
-                    End If
-                End If
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
-                rcList.Add(rc)
-            Next
-
-            dst3 = Palettize(idMap, 0)
-
-            ' strOut = Utility_Basics.selectCell(idMap, rcList)
-            SetTrueText(strOut, 1)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureLess_ClusterFlood : Inherits TaskParent
-        Dim fLess As New XR_FeatureLess_DepthFull
-        Public floodPoints As New List(Of cv.Point)
-        Public Sub New()
-            desc = "Identify the clusters in the XR_FeatureLess_DepthFull output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.gray)
-            dst2 = fLess.dst1.Clone
-            labels(2) = fLess.labels(2)
-
-            floodPoints.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
-                Dim val = dst2.Get(Of Byte)(r.Y, r.X)
-                If val = 255 Then
-                    Dim floodCount = FloodFill(dst2, r.TopLeft, floodPoints.Count + 1)
-                    floodPoints.Add(r.TopLeft)
-                    If floodPoints.Count >= 254 Then Exit For
-                End If
-            Next
-
-            If standaloneTest() Then dst3 = Palettize(dst2, 0)
-
-            If standalone Then
-                Static clusterID As Byte
-                clusterID = dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-
-                If clusterID > 0 Then
-                    dst0 = dst2.Clone
-                    FloodFill(dst0, task.clickPoint, 255)
-                    Threshold(dst0, dst0, 254, 255, ThresholdTypes.Binary)
-                    task.color.SetTo(white, dst0)
-                End If
-            End If
-            labels(3) = CStr(floodPoints.Count - 1) + " clusters were found "
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_FeatureLess_Predict : Inherits TaskParent
         Dim ml As New ML_RandomForest
         Public clusters() As Single
@@ -2373,7 +2250,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Tracker : Inherits TaskParent
+    Public Class FeatureLess_TrackerOld : Inherits TaskParent
         Public delaunay As New Delaunay_Basics
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -2481,7 +2358,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Cells : Inherits TaskParent
+    Public Class FeatureLess_Tracker : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
