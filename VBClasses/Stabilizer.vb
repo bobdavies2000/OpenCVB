@@ -1,4 +1,4 @@
-﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp : Imports OpenCvSharp.VideoStab
 Namespace VBClasses
     Public Class Stabilizer_Basics : Inherits TaskParent
         Private refLine As lpData
@@ -237,6 +237,108 @@ Namespace VBClasses
                  "Pitch: acute angle between lines.lplist(0) and lpGravity in the image (both edge directions)." + vbCrLf +
                  "Yaw: signed angle of lines.lplist(0) vs horizontal perpendicular to gravity (best when the scene line is horizontal in world coordinates)."
             SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Stabilizer_FullProfile : Inherits TaskParent
+        Private frameList As New List(Of Mat)
+        Private ReadOnly modelNames As String() = {"Translation", "Translation and scale", "Rotation", "Rigid",
+                                                    "Similarity", "Affine", "Homography"}
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Stabilizer radius", 1, 15, 5)
+                sliders.setupTrackBar("Stabilizer trim ratio x1000", 0, 400, 0)
+            End If
+            If radio.Setup(traceName) Then
+                For Each name In modelNames
+                    radio.addRadio(name)
+                Next
+                radio.check(5).Checked = True
+            End If
+            desc = "Cursor.ai: Stabilize a short frame buffer with OpenCV's full-profile CvVideoStab.Stabilize."
+            labels(2) = "CvVideoStab.Stabilize output"
+            labels(3) = "Current frame"
+        End Sub
+        Private Sub clearFrames()
+            For Each frame In frameList
+                frame.Dispose()
+            Next
+            frameList.Clear()
+        End Sub
+        Private Shared Function motionModel(mode As Integer) As VideoStabMotionModel
+            Select Case mode
+                Case 0
+                    Return VideoStabMotionModel.Translation
+                Case 1
+                    Return VideoStabMotionModel.TranslationAndScale
+                Case 2
+                    Return VideoStabMotionModel.Rotation
+                Case 3
+                    Return VideoStabMotionModel.Rigid
+                Case 4
+                    Return VideoStabMotionModel.Similarity
+                Case 6
+                    Return VideoStabMotionModel.Homography
+                Case Else
+                    Return VideoStabMotionModel.Affine
+            End Select
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim frame = src
+            If frame.Type <> MatType.CV_8UC1 And frame.Type <> MatType.CV_8UC3 Then frame = task.color
+            dst3 = frame.Clone()
+
+            If task.firstPass OrElse (frameList.Count > 0 AndAlso
+               (frameList(0).Width <> frame.Width OrElse
+                frameList(0).Height <> frame.Height OrElse
+                frameList(0).Type <> frame.Type)) Then
+                clearFrames()
+            End If
+
+            Static radiusSlider = OptionParent.FindSlider("Stabilizer radius")
+            Static trimSlider = OptionParent.FindSlider("Stabilizer trim ratio x1000")
+            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
+            Dim mode As Integer
+            For mode = 0 To frm.check.Count - 1
+                If frm.check(mode).Checked Then Exit For
+            Next
+            If mode >= modelNames.Length Then mode = 5
+            Dim radius = radiusSlider.Value
+            Dim trimRatio = CSng(trimSlider.Value / 1000.0)
+            Dim model = motionModel(mode)
+
+            frameList.Add(frame.Clone())
+            Dim keep = Math.Max(2, radius * 2 + 1)
+            While frameList.Count > keep
+                frameList(0).Dispose()
+                frameList.RemoveAt(0)
+            End While
+
+            If frameList.Count < 2 Then
+                dst2 = frame.Clone()
+                labels(2) = "Collecting frames for CvVideoStab.Stabilize."
+                Exit Sub
+            End If
+
+            Dim stabilized As Mat() = Nothing
+            Try
+                stabilized = CvVideoStab.Stabilize(frameList, radius, trimRatio, model)
+                dst2 = stabilized(stabilized.Length - 1).Clone()
+                labels(2) = modelNames(mode) + " radius=" + CStr(radius) + " trim=" + trimRatio.ToString(fmt2) +
+                            "  " + CStr(frameList.Count) + " frames"
+            Catch ex As Exception
+                dst2 = frame.Clone()
+                labels(2) = "CvVideoStab.Stabilize: " + ex.Message
+            Finally
+                If stabilized IsNot Nothing Then
+                    For Each m In stabilized
+                        m.Dispose()
+                    Next
+                End If
+            End Try
         End Sub
     End Class
 End Namespace

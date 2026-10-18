@@ -656,6 +656,7 @@ Sort_3Channel
 Sort_Basics
 Sort_Integer
 Stabilizer_Basics
+Stabilizer_FullProfile
 Stabilizer_IMU
 Stabilizer_OrientationPRY
 Stabilizer_PRYaw

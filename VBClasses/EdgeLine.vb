@@ -40,7 +40,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcData) ' placeholder for zero...
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
                 Dim mask = idMap(ValidateRect(rects(i)))

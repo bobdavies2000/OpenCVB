@@ -36,7 +36,7 @@ Namespace VBClasses
             Next
 
             rclist.Clear()
-            rclist.Add(New rcData)
+            rclist.Add(New rcData) ' placeholder for zero...
             For Each rc In sortedCells.Values
                 rc.id = rclist.Count
                 rclist.Add(rc)

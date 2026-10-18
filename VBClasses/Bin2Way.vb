@@ -273,7 +273,7 @@ Namespace VBClasses
             dst2 = mats.dst2
 
             rclist.Clear()
-            rclist.Add(New rcData)
+            rclist.Add(New rcData) ' placeholder for zero...
             dst3.SetTo(0)
             idMap.SetTo(0)
             For Each rc In newList.Values

@@ -20,7 +20,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcData) ' placeholder for zero...
             dst1 = color8U.dst2.Clone
             idMap.SetTo(0)
             For y = 0 To dst2.Height - 1
@@ -174,7 +174,7 @@ Namespace VBClasses
 
             idMap.SetTo(0)
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)

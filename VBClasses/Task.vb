@@ -56,8 +56,6 @@ Namespace VBClasses
             task.stableGray = New StableGray_Basics_TA
 
             task.grid = New Grid_Basics_TA
-            ' task.fLess = New FeatureLess_Basics
-            ' task.lines = New Line_Basics_TA
 
             task.filterBasics = New Filter_Basics_TA
             task.foreground = New Foreground_Basics_TA
@@ -203,6 +201,7 @@ Namespace VBClasses
             task.foreground.Run(New cv.Mat)
             task.edges.Run(task.gray)
             If task.fless IsNot Nothing Then task.fless.Run(gray)
+            If task.redC IsNot Nothing Then task.redC.Run(gray)
 
 
 

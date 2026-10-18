@@ -86,7 +86,7 @@ Namespace VBClasses
             Dim rcLastList = New List(Of rcData)(rcList)
 
             rcList.Clear()
-            rcList.Add(New rcData)
+            rcList.Add(New rcData) ' placeholder for zero...
             idMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
