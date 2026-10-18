@@ -379,11 +379,11 @@ Namespace VBClasses
             mat = mats.mat
             mats.Run(emptyMat)
             dst2 = mats.dst2.Clone
-            If standalone Then mats.defaultMats()
             If task.firstPass Then
                 task.clickPoint = New cv.Point(0, 0)
                 task.mousePicTag = 2
             End If
+            If standalone Then mats.defaultMats()
 
             If task.mouseClickFlag And task.mousePicTag = 2 Then
                 If task.clickPoint.Y < dst2.Rows / 2 Then
@@ -437,6 +437,13 @@ Namespace VBClasses
             If standalone Then defaultMats()
 
             dst2 = New Mat(dst2.Size(), mat(0).Type)
+            If task.firstPass Then
+                If mat(0).Channels = 1 Then
+                    For i = 0 To mat.Length - 1
+                        mat(i) = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                    Next
+                End If
+            End If
             For i = 0 To 3
                 If mat(i).Size <> task.quads(i).Size Then
                     Resize(mat(i), dst2(task.quads(i)), nSize)

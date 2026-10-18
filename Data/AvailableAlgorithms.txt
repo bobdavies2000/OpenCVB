@@ -13,6 +13,7 @@ BGSubtract_MOG
 BGSubtract_MOG2
 Bin2Way_Basics
 Bin2Way_Gradation
+Bin2Way_RedC
 Bin3Way_Basics
 Bin3Way_GrayScale
 Bin3Way_KMeans
@@ -806,7 +807,6 @@ XR_BGSubtract_Video
 XR_Bin2Way_GradationEdges
 XR_Bin2Way_KMeans
 XR_Bin2Way_RecurseOnce
-XR_Bin2Way_RedC
 XR_Bin2Way_RedCloudDarkest
 XR_Bin2Way_RedCloudLight
 XR_Bin2Way_RedCloudLightToDark

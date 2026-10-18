@@ -72,7 +72,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Bin2Way_RedC : Inherits TaskParent
+    Public Class Bin2Way_RedC : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
         Dim redC As New RedColor_FLessBasics
         Public Sub New()
@@ -87,7 +87,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                dst1(rc.rect).SetTo(rc.id, rc.mask)
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
