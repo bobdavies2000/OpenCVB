@@ -2334,11 +2334,11 @@ Namespace VBClasses
 
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
-            If task.redC Is Nothing Then task.redC = New RedColor_Basics
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -2355,19 +2355,19 @@ Namespace VBClasses
                 delaunay.ptList = New List(Of cv.Point2f)(nextList)
 
                 delaunay.Run(emptyMat)
-                idMap.SetTo(0)
+                indexMap.SetTo(0)
                 For i = 0 To delaunay.facetList.Count - 1
                     If task.fless.rcList(i).index = 0 Then Continue For
-                    FillConvexPoly(idMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
+                    FillConvexPoly(indexMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
                 Next
 
                 ' run before palettize
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.index, -1)
+                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.index, -1)
                 Next
 
-                dst1 = Palettize(idMap)
+                dst1 = Palettize(indexMap)
 
                 ' run after palettize
                 For Each rc In task.fless.rcList
@@ -2377,17 +2377,17 @@ Namespace VBClasses
                 Next
             End If
 
-            task.redC.Run(task.gray)
+            task.redColor.Run(task.gray)
 
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In task.redC.rcList
+            For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.index = idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.index = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
                 SetTrueText(CStr(rc.index), rc.maxDist, 3)
                 SetTrueText(CStr(rc.index), ptx, 1)
                 rcList.Add(rc)
@@ -2396,8 +2396,8 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(task.redC.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
-            labels(3) = CStr(task.redC.rcList.Count) + " cells were found"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
         End Sub
     End Class
 End Namespace

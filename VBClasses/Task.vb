@@ -201,7 +201,8 @@ Namespace VBClasses
             task.foreground.Run(New cv.Mat)
             task.edges.Run(task.gray)
             If task.fless IsNot Nothing Then task.fless.Run(gray)
-            If task.redC IsNot Nothing Then task.redC.Run(gray)
+            If task.delaunay IsNot Nothing Then task.delaunay.Run(gray)
+            If task.redColor IsNot Nothing Then task.redColor.Run(gray)
 
 
 

@@ -33,12 +33,12 @@ Namespace VBClasses
             For Each rc In redCore.rcList
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.id = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
+                rc.index = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
                 rc.index = rcList.Count
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(task.scalarColors(rc.id Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -77,7 +77,7 @@ Namespace VBClasses
                                 rc = New rcData(input(rect), rect, index)
                                 newList.Add(rc.pixels, rc)
                                 index += 1
-                                rc.id = newList.Count
+                                rc.index = newList.Count
                             End If
                         End If
                     End If
@@ -99,7 +99,7 @@ Namespace VBClasses
             End If
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.id Mod 254, rc.mask)
+                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -300,9 +300,9 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age > 1 Then
-                    If rcMotionCells.Contains(rc.id) = False Then
+                    If rcMotionCells.Contains(rc.index) = False Then
                         dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        idMap(rc.rect).SetTo(rc.id, rc.mask)
+                        idMap(rc.rect).SetTo(rc.index, rc.mask)
                         rcList.Add(rc)
                     End If
                 End If

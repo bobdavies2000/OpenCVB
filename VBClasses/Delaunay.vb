@@ -6,6 +6,7 @@ Namespace VBClasses
         Public ptList As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Public useFeatures As Boolean
+        Public indexMap As cv.Mat
         Dim subdiv As New Subdiv2D
         Public Sub New()
             If standalone Then useFeatures = True
@@ -36,7 +37,7 @@ Namespace VBClasses
                     nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
                 Next
 
-                FillConvexPoly(dst3, nextFacet, i, LineTypes.Link4)
+                FillConvexPoly(dst3, nextFacet, i + 1, LineTypes.Link4)
                 facetList.Add(nextFacet)
             Next
 
@@ -628,4 +629,45 @@ Namespace VBClasses
             labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
         End Sub
     End Class
+
+
+
+
+
+    Public Class Delaunay_FeatureLess : Inherits TaskParent
+        Public indexMap As cv.Mat
+        Public ptList As New List(Of cv.Point)
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            If task.delaunay Is Nothing Then task.delaunay = New Delaunay_Basics
+            desc = "Use the featureless cells to build a map covering the entire image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                task.delaunay.ptList.Clear()
+                For Each rc In task.fless.rcList
+                    If rc.index = 0 Then Continue For
+                    task.delaunay.ptList.Add(rc.maxDist)
+                Next
+
+                task.delaunay.Run(emptyMat)
+                indexMap = task.delaunay.dst3
+
+                For Each rc In task.fless.rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.index, -1)
+                Next
+
+                dst2 = Palettize(indexMap, 0)
+
+                ' run after palettize
+                For Each rc In task.fless.rcList
+                    If rc.index = 0 Then Continue For
+                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                Next
+                labels(2) = CStr(task.fless.rcList.Count) + " cells in the indexMap"
+            End If
+        End Sub
+    End Class
+
 End Namespace

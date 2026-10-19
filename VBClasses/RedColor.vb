@@ -221,7 +221,7 @@ Namespace VBClasses
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
-                rcGridMap(r).SetTo(rc.id)
+                rcGridMap(r).SetTo(rc.index)
             Next
         End Sub
     End Class

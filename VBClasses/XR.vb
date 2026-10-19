@@ -796,15 +796,15 @@ Namespace VBClasses
                 If usedColor.Contains(rc.index) Then rc.age = 1
                 usedColor.Add(rc.index)
 
-                rc.id = rcList.Count + 1
+                rc.index = rcList.Count + 1
                 rcList.Add(rc)
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             dst2.SetTo(0)
             For Each rc In rcList
-                InRange(idMap(rc.rect), rc.id, rc.id, rc.mask)
+                InRange(idMap(rc.rect), rc.index, rc.index, rc.mask)
                 rc.buildMaxDist(rc.mask)
                 dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
@@ -936,7 +936,7 @@ Namespace VBClasses
                         defectCount += 1
                     End If
                     Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
-                    DrawTour(idMap(rc.rect), hull.ToList, rc.id, -1)
+                    DrawTour(idMap(rc.rect), hull.ToList, rc.index, -1)
                     rclist.Add(rc)
                 End If
             Next
@@ -998,7 +998,7 @@ Namespace VBClasses
                 Dim d = pt.DistanceTo(rc.maxDist)
                 If d < bestDistance Then
                     bestDistance = d
-                    bestIndex = rc.id
+                    bestIndex = rc.index
                 End If
             Next
             Return bestIndex
@@ -1012,8 +1012,8 @@ Namespace VBClasses
             End If
             Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each rc In track.redC.rcList
-                If rc.id = 0 Then Continue For
-                xList.Add(rc.rect.X, rc.id)
+                If rc.index = 0 Then Continue For
+                xList.Add(rc.rect.X, rc.index)
             Next
 
             Dim minLeft As Integer = xList.Count / 4
@@ -1198,7 +1198,7 @@ Namespace VBClasses
             Dim m As New Mat(idMap.Size, MatType.CV_8U, 0)
             Using roi = idMap(rc.rect)
                 Dim part As New Mat
-                InRange(roi, rc.id, rc.id, part)
+                InRange(roi, rc.index, rc.index, part)
                 Using part
                     part.CopyTo(m(rc.rect))
                 End Using
@@ -1216,7 +1216,7 @@ Namespace VBClasses
 
             If task.rcD IsNot Nothing AndAlso task.rcD.pixels > 0 Then
                 For Each rc In rcList
-                    If rc.id = task.rcD.id Then Return rc
+                    If rc.index = task.rcD.index Then Return rc
                 Next
             End If
 
@@ -1283,7 +1283,7 @@ Namespace VBClasses
             dst3 = New Mat(mask.Size(), MatType.CV_8UC3, New Scalar(0, 0, 0))
             dst3.SetTo(New Scalar(255, 255, 255), mask)
 
-            labels(2) = "Subject index=" + CStr(subject.id) + ", pixels=" + CStr(subject.pixels) +
+            labels(2) = "Subject index=" + CStr(subject.index) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
             labels(3) = "white = kept region. Select another cell with RedColor UI to retarget."
             strOut = "Uses RedCloud color flood cells (RedColor_FLessBasics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
@@ -1337,7 +1337,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.index Mod 255), -1)
                 If task.rcD IsNot Nothing Then
-                    If rc.id = task.rcD.id Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                    If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
                 End If
             Next
         End Sub
@@ -1373,7 +1373,7 @@ Namespace VBClasses
                 Dim r = ValidateRect(BoundingRect(nz))
                 Dim rc As New rcData(cellMask(r), r, 255)
                 If rc.pixels = 0 Then Continue For
-                rc.id = label
+                rc.index = label
                 rc.index = rcList.Count + 1
                 rcList.Add(rc)
                 idMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -1515,7 +1515,7 @@ Namespace VBClasses
             For i = 0 To redC.rcList.Count - 1
                 Dim rc = redC.rcList(i)
                 Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
-                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.id)
+                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.index)
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
@@ -1532,7 +1532,6 @@ Namespace VBClasses
     Public Class XR_RedC_TrackHull : Inherits TaskParent
         Dim redC As New XR_RedC_Core
         Dim lastCenter As cv.Point
-        Dim lastid As Byte
         Dim lastRect As cv.Rect
         Public Sub New()
             task.gOptions.showMyDst1.Checked = True
@@ -1558,14 +1557,13 @@ Namespace VBClasses
             dst3.SetTo(0)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             Dim hull = Cv2.ConvexHull(task.rcD.contour.ToArray)
-            FillPoly(dst3(task.rcD.rect), {hull}, task.scalarColors(task.rcD.id + 1))
-            dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.id), task.rcD.mask)
+            FillPoly(dst3(task.rcD.rect), {hull}, task.scalarColors(task.rcD.index + 1))
+            dst3(task.rcD.rect).SetTo(task.scalarColors(task.rcD.index), task.rcD.mask)
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             Circle(dst1, lastCenter, task.DotSize + 1, task.highlight, -1)
             SetTrueText(task.rcD.displayCell() + vbCrLf, 1)
 
             lastCenter = Utility_Basics.ComputeHullCentroid(hull.ToArray, task.rcD)
-            lastid = task.rcD.id
             lastRect = task.rcD.rect
         End Sub
     End Class
@@ -1619,10 +1617,10 @@ Namespace VBClasses
             Next
 
             dst3.SetTo(0)
-            dst3(rcD.rect).SetTo(task.scalarColors(rcD.id), rcD.mask)
+            dst3(rcD.rect).SetTo(task.scalarColors(rcD.index), rcD.mask)
             For i = 0 To neighbors.Count - 1
                 Dim rc = redC.rcList(neighbors(i) - 1)
-                dst3(rc.rect).SetTo(task.scalarColors(rc.id), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
             Next
 
             dst3(rcD.rect).SetTo(task.highlight, rcD.mask)

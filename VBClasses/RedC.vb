@@ -2,11 +2,11 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim delaunay As New Delaunay_Basics
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim delaunay As New Delaunay_FeatureLess
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
-            If task.redC Is Nothing Then task.redC = New RedColor_Basics
+            If task.delaunay Is Nothing Then task.delaunay = New Delaunay_Basics
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -14,47 +14,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If heartbeatLTX() Then
-                Dim nextList As New List(Of cv.Point2f)
-                For Each rc In task.fless.rcList
-                    If rc.index = 0 Then Continue For
-                    nextList.Add(rc.maxDist)
-                Next
-
-                delaunay.ptList = New List(Of cv.Point2f)(nextList)
-
                 delaunay.Run(emptyMat)
-                idMap.SetTo(0)
-                For i = 0 To delaunay.facetList.Count - 1
-                    If task.fless.rcList(i).index = 0 Then Continue For
-                    FillConvexPoly(idMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
-                Next
-                FillConvexPoly(idMap, delaunay.facetList(0), 1, LineTypes.Link4) ' Stay away from zero
-
-                ' run before palettize
-                For Each rc In task.fless.rcList
-                    If rc.contour.Count = 0 Then Continue For
-                    DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.index, -1)
-                Next
-
-                dst1 = Palettize(idMap)
-
-                ' run after palettize
-                For Each rc In task.fless.rcList
-                    If rc.index = 0 Then Continue For
-                    DrawContours(dst1(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
-                    Circle(dst1, rc.maxDStable, task.DotSize, task.highlight, -1)
-                Next
+                dst1 = delaunay.dst2
             End If
 
-            dst0.SetTo(0)
+            rcMap.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             Dim usedList As New List(Of Integer)
-            For Each rc In task.redC.rcList
+            For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
-                rc.index = idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.index = delaunay.indexMap.Get(Of Byte)(ptx.Y, ptx.X)
                 If usedList.Contains(rc.index) = False Then
                     Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
                     SetTrueText(CStr(rc.index), rc.maxDist, 3)
@@ -63,12 +35,14 @@ Namespace VBClasses
                 End If
                 rcList.Add(rc)
 
-                dst0(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(task.redC.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
-            labels(3) = CStr(task.redC.rcList.Count) + " cells were found"
+            If standaloneTest() Then
+                dst2 = Palettize(rcMap, 0)
+                labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+                labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
+            End If
         End Sub
     End Class
 
@@ -228,8 +202,7 @@ Namespace VBClasses
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
-                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256)
-                rc.id = flood.dst1.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256) With {.index = i + 1}
                 rc.index = i + 1
                 rcList.Add(rc)
             Next
@@ -308,11 +281,11 @@ Namespace VBClasses
                 fullMask(rc.rect).SetTo(255, rc.mask)
             Next
 
-            merged = New rcData() With {.rect = unionRect, .mask = fullMask(unionRect).Clone(), .id = rcD.id,
+            merged = New rcData() With {.rect = unionRect, .mask = fullMask(unionRect).Clone(),
                                         .index = rcD.index, .maxDStable = merged.maxDist}
             dst3.SetTo(0)
             For Each rc In mergeList
-                dst3(rc.rect).SetTo(task.scalarColors(rc.id), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
             Next
             dst3(merged.rect).SetTo(task.highlight, merged.mask)
             Rectangle(dst2, merged.rect, task.highlight, task.lineWidth)
@@ -517,7 +490,7 @@ Namespace VBClasses
                     If rc.pixels > biggest.pixels Then biggest = rc
                 Next
                 unionRect = ValidateRect(unionRect)
-                Dim merged As New rcData(fullMask(unionRect), unionRect, -1) With {.id = biggest.id}
+                Dim merged As New rcData(fullMask(unionRect), unionRect, -1)
                 If merged.pixels > 0 Then sorted.Add(merged.pixels, merged)
             Next
 
@@ -595,7 +568,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For i = 0 To neighbors.Count - 1
-                dst3(neighbors(i).rect).SetTo(task.scalarColors(neighbors(i).id), neighbors(i).mask)
+                dst3(neighbors(i).rect).SetTo(task.scalarColors(neighbors(i).index Mod 255), neighbors(i).mask)
             Next
 
             dst3(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
@@ -708,9 +681,8 @@ Namespace VBClasses
             SetTrueText(XR_RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
-                rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.id = 0 Then rc.id = rc.index
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
+                If rc.index = 0 Then Continue For
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -721,7 +693,7 @@ Namespace VBClasses
             End If
 
             dst3 = Palettize(idMap, 0)
-            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
+            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned an index."
         End Sub
     End Class
 

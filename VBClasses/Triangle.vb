@@ -101,7 +101,7 @@ Namespace VBClasses
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.id = 0 Then Exit Sub
+            If rc.index = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)
@@ -164,7 +164,7 @@ Namespace VBClasses
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.id = 0 Then Exit Sub
+            If rc.index = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)

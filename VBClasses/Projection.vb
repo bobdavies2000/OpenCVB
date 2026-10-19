@@ -38,7 +38,7 @@ Namespace VBClasses
             rclist.Clear()
             rclist.Add(New rcData) ' placeholder for zero...
             For Each rc In sortedCells.Values
-                rc.id = rclist.Count
+                rc.index = rclist.Count
                 rclist.Add(rc)
             Next
 
@@ -52,7 +52,7 @@ Namespace VBClasses
             Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
             if heartbeatx() then  strOut = ""
             For Each rc In rclist
-                If rc.id = 0 Then Continue For
+                If rc.index = 0 Then Continue For
                 If viewType = "Side" Then
                     xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
                     xy2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height + ranges(0).Start
@@ -65,8 +65,8 @@ Namespace VBClasses
                     z2 = (ranges(0).End - ranges(0).Start) * (rc.rect.Y + rc.rect.Height) / dst2.Height
                 End If
                 objectList.Add(New Vec4f(xy1, xy2, z1, z2))
-                if heartbeatx() then 
-                    strOut += "Object " + vbTab + CStr(rc.id) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
+                if heartbeatx() Then
+                    strOut += "Object " + vbTab + CStr(rc.index) + vbTab + (xy2 - xy1).ToString(fmt3) + " m " + meterDesc + vbTab +
                                                z1.ToString(fmt1) + "m " + " to " + z2.ToString(fmt1) + "m from camera" + vbTab + CStr(rc.pixels) + " pixels" + vbCrLf
                 End If
             Next

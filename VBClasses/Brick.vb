@@ -885,7 +885,7 @@ Namespace VBClasses
         Dim depthList As New List(Of Single)
         Dim options As New Options_DiffDepth
         Public depthJumpers As New List(Of Integer)
-        Dim fLess As New RedC_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 30
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -895,10 +895,10 @@ Namespace VBClasses
             bricks.Run(src)
             options.Run()
 
-            fLess.Run(task.leftView)
+            redC.Run(task.leftView)
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.idMap)
-            labels(2) = fLess.labels(2)
+            dst2.SetTo(0, redC.rcMap)
+            labels(2) = redC.labels(2)
 
             depthList.Clear()
             For Each r In task.gridRects
@@ -912,7 +912,7 @@ Namespace VBClasses
             depthJumpers.Clear()
             For i = 0 To depthList.Count - 1
                 Dim r = task.gridRects(i)
-                Dim val = fLess.dst2.Get(Of Byte)(r.Y, r.X)
+                Dim val = redC.dst2.Get(Of Byte)(r.Y, r.X)
                 If val = 0 And depthList(i) <> 0 And lastDepthList(i) <> 0 Then
                     Dim diff = Math.Abs(depthList(i) - lastDepthList(i))
                     If diff > options.meters Then
@@ -949,7 +949,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.idMap)
+            dst2.SetTo(0, fLess.rcMap)
             labels(2) = fLess.labels(2)
 
             If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
