@@ -677,7 +677,6 @@ Namespace VBClasses
                     hColor.inputMask = rc.mask
                     hColor.Run(src(rc.rect))
                     pixelVector.Add(hColor.histArray.ToList)
-                    strOut += "(" + CStr(rc.id) + ") "
                     For Each count In hColor.histArray
                         strOut += CStr(count) + ","
                     Next

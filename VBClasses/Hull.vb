@@ -240,7 +240,7 @@ Namespace VBClasses
                 If rc.contour.Count >= 3 Then
                     Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
                     hulls.Add(hull.ToList)
-                    Dim color = task.scalarColors(rc.id)
+                    Dim color = task.scalarColors(rc.index)
                     dst3(rc.rect).SetTo(color, rc.mask)
                     DrawTour(idMap(rc.rect), hull.ToList, rc.index, -1)
 

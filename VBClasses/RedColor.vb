@@ -74,7 +74,7 @@ Namespace VBClasses
         Dim flood As New Flood_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Build an rcList from the flood data and present smalles to largest."
+            desc = "Build an rcList from the flood data and present smallest to largest."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap = idMap.Clone
@@ -105,10 +105,10 @@ Namespace VBClasses
 
             SetTrueText(XR_RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
-            For Each rc In rcList
-                rc.id = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.id = 0 Then rc.id = rc.index
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
+            For i = 0 To rcList.Count - 1
+                Dim rc = rcList(i)
+                rc.index = i
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -119,7 +119,7 @@ Namespace VBClasses
             End If
 
             dst3 = Palettize(idMap, 0)
-            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned rc.ID's."
+            labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned index."
         End Sub
     End Class
 

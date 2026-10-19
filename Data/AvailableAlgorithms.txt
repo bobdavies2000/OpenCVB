@@ -218,7 +218,6 @@ FeatureLess_Ordered
 FeatureLess_OrderKNN
 FeatureLess_SteadyCam
 FeatureLess_Tracker
-FeatureLess_TrackerOld
 FeatureMatch_Basics
 FeatureMatch_BRISK
 FeatureMatch_KAZE

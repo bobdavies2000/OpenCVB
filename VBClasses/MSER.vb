@@ -29,15 +29,6 @@ Namespace VBClasses
         Public Sub New()
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
-        Public Shared Function RebuildRCMap(idMap As Mat, rclist As List(Of rcData)) As Mat
-            Dim dst As New Mat(task.workRes, MatType.CV_8UC3, 0)
-            For Each rc In rclist
-                idMap(rc.rect).SetTo(rc.id, rc.mask)
-                dst(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                If rc.id >= 255 Then Exit For
-            Next
-            Return dst
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
             dst3 = redC.dst2
@@ -88,7 +79,7 @@ Namespace VBClasses
 
     Public Class MSER_Basics2 : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Dim cellMap As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        Dim idMap As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         Public Sub New()
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Create cells for each region in MSER output"
@@ -108,15 +99,15 @@ Namespace VBClasses
             Dim rclist As New List(Of rcData)({New rcData})
             dst1.SetTo(0)
             dst2.SetTo(0)
-            Dim lastMap = cellMap.Clone
-            cellMap.SetTo(0)
+            Dim lastMap = idMap.Clone
+            idMap.SetTo(0)
             Dim matchCount As Integer
             For i = 0 To floodPoints.Count - 1
-                Dim rc As New rcData With {.id = rclist.Count}
+                Dim rc As New rcData With {.index = rclist.Count}
                 Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
                 rc.rect = boxInput(boxes.ElementAt(i).Value)
                 InRange(dst3(rc.rect), val, val, rc.mask)
-                dst1(rc.rect).SetTo(rc.id, rc.mask)
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
                 rc.pixels = detect.maskCounts(i)
 
                 Dim indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -125,7 +116,7 @@ Namespace VBClasses
                 If indexLast <> 0 Then matchCount += 1
 
                 rclist.Add(rc)
-                cellMap(rc.rect).SetTo(rc.id, rc.mask)
+                idMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 

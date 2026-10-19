@@ -1310,7 +1310,7 @@ Namespace VBClasses
                 Dim rc = sortList.Values(i)
                 Dim idLast = CInt(idMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X))
                 For Each rcLast In rcLastList
-                    If idLast = rcLast.id And idLast > 0 Then
+                    If idLast = rcLast.index And idLast > 0 Then
                         rc.age = rcLast.age + 1
                         Exit For
                     End If

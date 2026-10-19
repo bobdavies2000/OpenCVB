@@ -564,7 +564,7 @@ Namespace VBClasses
             Dim index As Integer = 1
             For Each rc In redC.rcList
                 Dim rcTest = New rcData(rc.mask, rc.rect, index)
-                If rcTest.id >= 0 Then
+                If rcTest.index >= 0 Then
                     dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                     index += 1
@@ -588,7 +588,6 @@ Namespace VBClasses
             Dim rc As New rcData
             InRange(_mask, _index, _index, rc.mask)
             rc.rect = _rect
-            rc.id = _index
             Dim contour = ContourBuild(rc.mask)
             If contour.Count < 3 Then Return Nothing
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
@@ -622,7 +621,7 @@ Namespace VBClasses
                 ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
                 Dim rcTest = setCloudData(rc.mask, rc.rect, rcList.Count + 1, False)
                 If rcTest Is Nothing Then Continue For
-                If rcTest.id >= 0 Then
+                If rcTest.index >= 0 Then
                     dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                     rcList.Add(rcTest)

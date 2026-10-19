@@ -105,7 +105,7 @@ Namespace VBClasses
                         rc.index = rcList.Count
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        idMap(rc.rect).SetTo(rc.id, rc.mask)
+                        idMap(rc.rect).SetTo(rc.index, rc.mask)
                     End If
                 End If
             Next
