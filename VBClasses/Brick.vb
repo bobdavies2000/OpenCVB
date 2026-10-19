@@ -936,21 +936,21 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim options As New Options_DiffDepth
         Public rangeJumpers As New List(Of Integer)
-        Dim fLess As New RedC_Basics
+        Dim redC As New RedC_Basics
         Public Sub New()
             OptionParent.FindSlider("Depth varies more than X mm's").Value = 300
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Visualize where bricks have highly variable depth range."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.grayOriginal)
+            redC.Run(task.grayOriginal)
 
             bricks.Run(src)
             options.Run()
 
             dst2 = src.Clone
-            dst2.SetTo(0, fLess.rcMap)
-            labels(2) = fLess.labels(2)
+            dst2.SetTo(0, redC.rcMap)
+            labels(2) = redC.labels(2)
 
             If standaloneTest() Then dst3 = task.edges.dst2 Else dst3.SetTo(0)
 
