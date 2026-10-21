@@ -102,7 +102,7 @@ Namespace VBClasses
                 If Math.Abs(rc2.pixels - task.rcD.pixels) < 100 Then
                     Dim matchval = MatchShapes(task.rcD.contour, rc2.contour, options.matchOption)
                     If matchval < options.matchThreshold Then
-                        dst3(rc2.rect).SetTo(task.scalarColors(rc.index Mod 255), rc2.mask)
+                        dst3(rc2.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc2.mask)
                         similarCells.Add(rc2)
                         matchVals.Add(matchval)
                     End If

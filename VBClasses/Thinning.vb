@@ -16,7 +16,7 @@ Public Class Thinning_Basics : Inherits TaskParent
         For Each rc In redC.rcList
             XImgProc.Thinning(rc.mask, thin, options.thinningType)
             If thin.Empty = False AndAlso thin.Size = rc.mask.Size Then
-                dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), thin)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), thin)
             End If
         Next
         labels(3) = CStr(redC.rcList.Count) + " cells thinned with " + options.thinningType.ToString()

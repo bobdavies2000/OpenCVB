@@ -8113,7 +8113,7 @@ Namespace VBClasses
     '            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapDepth Then
     '                rEnd = sorted.ElementAt(i).Key
     '                If count > sampleThreshold Then
-    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    ranges.Add(New rangeData(rc.ID, rStart, rEnd, count))
     '                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
     '                Else
     '                    trimCount += count
@@ -8129,7 +8129,7 @@ Namespace VBClasses
     '            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
     '                If count > sampleThreshold Then
     '                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
-    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    ranges.Add(New rangeData(rc.ID, rStart, rEnd, count))
     '                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
     '                End If
     '            End If
@@ -8185,7 +8185,7 @@ Namespace VBClasses
     '            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapGray Then
     '                rEnd = sorted.ElementAt(i).Key
     '                If count > sampleThreshold Then
-    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    ranges.Add(New rangeData(rc.ID, rStart, rEnd, count))
     '                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
     '                Else
     '                    trimCount += count
@@ -8201,7 +8201,7 @@ Namespace VBClasses
     '            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
     '                If count > sampleThreshold Then
     '                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
-    '                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+    '                    ranges.Add(New rangeData(rc.ID, rStart, rEnd, count))
     '                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
     '                End If
     '            End If

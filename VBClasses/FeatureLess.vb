@@ -29,7 +29,7 @@ Namespace VBClasses
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
                     If rect.Width > task.gridWH And rect.Height > task.gridWH Then
                         If count = 0 Then Continue For
-                        rc = New rcData(dst1(rect), rect, index) With {.pixels = count, .index = index}
+                        rc = New rcData(dst1(rect), rect, index) With {.pixels = count}
                         sortList.Add(rc.pixels, rc)
                     End If
                 End If
@@ -41,8 +41,9 @@ Namespace VBClasses
             dst1.SetTo(0)
             Dim motionInput = task.motion.dst3.Clone
             For Each rc In sortList.Values
+                rc.ID = rcList.Count
                 rc.index = rcList.Count
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
                 SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
                 rcList.Add(rc)
@@ -90,7 +91,7 @@ Namespace VBClasses
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(dst1, mask, r.TopLeft, nextList.Count + 1, rect, 0, 0, flags)
                     If count = 0 Or rect.Width = 0 Or rect.Height = 0 Then Continue For
-                    Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count, .index = nextList.Count + 1}
+                    Dim rc = New rcData(mask(rect), rect, 255) With {.pixels = count}
                     nextList.Add(rc.pixels, rc)
                 End If
             Next
@@ -105,7 +106,7 @@ Namespace VBClasses
             If nextFree > 255 Then nextFree = 1
 
             For Each rc In rcList
-                Dim floodIndex = rc.index
+                Dim floodIndex = rc.ID
                 InRange(dst1(rc.rect), floodIndex, floodIndex, rc.mask)
                 If CountNonZero(rc.mask) > 0 Then rc.maxDist = rc.buildMaxDist(rc.mask)
 
@@ -123,7 +124,7 @@ Namespace VBClasses
 
                 If rcLast IsNot Nothing AndAlso rc.rect.IntersectsWith(rcLast.rect) AndAlso
                    usedList.Contains(prevIndex) = False Then
-                    rc.index = prevIndex
+                    rc.ID = prevIndex
                     rc.age = rcLast.age + 1
                     If rc.age >= 1000 Then rc.age = 100
                 Else
@@ -132,11 +133,15 @@ Namespace VBClasses
                         If nextFree > 255 Then nextFree = 1
                         If usedList.Count >= 255 Then Exit While
                     End While
-                    rc.index = nextFree
+                    rc.ID = nextFree
                     nextFree += 1
                 End If
-                usedList.Add(rc.index)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                usedList.Add(rc.ID)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            For i = 0 To rcList.Count - 1
+                rcList(i).index = i
             Next
 
             dst2 = Palettize(dst1, 0)
@@ -906,7 +911,7 @@ Namespace VBClasses
 
             feat.Run(dst2)
 
-            For Each pt In feat.ptList
+            For Each pt In feat.ptlist
                 Circle(dst2, pt, task.DotSize + 2, task.highlight, -1)
             Next
 
@@ -1167,7 +1172,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each rc In feat.rcList
-                dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist, 3)
             Next
 
@@ -1562,9 +1567,9 @@ Namespace VBClasses
             knn.Run(emptyMat)
 
             For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                rc.index = knn.result(rc.index, 0)
-                SetTrueText(CStr(rc.index), rc.maxDist)
+                If rc.ID = 0 Then Continue For
+                rc.ID = knn.result(rc.ID, 0)
+                SetTrueText(CStr(rc.ID), rc.maxDist)
             Next
         End Sub
     End Class
@@ -1578,7 +1583,7 @@ Namespace VBClasses
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Keep the rc.index assigned the first time each FeatureLess_Basics cell appears."
+            desc = "Keep the rc.ID assigned the first time each FeatureLess_Basics cell appears."
         End Sub
         Private Function indexUsed(index As Integer) As Boolean
             For Each rcPrev In tracked
@@ -1591,7 +1596,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(task.fless.rcList(0))
             For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
 
                 Dim matched As rcData = Nothing
                 For Each rcPrev In tracked
@@ -1604,7 +1609,7 @@ Namespace VBClasses
                 Next
 
                 If matched IsNot Nothing Then
-                    rc.index = matched.index
+                    rc.ID = matched.index
                     rc.age = matched.age + 1
                     tracked(tracked.IndexOf(matched)) = rc
                 Else
@@ -1612,18 +1617,18 @@ Namespace VBClasses
                     While indexUsed(nextFree)
                         nextFree += 1
                     End While
-                    rc.index = nextFree
+                    rc.ID = nextFree
                     tracked.Add(rc)
                 End If
-                claimed.Add(rc.index)
+                claimed.Add(rc.ID)
                 rcList.Add(rc)
             Next
 
             dst1.SetTo(0)
             For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
-                SetTrueText(CStr(rc.index), rc.maxDist)
+                If rc.ID = 0 Then Continue For
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
+                SetTrueText(CStr(rc.ID), rc.maxDist)
             Next
             dst2 = Palettize(dst1, 0)
 
@@ -1657,15 +1662,15 @@ Namespace VBClasses
                 labels(3) = delaunay.labels(2)
 
                 For Each rc In rcList
-                    If rc.index = 0 Then Continue For
-                    dst1(rc.rect).SetTo(rc.index, rc.mask)
+                    If rc.ID = 0 Then Continue For
+                    dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 Next
             End If
 
             dst3 = Palettize(dst1, 0)
 
             For Each rc In rcList
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
                 DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
@@ -1692,7 +1697,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData())
             For Each rc In fLessD.rcList
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
                 Dim nextID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(nextID, rc.mask)
                 rcList.Add(rc)
@@ -1729,7 +1734,7 @@ Namespace VBClasses
 
             rcMatch = Nothing
             For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
                 If rc.rect.IntersectsWith(rect) Then
                     rcMatch = rc
                     Exit For
@@ -1815,7 +1820,7 @@ Namespace VBClasses
 
             depthList.Clear()
             For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
 
                 Dim lineMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
                 Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
@@ -1880,7 +1885,7 @@ Namespace VBClasses
             ptList.Clear()
             indexList.Clear()
             For Each rc In task.fless.rcList
-                If rc.index = 0 Or rc.mask.Width < 2 Or rc.mask.Height < 2 Then Continue For
+                If rc.ID = 0 Or rc.mask.Width < 2 Or rc.mask.Height < 2 Then Continue For
 
                 Dim pt = New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
                 pt.X = Math.Max(0, Math.Min(rc.mask.Width - 1, pt.X))
@@ -1901,7 +1906,7 @@ Namespace VBClasses
                 depthList.Add(vDepth)
                 ptList.Add(hPts)
                 ptList.Add(vPts)
-                indexList.Add(rc.index)
+                indexList.Add(rc.ID)
 
                 Dim drawMask As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
                 Line(drawMask, New cv.Point(0, pt.Y), New cv.Point(drawMask.Width - 1, pt.Y), 255, task.lineWidth)
@@ -1976,7 +1981,7 @@ Namespace VBClasses
             Dim pts = disect.ptList(listIndex)
 
             For Each rc In task.fless.rcList
-                If rc.index <> selected Then Continue For
+                If rc.ID <> selected Then Continue For
                 Rectangle(alg.dst2, rc.rect, white, task.lineWidth)
                 If pts.Count >= 2 Then
                     Line(alg.dst2, pts(0), pts(pts.Count - 1), white, task.lineWidth + 1, task.lineType)
@@ -2273,13 +2278,13 @@ Namespace VBClasses
             For Each rcPrev In rcSnapshotList
                 Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
                 For Each rc In task.fless.rcList
-                    If rc.index = 0 Then Continue For
+                    If rc.ID = 0 Then Continue For
                     If rc.rect.Contains(pt) Then
-                        If usedList.Contains(rc.index) = False Then
-                            rc.index = rcPrev.index
-                            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                        If usedList.Contains(rc.ID) = False Then
+                            rc.ID = rcPrev.index
+                            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                             rcList.Add(rc)
-                            usedList.Add(rc.index)
+                            usedList.Add(rc.ID)
                             Exit For
                         End If
                     End If
@@ -2289,11 +2294,11 @@ Namespace VBClasses
             Dim unusedCount = task.fless.rcList.Count - usedList.Count
             Dim nextSlot As Integer = task.fless.rcList.Count
             For Each rc In task.fless.rcList
-                If rc.index = 0 Then Continue For
-                If usedList.Contains(rc.index) = False Then
-                    rc.index = nextSlot
+                If rc.ID = 0 Then Continue For
+                If usedList.Contains(rc.ID) = False Then
+                    rc.ID = nextSlot
                     nextSlot += 1
-                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                     rcList.Add(rc)
                 End If
             Next
@@ -2302,7 +2307,7 @@ Namespace VBClasses
                 dst2 = Palettize(rcMap, 0)
 
                 For Each rc In rcSnapshotList
-                    If rc.index <> 0 Then
+                    If rc.ID <> 0 Then
                         Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
                         Circle(dst2, pt, task.DotSize + 2, black, -1)
                         Circle(dst2, pt, task.DotSize, task.highlight, -1)
@@ -2343,7 +2348,7 @@ Namespace VBClasses
             If heartbeatLTX() Then
                 Dim nextList As New List(Of cv.Point2f)
                 For Each rc In task.fless.rcList
-                    If rc.index = 0 Then Continue For
+                    If rc.ID = 0 Then Continue For
                     nextList.Add(rc.maxDist)
                 Next
 
@@ -2359,14 +2364,14 @@ Namespace VBClasses
                 ' run before palettize
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.index, -1)
+                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
                 dst1 = Palettize(indexMap)
 
                 ' run after palettize
                 For Each rc In task.fless.rcList
-                    If rc.index = 0 Then Continue For
+                    If rc.ID = 0 Then Continue For
                     DrawContours(dst1(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                     Circle(dst1, rc.maxDStable, task.DotSize, task.highlight, -1)
                 Next
@@ -2382,12 +2387,12 @@ Namespace VBClasses
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.index = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
-                SetTrueText(CStr(rc.index), rc.maxDist, 3)
-                SetTrueText(CStr(rc.index), ptx, 1)
+                rc.ID = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
+                SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                SetTrueText(CStr(rc.ID), ptx, 1)
                 rcList.Add(rc)
 
-                dst0(rc.rect).SetTo(rc.index, rc.mask)
+                dst0(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(dst0, 0)

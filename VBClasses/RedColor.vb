@@ -30,7 +30,7 @@ Namespace VBClasses
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                             rcList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -98,8 +98,8 @@ Namespace VBClasses
             rcList.Add(New rcData())
             rcMap.SetTo(0)
             For Each rc In sortList.Values
-                rc.index = rcList.Count
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.ID = rcList.Count
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rcList.Add(rc)
             Next
 
@@ -107,8 +107,8 @@ Namespace VBClasses
 
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
-                rc.index = i
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.ID = i
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -148,8 +148,8 @@ Namespace VBClasses
                 Dim index As Integer = redC.rcMap.Get(Of Single)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
-                dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
-                rcGridMap(r).SetTo(rc.index)
+                dst3(r).SetTo(task.scalarColors(rc.ID Mod 255))
+                rcGridMap(r).SetTo(rc.ID)
             Next
         End Sub
     End Class
@@ -244,9 +244,9 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In rcSizeSort.Values
-                rc.index = rcList.Count
+                rc.ID = rcList.Count
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)

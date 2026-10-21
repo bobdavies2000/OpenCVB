@@ -33,12 +33,12 @@ Namespace VBClasses
             For Each rc In redCore.rcList
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.index = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                rc.index = rcList.Count
+                rc.ID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.ID = rcList.Count
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
@@ -77,7 +77,7 @@ Namespace VBClasses
                                 rc = New rcData(input(rect), rect, index)
                                 newList.Add(rc.pixels, rc)
                                 index += 1
-                                rc.index = newList.Count
+                                rc.ID = newList.Count
                             End If
                         End If
                     End If
@@ -99,7 +99,7 @@ Namespace VBClasses
             End If
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.index Mod 254, rc.mask)
+                dst2(rc.rect).SetTo(rc.ID Mod 254, rc.mask)
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
@@ -215,7 +215,7 @@ Namespace VBClasses
                     hullList.Add(pt + rc.rect.TopLeft)
                 Next
                 listOfPoints.Add(hullList)
-                FillPoly(dst3, listOfPoints, task.scalarColors(rc.index Mod 255))
+                FillPoly(dst3, listOfPoints, task.scalarColors(rc.ID Mod 255))
             Next
         End Sub
     End Class
@@ -239,8 +239,8 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age >= redC.options.ageThreshold Or rc.age = task.frameCount Then
-                    dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                    dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
                     rcList.Add(rc)
                 Else
                     dst2(rc.rect).SetTo(white, rc.mask)
@@ -300,9 +300,9 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In redC.rcList
                 If rc.age > 1 Then
-                    If rcMotionCells.Contains(rc.index) = False Then
-                        dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    If rcMotionCells.Contains(rc.ID) = False Then
+                        dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                        rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                         rcList.Add(rc)
                     End If
                 End If
@@ -357,7 +357,7 @@ Namespace VBClasses
     '        Dim maxDepth = task.foreground.splitValue
     '        For Each rc In redC.rcList
     '            If rc.wcMean(2) < maxDepth Then
-    '                dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+    '                dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
     '                count += 1
     '            End If
     '        Next

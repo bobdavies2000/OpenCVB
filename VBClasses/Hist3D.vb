@@ -285,14 +285,14 @@ Namespace VBClasses
                             Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
                             If index1 < pixels.rclist.Count Then
                                 Dim rc = pixels.rclist(index1)
-                                dst1(gRect).SetTo(task.scalarColors(rc.index Mod 255), dst3(gRect))
+                                dst1(gRect).SetTo(task.scalarColors(rc.ID Mod 255), dst3(gRect))
                             End If
                         End If
                     ElseIf candidates.Count = 1 Then
                         Dim index = candidates(0) - 1
                         If index < pixels.rclist.Count Then
                             Dim rc = pixels.rclist(candidates(0) - 1)
-                            dst1(gRect).SetTo(task.scalarColors(rc.index Mod 255), dst3(gRect))
+                            dst1(gRect).SetTo(task.scalarColors(rc.ID Mod 255), dst3(gRect))
                         End If
                     End If
                 End If

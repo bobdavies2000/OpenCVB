@@ -15,7 +15,7 @@ Namespace VBClasses
                 Dim tmp As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
                 task.motion.motionMask(rc.rect).CopyTo(tmp, rc.mask)
                 rc.motionPixels = CountNonZero(tmp)
-                rcIndexList.Add(rc.index)
+                rcIndexList.Add(rc.ID)
             Next
 
             If src.Channels <> 1 Then
@@ -64,13 +64,13 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In rcSizeSort.Values
-                rc.index = task.fless.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = task.fless.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.motionPixels = 0 Then
-                    Dim index = rcIndexList.IndexOf(rc.index)
+                    Dim index = rcIndexList.IndexOf(rc.ID)
                     If index >= 0 Then rc = rcLastList(index)
                 End If
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)
@@ -104,7 +104,7 @@ Namespace VBClasses
                 Dim rect As cv.Rect
                 Dim m As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 For Each rc In rcList
-                    If rc.index = clickindex Then
+                    If rc.ID = clickindex Then
                         If rect.Width = 0 Then rect = rc.rect Else rect = rect.Union(rc.rect)
                         m(rc.rect).SetTo(255, rc.mask)
                     End If
@@ -130,13 +130,13 @@ Namespace VBClasses
             For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
-                rc.index = delaunay.indexMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.ID = delaunay.indexMap.Get(Of Byte)(ptx.Y, ptx.X)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                ' SetTrueText(CStr(rc.index), rc.maxDist, 3)
-                SetTrueText(CStr(rc.index), ptx, 1)
+                ' SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                SetTrueText(CStr(rc.ID), ptx, 1)
                 rcList.Add(rc)
 
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)
@@ -163,7 +163,7 @@ Namespace VBClasses
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
             Dim displayStr As String = "There is no cell defined for that point."
             For Each rc In rclist
-                If rc.index = clickIndex Or clickIndex < 0 Then
+                If rc.ID = clickIndex Or clickIndex < 0 Then
                     task.rcD = rc
                     task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     displayStr = task.rcD.displayCell
@@ -182,7 +182,7 @@ Namespace VBClasses
                 labels(3) = redColor.labels(3)
                 dst3 = redColor.dst2.Clone
                 For Each rc In redColor.tracker.rcList
-                    If rc.index = 0 Then Continue For
+                    If rc.ID = 0 Then Continue For
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 Next
             End If
@@ -194,24 +194,24 @@ Namespace VBClasses
             Dim rcOwner(redColor.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
             For Each rc In rcFLess
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
 
                 CalcHist({redColor.rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redColor.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
                     If histArray(i) > 0 And rcOwner(i) = 0 Then
-                        rcOwner(i) = rc.index
+                        rcOwner(i) = rc.ID
                     End If
                 Next
             Next
 
             rcMap.SetTo(0)
             For Each rc In rcFLess
-                If rc.index = 0 Then Continue For
+                If rc.ID = 0 Then Continue For
                 For i = 1 To redColor.rcList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
-                    If rcOwner(i) = rc.index Then
+                    If rcOwner(i) = rc.ID Then
                         Dim rcTuple = redColor.rcList(i)
                         rc.rect = rc.rect.Union(rcTuple.rect)
                         rcMap(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
@@ -222,8 +222,8 @@ Namespace VBClasses
             ' update all the rc.mask's with the merged cells.
             rcList.Clear()
             For Each rc In rcFLess
-                If rc.index = 0 Then Continue For
-                InRange(rcMap(rc.rect), rc.index, rc.index, rc.mask)
+                If rc.ID = 0 Then Continue For
+                InRange(rcMap(rc.rect), rc.ID, rc.ID, rc.mask)
                 rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
                 Dim val1 = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
@@ -244,7 +244,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_CoreOld : Inherits TaskParent
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
@@ -256,7 +256,7 @@ Namespace VBClasses
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
             Dim displayStr As String = "There is no cell defined for that point."
             For Each rc In rclist
-                If rc.index = clickIndex Or clickIndex < 0 Then
+                If rc.ID = clickIndex Or clickIndex < 0 Then
                     task.rcD = rc
                     task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     displayStr = task.rcD.displayCell
@@ -267,7 +267,7 @@ Namespace VBClasses
         End Function
         Public Shared Function rcIndexFind(rclist As List(Of rcData), rcIndex As Integer) As rcData
             For Each rc In rclist
-                If rc.index = rcIndex Then Return rclist(rclist.IndexOf(rc))
+                If rc.ID = rcIndex Then Return rclist(rclist.IndexOf(rc))
             Next
             Return Nothing
         End Function
@@ -287,15 +287,15 @@ Namespace VBClasses
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
-                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256) With {.index = i + 1}
-                rc.index = i + 1
+                Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256) With {.ID = i + 1}
+                rc.ID = i + 1
                 rcList.Add(rc)
             Next
 
             rcMap.SetTo(0)
             For i = rcList.Count - 1 To 0 Step -1
                 Dim rc = rcList(i)
-                rcMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             SetTrueText(displayCell(rcList, rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
@@ -370,7 +370,7 @@ Namespace VBClasses
                                         .index = rcD.index, .maxDStable = merged.maxDist}
             dst3.SetTo(0)
             For Each rc In mergeList
-                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
             dst3(merged.rect).SetTo(task.highlight, merged.mask)
             Rectangle(dst2, merged.rect, task.highlight, task.lineWidth)
@@ -697,7 +697,7 @@ Namespace VBClasses
 
             Dim members As New List(Of rcData)
             For Each rc In flood.rcList
-                Dim bin = rc.index Mod 255
+                Dim bin = rc.ID Mod 255
                 If bin > 0 AndAlso bin < histArray.Length AndAlso histArray(bin) > 0 Then members.Add(rc)
             Next
 
@@ -758,16 +758,16 @@ Namespace VBClasses
             rcList.Add(New rcData())
             rcMap.SetTo(0)
             For Each rc In sortList.Values
-                rc.index = rcList.Count
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rc.ID = rcList.Count
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rcList.Add(rc)
             Next
 
             SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
-                If rc.index = 0 Then Continue For
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                If rc.ID = 0 Then Continue For
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 

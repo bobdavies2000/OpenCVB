@@ -437,25 +437,25 @@ Namespace VBClasses
             For Each rc In rcList
                 Dim previousIndex = map.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If previousIndex > 0 And usedList.Contains(previousIndex) = False Then
-                    rc.index = previousIndex
-                    If rc.index < rcLastList.Count Then
-                        rc.age = rcLastList(rc.index).age + 1
+                    rc.ID = previousIndex
+                    If rc.ID < rcLastList.Count Then
+                        rc.age = rcLastList(rc.ID).age + 1
                         If rc.age >= 1000 Then rc.age = 100
                         rcListStable.Add(rc)
-                        usedList.Add(rc.index)
+                        usedList.Add(rc.ID)
                     End If
                 Else
-                    rc.index = 0
+                    rc.ID = 0
                 End If
             Next
 
             'Dim indexNew = 1
             'For Each rc In rcList
-            '    If rc.index = 0 Then
+            '    If rc.ID = 0 Then
             '        While usedList.Contains(indexNew)
             '            indexNew += 1
             '        End While
-            '        rc.index = indexNew
+            '        rc.ID = indexNew
             '        rc.age = 1
             '        usedList.Add(indexNew)
             '    End If
@@ -478,12 +478,12 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim ptSteady = validatePoint(WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M))
                 Dim index = dst0.Get(Of Byte)(ptSteady.Y, ptSteady.X)
-                If index <> 0 Then rc.index = index
+                If index <> 0 Then rc.ID = index
             Next
 
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                If rc.index > 0 Then dst1(rc.rect).SetTo(rc.index, rc.mask)
+                If rc.ID > 0 Then dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst3 = Palettize(dst1, 0)

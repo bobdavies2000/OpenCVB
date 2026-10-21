@@ -305,6 +305,7 @@ Namespace VBClasses
             Public age As Integer = 1
             Public contour As New List(Of cv.Point)
             Public depth As Single
+            Public ID As Integer
             Public index As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
@@ -345,7 +346,8 @@ Namespace VBClasses
             End Function
             Public Function displayCell() As String
                 Dim strout = ""
-                strout += "index = " + CStr(index) + vbCrLf
+                strout += "ID = " + CStr(ID) + vbCrLf
+                strout += "index = " + CStr(Index) + vbCrLf
                 strout += "age = " + CStr(age) + vbCrLf
 
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf

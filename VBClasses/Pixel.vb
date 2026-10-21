@@ -681,7 +681,7 @@ Namespace VBClasses
                         strOut += CStr(count) + ","
                     Next
                     strOut += vbCrLf
-                    If rc.index >= maxRegion Then Exit For
+                    If rc.ID >= maxRegion Then Exit For
                 Next
             End If
             SetTrueText(strOut, 3)
@@ -690,8 +690,8 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each rc In redC.rcList
                 vbc.task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
-                dst1(rc.rect).SetTo(vbc.task.scalarColors(rc.index Mod 255), rc.mask)
-                If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
+                dst1(rc.rect).SetTo(vbc.task.scalarColors(rc.ID Mod 255), rc.mask)
+                If rc.ID <= maxRegion Then SetTrueText(CStr(rc.ID), rc.maxDist, 2)
             Next
             labels(1) = redC.labels(3)
         End Sub

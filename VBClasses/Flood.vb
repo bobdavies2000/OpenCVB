@@ -51,7 +51,7 @@ Namespace VBClasses
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -102,17 +102,18 @@ Namespace VBClasses
                                 Exit For
                             End If
                         Next
+                        rc.ID = rcList.Count
                         rc.index = rcList.Count
                         rcList.Add(rc)
-                        dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                        dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                        rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                     End If
                 End If
             Next
 
             lastCenters.Clear()
             For Each rc In rcList
-                lastCenters.Add(task.gridNabeRects(rc.index))
+                lastCenters.Add(task.gridNabeRects(rc.ID))
             Next
 
             labels(2) = CStr(rcList.Count) + " cells found. "
@@ -236,7 +237,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             If rcIndex >= rcList.Count Then rcIndex = 0
             Dim rc = rcList(rcIndex)
-            dst1(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+            dst1(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
             If task.heartBeatLT Then
                 rcIndex += 1
                 If rcIndex >= rcList.Count Then rcIndex = 0
@@ -244,7 +245,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(rcList.Count) + " cells were found."

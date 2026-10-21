@@ -606,9 +606,9 @@ Namespace VBClasses
     '                Next
 
     '                If goodDepth Then
-    '                    dataBuffer.Add(New Vec3f(task.scalarColors(rc.index Mod 255)(2),
-    '                                             task.scalarColors(rc.index Mod 255)(1),
-    '                                             task.scalarColors(rc.index Mod 255)(0)))
+    '                    dataBuffer.Add(New Vec3f(task.scalarColors(rc.ID Mod 255)(2),
+    '                                             task.scalarColors(rc.ID Mod 255)(1),
+    '                                             task.scalarColors(rc.ID Mod 255)(0)))
     '                    For j = 0 To vec.Length - 1
     '                        dataBuffer.Add(New Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
     '                    Next
@@ -950,8 +950,8 @@ Namespace VBClasses
             Dim buf As New List(Of Vec3f)
             Dim cellCount As Integer
             For Each rc In task.fless.rcList
-                If rc.index = 0 Or rc.rect.Width < 2 Or rc.rect.Height < 2 Then Continue For
-                Dim slot = planeAlg.disect.indexList.IndexOf(rc.index)
+                If rc.ID = 0 Or rc.rect.Width < 2 Or rc.rect.Height < 2 Then Continue For
+                Dim slot = planeAlg.disect.indexList.IndexOf(rc.ID)
                 Dim band = depthBand(rc, slot)
                 If band.z0 <= 0 Then Continue For
 
@@ -959,7 +959,7 @@ Namespace VBClasses
                 If slot >= 0 Then plane = planeAlg.planeList(slot)
                 If plane(0) = 0 And plane(1) = 0 And plane(2) = 0 Then plane = New Vec4f(0, 0, 1, band.z0)
 
-                Dim cellColor = task.vecColors(rc.index Mod task.vecColors.Length)
+                Dim cellColor = task.vecColors(rc.ID Mod task.vecColors.Length)
                 Dim color = New Vec3f(cellColor(0) / 255, cellColor(1) / 255, cellColor(2) / 255)
                 Dim before = buf.Count
                 addCellMask(buf, rc, plane, color, band.z0, band.lo, band.hi)

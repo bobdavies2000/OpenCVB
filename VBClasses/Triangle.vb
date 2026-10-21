@@ -101,7 +101,7 @@ Namespace VBClasses
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.index = 0 Then Exit Sub
+            If rc.ID = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)
@@ -127,9 +127,9 @@ Namespace VBClasses
 
             Dim c3D = task.pointCloud.Get(Of Point3f)(rc.maxDist.Y, rc.maxDist.X)
             triangles.Clear()
-            Dim color3D As New Point3f(task.scalarColors(rc.index Mod 255)(2) / 255,
-                                       task.scalarColors(rc.index Mod 255)(1) / 255,
-                                       task.scalarColors(rc.index Mod 255)(0) / 255)
+            Dim color3D As New Point3f(task.scalarColors(rc.ID Mod 255)(2) / 255,
+                                       task.scalarColors(rc.ID Mod 255)(1) / 255,
+                                       task.scalarColors(rc.ID Mod 255)(0) / 255)
             For i = 0 To pt3D.Count - 1
                 triangles.Add(color3D)
                 triangles.Add(c3D)
@@ -164,7 +164,7 @@ Namespace VBClasses
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
-            If rc.index = 0 Then Exit Sub
+            If rc.ID = 0 Then Exit Sub
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of Point3f)

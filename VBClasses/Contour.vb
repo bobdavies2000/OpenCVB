@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -36,7 +36,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
@@ -151,9 +151,9 @@ Namespace VBClasses
             dst1.SetTo(0)
             For i = 0 To sortedList.Count - 1
                 Dim rc = sortedList.Values(i)
-                rc.index = i + 1
+                rc.ID = i + 1
                 rcList.Add(rc)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
@@ -975,7 +975,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Basics_List : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public finder As New Contour_Finder
         Public options As New Options_Contours
         Dim edgeline As New EdgeLine_Basics
@@ -1093,7 +1093,7 @@ Namespace VBClasses
 
             dst0.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst0, {rc.contour}, 0, rc.index, task.lineWidth, task.lineType)
+                DrawContours(dst0, {rc.contour}, 0, rc.ID, task.lineWidth, task.lineType)
             Next
 
             rcLpList.Clear()
@@ -1154,16 +1154,16 @@ Namespace VBClasses
             dst2 = contours.dst2
             labels(2) = contours.labels(2)
 
-            ' Build a CV_8U map of contours: pixel value = rc.index
+            ' Build a CV_8U map of contours: pixel value = rc.ID
             dst0.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst0, {rc.contour}, 0, rc.index, -1, task.lineType)
+                DrawContours(dst0, {rc.contour}, 0, rc.ID, -1, task.lineType)
             Next
 
             ' Outline map - used to require the line actually touches the contour
             dst1.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst1, {rc.contour}, 0, rc.index, Math.Max(task.lineWidth, 2), task.lineType)
+                DrawContours(dst1, {rc.contour}, 0, rc.ID, Math.Max(task.lineWidth, 2), task.lineType)
             Next
 
             rcLpList.Clear()
@@ -1292,10 +1292,10 @@ Namespace VBClasses
                 Threshold(tmp(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
                 rc.depth = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
                 rc.maxDist = rc.buildMaxDist(rc.mask)
-                rc.index = sortList.Count + 1
-                If rc.pixels < task.minCellSize Then rc.index = 0
+                rc.ID = sortList.Count + 1
+                If rc.pixels < task.minCellSize Then rc.ID = 0
                 sortList.Add(rc.pixels, rc)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             If heartbeatLTX() Then rcMap = dst1.Clone
 
@@ -1317,8 +1317,8 @@ Namespace VBClasses
                 Next
 
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID Mod 255, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)
@@ -1370,10 +1370,10 @@ Namespace VBClasses
                 Threshold(tmp(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
                 rc.depth = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
                 rc.maxDist = rc.buildMaxDist(rc.mask)
-                rc.index = sortList.Count + 1
-                If rc.pixels < task.minCellSize Then rc.index = 0
+                rc.ID = sortList.Count + 1
+                If rc.pixels < task.minCellSize Then rc.ID = 0
                 sortList.Add(rc.pixels, rc)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             If heartbeatLTX() Then rcMap = dst1.Clone
 
@@ -1394,7 +1394,7 @@ Namespace VBClasses
 
     Public Class Contour_Finder : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public contourSort As New Contour_Sort
         Dim edgeline As New EdgeLine_Basics
         Dim options As New Options_Contours

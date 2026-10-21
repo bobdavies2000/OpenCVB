@@ -553,7 +553,7 @@ Namespace VBClasses
         Dim redC As New XR_RedC_Core
         Public Sub New()
             labels(3) = "Below left shows hullMask while below shows the contour mask."
-            desc = "Find the cv.Point farthest from the edges of a mask."
+            desc = "Display the cv.Point farthest from the edges of a mask."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
@@ -565,7 +565,7 @@ Namespace VBClasses
             For Each rc In redC.rcList
                 Dim rcTest = New rcData(rc.mask, rc.rect, index)
                 If rcTest.index >= 0 Then
-                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
+                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.ID), rcTest.mask)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                     index += 1
                 End If
@@ -622,7 +622,7 @@ Namespace VBClasses
                 Dim rcTest = setCloudData(rc.mask, rc.rect, rcList.Count + 1, False)
                 If rcTest Is Nothing Then Continue For
                 If rcTest.index >= 0 Then
-                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.index Mod 255), rcTest.mask)
+                    dst3(rcTest.rect).SetTo(task.scalarColors(rc.ID Mod 255), rcTest.mask)
                     Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
                     rcList.Add(rcTest)
                 End If

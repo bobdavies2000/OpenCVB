@@ -87,7 +87,7 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(dst1, 0)

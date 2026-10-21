@@ -717,7 +717,7 @@ Namespace VBClasses
 
             Dim rcIndex As Integer
             For Each rc In rcList
-                rc.index = rcIndex
+                rc.ID = rcIndex
                 rcIndex += 1
             Next
 
@@ -793,20 +793,20 @@ Namespace VBClasses
                     count += 1
                 End If
 
-                If usedColor.Contains(rc.index) Then rc.age = 1
-                usedColor.Add(rc.index)
+                If usedColor.Contains(rc.ID) Then rc.age = 1
+                usedColor.Add(rc.ID)
 
-                rc.index = rcList.Count + 1
+                rc.ID = rcList.Count + 1
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             dst2.SetTo(0)
             For Each rc In rcList
-                InRange(rcMap(rc.rect), rc.index, rc.index, rc.mask)
+                InRange(rcMap(rc.rect), rc.ID, rc.ID, rc.mask)
                 rc.buildMaxDist(rc.mask)
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
@@ -936,7 +936,7 @@ Namespace VBClasses
                         defectCount += 1
                     End If
                     Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
-                    DrawTour(rcMap(rc.rect), hull.ToList, rc.index, -1)
+                    DrawTour(rcMap(rc.rect), hull.ToList, rc.ID, -1)
                     rclist.Add(rc)
                 End If
             Next
@@ -998,7 +998,7 @@ Namespace VBClasses
                 Dim d = pt.DistanceTo(rc.maxDist)
                 If d < bestDistance Then
                     bestDistance = d
-                    bestIndex = rc.index
+                    bestIndex = rc.ID
                 End If
             Next
             Return bestIndex
@@ -1012,8 +1012,8 @@ Namespace VBClasses
             End If
             Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each rc In track.redC.rcList
-                If rc.index = 0 Then Continue For
-                xList.Add(rc.rect.X, rc.index)
+                If rc.ID = 0 Then Continue For
+                xList.Add(rc.rect.X, rc.ID)
             Next
 
             Dim minLeft As Integer = xList.Count / 4
@@ -1198,7 +1198,7 @@ Namespace VBClasses
             Dim m As New Mat(rcMap.Size, MatType.CV_8U, 0)
             Using roi = rcMap(rc.rect)
                 Dim part As New Mat
-                InRange(roi, rc.index, rc.index, part)
+                InRange(roi, rc.ID, rc.ID, part)
                 Using part
                     part.CopyTo(m(rc.rect))
                 End Using
@@ -1216,7 +1216,7 @@ Namespace VBClasses
 
             If task.rcD IsNot Nothing AndAlso task.rcD.pixels > 0 Then
                 For Each rc In rcList
-                    If rc.index = task.rcD.index Then Return rc
+                    If rc.ID = task.rcD.index Then Return rc
                 Next
             End If
 
@@ -1335,9 +1335,9 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In redC.rcList
-                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.index Mod 255), -1)
+                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.ID Mod 255), -1)
                 If task.rcD IsNot Nothing Then
-                    If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                    If rc.ID = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
                 End If
             Next
         End Sub
@@ -1373,10 +1373,10 @@ Namespace VBClasses
                 Dim r = ValidateRect(BoundingRect(nz))
                 Dim rc As New rcData(cellMask(r), r, 255)
                 If rc.pixels = 0 Then Continue For
-                rc.index = label
-                rc.index = rcList.Count + 1
+                rc.ID = label
+                rc.ID = rcList.Count + 1
                 rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst3 = Palettize(rcMap, 0)
@@ -1457,7 +1457,7 @@ Namespace VBClasses
             Dim count As Integer
             For Each rc In redC.rcList
                 If rc.age > Math.Min(10, task.frameCount) Then
-                    dst3(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
                     count += 1
                 End If
             Next
@@ -1515,7 +1515,7 @@ Namespace VBClasses
             For i = 0 To redC.rcList.Count - 1
                 Dim rc = redC.rcList(i)
                 Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
-                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.index)
+                If hull IsNot Nothing Then FillPoly(dst1(rc.rect), {hull}, rc.ID)
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
@@ -1549,7 +1549,7 @@ Namespace VBClasses
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
                 Dim nextHull = Cv2.ConvexHull(rc.contour.ToArray)
-                If nextHull IsNot Nothing Then FillPoly(dst0(rc.rect), {nextHull}, rc.index)
+                If nextHull IsNot Nothing Then FillPoly(dst0(rc.rect), {nextHull}, rc.ID)
             Next
             If task.rcD Is Nothing Then Exit Sub
             SetTrueText(XR_RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
@@ -1590,7 +1590,7 @@ Namespace VBClasses
             For i = redC.rcList.Count - 1 To 0 Step -1
                 Dim rc = redC.rcList(i)
                 Dim hull = Cv2.ConvexHull(rc.contour.ToArray)
-                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.index)
+                If hull IsNot Nothing Then FillPoly(dst0(rc.rect), {hull}, rc.ID)
             Next
 
             Dim index As Integer
@@ -1620,7 +1620,7 @@ Namespace VBClasses
             dst3(rcD.rect).SetTo(task.scalarColors(rcD.index), rcD.mask)
             For i = 0 To neighbors.Count - 1
                 Dim rc = redC.rcList(neighbors(i) - 1)
-                dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
+                dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
 
             dst3(rcD.rect).SetTo(task.highlight, rcD.mask)

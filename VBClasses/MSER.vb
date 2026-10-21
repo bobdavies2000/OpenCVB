@@ -50,7 +50,7 @@ Namespace VBClasses
             CvtColor(detect.dst2, dst0, ColorConversionCodes.BGR2GRAY)
             For i = 0 To boxes.Count - 1
                 Dim index = boxes.ElementAt(i).Value
-                Dim rc As New rcData With {.rect = boxInput(index)}
+                Dim rc As New rcData With {.rect = boxInput(index), .index = index}
                 Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
                 InRange(dst0(rc.rect), val, val, rc.mask)
                 rc.pixels = detect.maskCounts(index)
@@ -79,16 +79,15 @@ Namespace VBClasses
 
     Public Class MSER_Basics2 : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Dim rcMap As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        Dim rcMap As New Mat(dst2.Size(), MatType.CV_8U, 0)
         Public Sub New()
-            dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            dst1 = New Mat(dst1.Size(), MatType.CV_8U, 0)
             desc = "Create cells for each region in MSER output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             detect.Run(src)
-            CvtColor(detect.dst2, dst3, ColorConversionCodes.BGR2GRAY)
 
-            Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
             Dim boxInput = New List(Of cv.Rect)(detect.boxes)
             Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To boxInput.Count - 1
@@ -102,23 +101,25 @@ Namespace VBClasses
             Dim lastMap = rcMap.Clone
             rcMap.SetTo(0)
             Dim matchCount As Integer
+            Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
             For i = 0 To floodPoints.Count - 1
-                Dim rc As New rcData With {.index = rclist.Count}
+                Dim rc As New rcData
                 Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
                 rc.rect = boxInput(boxes.ElementAt(i).Value)
                 InRange(dst3(rc.rect), val, val, rc.mask)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = detect.maskCounts(i)
-
+                rc.ID = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
                 Dim color = task.scalarColors(i Mod 255)
                 If indexLast <> 0 Then matchCount += 1
 
                 rclist.Add(rc)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
+
+            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            dst2 = Palettize(rcMap, 0)
 
             labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
         End Sub

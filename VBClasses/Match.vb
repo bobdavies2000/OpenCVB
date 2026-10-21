@@ -704,7 +704,7 @@ Namespace VBClasses
             matchFeat.ptList.Clear()
             For Each rc In redC.rcList
                 matchFeat.ptList.Add(rc.maxDStable)
-                If rc.index >= 10 Then Exit For
+                If rc.ID >= 10 Then Exit For
             Next
 
             matchFeat.Run(emptyMat)
@@ -726,7 +726,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function findCell(rclist As List(Of rcData), index As Integer) As rcData
             For Each rc In rclist
-                If rc.index = index Then Return rc
+                If rc.ID = index Then Return rc
             Next
             Return Nothing
         End Function
