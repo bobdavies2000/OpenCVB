@@ -351,8 +351,6 @@ Partial Class OptionsGlobal
         ' stableDepthRGB
         ' 
         stableDepthRGB.AutoSize = True
-        stableDepthRGB.Checked = True
-        stableDepthRGB.CheckState = CheckState.Checked
         stableDepthRGB.Location = New Point(16, 228)
         stableDepthRGB.Margin = New Padding(3, 4, 3, 4)
         stableDepthRGB.Name = "stableDepthRGB"

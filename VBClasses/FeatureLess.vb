@@ -44,9 +44,6 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
-                Dim motionMat As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
-                motionInput(rc.rect).CopyTo(motionMat, rc.mask)
-                rc.motionPercent = 100 * CountNonZero(motionMat) / rc.pixels
                 SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
                 rcList.Add(rc)
             Next
@@ -1680,7 +1677,7 @@ Namespace VBClasses
     Public Class XR_FeatureLess_TrackerOriginal : Inherits TaskParent
         Dim fLessD As New XR_FeatureLess_Delaunay
         Public rcList As New List(Of rcData)
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Build a Delaunay map on heartbeatLT then use it to keep the index consistent."
         End Sub
@@ -1691,20 +1688,17 @@ Namespace VBClasses
             labels(2) = fLessD.labels(2)
             dst1 = fLessD.dst1.Clone
 
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             For Each rc In fLessD.rcList
                 If rc.index = 0 Then Continue For
                 Dim nextID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                idMap(rc.rect).SetTo(nextID, rc.mask)
+                rcMap(rc.rect).SetTo(nextID, rc.mask)
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(idMap, 0)
-
-            strOut = XR_RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
-            SetTrueText(strOut, 3)
+            dst2 = Palettize(rcMap, 0)
         End Sub
     End Class
 
@@ -1743,7 +1737,7 @@ Namespace VBClasses
             Next
             If rcMatch Is Nothing Then rcMatch = task.fless.rcList(1)
 
-            If heartbeatLTX() Or rcMatch.motionPercent >= 50 Or
+            If heartbeatLTX() Or rcMatch.motionPixels / rcMatch.pixels >= 50 Or
                 match.correlation * 100 < task.fOptions.MatchCorrSlider.Value Then
                 dst1.SetTo(0)
                 dst3.SetTo(0)
@@ -2195,7 +2189,7 @@ Namespace VBClasses
                 Dim resultDepth As Single
                 Dim resultText As String = ""
                 Dim hold = False
-                If rc IsNot Nothing AndAlso rc.motionPercent <= 0 Then
+                If rc IsNot Nothing AndAlso rc.motionPixels = 0 Then
                     Dim heldSlot = findStill(rc, used)
                     If heldSlot >= 0 AndAlso stillList(heldSlot).depth > 0 Then
                         used(heldSlot) = True
@@ -2253,7 +2247,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -2263,15 +2257,16 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = task.steadyCam.dst2
+            If task.fless.rcList.Count = 0 Then Exit Sub
 
-            Static rcSnapshotList As List(Of rcData)
-            If task.heartBeatLT Then
+            Static rcSnapshotList As New List(Of rcData)
+            If task.heartBeatLT Or rcSnapshotList.Count < 2 Then
                 rcSnapshotList = New List(Of rcData)(task.fless.rcList)
                 rcSnapshotList.RemoveAt(0)
                 dst3 = task.fless.dst3
             End If
 
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
@@ -2282,7 +2277,7 @@ Namespace VBClasses
                     If rc.rect.Contains(pt) Then
                         If usedList.Contains(rc.index) = False Then
                             rc.index = rcPrev.index
-                            idMap(rc.rect).SetTo(rc.index, rc.mask)
+                            rcMap(rc.rect).SetTo(rc.index, rc.mask)
                             rcList.Add(rc)
                             usedList.Add(rc.index)
                             Exit For
@@ -2298,13 +2293,13 @@ Namespace VBClasses
                 If usedList.Contains(rc.index) = False Then
                     rc.index = nextSlot
                     nextSlot += 1
-                    idMap(rc.rect).SetTo(rc.index, rc.mask)
+                    rcMap(rc.rect).SetTo(rc.index, rc.mask)
                     rcList.Add(rc)
                 End If
             Next
 
             If standaloneTest() Then
-                dst2 = Palettize(idMap, 0)
+                dst2 = Palettize(rcMap, 0)
 
                 For Each rc In rcSnapshotList
                     If rc.index <> 0 Then
@@ -2315,7 +2310,7 @@ Namespace VBClasses
                 Next
             End If
 
-            'strOut = XR_RedC_Core.showCell(rcList, idMap, dst2) + vbCrLf
+            'strOut = XR_RedC_Core.showCell(rcList, rcMap, dst2) + vbCrLf
 
             strOut = "In dst2 at left: " + vbCrLf + vbCrLf
             strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf

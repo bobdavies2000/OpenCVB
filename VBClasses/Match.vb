@@ -737,7 +737,7 @@ Namespace VBClasses
 
             Static clickIndex As Integer
             If task.mouseClickFlag Then
-                clickIndex = redColor.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                clickIndex = redColor.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
             Else
                 clickIndex = 1
             End If
@@ -749,7 +749,7 @@ Namespace VBClasses
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            WarpAffine(redColor.idMap, redColor.idMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+            WarpAffine(redColor.rcMap, redColor.rcMap, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class

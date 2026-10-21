@@ -4,15 +4,15 @@ Namespace VBClasses
         Dim contours As New Contour_Core
         Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Create an idMap of the contours using the colors indicated by KMeans"
+            desc = "Create an rcMap of the contours using the colors indicated by KMeans"
         End Sub
-        Public Shared Function clickContour(idMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
+        Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
-            Dim clickIndex = idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
+            Dim clickIndex = rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex)
                 dst(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -33,15 +33,15 @@ Namespace VBClasses
             contours.Run(color8U.dst2.Clone)
 
             Dim rcListLast As New List(Of rcData)(rcList)
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
 
-            task.color = clickContour(idMap, rcList, color8U.dst2)
+            task.color = clickContour(rcMap, rcList, color8U.dst2)
 
             SetTrueText(strOut, 1)
 
@@ -158,7 +158,7 @@ Namespace VBClasses
 
             dst2 = Palettize(dst1, 0)
 
-            if heartbeatx() then  labels(2) = CStr(rcList.Count) + " contours were found"
+            If heartbeatX() Then labels(2) = CStr(rcList.Count) + " contours were found"
         End Sub
     End Class
 
@@ -975,7 +975,7 @@ Namespace VBClasses
 
     Public Class XR_Contour_Basics_List : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public finder As New Contour_Finder
         Public options As New Options_Contours
         Dim edgeline As New EdgeLine_Basics
@@ -993,7 +993,7 @@ Namespace VBClasses
             finder.Run(src)
 
             rcList = finder.rcList
-            idMap = finder.idMap
+            rcMap = finder.rcMap
             labels(2) = CStr(rcList.Count) + " cells were found"
             dst2 = finder.dst2
             strOut = finder.strOut
@@ -1218,7 +1218,7 @@ Namespace VBClasses
     Public Class XR_Contour_Finder : Inherits TaskParent
         Public classCount As Integer
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(task.workRes, MatType.CV_8U, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public sortContours As New XR_Contour_SortTmp
         Dim edgeline As New EdgeLine_Basics
         Dim options As New Options_Contours
@@ -1246,7 +1246,7 @@ Namespace VBClasses
             sortContours.Run(src)
 
             rcList = sortContours.rcList
-            idMap = sortContours.idMap
+            rcMap = sortContours.rcMap
             labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
 
@@ -1264,7 +1264,7 @@ Namespace VBClasses
     Public Class XR_Contour_SortTmp : Inherits TaskParent
         Public allContours As cv.Point()()
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(task.workRes, MatType.CV_8U, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -1297,15 +1297,15 @@ Namespace VBClasses
                 sortList.Add(rc.pixels, rc)
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
-            If heartbeatLTX() Then idMap = dst1.Clone
+            If heartbeatLTX() Then rcMap = dst1.Clone
 
             Dim rcLastList As New List(Of rcData)(rcList)
-            Dim idMapLast = idMap.Clone
+            Dim idMapLast = rcMap.Clone
 
             dst2.SetTo(0)
             rcList.Clear()
             dst1.SetTo(0)
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For i = sortList.Values.Count - 1 To 0 Step -1
                 Dim rc = sortList.Values(i)
                 Dim idLast = CInt(idMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X))
@@ -1317,7 +1317,7 @@ Namespace VBClasses
                 Next
 
                 rcList.Add(rc)
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
             Next
 
@@ -1339,7 +1339,7 @@ Namespace VBClasses
     Public Class Contour_Sort : Inherits TaskParent
         Public allContours As cv.Point()()
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(task.workRes, MatType.CV_8U, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public Sub New()
             dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             desc = "Create a list of rcData cells from the contour data."
@@ -1375,11 +1375,11 @@ Namespace VBClasses
                 sortList.Add(rc.pixels, rc)
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
-            If heartbeatLTX() Then idMap = dst1.Clone
+            If heartbeatLTX() Then rcMap = dst1.Clone
 
             rcList = New List(Of rcData)(sortList.Values)
             For Each rc In rcList
-                Dim index = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim index = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 dst1(rc.rect).SetTo(index, rc.mask)
             Next
 
@@ -1394,7 +1394,7 @@ Namespace VBClasses
 
     Public Class Contour_Finder : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(task.workRes, MatType.CV_32F, 0)
+        Public rcMap As New Mat(task.workRes, MatType.CV_32F, 0)
         Public contourSort As New Contour_Sort
         Dim edgeline As New EdgeLine_Basics
         Dim options As New Options_Contours
@@ -1440,7 +1440,7 @@ Namespace VBClasses
             contourSort.Run(src)
             rcList = New List(Of rcData)(contourSort.rcList)
 
-            idMap = contourSort.idMap
+            rcMap = contourSort.rcMap
             labels(2) = contourSort.labels(2)
             dst2 = contourSort.dst2
         End Sub

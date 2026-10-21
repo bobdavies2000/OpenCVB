@@ -17,7 +17,6 @@ Namespace VBClasses
                 dst1 = src.Clone
             End If
 
-            dst1.ConvertTo(dst1, cv.MatType.CV_32S)
             dst2 = Palettize(dst1, 0)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
@@ -48,10 +47,11 @@ Namespace VBClasses
 
 
 
+
     Public Class XR_Flood_Original : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public fLess As New XR_FeatureLess_DepthFull
         Dim lastCenters As New HashSet(Of cv.Rect)
         Public Sub New()
@@ -87,7 +87,7 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             dst2.SetTo(0)
             Dim gRectSize = New cv.Size(task.gridWH, task.gridWH)
             For Each r In rects
@@ -105,7 +105,7 @@ Namespace VBClasses
                         rc.index = rcList.Count
                         rcList.Add(rc)
                         dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
-                        idMap(rc.rect).SetTo(rc.index, rc.mask)
+                        rcMap(rc.rect).SetTo(rc.index, rc.mask)
                     End If
                 End If
             Next
@@ -326,11 +326,11 @@ Namespace VBClasses
 
             Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
             redC.Run(dst1)
-            dst2 = Palettize(redC.idMap, 0)
+            dst2 = Palettize(redC.rcMap, 0)
             labels(2) = redC.labels(2)
 
             redC.Run(Not dst1)
-            dst3 = Palettize(redC.idMap, 0)
+            dst3 = Palettize(redC.rcMap, 0)
             labels(3) = redC.labels(2)
         End Sub
     End Class

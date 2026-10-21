@@ -428,7 +428,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            labels(3) = "steadyCam version of redc.idMap."
+            labels(3) = "steadyCam version of redc.rcMap."
             desc = "Use M in SteadyCam_Basics maintain the index for each redC cell."
         End Sub
         Public Shared Function setAge(rcList As List(Of rcData), rcLastList As List(Of rcData), map As cv.Mat) As List(Of rcData)
@@ -471,7 +471,7 @@ Namespace VBClasses
             labels(2) = redC.labels(2)
 
             If task.heartBeatLT Then
-                WarpAffine(redC.idMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+                WarpAffine(redC.rcMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 
             setAge(redC.rcList, rcLastList, dst0)

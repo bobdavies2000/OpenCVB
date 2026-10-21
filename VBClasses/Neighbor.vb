@@ -18,7 +18,7 @@ Namespace VBClasses
                 Dim histogram As New Mat
                 Dim bins = redC.rcList.Count
                 Dim ranges = {New Rangef(0, bins + 1)}
-                CalcHist({redC.idMap(rc.rect)}, {0}, New cv.Mat, histogram, 1, {bins}, ranges)
+                CalcHist({redC.rcMap(rc.rect)}, {0}, New cv.Mat, histogram, 1, {bins}, ranges)
 
                 Dim histArray(bins) As Single
                 histogram.GetArray(Of Single)(histArray)

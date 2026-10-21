@@ -1,5 +1,90 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class RedC_BasicsNew : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public Sub New()
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
+            desc = "Use the FeatureLess regions to improve the RedColor output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcLastList As New List(Of rcData)(rcList)
+            Dim rcIndexList As New List(Of Integer)
+            For Each rc In rcLastList
+                Dim tmp As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+                task.motion.motionMask(rc.rect).CopyTo(tmp, rc.mask)
+                rc.motionPixels = CountNonZero(tmp)
+                rcIndexList.Add(rc.index)
+            Next
+
+            If src.Channels <> 1 Then
+                Static color8U As New Color8U_Basics
+                color8U.Run(task.gray)
+                src = color8U.dst2
+            End If
+
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
+            For Each r In task.fless.brickList
+                Dim val = mask(r).Get(Of Byte)(0, 0)
+                If val = 0 Then
+                    Dim index As Integer = task.fless.dst1(r).Get(Of Byte)(0, 0)
+                    If index > 0 Then
+                        Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
+                        Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
+                        rectSorted.Add(index, (count, ValidateRect(rect)))
+                    End If
+                End If
+            Next
+
+            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To rectSorted.Count - 2
+                Dim r1 = rectSorted.ElementAt(i).Value.r
+                If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
+                    For j = i To rectSorted.Count - 2
+                        Dim r2 = rectSorted.ElementAt(j + 1).Value.r
+                        If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
+                            r1 = r1.Union(r2)
+                        Else
+                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
+                            rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+                            i = j
+                            Exit For
+                        End If
+                    Next
+                Else
+                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
+                    rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
+                End If
+            Next
+
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            For Each rc In rcSizeSort.Values
+                rc.index = task.fless.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If rc.motionPixels = 0 Then
+                    Dim index = rcIndexList.IndexOf(rc.index)
+                    If index >= 0 Then rc = rcLastList(index)
+                End If
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            dst2 = Palettize(rcMap, 0)
+            dst3 = task.fless.dst2
+
+            labels(2) = CStr(rcList.Count) + " cells were identified."
+        End Sub
+    End Class
+
+
+
+
+
+
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -12,8 +97,28 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the FeatureLess cells points."
         End Sub
+        Public Shared Function showCell(rcList As List(Of rcData), rcMap As cv.Mat, dst As cv.Mat) As String
+            Dim clickindex As Integer
+            clickindex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If clickindex > 0 And clickindex < rcList.Count Then
+                Dim rect As cv.Rect
+                Dim m As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+                For Each rc In rcList
+                    If rc.index = clickindex Then
+                        If rect.Width = 0 Then rect = rc.rect Else rect = rect.Union(rc.rect)
+                        m(rc.rect).SetTo(255, rc.mask)
+                    End If
+                Next
+                Rectangle(dst, rect, task.highlight, task.lineWidth)
+                task.color.SetTo(white, m)
+
+                Dim rc1 = New rcData(m(rect), rect, clickindex)
+                Return rc1.displayCell
+            End If
+            Return ""
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
+            If heartbeatLTX() Or delaunay.ptList.Count = 0 Then
                 delaunay.Run(emptyMat)
                 dst1 = delaunay.dst2
             End If
@@ -22,27 +127,24 @@ Namespace VBClasses
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            Dim usedList As New List(Of Integer)
             For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 rc.index = delaunay.indexMap.Get(Of Byte)(ptx.Y, ptx.X)
-                If usedList.Contains(rc.index) = False Then
-                    Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                    SetTrueText(CStr(rc.index), rc.maxDist, 3)
-                    SetTrueText(CStr(rc.index), ptx, 1)
-                    usedList.Add(rc.index)
-                End If
+                Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
+                ' SetTrueText(CStr(rc.index), rc.maxDist, 3)
+                SetTrueText(CStr(rc.index), ptx, 1)
                 rcList.Add(rc)
 
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            If standaloneTest() Then
-                dst2 = Palettize(rcMap, 0)
-                labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
-                labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
-            End If
+            dst2 = Palettize(rcMap, 0)
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
+
+            strOut = showCell(rcList, rcMap, dst2) + vbCrLf
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -54,7 +156,7 @@ Namespace VBClasses
     Public Class XR_RedC_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim redColor As New RedColor_Basics
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Use CalcHist on FeatureLess_Tracker cells to merge Color8U floodfill regions."
         End Sub
@@ -70,23 +172,8 @@ Namespace VBClasses
             Next
             Return displayStr
         End Function
-        Public Shared Function showCell(rcList As List(Of rcData), idMap As cv.Mat, dst As cv.Mat) As String
-            Dim clickindex As Integer
-            If idMap.Type = cv.MatType.CV_8U Then
-                clickindex = idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            Else
-                clickindex = idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
-            End If
-            If clickindex > 0 And clickindex < rcList.Count Then
-                Dim rc = rcList(clickindex)
-                Rectangle(dst, rc.rect, task.highlight, task.lineWidth)
-                task.color(rc.rect).SetTo(white, rc.mask)
-                Return rc.displayCell
-            End If
-            Return ""
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = idMap.Clone
+            Dim lastMap = rcMap.Clone
 
             redColor.Run(src)
 
@@ -109,7 +196,7 @@ Namespace VBClasses
             For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
 
-                CalcHist({redColor.idMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redColor.rcList.Count}, ranges)
+                CalcHist({redColor.rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redColor.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
@@ -119,7 +206,7 @@ Namespace VBClasses
                 Next
             Next
 
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
                 For i = 1 To redColor.rcList.Count - 1
@@ -127,7 +214,7 @@ Namespace VBClasses
                     If rcOwner(i) = rc.index Then
                         Dim rcTuple = redColor.rcList(i)
                         rc.rect = rc.rect.Union(rcTuple.rect)
-                        idMap(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
+                        rcMap(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                     End If
                 Next
             Next
@@ -136,18 +223,16 @@ Namespace VBClasses
             rcList.Clear()
             For Each rc In rcFLess
                 If rc.index = 0 Then Continue For
-                InRange(idMap(rc.rect), rc.index, rc.index, rc.mask)
+                InRange(rcMap(rc.rect), rc.index, rc.index, rc.mask)
                 rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)
-                Dim val1 = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                Dim val2 = idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                Dim val1 = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim val2 = rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Then rc.maxDStable = rc.maxDist
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(idMap, 0)
-
-            SetTrueText(XR_RedC_Core.showCell(rcList, dst1, dst2), 1)
+            dst2 = Palettize(rcMap, 0)
 
             labels(2) = CStr(redColor.rcList.Count) + " input cells merged into the " +
                         CStr(rcList.Count - 1) + " featureless cells.  Age is shown."
@@ -159,13 +244,13 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_CoreOld : Inherits TaskParent
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "idMap version of cells.  Age is shown for the largest cells."
+            labels(3) = "rcMap version of cells.  Age is shown for the largest cells."
             desc = "Segment the image based on color."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
@@ -188,7 +273,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim rcListLast = New List(Of rcData)(rcList)
-            Dim rcidMapLast = idMap.Clone
+            Dim rcidMapLast = rcMap.Clone
 
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
@@ -207,13 +292,13 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For i = rcList.Count - 1 To 0 Step -1
                 Dim rc = rcList(i)
-                idMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index Mod 256, rc.mask)
             Next
 
-            SetTrueText(displayCell(rcList, idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(displayCell(rcList, rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             If task.rcD IsNot Nothing Then
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
@@ -221,7 +306,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(idMap, 0)
+            dst3 = Palettize(rcMap, 0)
 
             labels(2) = CStr(rcList.Count) + " cells were found "
         End Sub
@@ -330,7 +415,7 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
 
             If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.idMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -388,9 +473,9 @@ Namespace VBClasses
 
     Public Class XR_RedC_DepthMerge : Inherits TaskParent
         Public redC As New XR_RedC_Core
-        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            labels(3) = "idMap version of cells"
+            labels(3) = "rcMap version of cells"
             desc = "Cursor.ai: Merge neighboring RedC color cells when their min/max depths overlap."
         End Sub
         Private Shared Function cellDepthRange(rc As rcData) As mmData
@@ -414,7 +499,7 @@ Namespace VBClasses
             Dim n = redC.rcList.Count
             If n = 0 Then Exit Sub
 
-            idMap = redC.idMap
+            rcMap = redC.rcMap
             dst3 = dst2.Clone
             Exit Sub
 
@@ -429,9 +514,9 @@ Namespace VBClasses
             For i = 0 To n - 1
                 nabes(i) = New HashSet(Of Integer)
             Next
-            Dim w = redC.idMap.Width, h = redC.idMap.Height
+            Dim w = redC.rcMap.Width, h = redC.rcMap.Height
             Dim mapData(w * h - 1) As Byte
-            redC.idMap.GetArray(Of Byte)(mapData)
+            redC.rcMap.GetArray(Of Byte)(mapData)
             For y = 0 To h - 1
                 Dim row = y * w
                 For x = 0 To w - 1
@@ -495,7 +580,7 @@ Namespace VBClasses
             Next
 
             Dim mm = cellDepthRange(task.rcD)
-            strOut = XR_RedC_Core.displayCell(redC.rcList, redC.idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            strOut = XR_RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             SetTrueText(strOut + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m" + vbCrLf +
                         "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
                         mm.maxVal.ToString(fmt2) + "m", 1)
@@ -558,7 +643,7 @@ Namespace VBClasses
             If redC.rcList.Count = 0 Then Exit Sub
             If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
 
-            Dim index As Integer = redC.idMap.Get(Of Single)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
+            Dim index As Integer = redC.rcMap.Get(Of Single)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
 
             neighbors.Clear()
             For Each rc In redC.rcList
@@ -588,7 +673,7 @@ Namespace VBClasses
         Public merged As New rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Cursor.ai: Merge flood cells under the largest FeatureLess_ToList cell using CalcHist on idMap."
+            desc = "Cursor.ai: Merge flood cells under the largest FeatureLess_ToList cell using CalcHist on rcMap."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             flood.Run(src)
@@ -606,7 +691,7 @@ Namespace VBClasses
             Dim flRc = redC.rcList(1)
             Dim histogram As New Mat
             Dim ranges() As Rangef = {New Rangef(0, 256)}
-            CalcHist({flood.idMap(flRc.rect)}, {0}, flRc.mask, histogram, 1, {256}, ranges)
+            CalcHist({flood.rcMap(flRc.rect)}, {0}, flRc.mask, histogram, 1, {256}, ranges)
             Dim histArray(histogram.Rows - 1) As Single
             histogram.GetArray(Of Single)(histArray)
 
@@ -644,7 +729,7 @@ Namespace VBClasses
 
 
     Public Class RedC_FloodToRC : Inherits TaskParent
-        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
@@ -652,7 +737,7 @@ Namespace VBClasses
             desc = "Build an rcList from the flood data and present smalles to largest."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = idMap.Clone
+            Dim lastMap = rcMap.Clone
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(task.gray)
@@ -671,18 +756,18 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData())
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For Each rc In sortList.Values
                 rc.index = rcList.Count
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
-            SetTrueText(XR_RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -692,7 +777,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(idMap, 0)
+            dst3 = Palettize(rcMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned an index."
         End Sub
     End Class
@@ -700,17 +785,15 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_SteadyCam : Inherits TaskParent
-        Dim redC As New XR_RedC_Core
+    Public Class RedC_Cells : Inherits TaskParent
+        Dim redC As New RedC_Basics
         Public Sub New()
-            desc = "Build a steadycam image of the RedC output"
+            desc = "Break down the cells withing each RedC cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(task.gray)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-
-            WarpAffine(dst2, dst3, task.steadyCam.M, dst2.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
 

@@ -309,7 +309,7 @@ Namespace VBClasses
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
             Public maxDist As New cv.Point
             Public maxDStable As New cv.Point
-            Public motionPercent As Single
+            Public motionPixels As Single
             Public pixels As Integer
             Public pt As cv.Point ' used with feature points.
             Public rect As New cv.Rect(0, 0, 1, 1)
@@ -336,6 +336,10 @@ Namespace VBClasses
                 maxDist.X = mm.maxLoc.X + rect.X
                 maxDist.Y = mm.maxLoc.Y + rect.Y
                 maxDStable = maxDist
+
+                Dim tmp As New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                task.motion.motionMask(rect).CopyTo(tmp, mask)
+                motionPixels = CountNonZero(tmp)
 
                 Return maxDist
             End Function

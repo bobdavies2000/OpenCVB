@@ -58,7 +58,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                Dim indexLast = redC.idMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
+                Dim indexLast = redC.rcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast <> 0 And indexLast < redC.rcList.Count Then
                     Dim lrc = redC.rcList(indexLast)
                     matched.Add(indexLast)
@@ -79,7 +79,7 @@ Namespace VBClasses
 
     Public Class MSER_Basics2 : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Dim idMap As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+        Dim rcMap As New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
         Public Sub New()
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Create cells for each region in MSER output"
@@ -99,8 +99,8 @@ Namespace VBClasses
             Dim rclist As New List(Of rcData)({New rcData})
             dst1.SetTo(0)
             dst2.SetTo(0)
-            Dim lastMap = idMap.Clone
-            idMap.SetTo(0)
+            Dim lastMap = rcMap.Clone
+            rcMap.SetTo(0)
             Dim matchCount As Integer
             For i = 0 To floodPoints.Count - 1
                 Dim rc As New rcData With {.index = rclist.Count}
@@ -116,7 +116,7 @@ Namespace VBClasses
                 If indexLast <> 0 Then matchCount += 1
 
                 rclist.Add(rc)
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst2(rc.rect).SetTo(task.scalarColors(rc.index Mod 255), rc.mask)
             Next
 

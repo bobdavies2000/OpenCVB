@@ -4,7 +4,7 @@ Namespace VBClasses
     Public Class EdgeLine_Basics : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat
+        Public rcMap As New Mat
         Public classCount As Integer
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
@@ -21,8 +21,8 @@ Namespace VBClasses
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handlesrc.Free()
             Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
-            tmp.ConvertTo(idMap, cv.MatType.CV_32F)
-            idMap.ConvertTo(dst2, MatType.CV_8U)
+            tmp.ConvertTo(rcMap, cv.MatType.CV_32F)
+            rcMap.ConvertTo(dst2, MatType.CV_8U)
 
             Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
             ' prevent leaks at the image boundary...
@@ -43,7 +43,7 @@ Namespace VBClasses
             rcList.Add(New rcData) ' placeholder for zero...
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
-                Dim mask = idMap(ValidateRect(rects(i)))
+                Dim mask = rcMap(ValidateRect(rects(i)))
                 Dim rc = New rcData(mask, ValidateRect(rects(i)), index)
 
                 rcList.Add(rc)
@@ -272,7 +272,7 @@ Namespace VBClasses
             handleMask.Free()
 
             dst2 = Mat.FromPixelData(input.Rows, input.Cols, MatType.CV_8U, imagePtr)
-            if heartbeatx() then 
+            If heartbeatX() Then
                 labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines found while " +
                                             CStr(EdgeLine_GetSegCount(cPtr)) + " edge/lines were found on the current image."
                 labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
@@ -466,8 +466,8 @@ Namespace VBClasses
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handlesrc.Free()
-            Dim idMap = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
-            idMap.ConvertTo(dst2, MatType.CV_8U)
+            Dim rcMap = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
+            rcMap.ConvertTo(dst2, MatType.CV_8U)
 
             Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
 
@@ -487,7 +487,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             keyList.Clear()
             For i = 0 To classCount - 1
-                Dim key As New keyData With {.rect = rects(i), .mask = idMap(rects(i))}
+                Dim key As New keyData With {.rect = rects(i), .mask = rcMap(rects(i))}
                 keyList.Add(key)
             Next
 

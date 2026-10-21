@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             desc = "Build a list of cells for each floodfill region in the Color8U input."
         End Sub
@@ -21,7 +21,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             dst1 = color8U.dst2.Clone
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
@@ -30,7 +30,7 @@ Namespace VBClasses
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
-                            idMap(rc.rect).SetTo(rc.index, rc.mask)
+                            rcMap(rc.rect).SetTo(rc.index, rc.mask)
                             rcList.Add(rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -46,7 +46,7 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(sortList.Values)
 
-            dst3 = Palettize(idMap, 0)
+            dst3 = Palettize(rcMap, 0)
 
             'If standaloneTest() Then
             '    Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -69,7 +69,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_FloodToID : Inherits TaskParent
-        Public idMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
         Public Sub New()
@@ -77,7 +77,7 @@ Namespace VBClasses
             desc = "Build an rcList from the flood data and present smallest to largest."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = idMap.Clone
+            Dim lastMap = rcMap.Clone
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(task.gray)
@@ -96,19 +96,19 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData())
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             For Each rc In sortList.Values
                 rc.index = rcList.Count
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 
-            SetTrueText(XR_RedC_Core.displayCell(rcList, idMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
                 rc.index = i
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
             labels(2) = CStr(sortList.Values.Count) + " cells were found "
 
@@ -118,8 +118,70 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(idMap, 0)
+            dst3 = Palettize(rcMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned index."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_GridRects : Inherits TaskParent
+        Dim redC As New RedColor_FLessBasics
+        Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
+        Public Sub New()
+            labels(3) = "RedColor output mapped into the gridRects."
+            desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            rcGridMap.SetTo(0)
+            dst3.SetTo(0)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
+
+                Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
+                Dim index As Integer = redC.rcMap.Get(Of Single)(center.Y, center.X) - 1
+                If index >= redC.rcList.Count Or index < 0 Then Continue For
+                Dim rc = redC.rcList(index)
+                dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
+                rcGridMap(r).SetTo(rc.index)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_InRange : Inherits TaskParent
+        Public inputRemoved As New Mat
+        Public showSelected As Boolean = True
+        Public redC As New RedColor_FLessBasics
+        Dim color8U As New Color8U_Basics
+        Public Sub New()
+            labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+            desc = "Use InRange to prepare an 8U input image for RedColor_FLessBasics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(src)
+            InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
+            ConvertScaleAbs(inputRemoved, inputRemoved)
+            src = color8U.dst2
+
+            src.SetTo(0, inputRemoved)
+
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+            dst2 = redC.dst2.SetTo(0, inputRemoved)
+
+            labels(2) = $"{redC.rcList.Count} cells identified"
+
+            If showSelected Then SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 
@@ -128,7 +190,7 @@ Namespace VBClasses
 
     Public Class RedColor_FLessBasics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -178,82 +240,19 @@ Namespace VBClasses
                 End If
             Next
 
-            idMap.SetTo(0)
+            rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In rcSizeSort.Values
                 rc.index = rcList.Count
                 rcList.Add(rc)
-                idMap(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            dst2 = Palettize(idMap, 0)
+            dst2 = Palettize(rcMap, 0)
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedColor_GridRects : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
-        Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
-        Public Sub New()
-            labels(3) = "RedColor output mapped into the gridRects."
-            desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            rcGridMap.SetTo(0)
-            dst3.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
-
-                Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index As Integer = redC.idMap.Get(Of Single)(center.Y, center.X) - 1
-                If index >= redC.rcList.Count Or index < 0 Then Continue For
-                Dim rc = redC.rcList(index)
-                dst3(r).SetTo(task.scalarColors(rc.index Mod 255))
-                rcGridMap(r).SetTo(rc.index)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedColor_InRange : Inherits TaskParent
-        Public inputRemoved As New Mat
-        Public showSelected As Boolean = True
-        Public redC As New RedColor_FLessBasics
-        Dim color8U As New Color8U_Basics
-        Public Sub New()
-            labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-            desc = "Use InRange to prepare an 8U input image for RedColor_FLessBasics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
-            ConvertScaleAbs(inputRemoved, inputRemoved)
-            src = color8U.dst2
-
-            src.SetTo(0, inputRemoved)
-
-            redC.Run(src)
-            labels(2) = redC.labels(2)
-            dst2 = redC.dst2.SetTo(0, inputRemoved)
-
-            labels(2) = $"{redC.rcList.Count} cells identified"
-
-            If showSelected Then SetTrueText(redC.strOut, 3)
         End Sub
     End Class
 End Namespace

@@ -523,10 +523,10 @@ Namespace VBClasses
     Public Class Delaunay_Map : Inherits TaskParent
         Dim subdiv As New Subdiv2D
         Public rcList As List(Of rcData)
-        Public idMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "Visualization of the idMap with colors.  The idMap contains integers."
+            labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."
             desc = "Create a map using the rcList provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -559,7 +559,7 @@ Namespace VBClasses
                 Next
 
                 Dim rc = rcList(i)
-                FillConvexPoly(idMap, nextFacet, rc.index, LineTypes.Link4)
+                FillConvexPoly(rcMap, nextFacet, rc.index, LineTypes.Link4)
                 FillConvexPoly(dst3, nextFacet, task.scalarColors(rc.index Mod 255), LineTypes.Link4)
                 facetList.Add(nextFacet)
             Next
@@ -643,11 +643,13 @@ Namespace VBClasses
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
+            If heartbeatLTX() Or task.delaunay.ptList.Count = 0 Then
                 task.delaunay.ptList.Clear()
+                ptList.Clear()
                 For Each rc In task.fless.rcList
                     If rc.index = 0 Then Continue For
                     task.delaunay.ptList.Add(rc.maxDist)
+                    ptList.Add(New cv.Point(CInt(rc.maxDist.X), CInt(rc.maxDist.Y)))
                 Next
 
                 task.delaunay.Run(emptyMat)
