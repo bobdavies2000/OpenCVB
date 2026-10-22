@@ -278,7 +278,7 @@ class RedCloudLined
 {
 private:
 public:
-    Mat src, mask;
+    Mat src, result, mask;
     vector<Rect>cellRects;
 
     RedCloudLined() {}
@@ -295,7 +295,7 @@ public:
         {
             for (int x = 0; x < src.cols; x++)
             {
-                if (src.at<unsigned char>(y, x) == 0)
+                if (mask.at<unsigned char>(y, x) == 0)
                 {
                     pt = Point(x, y);
                     int count = floodFill(src, mask, pt, srcFill, &rect, 0, 0, 4 | floodFlag | (maskFill << 8));
@@ -317,6 +317,8 @@ public:
                 if (maskFill >= 256) maskFill = 1; // start over 
             }
         }
+        Rect maskRect = Rect(1, 1, mask.cols - 2, mask.rows - 2);
+        mask(maskRect).copyTo(result);
     }
 };
 
@@ -330,7 +332,7 @@ RedCloudLined_Run(RedCloudLined* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
     cPtr->RunCPP();
-    return (int*)cPtr->mask.data;
+    return (int*)cPtr->result.data;
 }
 
 

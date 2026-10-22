@@ -29,7 +29,7 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.index = index}
+                            Dim rc = New rcData(dst1(rect), rect, index) With {.ID = index, .index = index}
                             rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                             rcList.Add(rc)
                         Else

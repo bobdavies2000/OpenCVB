@@ -77,7 +77,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Basics2 : Inherits TaskParent
+    Public Class XR_MSER_Basics2 : Inherits TaskParent
         Dim detect As New MSER_CPP
         Dim rcMap As New Mat(dst2.Size(), MatType.CV_8U, 0)
         Public Sub New()
@@ -109,16 +109,16 @@ Namespace VBClasses
                 InRange(dst3(rc.rect), val, val, rc.mask)
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = detect.maskCounts(i)
-                rc.ID = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = i ' detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
                 Dim color = task.scalarColors(i Mod 255)
                 If indexLast <> 0 Then matchCount += 1
 
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rclist.Add(rc)
             Next
 
-            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             dst2 = Palettize(rcMap, 0)
 
             labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
@@ -129,7 +129,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Basics3 : Inherits TaskParent
+    Public Class XR_MSER_Basics3 : Inherits TaskParent
         Dim detect As New MSER_CPP
         Dim displaycount As Integer
         Public Sub New()

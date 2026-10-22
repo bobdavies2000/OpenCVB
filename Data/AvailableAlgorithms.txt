@@ -502,8 +502,6 @@ Motion_ValidateColor
 Mouse_Basics
 Mouse_ClickPointUsage
 MSER_Basics
-MSER_Basics2
-MSER_Basics3
 MSER_CPP
 MSER_Detect
 MSER_Left
@@ -619,7 +617,6 @@ RedC_Cells
 RedC_Depth
 RedC_Features
 RedC_FloodToRC
-RedC_MergeCells
 RedC_NeighborHist
 RedCloud_Basics
 RedCloud_Core
@@ -1497,6 +1494,8 @@ XR_Motion_ValidateRight
 XR_Mouse_LeftClickZoom
 XR_Mouse_ValidateLocation
 XR_MSER_Basics1
+XR_MSER_Basics2
+XR_MSER_Basics3
 XR_MSER_Binarize
 XR_MSER_Grayscale
 XR_MSER_LeftRight
@@ -1609,6 +1608,7 @@ XR_RedC_CoreOld
 XR_RedC_DepthMerge
 XR_RedC_FeatureLessTestSingle
 XR_RedC_Hulls
+XR_RedC_MergeCells
 XR_RedC_NeighborHulls1
 XR_RedC_Reliable
 XR_RedC_Sizes

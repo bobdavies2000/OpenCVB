@@ -701,6 +701,7 @@ Namespace VBClasses
 
             rcMap = src.Clone
             rcList.Clear()
+            rcList.Add(New rcData)
             Dim rect As cv.Rect
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             For Each r In task.gridRects
@@ -718,12 +719,9 @@ Namespace VBClasses
             Dim rcIndex As Integer
             For Each rc In rcList
                 rc.ID = rcIndex
+                rc.index = rcIndex
                 rcIndex += 1
             Next
-
-            'strOut = Utility_Basics.selectCell(rcMap, rcList)
-            'SetTrueText(strOut, 3)
-
             labels(2) = CStr(rcIndex) + " cells were found."
         End Sub
     End Class
@@ -763,12 +761,11 @@ Namespace VBClasses
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As Mat = rcMap.Clone
 
-            Dim minPixels As Integer = dst2.Total * 0.001
             Dim index As Integer = 1
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 0 To rects.Length - 1
                 Dim rc = New rcData(dst0(rects(i)), rects(i), index)
-                If rc.pixels < minPixels Then Continue For
+                If rc.pixels < task.minCellSize Then Continue For
                 newList.Add(rc.pixels, rc)
                 index += 1
             Next
@@ -776,6 +773,7 @@ Namespace VBClasses
             Dim r2 As cv.Rect
             Dim count As Integer
             rcList.Clear()
+            rcList.Add(New rcData)
             Dim usedColor As New List(Of Integer)
             For Each rc In newList.Values
                 Dim r1 = rc.rect
@@ -796,22 +794,23 @@ Namespace VBClasses
                 If usedColor.Contains(rc.ID) Then rc.age = 1
                 usedColor.Add(rc.ID)
 
-                rc.ID = rcList.Count + 1
+                rc.ID = rcList.Count
+                rc.index = rcList.Count
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                SetTrueText(CStr(rc.age), rc.maxDist)
+                SetTrueText(CStr(rc.ID), rc.maxDist)
             Next
 
             dst2.SetTo(0)
             For Each rc In rcList
                 InRange(rcMap(rc.rect), rc.ID, rc.ID, rc.mask)
                 rc.buildMaxDist(rc.mask)
-                dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
                 Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
             labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
-                        " minpixels.  " + CStr(count) + " matched to previous generation"
+                        " minpixels (" + CStr(task.minCellSize) + ".  " + CStr(count) + " matched To previous generation"
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = RedCloudLined_Close(cPtr)
@@ -828,20 +827,20 @@ Namespace VBClasses
         Dim redRight As New RedColor_FLessBasics
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            desc = "Display the RedColor_FLessBasics output for both the left and right images."
+            desc = "Display the RedColor_FLessBasics output For both the left And right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
 
             redLeft.Run(reduction.dst2)
             dst2 = Palettize(redLeft.dst2, 0)
-            labels(2) = redLeft.labels(2) + " in the left image"
+            labels(2) = redLeft.labels(2) + " In the left image"
 
             reduction.Run(task.rightView)
 
             redRight.Run(reduction.dst2)
             dst3 = Palettize(redRight.dst2, 0)
-            labels(3) = redRight.labels(2) + " in the right image"
+            labels(3) = redRight.labels(2) + " In the right image"
         End Sub
     End Class
 
@@ -853,7 +852,7 @@ Namespace VBClasses
         Dim binN As New BinNWay_Basics
         Dim redC As New RedColor_FLessBasics
         Public Sub New()
-            desc = "Run RedColor on the output of the BinNWay_Basics"
+            desc = "Run RedColor On the output Of the BinNWay_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             binN.Run(src)
@@ -877,7 +876,7 @@ Namespace VBClasses
         Dim redC As New RedColor_FLessBasics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
-            desc = "Attach an color8u class to each r."
+            desc = "Attach an color8u Class To Each r."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)

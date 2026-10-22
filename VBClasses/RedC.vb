@@ -69,6 +69,7 @@ Namespace VBClasses
                     Dim index = rcIndexList.IndexOf(rc.ID)
                     If index >= 0 Then rc = rcLastList(index)
                 End If
+                rc.index = rcList.Count
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
@@ -193,6 +194,7 @@ Namespace VBClasses
             Dim rcFLess = New List(Of rcData)(redColor.tracker.rcList)
             Dim rcOwner(redColor.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
+
             For Each rc In rcFLess
                 If rc.ID = 0 Then Continue For
 
@@ -228,14 +230,15 @@ Namespace VBClasses
                 Dim val1 = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 Dim val2 = rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                 If val1 <> val2 Then rc.maxDStable = rc.maxDist
-                SetTrueText(CStr(rc.age), rc.maxDist, 2)
+                SetTrueText(CStr(rc.ID), rc.maxDist, 2)
+                rc.index = rcList.Count
                 rcList.Add(rc)
             Next
 
             dst2 = Palettize(rcMap, 0)
 
             labels(2) = CStr(redColor.rcList.Count) + " input cells merged into the " +
-                        CStr(rcList.Count - 1) + " featureless cells.  Age is shown."
+                        CStr(rcList.Count - 1) + " featureless cells."
         End Sub
     End Class
 
@@ -250,7 +253,7 @@ Namespace VBClasses
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "rcMap version of cells.  Age is shown for the largest cells."
+            labels(3) = "rcMap version of cells."
             desc = "Segment the image based on color."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
@@ -284,11 +287,13 @@ Namespace VBClasses
             flood.Run(src)
             dst2 = flood.dst2
             rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
             For i = 0 To flood.rectList.Count - 1
                 Dim floodVal = flood.indexList(i)
                 Dim r = flood.rectList(i)
                 Dim rc As New rcData(flood.mask(r), r, floodVal Mod 256) With {.ID = i + 1}
-                rc.ID = i + 1
+                rc.ID = i
+                rc.index = i
                 rcList.Add(rc)
             Next
 
@@ -317,7 +322,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_MergeCells : Inherits TaskParent
+    Public Class XR_RedC_MergeCells : Inherits TaskParent
         Dim nabe As New RedC_NeighborHist
         Public merged As New rcData
         Public mergeList As New List(Of rcData)
@@ -367,7 +372,7 @@ Namespace VBClasses
             Next
 
             merged = New rcData() With {.rect = unionRect, .mask = fullMask(unionRect).Clone(),
-                                        .index = rcD.index, .maxDStable = merged.maxDist}
+                                        .maxDStable = merged.maxDist}
             dst3.SetTo(0)
             For Each rc In mergeList
                 dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
@@ -628,7 +633,7 @@ Namespace VBClasses
 
 
     Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New XR_RedC_Core
+        Public redC As New RedC_Basics
         Public neighbors As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
