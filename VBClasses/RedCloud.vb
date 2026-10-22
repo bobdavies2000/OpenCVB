@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public options As New Options_RedCloud
         Dim reduction As New Reduction_BasicsParmInput
         Public runSelectCell As Boolean = True
@@ -36,6 +36,7 @@ Namespace VBClasses
                 rc.ID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.ID = rcList.Count
+                rc.index = rcList.Count
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
@@ -99,7 +100,8 @@ Namespace VBClasses
             End If
             dst2.SetTo(0)
             For Each rc In rcList
-                dst2(rc.rect).SetTo(rc.ID Mod 254, rc.mask)
+                If rc.pixels < task.minCellSize Then Continue For
+                dst2(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
