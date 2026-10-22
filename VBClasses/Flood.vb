@@ -231,7 +231,7 @@ Namespace VBClasses
             dst3 = task.edges.dst2
             labels(3) = task.edges.labels(2)
 
-            Dim rcList = RedCloud_Core.sweepImage(dst3, 0)
+            Dim rcList = RedCloud_Core.sweepImage(dst3)
 
             Static rcIndex As Integer
             dst1.SetTo(0)

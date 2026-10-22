@@ -24,6 +24,7 @@ Namespace VBClasses
             labels(3) = redCore.labels(3)
 
             rcList.Clear()
+            rcList.Add(New rcData)
             rcMap.SetTo(0)
             dst2.SetTo(0)
             Dim matchCount As Integer
@@ -35,13 +36,16 @@ Namespace VBClasses
                 matchAverage += rc.age
                 rc.ID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                rc.ID = rcList.Count
                 rc.index = rcList.Count
+                If rc.pixels < task.minCellSize Then Continue For
                 rcList.Add(rc)
 
-                dst2(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
 
+            If rcList.Count >= 255 Then
+                MsgBox("RedCloud_Basics has exceeded the 8-bit max.  Increase task.minCellSize?")
+            End If
             labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
                                 "average age: " + (matchAverage / rcList.Count).ToString(fmt1)
             labels(3) = redCore.labels(3)
@@ -60,7 +64,7 @@ Namespace VBClasses
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
-        Public Shared Function sweepImage(input As Mat, minSize As Integer) As List(Of rcData)
+        Public Shared Function sweepImage(input As Mat) As List(Of rcData)
             Dim index As Integer = 1
             Dim rect As New cv.Rect
             Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
@@ -74,7 +78,7 @@ Namespace VBClasses
                     If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                         Dim count = FloodFill(input, mask, pt, index, rect, 0, 0, flags)
                         If rect.Width > 0 And rect.Height > 0 Then
-                            If count >= minSize Then
+                            If count >= task.minCellSize Then
                                 rc = New rcData(input(rect), rect, index)
                                 newList.Add(rc.pixels, rc)
                                 index += 1
@@ -82,9 +86,9 @@ Namespace VBClasses
                             End If
                         End If
                     End If
-                    If index = 254 Then index = 1
                 Next
             Next
+
             Return New List(Of rcData)(newList.Values)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -93,7 +97,7 @@ Namespace VBClasses
                 src = prepEdges.dst2.Clone
             End If
 
-            rcList = sweepImage(src, src.Total * 0.0001)
+            rcList = sweepImage(src)
             If rcList.Count = 0 Then
                 rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
                 task.rcD = rcList(0)
@@ -103,6 +107,7 @@ Namespace VBClasses
                 If rc.pixels < task.minCellSize Then Continue For
                 dst2(rc.rect).SetTo(rc.ID, rc.mask)
             Next
+            If rcList.Count >= 255 Then MsgBox("RedCloud_Core has exceeded the 8-bit max.  Increase task.minCellSize?")
             dst3 = Palettize(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
@@ -262,7 +267,7 @@ Namespace VBClasses
     Public Class XR_RedCloud_MotionFilter : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim pcMotion As New Motion_CloudPixel
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
@@ -275,7 +280,6 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            redC.rcMap.ConvertTo(dst0, MatType.CV_8U)
             dst1.SetTo(0)
             dst0.CopyTo(dst1, pcMotion.dst2)
 
@@ -300,11 +304,13 @@ Namespace VBClasses
             dst3.SetTo(0)
             rcMap.SetTo(0)
             rcList.Clear()
+            rcList.Add(New rcData)
             For Each rc In redC.rcList
                 If rc.age > 1 Then
                     If rcMotionCells.Contains(rc.ID) = False Then
-                        dst3(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
+                        dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
                         rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                        rc.index = rcList.Count
                         rcList.Add(rc)
                     End If
                 End If
