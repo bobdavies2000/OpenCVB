@@ -695,7 +695,7 @@ Namespace VBClasses
             desc = "Create a histogram of the featureless regions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            contours.Run(src)
+            contours.Run(task.gray)
             contours.rcMap.ConvertTo(dst1, MatType.CV_32F)
             bProject.Run(dst1) ' calcHist doesn't support 32S
             dst2 = bProject.dst2

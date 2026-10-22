@@ -207,6 +207,7 @@ Feature_TrackerRect
 Feature_WarpAlign
 Feature_WithRotation
 FeatureLess_Basics
+FeatureLess_BasicsNew
 FeatureLess_DisectHLine
 FeatureLess_Disection
 FeatureLess_DisectionOriginal

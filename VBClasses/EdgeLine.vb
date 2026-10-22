@@ -9,6 +9,7 @@ Namespace VBClasses
         Dim delaunay As New Delaunay_FeatureLess
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Use EdgeLines to find edges/lines but without using motionMask directly"
         End Sub
@@ -23,7 +24,7 @@ Namespace VBClasses
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handlesrc.Free()
             Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
-            tmp.ConvertTo(rcMap, cv.MatType.CV_32F)
+            tmp.ConvertTo(rcMap, cv.MatType.CV_8U)
 
             Dim rectPtr = EdgeLineRaw_Rects(cPtr)
             If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
@@ -46,6 +47,7 @@ Namespace VBClasses
                 rc.ID = delaunay.indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcList.Add(rc)
                 If standaloneTest() Then dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
+
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +

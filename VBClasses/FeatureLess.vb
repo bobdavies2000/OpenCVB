@@ -2,20 +2,21 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public brickList As New List(Of cv.Rect)
+        Public fLessBrick As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless gridrects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim rcListLast As New List(Of rcData)(rcList)
+
             dst1.SetTo(0)
-            brickList.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim r = task.gridRects(i)
+            fLessBrick.Clear()
+            For Each r In task.gridRects
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
                 If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
                 dst1(r).SetTo(255)
-                brickList.Add(r)
+                fLessBrick.Add(r)
             Next
 
             Dim rect As cv.Rect
@@ -23,7 +24,7 @@ Namespace VBClasses
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
-            For Each r In task.gridRects
+            For Each r In fLessBrick
                 If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
                     Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
@@ -61,6 +62,73 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class FeatureLess_BasicsNew : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim delaunay As New Delaunay_Basics
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
+            desc = "Find the featureless regions but if no motion, don't change the shape - only location."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                Dim nextList As New List(Of cv.Point2f)
+                For Each rc In task.fless.rcList
+                    If rc.ID = 0 Then Continue For
+                    nextList.Add(rc.maxDist)
+                Next
+
+                delaunay.ptList = New List(Of cv.Point2f)(nextList)
+
+                delaunay.Run(emptyMat)
+                indexMap.SetTo(0)
+                For i = 0 To delaunay.facetList.Count - 1
+                    If task.fless.rcList(i).index = 0 Then Continue For
+                    FillConvexPoly(indexMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
+                Next
+
+                ' run before palettize
+                For Each rc In task.fless.rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
+                Next
+
+                dst2 = Palettize(indexMap)
+
+                ' run after palettize
+                For Each rc In task.fless.rcList
+                    If rc.ID = 0 Then Continue For
+                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                    Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
+                Next
+            End If
+
+            dst0.SetTo(0)
+            dst3.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            For Each rc In task.redColor.rcList
+                Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
+                ptx = validatePoint(ptx)
+                Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
+                rc.ID = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.index = rcList.Count
+                SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                rcList.Add(rc)
+
+                dst0(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            dst2 = Palettize(dst0, 0)
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
+        End Sub
+    End Class
 
 
 

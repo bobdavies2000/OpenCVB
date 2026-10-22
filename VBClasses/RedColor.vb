@@ -6,11 +6,10 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            desc = "Build a list of cells for each floodfill region in the Color8U input."
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
-            labels(2) = color8U.labels(2)
 
             tracker.Run(color8U.dst2)
             dst2 = color8U.dst3.Clone
@@ -18,20 +17,19 @@ Namespace VBClasses
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
             dst1 = color8U.dst2.Clone
             rcMap.SetTo(0)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For y = 0 To dst2.Height - 1
                 For x = 0 To dst2.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = rcList.Count
+                        Dim index = sortList.Count
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.ID = index, .index = index}
+                            Dim rc = New rcData(dst1(rect), rect, index) With {.ID = index}
                             rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                            rcList.Add(rc)
+                            sortList.Add(rc.pixels, rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
                         End If
@@ -39,30 +37,21 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For Each rc In rcList
-                sortList.Add(rc.pixels, rc)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            For i = 0 To sortList.Values.Count - 1
+                Dim rc = sortList.Values(i)
+                rc.index = i + 1
+                rcList.Add(rc)
             Next
 
-            rcList = New List(Of rcData)(sortList.Values)
-
-            dst3 = Palettize(rcMap, 0)
-
-            'If standaloneTest() Then
-            '    Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            '    Dim rc = rcList(clickIndex)
-            '    Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-            '    dst2(rc.rect).SetTo(white, rc.mask)
-            '    SetTrueText(CStr(clickIndex), rc.maxDist)
-            '    SetTrueText(rc.displayCell, 1)
-            'End If
-
-            labels(3) = CStr(rcList.Count) + " cells found"
+            labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
-                MsgBox("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!")
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
         End Sub
     End Class
+
 
 
 
@@ -207,7 +196,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In task.fless.brickList
+            For Each r In task.fless.fLessBrick
                 Dim val = mask(r).Get(Of Byte)(0, 0)
                 If val = 0 Then
                     Dim index As Integer = task.fless.dst1(r).Get(Of Byte)(0, 0)

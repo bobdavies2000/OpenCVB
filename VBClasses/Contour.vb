@@ -1230,7 +1230,7 @@ Namespace VBClasses
             options.Run()
 
             edgeline.Run(task.gray)
-            dst3 = edgeline.dst2
+            dst3 = edgeline.rcMap
 
             Dim mode = options.options2.ApproximationMode
             If options.retrievalMode = RetrievalModes.FloodFill Then
@@ -1272,7 +1272,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edgeline.Run(task.gray)
-            allContours = Contour_Finder.buildContours(edgeline.dst2)
+            allContours = Contour_Finder.buildContours(edgeline.rcMap)
 
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
             Dim tmp As New Mat(task.workRes, MatType.CV_8U, 0)
