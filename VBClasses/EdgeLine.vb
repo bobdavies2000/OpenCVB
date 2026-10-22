@@ -44,8 +44,7 @@ Namespace VBClasses
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
                 Dim mask = rcMap(ValidateRect(rects(i)))
-                Dim rc = New rcData(mask, ValidateRect(rects(i)), index)
-                rc.index = rcList.Count
+                Dim rc = New rcData(mask, ValidateRect(rects(i)), index) With {.index = rcList.Count}
                 rcList.Add(rc)
                 If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(index Mod 255), rc.mask)
             Next

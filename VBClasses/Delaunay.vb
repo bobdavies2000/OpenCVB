@@ -262,7 +262,7 @@ Namespace VBClasses
 
 
 
-    Public Class Delaunay_ConsistentColor : Inherits TaskParent
+    Public Class XR_Delaunay_ConsistentColor : Inherits TaskParent
         Public inputPoints As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Public facet32s As Mat

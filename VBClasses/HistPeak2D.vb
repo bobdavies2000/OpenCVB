@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class HistPeak2D_Basics : Inherits TaskParent
         Public auto As New OpAuto_Peaks2DGrid
         Dim bgr As New Hist2D_BGR
-        Dim delaunay As New Delaunay_ConsistentColor
+        Dim delaunay As New XR_Delaunay_ConsistentColor
         Public histogram As New Mat
         Public ranges() As Rangef
         Public Sub New()

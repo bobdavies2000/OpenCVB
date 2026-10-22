@@ -90,7 +90,6 @@ DCT_Basics
 DCT_FeatureLess
 Delaunay_Basics
 Delaunay_Color
-Delaunay_ConsistentColor
 Delaunay_Contours
 Delaunay_EmptyClone
 Delaunay_FeatureLess
@@ -975,6 +974,7 @@ XR_Covariance_Test
 XR_CSV_Basics
 XR_DCT_Depth
 XR_DCT_RGB
+XR_Delaunay_ConsistentColor
 XR_Delaunay_Contours
 XR_Delaunay_GenerationsNoKNN
 XR_Delaunay_SubDiv
