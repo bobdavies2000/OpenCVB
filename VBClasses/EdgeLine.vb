@@ -6,14 +6,16 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat
         Public classCount As Integer
+        Dim delaunay As New Delaunay_FeatureLess
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
-            labels(3) = "Palette version of dst2"
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Use EdgeLines to find edges/lines but without using motionMask directly"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray
+
+            delaunay.Run(src)
 
             Dim cppData(src.Total - 1) As Byte
             src.GetArray(Of Byte)(cppData)
@@ -22,11 +24,6 @@ Namespace VBClasses
             handlesrc.Free()
             Dim tmp = Mat.FromPixelData(src.Rows, src.Cols, MatType.CV_32S, imagePtr)
             tmp.ConvertTo(rcMap, cv.MatType.CV_32F)
-            rcMap.ConvertTo(dst2, MatType.CV_8U)
-
-            Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
-            ' prevent leaks at the image boundary...
-            Rectangle(dst2, New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), Scalar.All(255), imageEdgeWidth)
 
             Dim rectPtr = EdgeLineRaw_Rects(cPtr)
             If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
@@ -38,15 +35,17 @@ Namespace VBClasses
             Dim rectData = Mat.FromPixelData(classCount, 1, MatType.CV_32SC4, rectPtr)
             rectData.GetArray(Of cv.Rect)(rects)
 
-            dst3.SetTo(0)
+            dst2.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             For i = 0 To classCount - 1
                 Dim index = rcList.Count
-                Dim mask = rcMap(ValidateRect(rects(i)))
-                Dim rc = New rcData(mask, ValidateRect(rects(i)), index) With {.index = rcList.Count}
+                Dim r = ValidateRect(rects(i))
+                Dim mask = rcMap(r)
+                Dim rc = New rcData(mask, r, index) With {.index = rcList.Count}
+                rc.ID = delaunay.indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcList.Add(rc)
-                If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(index Mod 255), rc.mask)
+                If standaloneTest() Then dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
