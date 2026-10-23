@@ -81,7 +81,6 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Dim rcMap As New Mat(dst2.Size(), MatType.CV_8U, 0)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             dst1 = New Mat(dst1.Size(), MatType.CV_8U, 0)
             desc = "Create cells for each region in MSER output"
         End Sub

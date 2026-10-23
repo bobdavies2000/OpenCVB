@@ -44,7 +44,7 @@ Namespace VBClasses
                 Dim r = ValidateRect(rects(i))
                 Dim mask = rcMap(r)
                 Dim rc = New rcData(mask, r, index) With {.index = rcList.Count}
-                rc.ID = delaunay.indexMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = delaunay.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcList.Add(rc)
                 If standaloneTest() Then dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
 

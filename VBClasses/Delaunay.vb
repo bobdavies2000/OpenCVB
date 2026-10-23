@@ -6,7 +6,6 @@ Namespace VBClasses
         Public ptList As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Public useFeatures As Boolean
-        Public indexMap As cv.Mat
         Dim subdiv As New Subdiv2D
         Public Sub New()
             If standalone Then useFeatures = True
@@ -77,7 +76,7 @@ Namespace VBClasses
             Next
 
             For Each pt In random.PointList
-                Circle(dst2, pt, task.DotSize + 1, Scalar.red, -1, task.lineType)
+                Circle(dst2, pt, task.DotSize + 1, Scalar.Red, -1, task.lineType)
             Next
 
             Dim facets = New Point2f()() {Nothing}
@@ -120,7 +119,7 @@ Namespace VBClasses
                 End Function).ToArray()
 
             For Each p In points
-                Circle(dst2, p, task.DotSize + 1, Scalar.red, -1, task.lineType)
+                Circle(dst2, p, task.DotSize + 1, Scalar.Red, -1, task.lineType)
             Next
             dst3 = dst2.Clone()
 
@@ -635,39 +634,38 @@ Namespace VBClasses
 
 
     Public Class Delaunay_FeatureLess : Inherits TaskParent
-        Public indexMap As cv.Mat
+        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public ptList As New List(Of cv.Point)
+        Public delaunay As New Delaunay_Basics
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
-            If task.delaunay Is Nothing Then task.delaunay = New Delaunay_Basics
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Or task.delaunay.ptList.Count = 0 Then
-                task.delaunay.ptList.Clear()
+            If heartbeatLTX() Or delaunay.ptList.Count = 0 Then
+                delaunay.ptList.Clear()
                 ptList.Clear()
                 For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    task.delaunay.ptList.Add(rc.maxDist)
+                    delaunay.ptList.Add(rc.maxDist)
                     ptList.Add(New cv.Point(CInt(rc.maxDist.X), CInt(rc.maxDist.Y)))
                 Next
 
-                task.delaunay.Run(emptyMat)
-                indexMap = task.delaunay.dst3
+                delaunay.Run(emptyMat)
+                idMap = delaunay.dst3.Clone
 
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
+                    rc.ID = delaunay.dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
-                dst2 = Palettize(indexMap, 0)
+                dst2 = Palettize(idMap, 0)
 
                 ' run after palettize
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
                     DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                 Next
-                labels(2) = CStr(task.fless.rcList.Count) + " cells in the indexMap"
+                labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
             End If
         End Sub
     End Class

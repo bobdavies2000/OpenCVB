@@ -36,24 +36,19 @@ Namespace VBClasses
             Dim rc As rcData
             For Each r In fLessBrick
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
-                    Dim index = sortList.Count + 1
-                    Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    rc = New rcData(rcMap(rect), rect, index) With {.pixels = count, .ID = sortList.Count + 1}
+                    Dim id = task.delaunay.delaunay.dst3.Get(Of Byte)(r.Y, r.X)
+                    If id = 0 Then id = sortList.Count
+                    Dim count = FloodFill(rcMap, mask, r.TopLeft, id, rect, 0, 0, flags)
+                    rc = New rcData(rcMap(rect), rect, id) With {.pixels = count, .ID = id}
                     If rc.motionPixels = 0 Then
                         Dim idLast = rcFinder(rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X))
-                        If idLast > 0 Then
-                            rc = rcListLast(idLast)
-                            ' rc.ID = index
-                        End If
+                        If idLast > 0 Then rc = rcListLast(idLast)
                     End If
                     sortList.Add(rc.pixels, rc)
                 End If
             Next
 
-            cv.Cv2.ImShow("rcMap", Palettize(rcMap, 0))
-
             rcList.Clear()
-            Threshold(rcMap, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
             rcList.Add(New rcData) ' placeholder for zero...
             dst1.SetTo(0)
             Dim motionInput = task.motion.dst3.Clone
@@ -61,22 +56,20 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
-                ' SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
                 SetTrueText(CStr(rc.ID), rc.maxDist)
                 rcList.Add(rc)
             Next
-
-            Dim val = dst1.Get(Of Byte)(70, 300)
-            If val = 0 Then Dim k = 0
 
             dst2 = Palettize(dst1, 0)
 
             If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
 
             Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            rc = rcList(clickIndex)
-            Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-            SetTrueText(rc.displayCell, 3)
+            If clickIndex < rcList.Count Then
+                rc = rcList(clickIndex)
+                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+                SetTrueText(rc.displayCell, 3)
+            End If
 
             labels(2) = CStr(rcList.Count - 1) + " featureless regions found"
         End Sub
@@ -92,7 +85,6 @@ Namespace VBClasses
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Find the featureless regions but if no motion, don't change the shape - only location."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -478,7 +470,6 @@ Namespace VBClasses
         Public fLessNot As New List(Of cv.Rect)
         Public ptList As New HashSet(Of cv.Point)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "A features grid rect cannot change if there has been no motion in that grid rect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -842,7 +833,6 @@ Namespace VBClasses
     Public Class XR_FeatureLess_Stabilized : Inherits TaskParent
         Dim diff As New Diff_Simple
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             labels(2) = "CV_8U version of the featureless cells."
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
         End Sub
@@ -1624,7 +1614,6 @@ Namespace VBClasses
         Dim knn As New KNN_Minimal
         Dim dimension As Integer = 5
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Try to keep the featureless region index consistent from frame to frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1669,7 +1658,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Dim tracked As New List(Of rcData)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Keep the rc.ID assigned the first time each FeatureLess_Basics cell appears."
         End Sub
@@ -1731,7 +1719,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Create a map for the featureless cells with Delaunay triangulation"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1808,7 +1795,6 @@ Namespace VBClasses
         Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public verticalizeAngle As Double
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             verticalizeAngle = task.verticalizeAngle
             task.fOptions.MatchCorrSlider.Value = 85
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -1899,7 +1885,6 @@ Namespace VBClasses
         ' Each cell adds the horizontal line depths, then the vertical line depths.
         Public depthList As New List(Of List(Of Single))
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1948,7 +1933,6 @@ Namespace VBClasses
         Public ptList As New List(Of List(Of cv.Point))
         Public indexList As New List(Of Integer)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Cursor.ai: Disect featureless cells with a horizontal and vertical line through maxDist."
         End Sub
         Private Shared Sub depthAlongLine(rc As rcData, p1 As cv.Point, p2 As cv.Point,
@@ -2342,7 +2326,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm - visual solution.
             desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells." +
@@ -2425,7 +2408,6 @@ Namespace VBClasses
         Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

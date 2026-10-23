@@ -181,7 +181,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
             desc = "Use the FeatureLess regions to improve the RedColor output."

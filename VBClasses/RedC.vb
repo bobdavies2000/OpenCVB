@@ -4,7 +4,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
             desc = "Use the FeatureLess regions to improve the RedColor output."
         End Sub
@@ -89,10 +88,7 @@ Namespace VBClasses
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim delaunay As New Delaunay_FeatureLess
         Public Sub New()
-            If task.delaunay Is Nothing Then task.delaunay = New Delaunay_Basics
-            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -119,10 +115,7 @@ Namespace VBClasses
             Return ""
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Or delaunay.ptList.Count = 0 Then
-                delaunay.Run(emptyMat)
-                dst1 = delaunay.dst2
-            End If
+            If heartbeatLTX() Then dst1 = task.delaunay.dst2
 
             rcMap.SetTo(0)
             dst3.SetTo(0)
@@ -131,7 +124,7 @@ Namespace VBClasses
             For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
-                rc.ID = delaunay.indexMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.ID = task.delaunay.idMap.Get(Of Byte)(ptx.Y, ptx.X)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
                 ' SetTrueText(CStr(rc.ID), rc.maxDist, 3)
                 SetTrueText(CStr(rc.ID), ptx, 1)
@@ -141,7 +134,7 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(rcMap, 0)
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunay.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
 
             strOut = showCell(rcList, rcMap, dst2) + vbCrLf

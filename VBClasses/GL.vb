@@ -818,7 +818,6 @@ Namespace VBClasses
     Public Class GL_Planes : Inherits TaskParent
         Dim planeAlg As New FeatureLess_DisectionPlane
         Public Sub New()
-            If task.fless Is Nothing Then task.fless = New FeatureLess_Basics
             desc = "Cursor.ai: Display the FeatureLess_Basics cell planes in SharpGL."
         End Sub
         Private Function depthBand(rc As rcData, slot As Integer) As (z0 As Single, lo As Single, hi As Single)
@@ -863,7 +862,7 @@ Namespace VBClasses
             Dim pad = Math.Max(0.25F, hi - lo)
             Return (z0, Math.Max(0.001F, lo - pad), hi + pad)
         End Function
-        Private Function planeCorner(u As Integer, v As Integer, plane As Vec4f, z0 As Single, lo As Single, hi As Single) As Point3f
+        Private Shared Function planeCorner(u As Integer, v As Integer, plane As Vec4f, z0 As Single, lo As Single, hi As Single) As Point3f
             Dim z = z0
             Dim denom = plane(0) * (u - task.calibData.leftIntrinsics.ppx) / task.calibData.leftIntrinsics.fx +
                         plane(1) * (v - task.calibData.leftIntrinsics.ppy) / task.calibData.leftIntrinsics.fy + plane(2)
@@ -873,7 +872,7 @@ Namespace VBClasses
             End If
             Return Cloud_Basics.worldCoordinates(u, v, z)
         End Function
-        Private Function maskRuns(mask As cv.Mat, row As Integer, bytes As Byte()) As List(Of cv.Rect)
+        Private Shared Function maskRuns(mask As cv.Mat, row As Integer, bytes As Byte()) As List(Of cv.Rect)
             Dim runs As New List(Of cv.Rect)
             Dim cols = mask.Cols
             Dim x = 0
@@ -890,7 +889,7 @@ Namespace VBClasses
             End While
             Return runs
         End Function
-        Private Sub addPlaneRect(buf As List(Of Vec3f), color As Vec3f, plane As Vec4f,
+        Private Shared Sub addPlaneRect(buf As List(Of Vec3f), color As Vec3f, plane As Vec4f,
                                  x0 As Integer, y0 As Integer, x1 As Integer, y1 As Integer,
                                  z0 As Single, lo As Single, hi As Single)
             buf.Add(color)
@@ -900,7 +899,7 @@ Namespace VBClasses
                 buf.Add(New Vec3f(corner.X, corner.Y, corner.Z))
             Next
         End Sub
-        Private Sub addCellMask(buf As List(Of Vec3f), rc As rcData, plane As Vec4f, color As Vec3f,
+        Private Shared Sub addCellMask(buf As List(Of Vec3f), rc As rcData, plane As Vec4f, color As Vec3f,
                                 z0 As Single, lo As Single, hi As Single)
             Dim mask = rc.mask
             If mask Is Nothing OrElse mask.Rows < 1 OrElse mask.Cols < 1 Then Exit Sub
