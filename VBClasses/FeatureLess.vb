@@ -2,58 +2,78 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst1.Size, MatType.CV_8U, 0)
+        Dim rcListLast As New List(Of rcData)
+        Dim rcMapLast As cv.Mat
         Public fLessBrick As New List(Of cv.Rect)
         Public Sub New()
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless gridrects."
         End Sub
+        Private Function rcFinder(id As Byte) As Integer
+            For Each rc In rcListLast
+                If rc.ID = id Then Return rc.index
+            Next
+            Return 0
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcListLast As New List(Of rcData)(rcList)
+            rcListLast = New List(Of rcData)(rcList)
+            rcMapLast = rcMap.Clone
 
-            dst1.SetTo(0)
+            rcMap.SetTo(0)
             fLessBrick.Clear()
             For Each r In task.gridRects
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
                 If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
-                dst1(r).SetTo(255)
+                rcMap(r).SetTo(255)
                 fLessBrick.Add(r)
             Next
 
             Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst1.Width + 2, dst1.Height + 2), MatType.CV_8U, 0)
+            Dim mask = New Mat(New Size(rcMap.Width + 2, rcMap.Height + 2), MatType.CV_8U, 0)
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
             For Each r In fLessBrick
-                If dst1.Get(Of Byte)(r.Y, r.X) = 255 Then
+                If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim index = sortList.Count + 1
-                    Dim count = FloodFill(dst1, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If rect.Width > task.gridWH And rect.Height > task.gridWH Then
-                        If count = 0 Then Continue For
-                        rc = New rcData(dst1(rect), rect, index) With {.pixels = count}
-                        sortList.Add(rc.pixels, rc)
+                    Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rc = New rcData(rcMap(rect), rect, index) With {.pixels = count, .ID = sortList.Count + 1}
+                    If rc.motionPixels = 0 Then
+                        Dim idLast = rcFinder(rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X))
+                        If idLast > 0 Then
+                            rc = rcListLast(idLast)
+                            ' rc.ID = index
+                        End If
                     End If
+                    sortList.Add(rc.pixels, rc)
                 End If
             Next
 
+            cv.Cv2.ImShow("rcMap", Palettize(rcMap, 0))
+
             rcList.Clear()
-            Threshold(dst1, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
+            Threshold(rcMap, dst0, 0, 255, cv.ThresholdTypes.BinaryInv)
             rcList.Add(New rcData) ' placeholder for zero...
             dst1.SetTo(0)
             Dim motionInput = task.motion.dst3.Clone
             For Each rc In sortList.Values
-                rc.ID = rcList.Count
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
-                SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
+                ' SetTrueText(rc.depth.ToString("F1"), rc.maxDist)
+                SetTrueText(CStr(rc.ID), rc.maxDist)
                 rcList.Add(rc)
             Next
+
+            Dim val = dst1.Get(Of Byte)(70, 300)
+            If val = 0 Then Dim k = 0
+
             dst2 = Palettize(dst1, 0)
 
             If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
 
-            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             rc = rcList(clickIndex)
             Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
             SetTrueText(rc.displayCell, 3)

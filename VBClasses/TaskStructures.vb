@@ -312,7 +312,6 @@ Namespace VBClasses
             Public maxDStable As New cv.Point
             Public motionPixels As Single
             Public pixels As Integer
-            Public pt As cv.Point ' used with feature points.
             Public rect As New cv.Rect(0, 0, 1, 1)
             Public Sub New()
             End Sub
