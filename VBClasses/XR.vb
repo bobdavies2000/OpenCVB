@@ -1698,8 +1698,8 @@ Namespace VBClasses
             ptList.Clear()
             Dim generations As New List(Of Integer)
             For Each pt In facetGen.ptList
-                Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-                If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
+                Dim fIndex = facetGen.delaunay.dst3.Get(Of Byte)(pt.Y, pt.X)
+                If fIndex >= facetGen.delaunay.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 generations.Add(g)
                 ptList.Add(pt)
@@ -1711,8 +1711,8 @@ Namespace VBClasses
             Dim maxGens = generations.Max()
             Dim index = generations.IndexOf(maxGens)
             anchorPoint = ptList(index)
-            If index < facetGen.facet.facetList.Count Then
-                Dim bestFacet = facetGen.facet.facetList(index)
+            If index < facetGen.delaunay.facetList.Count Then
+                Dim bestFacet = facetGen.delaunay.facetList(index)
                 FillConvexPoly(dst2, bestFacet, Scalar.Black, task.lineType)
                 DrawTour(dst2, bestFacet, task.highlight)
             End If
@@ -1797,8 +1797,8 @@ Namespace VBClasses
             ptList.Clear()
             Dim generations As New List(Of Integer)
             For Each pt In facetGen.ptList
-                Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-                If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new cv.Point
+                Dim fIndex = facetGen.delaunay.dst3.Get(Of Integer)(pt.Y, pt.X)
+                If fIndex >= facetGen.delaunay.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 generations.Add(g)
                 ptList.Add(pt)
@@ -1810,8 +1810,8 @@ Namespace VBClasses
             Dim maxGens = generations.Max()
             Dim index = generations.IndexOf(maxGens)
             anchorPoint = ptList(index)
-            If index < facetGen.facet.facetList.Count Then
-                Dim bestFacet = facetGen.facet.facetList(index)
+            If index < facetGen.delaunay.facetList.Count Then
+                Dim bestFacet = facetGen.delaunay.facetList(index)
                 FillConvexPoly(dst2, bestFacet, Scalar.Black, task.lineType)
                 DrawTour(dst2, bestFacet, task.highlight)
             End If

@@ -8,7 +8,7 @@ Namespace VBClasses
         Public fLessBrick As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless gridrects."
+            desc = "Identify featureless regions."
         End Sub
         Private Function rcFinder(id As Byte) As Integer
             For Each rc In rcListLast
@@ -36,7 +36,7 @@ Namespace VBClasses
             Dim rc As rcData
             For Each r In fLessBrick
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
-                    Dim id = task.delaunay.delaunay.dst3.Get(Of Byte)(r.Y, r.X)
+                    Dim id = task.delaunay.dst3.Get(Of Byte)(r.Y, r.X)
                     If id = 0 Then id = sortList.Count
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, id, rect, 0, 0, flags)
                     rc = New rcData(rcMap(rect), rect, id) With {.pixels = count, .ID = id}
@@ -75,72 +75,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class FeatureLess_BasicsNew : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim delaunay As New Delaunay_Basics
-        Public Sub New()
-            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            desc = "Find the featureless regions but if no motion, don't change the shape - only location."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
-                Dim nextList As New List(Of cv.Point2f)
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    nextList.Add(rc.maxDist)
-                Next
-
-                delaunay.ptList = New List(Of cv.Point2f)(nextList)
-
-                delaunay.Run(emptyMat)
-                indexMap.SetTo(0)
-                For i = 0 To delaunay.facetList.Count - 1
-                    If task.fless.rcList(i).index = 0 Then Continue For
-                    FillConvexPoly(indexMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
-                Next
-
-                ' run before palettize
-                For Each rc In task.fless.rcList
-                    If rc.contour.Count = 0 Then Continue For
-                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
-                Next
-
-                dst2 = Palettize(indexMap)
-
-                ' run after palettize
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
-                    Circle(dst2, rc.maxDStable, task.DotSize, task.highlight, -1)
-                Next
-            End If
-
-            dst0.SetTo(0)
-            dst3.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In task.redColor.rcList
-                Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
-                ptx = validatePoint(ptx)
-                Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.ID = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
-                rc.index = rcList.Count
-                SetTrueText(CStr(rc.ID), rc.maxDist, 3)
-                rcList.Add(rc)
-
-                dst0(rc.rect).SetTo(rc.ID, rc.mask)
-            Next
-
-            dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
-            labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
-        End Sub
-    End Class
 
 
 
@@ -1645,7 +1579,7 @@ Namespace VBClasses
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
-                rc.ID = knn.result(rc.ID, 0)
+                rc.ID = knn.result(rc.index, 0)
                 SetTrueText(CStr(rc.ID), rc.maxDist)
             Next
         End Sub
@@ -2405,8 +2339,7 @@ Namespace VBClasses
 
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public indexMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim delaunay As New Delaunay_Basics
+        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -2415,40 +2348,7 @@ Namespace VBClasses
             desc = "Track the FeatureLess cells points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
-                Dim nextList As New List(Of cv.Point2f)
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    nextList.Add(rc.maxDist)
-                Next
-
-                delaunay.ptList = New List(Of cv.Point2f)(nextList)
-
-                delaunay.Run(emptyMat)
-                indexMap.SetTo(0)
-                For i = 0 To delaunay.facetList.Count - 1
-                    If task.fless.rcList(i).index = 0 Then Continue For
-                    FillConvexPoly(indexMap, delaunay.facetList(i), task.fless.rcList(i).index + 1, LineTypes.Link4)
-                Next
-
-                ' run before palettize
-                For Each rc In task.fless.rcList
-                    If rc.contour.Count = 0 Then Continue For
-                    DrawContours(indexMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
-                Next
-
-                dst1 = Palettize(indexMap)
-
-                ' run after palettize
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    DrawContours(dst1(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
-                    Circle(dst1, rc.maxDStable, task.DotSize, task.highlight, -1)
-                Next
-            End If
-
-            task.redColor.Run(task.gray)
-
+            idMap = task.delaunay.idMap
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
@@ -2457,8 +2357,8 @@ Namespace VBClasses
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.ID = indexMap.Get(Of Byte)(ptx.Y, ptx.X)
-                SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                rc.ID = idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                SetTrueText(CStr(rc.index), rc.maxDist, 3)
                 SetTrueText(CStr(rc.ID), ptx, 1)
                 rcList.Add(rc)
 
@@ -2466,7 +2366,7 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(delaunay.ptList.Count) + " cells"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunay.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
         End Sub
     End Class

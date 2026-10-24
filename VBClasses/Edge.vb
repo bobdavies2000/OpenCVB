@@ -36,8 +36,6 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.gray
 
             edges.run(src)
-            If edges.dst2.Channels <> 1 Then CvtColor(edges.dst2, edges.dst2, ColorConversionCodes.BGR2GRAY)
-            If edges.dst2.Type <> MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, MatType.CV_8U)
             dst2 = edges.dst2
             labels(2) = traceName + " - selection = " + task.fOptions.EdgeMethods.Text
         End Sub

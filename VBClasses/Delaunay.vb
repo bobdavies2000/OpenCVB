@@ -4,40 +4,43 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Delaunay_Basics : Inherits TaskParent
         Public ptList As New List(Of Point2f)
-        Public facetList As New List(Of List(Of cv.Point))
         Public useFeatures As Boolean
-        Dim subdiv As New Subdiv2D
+        Public facetList As New List(Of List(Of cv.Point))
         Public Sub New()
             If standalone Then useFeatures = True
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, 0)
             desc = "Subdivide an image based on ptList."
         End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If useFeatures Then
-                Static feat As New Feature_Basics
-                feat.Run(src)
-                ptList.Clear()
-                For Each pt In feat.ptlist
-                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
-                    If ptList.Count >= 255 Then Exit For ' CV_8U limit...
-                Next
-            End If
-
-            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        Public Shared Function buildFacets(ptList As List(Of cv.Point2f)) As List(Of List(Of cv.Point))
+            Static subdiv As New Subdiv2D
+            subdiv.InitDelaunay(New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height))
             subdiv.Insert(ptList)
 
             Dim facets = New Point2f()() {Nothing}
             subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-            facetList.Clear()
+            Dim facetList As New List(Of List(Of cv.Point))
             For i = 0 To facets.Length - 1
                 Dim nextFacet As New List(Of cv.Point)
                 For j = 0 To facets(i).Length - 1
                     nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
                 Next
 
-                FillConvexPoly(dst3, nextFacet, i + 1, LineTypes.Link4)
                 facetList.Add(nextFacet)
+            Next
+
+            Return facetList
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If useFeatures Then
+                Static feat As New Feature_Basics
+                feat.Run(src)
+                ptList = New List(Of cv.Point2f)(feat.ptlist)
+            End If
+
+            facetList = buildFacets(ptList)
+            For i = 0 To facetList.Count - 1
+                FillConvexPoly(dst3, facetList(i), i + 1, LineTypes.Link4)
             Next
 
             dst2 = Palettize(dst3)
@@ -159,7 +162,7 @@ Namespace VBClasses
 
     Public Class XR_Delaunay_GenerationsNoKNN : Inherits TaskParent
         Public inputPoints As New List(Of Point2f)
-        Public facet As New Delaunay_Basics
+        Public delaunay As New Delaunay_Basics
         Dim random As New Random_Basics
         Public Sub New()
             OptionParent.FindSlider("Random Pixel Count").Value = 10
@@ -174,17 +177,21 @@ Namespace VBClasses
                 inputPoints = New List(Of Point2f)(random.PointList)
             End If
 
-            facet.ptList = New List(Of Point2f)(inputPoints)
-            facet.Run(src)
-            dst2 = facet.dst2
+            delaunay.ptList.Clear()
+            For Each pt In inputPoints
+                delaunay.ptList.Add(New cv.Point(pt.X, pt.Y))
+            Next
+
+            delaunay.Run(src)
+            dst2 = delaunay.dst2
 
             Dim generationMap = dst3.Clone
             dst3.SetTo(0)
             Dim usedG As New HashSet(Of Integer), g As Integer
             For Each pt In inputPoints
-                Dim index = facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-                If index >= facet.facetList.Count Then Continue For
-                Dim nextFacet = facet.facetList(index)
+                Dim index = delaunay.dst3.Get(Of Integer)(pt.Y, pt.X)
+                If index >= delaunay.facetList.Count Then Continue For
+                Dim nextFacet = delaunay.facetList(index)
                 ' insure that each facet has a unique generation number
                 If task.firstPass Then
                     g = usedG.Count
@@ -211,7 +218,7 @@ Namespace VBClasses
 
     Public Class Delaunay_Generations : Inherits TaskParent
         Public ptList As New List(Of Point2f)
-        Public facet As New Delaunay_Basics
+        Public delaunay As New Delaunay_Basics
         Dim knn As New KNN_OneToOne
         Dim random As New Random_Basics
         Public Sub New()
@@ -230,17 +237,19 @@ Namespace VBClasses
             knn.queries = New List(Of Point2f)(ptList)
             knn.Run(src)
 
-            facet.ptList = New List(Of Point2f)(ptList)
-            facet.Run(src)
-            dst2 = facet.dst2
+            For Each pt In ptList
+                delaunay.ptList.Add(New cv.Point(pt.X, pt.Y))
+            Next
+            delaunay.Run(src)
+            dst2 = delaunay.dst2
 
             Dim generationMap = dst0.Clone
             dst0.SetTo(0)
             Dim usedG As New List(Of Integer), g As Integer
             For Each lp In knn.matches
-                Dim index = facet.dst3.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If index >= facet.facetList.Count Then Continue For
-                Dim nextFacet = facet.facetList(index)
+                Dim index = delaunay.dst3.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                If index >= delaunay.facetList.Count Then Continue For
+                Dim nextFacet = delaunay.facetList(index)
                 ' insure that each facet has a unique generation number
                 If task.firstPass Then
                     g = usedG.Count
@@ -635,26 +644,27 @@ Namespace VBClasses
 
     Public Class Delaunay_FeatureLess : Inherits TaskParent
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public ptList As New List(Of cv.Point)
-        Public delaunay As New Delaunay_Basics
+        Public ptList As New List(Of cv.Point2f)
+        Public facetList As New List(Of List(Of cv.Point))
         Public Sub New()
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Or delaunay.ptList.Count = 0 Then
-                delaunay.ptList.Clear()
+            If heartbeatLTX() Or ptList.Count <= 2 Then
                 ptList.Clear()
                 For Each rc In task.fless.rcList
-                    delaunay.ptList.Add(rc.maxDist)
-                    ptList.Add(New cv.Point(CInt(rc.maxDist.X), CInt(rc.maxDist.Y)))
+                    ptList.Add(rc.maxDist)
                 Next
 
-                delaunay.Run(emptyMat)
-                idMap = delaunay.dst3.Clone
+
+                facetList = Delaunay_Basics.buildFacets(ptList)
+                For i = 0 To facetList.Count - 1
+                    FillConvexPoly(idMap, facetList(i), i + 1, LineTypes.Link4)
+                Next
 
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    rc.ID = delaunay.dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    rc.ID = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
@@ -669,5 +679,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
 End Namespace
