@@ -26,7 +26,7 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In task.fless.fLessBrick
+            For Each r In task.fless.fLessBricks
                 Dim val = mask(r).Get(Of Byte)(0, 0)
                 If val = 0 Then
                     Dim index As Integer = task.fless.dst1(r).Get(Of Byte)(0, 0)

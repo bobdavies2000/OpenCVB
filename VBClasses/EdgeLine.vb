@@ -43,7 +43,7 @@ Namespace VBClasses
                 Dim rc = New rcData(mask, r, index) With {.index = rcList.Count}
                 rc.ID = task.delaunay.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcList.Add(rc)
-                If standaloneTest() Then dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +

@@ -32,6 +32,7 @@ Namespace VBClasses
         Public fLessMask As Mat
 
         Public firstPass As Boolean = True
+        Public algorithmActive As Boolean
 
         ' treeview data
         Public cpu As New CPUTime

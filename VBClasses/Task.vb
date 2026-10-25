@@ -208,9 +208,9 @@ Namespace VBClasses
 
 
 
-
+            task.algorithmActive = True
             task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-
+            task.algorithmActive = False
 
 
 

@@ -5,28 +5,35 @@ Namespace VBClasses
         Public rcMap As New cv.Mat(dst1.Size, MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
         Dim rcMapLast As cv.Mat
-        Public fLessBrick As New List(Of cv.Rect)
+        Public fLessBricks As New List(Of cv.Rect)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless regions."
         End Sub
-        Private Function rcFinder(id As Byte) As Integer
-            For Each rc In rcListLast
+        Public Shared Function rcFinder(myList As List(Of rcData), id As Byte) As Integer
+            For Each rc In myList
                 If rc.ID = id Then Return rc.index
             Next
             Return 0
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.algorithmActive Then
+                SetTrueText(traceName + " is a task algorithm that is already run", 3)
+                dst2 = task.fless.dst2
+                labels(2) = task.fless.labels(2)
+                Exit Sub ' this is a task.algorithm that has already run...
+            End If
+
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
 
             rcMap.SetTo(0)
-            fLessBrick.Clear()
+            fLessBricks.Clear()
             For Each r In task.gridRects
                 If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
                 If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
                 rcMap(r).SetTo(255)
-                fLessBrick.Add(r)
+                fLessBricks.Add(r)
             Next
 
             Dim rect As cv.Rect
@@ -34,14 +41,14 @@ Namespace VBClasses
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
-            For Each r In fLessBrick
+            For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
-                    Dim id = task.delaunay.dst3.Get(Of Byte)(r.Y, r.X)
+                    Dim id = task.delaunay.idMap.Get(Of Byte)(r.Y, r.X)
                     If id = 0 Then id = sortList.Count
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, id, rect, 0, 0, flags)
                     rc = New rcData(rcMap(rect), rect, id) With {.pixels = count, .ID = id}
                     If rc.motionPixels = 0 Then
-                        Dim idLast = rcFinder(rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X))
+                        Dim idLast = rcFinder(rcListLast, rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X))
                         If idLast > 0 Then rc = rcListLast(idLast)
                     End If
                     sortList.Add(rc.pixels, rc)
@@ -66,10 +73,16 @@ Namespace VBClasses
 
             Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex < rcList.Count Then
-                rc = rcList(clickIndex)
-                Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                SetTrueText(rc.displayCell, 3)
+                Dim index = rcFinder(rcList, clickIndex)
+                If index > 0 Then
+                    rc = rcList(index)
+                    Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
+                    strOut = rc.displayCell
+                End If
             End If
+            SetTrueText(strOut, 3)
+
+            If standaloneTest() Then dst3 = task.motion.motionMask
 
             labels(2) = CStr(rcList.Count - 1) + " featureless regions found"
         End Sub

@@ -35,7 +35,10 @@ Namespace VBClasses
             If useFeatures Then
                 Static feat As New Feature_Basics
                 feat.Run(src)
-                ptList = New List(Of cv.Point2f)(feat.ptlist)
+                ptList.Clear()
+                For Each pt In feat.ptlist
+                    ptList.Add(New cv.Point2f(pt.X, pt.Y))
+                Next
             End If
 
             facetList = buildFacets(ptList)
@@ -650,6 +653,12 @@ Namespace VBClasses
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.algorithmActive Then
+                SetTrueText(traceName + " is a task algorithm that is already run", 3)
+                dst2 = task.delaunay.dst2
+                labels(2) = task.delaunay.labels(2)
+                Exit Sub ' this is a task.algorithm that has already run...
+            End If
             If heartbeatLTX() Or ptList.Count <= 2 Then
                 ptList.Clear()
                 For Each rc In task.fless.rcList

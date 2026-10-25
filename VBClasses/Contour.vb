@@ -775,6 +775,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
+            If contours.rcList.Count = 0 Then Exit Sub
             If standalone Then
                 dst2 = contours.dst2
                 labels(2) = contours.labels(2)
