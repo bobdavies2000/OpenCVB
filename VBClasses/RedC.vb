@@ -95,26 +95,6 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the FeatureLess cells points."
         End Sub
-        Public Shared Function showCell(rcList As List(Of rcData), rcMap As cv.Mat, dst As cv.Mat) As String
-            Dim clickindex As Integer
-            clickindex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickindex > 0 And clickindex < rcList.Count Then
-                Dim rect As cv.Rect
-                Dim m As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-                For Each rc In rcList
-                    If rc.ID = clickindex Then
-                        If rect.Width = 0 Then rect = rc.rect Else rect = rect.Union(rc.rect)
-                        m(rc.rect).SetTo(255, rc.mask)
-                    End If
-                Next
-                Rectangle(dst, rect, task.highlight, task.lineWidth)
-                task.color.SetTo(white, m)
-
-                Dim rc1 = New rcData(m(rect), rect, clickindex)
-                Return rc1.displayCell
-            End If
-            Return ""
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If heartbeatLTX() Then dst1 = task.delaunay.dst2
 
@@ -127,8 +107,7 @@ Namespace VBClasses
                 ptx = validatePoint(ptx)
                 rc.ID = task.delaunay.idMap.Get(Of Byte)(ptx.Y, ptx.X)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                ' SetTrueText(CStr(rc.ID), rc.maxDist, 3)
-                SetTrueText(CStr(rc.ID), ptx, 1)
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
                 rcList.Add(rc)
 
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
@@ -138,8 +117,11 @@ Namespace VBClasses
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunay.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
 
-            strOut = showCell(rcList, rcMap, dst2) + vbCrLf
-            SetTrueText(strOut, 3)
+            If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
+            Dim rcNext = FeatureLess_Basics.rcFinder(rcMap, rcList)
+            If rcNext IsNot Nothing Then task.rcD = rcNext
+            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            SetTrueText(task.rcD.displayCell, 3)
         End Sub
     End Class
 

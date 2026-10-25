@@ -659,12 +659,12 @@ Namespace VBClasses
                 labels(2) = task.delaunay.labels(2)
                 Exit Sub ' this is a task.algorithm that has already run...
             End If
+
             If heartbeatLTX() Or ptList.Count <= 2 Then
                 ptList.Clear()
                 For Each rc In task.fless.rcList
                     ptList.Add(rc.maxDist)
                 Next
-
 
                 facetList = Delaunay_Basics.buildFacets(ptList)
                 For i = 0 To facetList.Count - 1

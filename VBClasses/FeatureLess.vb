@@ -10,11 +10,13 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless regions."
         End Sub
-        Public Shared Function rcFinder(myList As List(Of rcData), id As Byte) As Integer
+        Public Shared Function rcFinder(myMap As cv.Mat, myList As List(Of rcData)) As rcData
+            Dim clickID = myMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             For Each rc In myList
-                If rc.ID = id Then Return rc.index
+                If rc.ID = clickID Then Return myList(rc.index)
             Next
-            Return 0
+
+            Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.algorithmActive Then
@@ -48,8 +50,11 @@ Namespace VBClasses
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, id, rect, 0, 0, flags)
                     rc = New rcData(rcMap(rect), rect, id) With {.pixels = count, .ID = id}
                     If rc.motionPixels = 0 Then
-                        Dim idLast = rcFinder(rcListLast, rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X))
-                        If idLast > 0 Then rc = rcListLast(idLast)
+                        Dim rcLast = rcFinder(rcMapLast, rcListLast)
+                        If rcLast IsNot Nothing Then
+                            rc = rcLast
+                            rc.age += 1
+                        End If
                     End If
                     sortList.Add(rc.pixels, rc)
                 End If
@@ -63,24 +68,17 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
-                SetTrueText(CStr(rc.ID), rc.maxDist)
+                SetTrueText(CStr(rc.age), rc.maxDist)
                 rcList.Add(rc)
             Next
 
             dst2 = Palettize(dst1, 0)
 
             If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
-
-            Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If clickIndex < rcList.Count Then
-                Dim index = rcFinder(rcList, clickIndex)
-                If index > 0 Then
-                    rc = rcList(index)
-                    Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
-                    strOut = rc.displayCell
-                End If
-            End If
-            SetTrueText(strOut, 3)
+            Dim rcNext = rcFinder(rcMap, rcList)
+            If rcNext IsNot Nothing Then task.rcD = rcNext
+            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+            SetTrueText(task.rcD.displayCell, 3)
 
             If standaloneTest() Then dst3 = task.motion.motionMask
 

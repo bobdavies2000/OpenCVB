@@ -201,14 +201,14 @@ Namespace VBClasses
 
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
             task.foreground.Run(New cv.Mat)
+            task.edges.Run(gray)
             task.fless.Run(gray)
             task.delaunay.Run(gray)
-            task.edges.Run(gray)
             If task.redColor IsNot Nothing Then task.redColor.Run(gray)
 
 
 
-            task.algorithmActive = True
+            task.algorithmActive = True ' every task algorithm can use this to avoid rerunning...
             task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             task.algorithmActive = False
 
