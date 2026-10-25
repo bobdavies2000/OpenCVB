@@ -17,7 +17,7 @@ Namespace VBClasses
                         " to adjust accuracy of accumulated image.", 3)
 
             If src.Channels <> 1 Then src = task.gray.Clone
-            If task.optionsChanged Or task.heartBeatLT Then
+            If task.optionsChanged Or heartbeatLTX() Then
                 dst2 = src.Clone
                 motionSort.Clear()
                 motionMask.SetTo(255)

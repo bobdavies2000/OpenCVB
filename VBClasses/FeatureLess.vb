@@ -10,19 +10,19 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless regions."
         End Sub
-        Public Shared Function rcFinder(myMap As cv.Mat, myList As List(Of rcData)) As rcData
-            Dim clickID = myMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        Public Shared Function MyFinder(myList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
             For Each rc In myList
-                If rc.ID = clickID Then Return myList(rc.index)
+                If rc.ID = id Then Return myList(rc.index)
             Next
-
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.algorithmActive Then
-                SetTrueText(traceName + " is a task algorithm that is already run", 3)
+                SetTrueText(traceName + " is a task algorithm that has already run", 3)
                 dst2 = task.fless.dst2
                 labels(2) = task.fless.labels(2)
+                trueData = New List(Of TrueText)(task.fless.trueData)
                 Exit Sub ' this is a task.algorithm that has already run...
             End If
 
@@ -43,42 +43,49 @@ Namespace VBClasses
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
+            Dim index As Integer = 1
             For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
-                    Dim id = task.delaunay.idMap.Get(Of Byte)(r.Y, r.X)
-                    If id = 0 Then id = sortList.Count
-                    Dim count = FloodFill(rcMap, mask, r.TopLeft, id, rect, 0, 0, flags)
-                    rc = New rcData(rcMap(rect), rect, id) With {.pixels = count, .ID = id}
-                    If rc.motionPixels = 0 Then
-                        Dim rcLast = rcFinder(rcMapLast, rcListLast)
-                        If rcLast IsNot Nothing Then
-                            rc = rcLast
-                            rc.age += 1
-                        End If
-                    End If
+                    Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rc = New rcData(rcMap(rect), rect, index)
                     sortList.Add(rc.pixels, rc)
                 End If
             Next
 
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            dst1.SetTo(0)
+            rcMap.SetTo(0)
             Dim motionInput = task.motion.dst3.Clone
             For Each rc In sortList.Values
                 rc.index = rcList.Count
-                dst1(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
-                SetTrueText(CStr(rc.age), rc.maxDist)
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(dst1, 0)
+            For Each rc In rcList
+                If rc.motionPixels = 0 Then
+                    Dim rclast = MyFinder(rcListLast, rc.ID)
+                    If rclast IsNot Nothing Then
+                        rc.age = rclast.age + 1
+                        If rc.age >= 1000 Then rc.age = 10
+                        rc.maxDStable = rclast.maxDStable
+                    End If
+                End If
+                SetTrueText(CStr(rc.age), rc.maxDStable)
+            Next
+            dst2 = Palettize(rcMap, 0)
 
-            If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
-            Dim rcNext = rcFinder(rcMap, rcList)
-            If rcNext IsNot Nothing Then task.rcD = rcNext
-            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(task.rcD.displayCell, 3)
+            Dim rcNext = MyFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rcNext IsNot Nothing Then
+                task.rcD = rcNext
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                SetTrueText(task.rcD.displayCell, 3)
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
 
             If standaloneTest() Then dst3 = task.motion.motionMask
 
@@ -2359,7 +2366,7 @@ Namespace VBClasses
             desc = "Track the FeatureLess cells points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            idMap = task.delaunay.idMap
+            idMap = task.delaunayFLess.idMap
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
@@ -2377,7 +2384,7 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst0, 0)
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunay.ptList.Count) + " cells"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
         End Sub
     End Class

@@ -1,102 +1,28 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedC_BasicsNew : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public Sub New()
-            labels(3) = "The output of FeatureLess_Basics.  Note that cell colors match the RedColor output."
-            desc = "Use the FeatureLess regions to improve the RedColor output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rcLastList As New List(Of rcData)(rcList)
-            Dim rcIndexList As New List(Of Integer)
-            For Each rc In rcLastList
-                Dim tmp As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-                task.motion.motionMask(rc.rect).CopyTo(tmp, rc.mask)
-                rc.motionPixels = CountNonZero(tmp)
-                rcIndexList.Add(rc.ID)
-            Next
-
-            If src.Channels <> 1 Then
-                Static color8U As New Color8U_Basics
-                color8U.Run(task.gray)
-                src = color8U.dst2
-            End If
-
-            Dim rect As cv.Rect
-            Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            Dim rectSorted As New SortedList(Of Integer, (count As Integer, r As cv.Rect))(New compareAllowIdenticalInteger)
-            For Each r In task.fless.fLessBricks
-                Dim val = mask(r).Get(Of Byte)(0, 0)
-                If val = 0 Then
-                    Dim index As Integer = task.fless.dst1(r).Get(Of Byte)(0, 0)
-                    If index > 0 Then
-                        Dim flags = FloodFillFlags.FixedRange Or FloodFillFlags.Link4 Or (index << 8)
-                        Dim count = FloodFill(src, mask, r.TopLeft, index, rect, 0, 0, flags)
-                        rectSorted.Add(index, (count, ValidateRect(rect)))
-                    End If
-                End If
-            Next
-
-            Dim rcSizeSort As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To rectSorted.Count - 2
-                Dim r1 = rectSorted.ElementAt(i).Value.r
-                If rectSorted.ElementAt(i).Key = rectSorted.ElementAt(i + 1).Key Then
-                    For j = i To rectSorted.Count - 2
-                        Dim r2 = rectSorted.ElementAt(j + 1).Value.r
-                        If rectSorted.ElementAt(j).Key = rectSorted.ElementAt(j + 1).Key Then
-                            r1 = r1.Union(r2)
-                        Else
-                            Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(j).Key)
-                            rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-                            i = j
-                            Exit For
-                        End If
-                    Next
-                Else
-                    Dim rc As New rcData(src(r1), r1, rectSorted.ElementAt(i).Key)
-                    rcSizeSort.Add(rectSorted.ElementAt(i).Value.count, rc)
-                End If
-            Next
-
-            rcMap.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In rcSizeSort.Values
-                rc.ID = task.fless.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If rc.motionPixels = 0 Then
-                    Dim index = rcIndexList.IndexOf(rc.ID)
-                    If index >= 0 Then rc = rcLastList(index)
-                End If
-                rc.index = rcList.Count
-                rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-            Next
-
-            dst2 = Palettize(rcMap, 0)
-            dst3 = task.fless.dst2
-
-            labels(2) = CStr(rcList.Count) + " cells were identified."
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim rcListLast As New List(Of rcData)
+        Dim rcMapLast As cv.Mat
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Track the FeatureLess cells points."
+            desc = "Identify each cell using color"
         End Sub
+        Private Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
+            For Each rc In myList
+                If rc.ID = id Then Return myList(rc.index)
+            Next
+            Return Nothing
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then dst1 = task.delaunay.dst2
+            If heartbeatLTX() Then dst1 = task.delaunayFLess.dst2
+
+            rcListLast = New List(Of rcData)(rcList)
+            rcMapLast = rcMap.Clone
 
             rcMap.SetTo(0)
             dst3.SetTo(0)
@@ -105,23 +31,40 @@ Namespace VBClasses
             For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
-                rc.ID = task.delaunay.idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                SetTrueText(CStr(rc.age), rc.maxDist, 2)
                 rcList.Add(rc)
 
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
+            For Each rc In rcList
+                Dim rcLast = rcFinder(rcListLast, rc.ID)
+                rc.maxDStable = rc.maxDist
+                If rcLast IsNot Nothing Then
+                    If rcLast.motionPixels = 0 Then
+                        rc.age = rcLast.age + 1
+                        If rc.age >= 1000 Then rc.age = 10
+                        rc.maxDStable = rcLast.maxDStable
+                    End If
+                End If
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
+            Next
+
             dst2 = Palettize(rcMap, 0)
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunay.ptList.Count) + " cells"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
 
-            If task.firstPass And rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
-            Dim rcNext = FeatureLess_Basics.rcFinder(rcMap, rcList)
-            If rcNext IsNot Nothing Then task.rcD = rcNext
-            Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-            SetTrueText(task.rcD.displayCell, 3)
+            Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rctmp IsNot Nothing Then
+                task.rcD = rctmp
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                SetTrueText(task.rcD.displayCell, 3)
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
         End Sub
     End Class
 

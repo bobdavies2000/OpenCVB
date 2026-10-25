@@ -51,7 +51,7 @@ Namespace VBClasses
             task.motion = New Motion_Basics_TA With {.standalone = False}
             task.heartBeats = New HeartBeat_Basics_TA
             task.edges = New Edge_Basics_TA
-            task.delaunay = New Delaunay_FeatureLess
+            task.delaunayFLess = New Delaunay_FeatureLess
             task.fless = New FeatureLess_Basics
 
             task.stableDepth = New StableDepth_Basics_TA
@@ -201,9 +201,10 @@ Namespace VBClasses
 
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
             task.foreground.Run(New cv.Mat)
+            If task.firstPass Then task.delaunayFLess.Run(gray)
             task.edges.Run(gray)
             task.fless.Run(gray)
-            task.delaunay.Run(gray)
+            task.delaunayFLess.Run(gray)
             If task.redColor IsNot Nothing Then task.redColor.Run(gray)
 
 
