@@ -1,5 +1,105 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class RedC_BasicsNew : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim rcListLast As New List(Of rcData)
+        Dim rcMapLast As cv.Mat
+        Dim rcLists As New List(Of List(Of Integer))
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Identify each cell using color"
+        End Sub
+        Private Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
+            For Each rc In inputList
+                If rc.ID = id And rc.ID < inputList.Count Then Return inputList(rc.index)
+            Next
+            Return Nothing
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then dst1 = task.delaunayFLess.dst2
+
+            rcListLast = New List(Of rcData)(rcList)
+            rcMapLast = rcMap.Clone
+
+            rcLists.Clear()
+            For i = 0 To task.fless.rcList.Count - 1
+                rcLists.Add(New List(Of Integer))
+            Next
+
+            For Each rc In task.redColor.rcList
+                Dim id = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                if id < rcLists.Count Then rcLists(id).Add(rc.index)
+            Next
+
+            rcMap.SetTo(0)
+            dst3.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            For i = 1 To rcLists.Count - 1
+                Dim rect As New cv.Rect
+                mask.SetTo(0)
+                For Each index In rcLists(i)
+                    Dim rc = task.redColor.rcList(index)
+                    If rect.Width = 0 Then
+                        rect = rc.rect
+                        mask(rc.rect).SetTo(255, rc.mask)
+                    Else
+                        mask(rc.rect).SetTo(255, rc.mask)
+                        rect = rect.Union(rc.rect)
+                    End If
+                Next
+                If rect.Width > 0 Then
+                    Dim rcNew = New rcData(mask(rect), rect, 255) With {.ID = i, .index = i}
+                    rcList.Add(rcNew)
+
+                    rcMap(rcNew.rect).SetTo(rcNew.ID, rcNew.mask)
+                End If
+            Next
+
+            For Each rc In rcList
+                Dim rcLast = rcFinder(rcListLast, rc.ID)
+                rc.maxDStable = rc.maxDist
+                If rcLast IsNot Nothing Then
+                    Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDStable, task.steadyCam.M)
+                    ptx = validatePoint(ptx)
+                    Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                    If idLast = rc.ID Then
+                        Line(dst3, rc.maxDStable, ptx, white, task.lineWidth)
+                        rc.age = rcLast.age + 1
+                        If rc.age >= 1000 Then rc.age = 10
+                        rc.maxDStable = rcLast.maxDStable
+                    End If
+                End If
+                SetTrueText(CStr(rc.age), rc.maxDStable, 2)
+            Next
+
+            dst2 = Palettize(rcMap, 0)
+
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(rcList.Count) + " cells"
+
+            If task.firstPass Then If rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
+
+            Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rctmp IsNot Nothing Then
+                task.rcD = rctmp
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                SetTrueText(task.rcD.displayCell, 3)
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
     Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
