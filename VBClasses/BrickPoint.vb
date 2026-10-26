@@ -6,7 +6,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public Sub New()
             labels(3) = "Sobel input to BrickPoint_Basics"
-            desc = "Find the max Sobel cv.Point in each r"
+            desc = "Find the max Sobel cv.Point in each rect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src

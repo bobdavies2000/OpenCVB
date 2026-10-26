@@ -292,7 +292,7 @@ Namespace VBClasses
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "EdgeLine segments displayed one for each frame starting with the longest."
-            desc = "Find lines using the r points"
+            desc = "Find lines using the rect points"
         End Sub
         Public Sub showSegment(dst As Mat)
             If task.quarterBeat Then
@@ -324,7 +324,7 @@ Namespace VBClasses
             Dim brickCount As Integer, segmentCount As Integer
             For Each pt In bPoint.ptList
                 Dim val = edgeline.dst2.Get(Of Byte)(pt.Y, pt.X)
-                If val > 0 And val < 255 Then
+                If val > 0 And val < edgeline.classCount Then
                     If segments(val) Is Nothing Then
                         segments(val) = New List(Of Point2f)
                         segmentCount += 1

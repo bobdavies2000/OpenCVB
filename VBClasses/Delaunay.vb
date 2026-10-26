@@ -667,8 +667,8 @@ Namespace VBClasses
                 Next
 
                 facetList = Delaunay_Basics.buildFacets(ptList)
-                For i = 0 To facetList.Count - 1
-                    FillConvexPoly(idMap, facetList(i), i + 1, LineTypes.Link4)
+                For i = 1 To facetList.Count - 1
+                    FillConvexPoly(idMap, facetList(i), i, LineTypes.Link4)
                 Next
 
                 For Each rc In task.fless.rcList

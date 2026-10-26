@@ -66,6 +66,7 @@ Namespace VBClasses
             Next
 
             For Each rc In rcList
+                If rc.index = 0 Then Continue For
                 If rc.motionPixels = 0 Then
                     Dim rclast = MyFinder(rcListLast, rc.ID)
                     If rclast IsNot Nothing Then
