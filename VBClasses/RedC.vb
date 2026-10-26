@@ -11,6 +11,7 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "The circle shows the location of the current MaxDStable. The line is travel distance."
             desc = "Identify each cell using color"
         End Sub
         Private Shared Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
@@ -65,24 +66,23 @@ Namespace VBClasses
             For Each rc In sortList.Values
                 rc.index = rcList.Count
                 Dim rcLast = rcFinder(rcListLast, rc.ID)
-                rc.maxDStable = rc.maxDist
                 If rcLast IsNot Nothing Then
                     Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDStable, task.steadyCam.M)
                     ptx = validatePoint(ptx)
 
                     Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If idLast = rc.ID Then
+                        Dim val2 = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        If val2 <> idLast Then rc.maxDStable = rc.maxDist
+                        Circle(dst3, rc.maxDStable, task.DotSize + 1, white, -1)
                         Line(dst3, rc.maxDStable, ptx, white, task.lineWidth)
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         rc.maxDStable = rcLast.maxDStable
+                        Circle(dst1, rc.maxDStable, task.DotSize, black, -1)
                     End If
-
-                    ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
-                    ptx = validatePoint(ptx)
-                    Circle(dst1, ptx, task.DotSize, black, -1)
                 End If
-                SetTrueText(CStr(rc.age), rc.maxDist, 2)
+                SetTrueText(CStr(rc.age), rc.maxDStable, 2)
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
