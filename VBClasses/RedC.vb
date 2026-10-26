@@ -37,11 +37,9 @@ Namespace VBClasses
                 If id < rcLists.Count Then rcLists(id).Add(rc.index)
             Next
 
-            rcMap.SetTo(0)
             dst3.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
             Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
             For i = 1 To rcLists.Count - 1
                 Dim rect As New cv.Rect
                 mask.SetTo(0)
@@ -56,14 +54,16 @@ Namespace VBClasses
                     End If
                 Next
                 If rect.Width > 0 Then
-                    Dim rcNew = New rcData(mask(rect), rect, 255) With {.ID = i, .index = i}
-                    rcList.Add(rcNew)
-
-                    rcMap(rcNew.rect).SetTo(rcNew.ID, rcNew.mask)
+                    Dim rcNew = New rcData(mask(rect), rect, 255) With {.ID = i}
+                    sortList.Add(rcNew.pixels, rcNew)
                 End If
             Next
 
-            For Each rc In rcList
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            rcMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
                 Dim rcLast = rcFinder(rcListLast, rc.ID)
                 rc.maxDStable = rc.maxDist
                 If rcLast IsNot Nothing Then
@@ -83,6 +83,8 @@ Namespace VBClasses
                     Circle(dst1, ptx, task.DotSize, black, -1)
                 End If
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)
