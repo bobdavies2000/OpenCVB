@@ -245,7 +245,7 @@ Namespace VBClasses
 
             regions.Clear()
             indexList.Clear()
-            If task.heartBeatLT Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
+            If heartbeatLTX() Then dst3 = buildMapHeartBeat(dst1.Clone) Else dst3 = buildMap(dst1.Clone)
 
             index = regions.Count + 1
             For Each r In task.gridRects
@@ -1068,7 +1068,7 @@ Namespace VBClasses
             ranges = {New Rangef(mmX.minVal - 0.01, 255.01), New Rangef(0, task.MaxZmeters)}
 
             Dim trainLabels(rectCount - 1) As Single
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 Dim histogram As New Mat
                 Dim histInput = Mat.FromPixelData(colorDepth.Count \ 2, 1, MatType.CV_32FC2, colorDepth.ToArray())
                 CalcHist({histInput}, {0, 1}, New Mat(), histogram, 2, {task.histogramBins, task.histogramBins}, ranges)

@@ -520,7 +520,7 @@ Namespace VBClasses
             desc = "Use connected components to find blobs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 input.Run(src)
                 dst2 = input.dst2
                 Dim binary As New Mat

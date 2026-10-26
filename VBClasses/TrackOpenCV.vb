@@ -87,7 +87,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lpList = task.lines.lpList
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 task.optionsChanged = True
                 Dim gridIndex = task.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
                 track.inputRect = task.gridNabeRects(gridIndex)

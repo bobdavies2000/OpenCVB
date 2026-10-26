@@ -199,7 +199,7 @@ Namespace VBClasses
             If pointcloud.Type <> MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
 
             Static count As Integer
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 dst2.SetTo(0)
                 dst3.SetTo(0)
                 count = 0

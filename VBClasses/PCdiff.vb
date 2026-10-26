@@ -59,7 +59,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static index As Integer = -1
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 index += 1
                 If index > 2 Then index = 0
             End If

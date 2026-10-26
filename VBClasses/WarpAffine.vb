@@ -448,7 +448,7 @@ Namespace VBClasses
             If task.lines.lpList.Count = 0 Then Exit Sub
 
             Static fixedLine As lpData
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 dst3 = src.Clone
                 fixedLine = task.lines.lpList(0)
             End If

@@ -44,7 +44,7 @@ Namespace VBClasses
             task.almostHeartBeat = msWatch - msLast + frameDuration * 1.5 > ms1000
 
             If (msWatch - msLast) > ms1000 Then msLast = msWatch
-            If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
+            if heartbeatltx() then  task.toggleOn = Not task.toggleOn
 
             Static lastHeartBeatLT As Boolean = False
             Static lastHeartBeat As Boolean = False

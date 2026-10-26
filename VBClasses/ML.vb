@@ -593,7 +593,7 @@ Namespace VBClasses
             rtrees.ActiveVarCount = varCount
             rtrees.TermCriteria = TermCriteria.Both(5, 0)
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 rtrees.Train(trainMat, ML.SampleTypes.RowSample, trainResponse)
             Else
                 predictions = New Mat

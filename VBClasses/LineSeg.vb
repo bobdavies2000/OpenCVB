@@ -568,7 +568,7 @@ Namespace VBClasses
 
             Dim nLines = currLp.Count
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 Dim mPick = Math.Min(SlotCount, nLines)
                 Dim topIdx = Enumerable.Range(0, nLines).OrderByDescending(Function(i) currLp(i).length).Take(mPick).ToList()
                 For i = 0 To SlotCount - 1

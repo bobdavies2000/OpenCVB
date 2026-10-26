@@ -470,7 +470,7 @@ Namespace VBClasses
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 WarpAffine(redC.rcMap, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
 

@@ -998,7 +998,7 @@ Namespace VBClasses
             Static plane As Integer = 0
             Static warnings As New List(Of String)
             Static infWarnings As Integer
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 plane += 1
                 If plane > 2 Then plane = 0
             End If

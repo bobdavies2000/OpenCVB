@@ -670,7 +670,7 @@ Namespace VBClasses
             desc = "Track each of the lines found in Line_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 lpList = New List(Of lpData)(task.lines.lpList)
             End If
             dst2 = task.color.Clone
@@ -795,7 +795,7 @@ Namespace VBClasses
 
             If lpListLast.Count = 0 Then
                 lpListLast = New List(Of lpData)(task.lines.lpList)
-                If task.heartBeatLT Then labels(2) = "No previous frame; matching starts next frame."
+                if heartbeatltx() then  labels(2) = "No previous frame; matching starts next frame."
                 Exit Sub
             End If
 

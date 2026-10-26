@@ -1538,7 +1538,7 @@ Namespace VBClasses
             desc = "Track the selected cell even after maxDStable goes beyond the edge of the cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then dst1.SetTo(0)
+            If heartbeatLTX() Then dst1.SetTo(0)
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)

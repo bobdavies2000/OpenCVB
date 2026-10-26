@@ -94,7 +94,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If task.heartBeatLT Then
+                if heartbeatltx() then 
                     matchRect = ValidateRect(task.lines.lpList(0).rect)
                     match.template = src(matchRect)
                 End If
@@ -661,7 +661,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lastM As cv.Mat = Mat.Eye(2, 3, MatType.CV_64FC1)
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 feat.Run(src)
                 ptLast.Clear()
                 For Each pt In feat.ptlist
@@ -774,7 +774,7 @@ Namespace VBClasses
                 Next
             End If
 
-            If task.heartBeatLT Then dst3.SetTo(0)
+            if heartbeatltx() then  dst3.SetTo(0)
             dst1 = task.steadyCam.dst3.Clone
             For Each pt In ptList
                 pt = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.M)

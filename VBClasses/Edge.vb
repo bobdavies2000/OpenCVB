@@ -1084,7 +1084,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static frm = OptionParent.FindFrm("Options_Edge_Basics Radio Buttons")
 
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 Dim index = task.fOptions.EdgeMethods.SelectedIndex + 1
                 If index >= task.fOptions.EdgeMethods.Items.Count Then index = 0
                 task.fOptions.EdgeMethods.SelectedIndex = index

@@ -42,7 +42,7 @@ Namespace VBClasses
             Dim KNNdimension = 2
             If standalone Then
                 Static random As New Random_Basics
-                If task.heartBeatLT Then
+                if heartbeatltx() then 
                     random.Run(src)
                     trainInput = New List(Of Point2f)(random.PointList)
                 End If
@@ -175,7 +175,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If task.heartBeatLT Then
+                if heartbeatltx() then 
                     Static random As New Random_Basics
                     random.Run(src)
                     trainInput = New List(Of Point2f)(random.PointList)
@@ -231,7 +231,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If task.heartBeatLT Then
+                if heartbeatltx() then 
                     random.Run(src)
                     knn.trainInput = New List(Of Point2f)(random.PointList)
                     random.Run(src)
@@ -466,7 +466,7 @@ Namespace VBClasses
             desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 queries.Clear()
                 trainInput.Clear()
                 random.Run(src)
@@ -533,7 +533,7 @@ Namespace VBClasses
             desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 random.Run(src)
                 trainInput = New List(Of Vec4f)(random.PointList)
                 queries.Clear()
@@ -581,7 +581,7 @@ Namespace VBClasses
             desc = "Test the use of the general form KNN_BasicsN algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 trainInput.Clear()
                 For i = 0 To knn.options.numPoints - 1
                     For j = 0 To knn.options.knnDimension - 1

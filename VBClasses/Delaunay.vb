@@ -233,7 +233,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If task.heartBeatLT Then random.Run(src)
+                If heartbeatLTX() Then random.Run(src)
                 ptList = New List(Of Point2f)(random.PointList)
             End If
 

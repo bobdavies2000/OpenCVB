@@ -367,7 +367,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Exit Sub
             If task.lines.lpList.Count = 0 Then Exit Sub
-            If task.heartBeatLT Then dst1.SetTo(0)
+            if heartbeatltx() then  dst1.SetTo(0)
             Selection.Run(emptyMat)
             Dim lp = Selection.lp
 

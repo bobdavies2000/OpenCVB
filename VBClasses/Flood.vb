@@ -238,7 +238,7 @@ Namespace VBClasses
             If rcIndex >= rcList.Count Then rcIndex = 0
             Dim rc = rcList(rcIndex)
             dst1(rc.rect).SetTo(task.scalarColors(rc.ID Mod 255), rc.mask)
-            If task.heartBeatLT Then
+            If heartbeatLTX() Then
                 rcIndex += 1
                 If rcIndex >= rcList.Count Then rcIndex = 0
             End If

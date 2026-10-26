@@ -556,7 +556,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lpList As New List(Of lpData)
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 delaunay.Run(src)
                 lpList = New List(Of lpData)(task.lines.lpList)
                 labels(2) = delaunay.labels(2)
@@ -1403,7 +1403,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.firstPass Then lastImage = src.Clone
 
-            If task.heartBeatLT Then
+            if heartbeatltx() then 
                 dst3.SetTo(0)
                 For Each lp In verticalLast
                     Line(dst3, lp.ptE1, lp.ptE2, lp.color, task.lineWidth, LineTypes.Link4)
@@ -1955,7 +1955,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If task.heartBeatLT Then
+                if heartbeatltx() then 
                     lp1 = New lpData(New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)),
                                      New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)))
                     lp2 = New lpData(New Point2f(task.msRNG.Next(0, dst2.Width), task.msRNG.Next(0, dst2.Height)),
