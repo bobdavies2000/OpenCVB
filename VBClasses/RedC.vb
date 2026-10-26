@@ -1,6 +1,6 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedC_BasicsNew : Inherits TaskParent
+    Public Class RedC_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
@@ -8,11 +8,12 @@ Namespace VBClasses
         Dim rcLists As New List(Of List(Of Integer))
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Identify each cell using color"
         End Sub
-        Private Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
+        Private Shared Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
             For Each rc In inputList
                 If rc.ID = id And rc.ID < inputList.Count Then Return inputList(rc.index)
@@ -22,6 +23,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If heartbeatLTX() Then dst1 = task.delaunayFLess.dst2
 
+            If standalone AndAlso heartbeatLTX() Then dst1 = task.delaunayFLess.dst2.Clone
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
 
@@ -32,7 +34,7 @@ Namespace VBClasses
 
             For Each rc In task.redColor.rcList
                 Dim id = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                if id < rcLists.Count Then rcLists(id).Add(rc.index)
+                If id < rcLists.Count Then rcLists(id).Add(rc.index)
             Next
 
             rcMap.SetTo(0)
@@ -67,15 +69,20 @@ Namespace VBClasses
                 If rcLast IsNot Nothing Then
                     Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDStable, task.steadyCam.M)
                     ptx = validatePoint(ptx)
-                    Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+
+                    Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If idLast = rc.ID Then
                         Line(dst3, rc.maxDStable, ptx, white, task.lineWidth)
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         rc.maxDStable = rcLast.maxDStable
                     End If
+
+                    ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
+                    ptx = validatePoint(ptx)
+                    Circle(dst1, ptx, task.DotSize, black, -1)
                 End If
-                SetTrueText(CStr(rc.age), rc.maxDStable, 2)
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
             dst2 = Palettize(rcMap, 0)
@@ -100,7 +107,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Basics : Inherits TaskParent
+    Public Class RedC_BasicsOld : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
@@ -111,7 +118,7 @@ Namespace VBClasses
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Identify each cell using color"
         End Sub
-        Private Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
+        Private Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
             For Each rc In myList
                 If rc.ID = id Then Return myList(rc.index)

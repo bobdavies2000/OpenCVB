@@ -7,7 +7,6 @@ Namespace VBClasses
         Dim rcMapLast As cv.Mat
         Public fLessBricks As New List(Of cv.Rect)
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify featureless regions."
         End Sub
         Public Shared Function MyFinder(myList As List(Of rcData), id As Integer) As rcData
@@ -55,7 +54,6 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             rcMap.SetTo(0)
-            Dim motionInput = task.motion.dst3.Clone
             For Each rc In sortList.Values
                 rc.index = rcList.Count
                 rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -87,8 +85,6 @@ Namespace VBClasses
             Else
                 If rcList.Count > 1 Then task.rcD = rcList(1)
             End If
-
-            If standaloneTest() Then dst3 = task.motion.motionMask
 
             labels(2) = CStr(rcList.Count - 1) + " featureless regions found"
         End Sub
@@ -2363,7 +2359,6 @@ Namespace VBClasses
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the FeatureLess cells points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2372,21 +2367,26 @@ Namespace VBClasses
             dst3.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            For Each rc In task.redColor.rcList
+            For Each rc In task.fless.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
                 rc.ID = idMap.Get(Of Byte)(ptx.Y, ptx.X)
-                SetTrueText(CStr(rc.index), rc.maxDist, 3)
-                SetTrueText(CStr(rc.ID), ptx, 1)
                 rcList.Add(rc)
-
                 dst0(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(dst0, 0)
+
+            WarpAffine(task.delaunayFLess.dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
+
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
         End Sub
     End Class
+
+
+
+
+
 End Namespace

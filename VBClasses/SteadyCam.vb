@@ -251,4 +251,23 @@ Namespace VBClasses
             labels(3) = "angle=" + angle.ToString(fmt2) + " deg after shiftXY "
         End Sub
     End Class
+
+
+
+
+
+    Public Class SteadyCam_MapTest : Inherits TaskParent
+        Public Sub New()
+            labels(2) = "Testing the SteadyCam translation "
+            desc = "Testing the steadyCam translation from the current frame to the heartbeat map."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then dst2 = task.delaunayFLess.dst2
+            For Each pt In task.delaunayFLess.ptList
+                Dim ptx = WarpAffine_Basics.WarpPoint(pt, task.steadyCam.inverseM)
+                ptx = validatePoint(ptx)
+                Circle(dst2, ptx, task.DotSize, black, -1)
+            Next
+        End Sub
+    End Class
 End Namespace

@@ -610,7 +610,7 @@ Rectangle_Fit
 Rectangle_Quadrants
 Rectangle_Rotated
 RedC_Basics
-RedC_BasicsNew
+RedC_BasicsOld
 RedC_CellLines
 RedC_Cells
 RedC_Depth
@@ -681,6 +681,7 @@ SteadyCam_BasicsOriginal
 SteadyCam_FindLines
 SteadyCam_Kalman
 SteadyCam_LongestLine
+SteadyCam_MapTest
 SteadyCam_WarpAffine
 SteadyM_Basics
 SteadyM_Delaunay
