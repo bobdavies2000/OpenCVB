@@ -2,8 +2,8 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class StableDepth_Basics_TA : Inherits TaskParent
         Dim colorize As New DepthColorizer_CPP
-        Public pointcloud As Mat
-        Public pcSplit(2) As Mat
+        Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        Public pcSplit(2) As cv.Mat
         Public Sub New()
             labels(2) = "Accumulated minimum values at each depth pixel.  Updated using RGB motion."
             labels(3) = "Pixels that were updated on the current frame."

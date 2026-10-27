@@ -1618,8 +1618,10 @@ Namespace VBClasses
             dst3.SetTo(0)
             dst3(rcD.rect).SetTo(task.scalarColors(rcD.index), rcD.mask)
             For i = 0 To neighbors.Count - 1
-                Dim rc = redC.rcList(neighbors(i) - 1)
-                dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
+                If neighbors(i) < redC.rcList.Count Then
+                    Dim rc = redC.rcList(neighbors(i) - 1)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
+                End If
             Next
 
             dst3(rcD.rect).SetTo(task.highlight, rcD.mask)

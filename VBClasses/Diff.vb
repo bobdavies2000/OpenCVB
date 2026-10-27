@@ -166,7 +166,7 @@ Namespace VBClasses
 
     Public Class Diff_Simple : Inherits TaskParent
         Public changedPixels As Integer
-        Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public lastFrame As New Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             desc = "Simple diff of lastFrame and current src."
         End Sub

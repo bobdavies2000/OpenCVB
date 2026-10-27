@@ -207,12 +207,13 @@ Namespace VBClasses
             hulls.Clear()
             Dim listOfPoints = New List(Of List(Of cv.Point))
             For Each rc In redC.rcList
+                If rc.contour.Count = 0 Then Continue For
                 knn.trainInput.Clear()
                 For Each pt In rc.contour
                     knn.trainInput.Add(pt)
                 Next
                 knn.queries = New List(Of Point2f)({New Point2f(0, 0), New Point2f(rc.rect.Width, 0),
-                                  New Point2f(rc.rect.Width, rc.rect.Height), New Point2f(0, rc.rect.Height)})
+                                      New Point2f(rc.rect.Width, rc.rect.Height), New Point2f(0, rc.rect.Height)})
                 knn.Run(Nothing)
 
                 listOfPoints.Clear()

@@ -786,7 +786,7 @@ Namespace VBClasses
             desc = "Double-check that any differences from the previous fLess output occurred because of motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.fless.dst1
+            dst2 = task.fless.rcMap
             labels(3) = task.fless.labels(2)
 
             Static fLessLast = dst2.Clone
