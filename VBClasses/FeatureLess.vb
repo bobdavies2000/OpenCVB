@@ -40,14 +40,16 @@ Namespace VBClasses
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(rcMap.Width + 2, rcMap.Height + 2), MatType.CV_8U, 0)
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim rc As rcData
             Dim index As Integer = 1
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    rc = New rcData(rcMap(rect), rect, index)
-                    sortList.Add(rc.pixels, rc)
+                    If rect.Width > 0 And rect.Height > 0 Then
+                        rc = New rcData(rcMap(rect), rect, index)
+                        sortList.Add(rc.pixels, rc)
+                    End If
                 End If
             Next
 
@@ -86,7 +88,7 @@ Namespace VBClasses
                 If rcList.Count > 1 Then task.rcD = rcList(1)
             End If
 
-            labels(2) = CStr(rcList.Count - 1) + " featureless regions found"
+            labels(2) = CStr(rcList.Count - 1) + " featureless regions found.  Age is shown."
         End Sub
     End Class
 
@@ -2388,5 +2390,13 @@ Namespace VBClasses
 
 
 
-
+    Public Class FeatureLess_ReMap : Inherits TaskParent
+        Public Sub New()
+            desc = "Update the featureless idMap using SteadyCam M."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            WarpAffine(src, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
+            dst3 = task.steadyCam.dst2
+        End Sub
+    End Class
 End Namespace

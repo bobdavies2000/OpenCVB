@@ -40,7 +40,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 1 To rcLists.Count - 1
                 Dim rect As New cv.Rect
                 mask.SetTo(0)
@@ -64,6 +64,8 @@ Namespace VBClasses
             rcList.Add(New rcData) ' placeholder for zero...
             rcMap.SetTo(0)
             For Each rc In sortList.Values
+                Dim val = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If val <> 0 Then Continue For ' already mapped...
                 rc.index = rcList.Count
                 Dim rcLast = rcFinder(rcListLast, rc.ID)
                 If rcLast IsNot Nothing Then
@@ -82,7 +84,7 @@ Namespace VBClasses
                         Circle(dst1, rc.maxDStable, task.DotSize, black, -1)
                     End If
                 End If
-                SetTrueText(CStr(rc.age), rc.maxDStable, 2)
+                SetTrueText(CStr(rc.age), rc.maxDist, 2)
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
@@ -95,6 +97,7 @@ Namespace VBClasses
 
             Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             If rctmp IsNot Nothing Then
+                If task.mouseClickFlag Then task.clickPoint = rctmp.maxDist
                 task.rcD = rctmp
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)

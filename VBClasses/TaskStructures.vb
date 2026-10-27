@@ -318,6 +318,7 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
+                'Threshold(_mask, mask, 0, 255, cv.ThresholdTypes.Binary)
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
@@ -346,7 +347,7 @@ Namespace VBClasses
             Public Function displayCell() As String
                 Dim strout = ""
                 strout += "ID = " + CStr(ID) + vbCrLf
-                strout += "index = " + CStr(Index) + vbCrLf
+                strout += "index = " + CStr(index) + vbCrLf
                 strout += "age = " + CStr(age) + vbCrLf
 
                 strout += "contour point count = " + CStr(contour.Count) + vbCrLf

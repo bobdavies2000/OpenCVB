@@ -1714,9 +1714,7 @@ Namespace VBClasses
             labels(3) = "Shift X/Y = " + shiftXY.X.ToString("F1") + "/" + shiftXY.Y.ToString("F1") +
                         "  rotation = " + rotateAngle.ToString("F1") + " deg"
 
-            If standaloneTest() Then
-                WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
-            End If
+            WarpAffine(src, dst2, M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
         End Sub
     End Class
 

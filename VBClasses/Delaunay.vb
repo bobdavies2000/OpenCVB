@@ -47,6 +47,7 @@ Namespace VBClasses
             Next
 
             dst2 = Palettize(dst3)
+            WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
 
             labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
         End Sub
@@ -649,6 +650,7 @@ Namespace VBClasses
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public ptList As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
+        Public remap As New FeatureLess_ReMap
         Public Sub New()
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
@@ -656,6 +658,7 @@ Namespace VBClasses
             If task.algorithmActive Then
                 SetTrueText(traceName + " is a task algorithm that has already run", 3)
                 dst2 = task.delaunayFLess.dst2
+                dst3 = task.delaunayFLess.dst3
                 labels(2) = task.delaunayFLess.labels(2)
                 Exit Sub ' this is a task.algorithm that has already run...
             End If
@@ -677,15 +680,18 @@ Namespace VBClasses
                     DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
-                dst2 = Palettize(idMap, 0)
+                dst1 = Palettize(idMap, 0)
 
                 ' run after palettize
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                    DrawContours(dst1(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
             End If
+            remap.Run(dst1)
+            dst2 = remap.dst2
+            dst3 = remap.dst3
         End Sub
     End Class
 End Namespace
