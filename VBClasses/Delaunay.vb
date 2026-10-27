@@ -650,7 +650,7 @@ Namespace VBClasses
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public ptList As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
-        Public remap As New FeatureLess_ReMap
+        Public snapshotList As New List(Of rcData)
         Public Sub New()
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
@@ -664,6 +664,8 @@ Namespace VBClasses
             End If
 
             If heartbeatLTX() Or ptList.Count <= 2 Then
+                snapshotList = New List(Of rcData)(task.fless.rcList)
+
                 ptList.Clear()
                 For Each rc In task.fless.rcList
                     ptList.Add(rc.maxDist)
@@ -689,9 +691,8 @@ Namespace VBClasses
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
             End If
-            remap.Run(dst1)
-            dst2 = remap.dst2
-            dst3 = remap.dst3
+            WarpAffine(dst1, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
+            dst3 = task.steadyCam.dst2
         End Sub
     End Class
 End Namespace

@@ -8,7 +8,6 @@ Namespace VBClasses
         Dim rcLists As New List(Of List(Of Integer))
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The circle shows the location of the current MaxDStable. The line is travel distance."
@@ -22,9 +21,6 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then dst1 = task.delaunayFLess.dst2
-
-            If standalone AndAlso heartbeatLTX() Then dst1 = task.delaunayFLess.dst2.Clone
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
 
@@ -84,12 +80,19 @@ Namespace VBClasses
                         Circle(dst1, rc.maxDStable, task.DotSize, black, -1)
                     End If
                 End If
-                SetTrueText(CStr(rc.age), rc.maxDist, 2)
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             dst2 = Palettize(rcMap, 0)
+
+            For Each rc In task.delaunayFLess.snapshotList
+                Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                Circle(dst2, pt, task.DotSize + 2, black, -1)
+                Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                Dim rcCurr = rcFinder(rcList, rc.ID)
+                If rcCurr IsNot Nothing Then SetTrueText(CStr(rcCurr.age), pt, 2)
+            Next
 
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(rcList.Count) + " cells"
 
@@ -97,10 +100,9 @@ Namespace VBClasses
 
             Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             If rctmp IsNot Nothing Then
-                If task.mouseClickFlag Then task.clickPoint = rctmp.maxDist
+                If task.mouseClickFlag Or task.rcD.ID <> rctmp.ID Then task.clickPoint = rctmp.maxDist
                 task.rcD = rctmp
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                 SetTrueText(task.rcD.displayCell, 3)
             Else
                 If rcList.Count > 1 Then task.rcD = rcList(1)

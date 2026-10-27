@@ -46,7 +46,8 @@ Namespace VBClasses
             For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    If rect.Width > 0 And rect.Height > 0 Then
+                    ' it is difficult to track cells that are narrow...
+                    If rect.Width > task.gridWH Or rect.Height > task.gridWH Then
                         rc = New rcData(rcMap(rect), rect, index)
                         sortList.Add(rc.pixels, rc)
                     End If
@@ -2273,87 +2274,6 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Tracker : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            ' Hungarian Assignment algorithm - visual solution.
-            desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells." +
-                   "  No cost function needed."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.steadyCam.dst2
-            If task.fless.rcList.Count = 0 Then Exit Sub
-
-            Static rcSnapshotList As New List(Of rcData)
-            If task.heartBeatLT Or rcSnapshotList.Count < 2 Then
-                rcSnapshotList = New List(Of rcData)(task.fless.rcList)
-                rcSnapshotList.RemoveAt(0)
-                dst3 = task.fless.dst3
-            End If
-
-            rcMap.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData())
-            Dim usedList As New List(Of Integer)
-            For Each rcPrev In rcSnapshotList
-                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    If rc.rect.Contains(pt) Then
-                        If usedList.Contains(rc.ID) = False Then
-                            rc.ID = rcPrev.index
-                            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                            rcList.Add(rc)
-                            usedList.Add(rc.ID)
-                            Exit For
-                        End If
-                    End If
-                Next
-            Next
-
-            Dim unusedCount = task.fless.rcList.Count - usedList.Count
-            Dim nextSlot As Integer = task.fless.rcList.Count
-            For Each rc In task.fless.rcList
-                If rc.ID = 0 Then Continue For
-                If usedList.Contains(rc.ID) = False Then
-                    rc.ID = nextSlot
-                    nextSlot += 1
-                    rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                    rcList.Add(rc)
-                End If
-            Next
-
-            If standaloneTest() Then
-                dst2 = Palettize(rcMap, 0)
-
-                For Each rc In rcSnapshotList
-                    If rc.ID <> 0 Then
-                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
-                        Circle(dst2, pt, task.DotSize + 2, black, -1)
-                        Circle(dst2, pt, task.DotSize, task.highlight, -1)
-                    End If
-                Next
-            End If
-
-            'strOut = XR_RedC_Core.showCell(rcList, rcMap, dst2) + vbCrLf
-
-            strOut = "In dst2 at left: " + vbCrLf + vbCrLf
-            strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
-            strOut += "- A cell with no circle is a new cell." + vbCrLf
-            strOut += "- All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
-            strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
-            SetTrueText(strOut, 3)
-
-            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
-            labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
-        End Sub
-    End Class
-
-
-
-
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -2397,6 +2317,87 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             WarpAffine(src, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
             dst3 = task.steadyCam.dst2
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class FeatureLess_Tracker : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcSnapshotList As New List(Of rcData)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            ' Hungarian Assignment algorithm - visual solution.
+            desc = "Use the maxDist point with task.SteadyCam.M to track the FeatureLess_Basics cells." +
+                   "  No cost function needed."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = task.steadyCam.dst2
+            If task.fless.rcList.Count = 0 Then Exit Sub
+
+            If task.heartBeatLT Or rcSnapshotList.Count < 2 Then
+                rcSnapshotList = New List(Of rcData)(task.fless.rcList)
+                dst3 = task.fless.dst3
+            End If
+
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData())
+            Dim usedList As New List(Of Integer)
+            For Each rcPrev In rcSnapshotList
+                If rcPrev.index = 0 Then Continue For
+                Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
+                For Each rc In task.fless.rcList
+                    If rc.ID = 0 Then Continue For
+                    If rc.rect.Contains(pt) Then
+                        If usedList.Contains(rc.ID) = False Then
+                            rc.ID = rcPrev.index
+                            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                            rcList.Add(rc)
+                            usedList.Add(rc.ID)
+                            Exit For
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim unusedCount = task.fless.rcList.Count - usedList.Count
+            Dim nextSlot As Integer = task.fless.rcList.Count
+            For Each rc In task.fless.rcList
+                If rc.ID = 0 Then Continue For
+                If usedList.Contains(rc.ID) = False Then
+                    rc.ID = nextSlot
+                    nextSlot += 1
+                    rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                    rcList.Add(rc)
+                End If
+            Next
+
+            If standaloneTest() Then
+                dst2 = Palettize(rcMap, 0)
+
+                For Each rc In rcSnapshotList
+                    If rc.index = 0 Then Continue For
+                    If rc.ID <> 0 Then
+                        Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                        Circle(dst2, pt, task.DotSize + 2, black, -1)
+                        Circle(dst2, pt, task.DotSize, task.highlight, -1)
+                    End If
+                Next
+            End If
+
+            strOut = "In dst2 at left: " + vbCrLf + vbCrLf
+            strOut += "- A circle with no cell shows a cell that is no longer present." + vbCrLf
+            strOut += "- A cell with no circle is a new cell." + vbCrLf
+            strOut += "- All circles represent the new location of a cell found at the time of the heartbeat snapshot." + vbCrLf
+            strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
+            SetTrueText(strOut, 3)
+
+            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
+            labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
 End Namespace
