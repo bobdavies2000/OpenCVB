@@ -1509,7 +1509,7 @@ Namespace VBClasses
 
             delaunay.Run(src)
 
-            Dim indexMap = delaunay.dst3
+            Dim indexMap = delaunay.dst1
             Static hbIndexList As New List(Of Integer)
             Static hbIndexMap As cv.Mat
             'If task.heartBeatLT And task.gOptions.DebugCheckBox.Checked = False Then
@@ -1613,7 +1613,7 @@ Namespace VBClasses
 
             delaunay.Run(src)
 
-            Dim indexMap = delaunay.dst3
+            Dim indexMap = delaunay.dst1
 
             If heartbeatLTX() Then
                 shiftXY = New cv.Point2f

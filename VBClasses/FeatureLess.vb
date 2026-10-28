@@ -1685,7 +1685,7 @@ Namespace VBClasses
                 Next
 
                 delaunay.Run(emptyMat)
-                dst1 = delaunay.dst3.Clone
+                dst1 = delaunay.dst1.Clone
                 labels(3) = delaunay.labels(2)
 
                 For Each rc In rcList

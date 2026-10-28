@@ -43,10 +43,10 @@ Namespace VBClasses
 
             facetList = buildFacets(ptList)
             For i = 0 To facetList.Count - 1
-                FillConvexPoly(dst3, facetList(i), i + 1, LineTypes.Link4)
+                FillConvexPoly(dst1, facetList(i), i + 1, LineTypes.Link4)
             Next
 
-            dst2 = Palettize(dst3)
+            dst2 = Palettize(dst1)
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
 
             labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
@@ -193,7 +193,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim usedG As New HashSet(Of Integer), g As Integer
             For Each pt In inputPoints
-                Dim index = delaunay.dst3.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = delaunay.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If index >= delaunay.facetList.Count Then Continue For
                 Dim nextFacet = delaunay.facetList(index)
                 ' insure that each facet has a unique generation number
@@ -241,6 +241,7 @@ Namespace VBClasses
             knn.queries = New List(Of Point2f)(ptList)
             knn.Run(src)
 
+            delaunay.ptList.Clear()
             For Each pt In ptList
                 delaunay.ptList.Add(New cv.Point(pt.X, pt.Y))
             Next
@@ -251,7 +252,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             Dim usedG As New List(Of Integer), g As Integer
             For Each lp In knn.matches
-                Dim index = delaunay.dst3.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                Dim index = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
                 If index >= delaunay.facetList.Count Then Continue For
                 Dim nextFacet = delaunay.facetList(index)
                 ' insure that each facet has a unique generation number

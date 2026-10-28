@@ -1700,7 +1700,7 @@ Namespace VBClasses
             ptList.Clear()
             Dim generations As New List(Of Integer)
             For Each pt In facetGen.ptList
-                Dim fIndex = facetGen.delaunay.dst3.Get(Of Byte)(pt.Y, pt.X)
+                Dim fIndex = facetGen.delaunay.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If fIndex >= facetGen.delaunay.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 generations.Add(g)
@@ -1785,6 +1785,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             good.Run(src)
+            facetGen.ptList.Clear()
             For Each pt In good.feat.ptlist
                 facetGen.ptList.Add(pt)
             Next
@@ -1799,7 +1800,7 @@ Namespace VBClasses
             ptList.Clear()
             Dim generations As New List(Of Integer)
             For Each pt In facetGen.ptList
-                Dim fIndex = facetGen.delaunay.dst3.Get(Of Integer)(pt.Y, pt.X)
+                Dim fIndex = facetGen.delaunay.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If fIndex >= facetGen.delaunay.facetList.Count Then Continue For ' new cv.Point
                 Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 generations.Add(g)

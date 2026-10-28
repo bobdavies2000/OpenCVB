@@ -67,7 +67,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             delaunay.Run(task.gray)
-            delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+            dst1 = delaunay.dst1.Clone
 
             ptList.Clear()
             indexList.Clear()
@@ -334,7 +334,7 @@ Namespace VBClasses
                 Next
 
                 delaunay.Run(emptyMat)
-                delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+                dst1 = delaunay.dst1.Clone
 
                 WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
@@ -390,7 +390,7 @@ Namespace VBClasses
                 Next
 
                 delaunay.Run(emptyMat)
-                delaunay.dst3.ConvertTo(dst1, cv.MatType.CV_8U)
+                dst1 = delaunay.dst1.Clone
 
                 WarpAffine(dst1, dst0, task.steadyCam.M, dst0.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
             End If
