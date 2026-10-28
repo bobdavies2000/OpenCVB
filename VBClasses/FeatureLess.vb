@@ -4,7 +4,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst1.Size, MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
-        Dim rcMapLast As cv.Mat
         Public fLessBricks As New List(Of cv.Rect)
         Public Sub New()
             desc = "Identify featureless regions."
@@ -26,7 +25,6 @@ Namespace VBClasses
             End If
 
             rcListLast = New List(Of rcData)(rcList)
-            rcMapLast = rcMap.Clone
 
             rcMap.SetTo(0)
             fLessBricks.Clear()
@@ -2327,7 +2325,7 @@ Namespace VBClasses
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public rcSnapshotList As New List(Of rcData)
+        Public rcSnapshot As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm - visual solution.
@@ -2338,8 +2336,8 @@ Namespace VBClasses
             dst1 = task.steadyCam.dst2
             If task.fless.rcList.Count = 0 Then Exit Sub
 
-            If task.heartBeatLT Or rcSnapshotList.Count < 2 Then
-                rcSnapshotList = New List(Of rcData)(task.fless.rcList)
+            If task.heartBeatLT Or rcSnapshot.Count < 2 Then
+                rcSnapshot = New List(Of rcData)(task.fless.rcList)
                 dst3 = task.fless.dst3
             End If
 
@@ -2347,7 +2345,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
-            For Each rcPrev In rcSnapshotList
+            For Each rcPrev In rcSnapshot
                 If rcPrev.index = 0 Then Continue For
                 Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
                 For Each rc In task.fless.rcList
@@ -2379,7 +2377,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = Palettize(rcMap, 0)
 
-                For Each rc In rcSnapshotList
+                For Each rc In rcSnapshot
                     If rc.index = 0 Then Continue For
                     If rc.ID <> 0 Then
                         Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
@@ -2397,7 +2395,7 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
-            labels(3) = CStr(rcSnapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+            labels(3) = CStr(rcSnapshot.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
 End Namespace

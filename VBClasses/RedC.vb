@@ -34,7 +34,6 @@ Namespace VBClasses
                 If id < rcLists.Count Then rcLists(id).Add(rc.index)
             Next
 
-            dst3.SetTo(0)
             Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For i = 1 To rcLists.Count - 1
@@ -51,14 +50,15 @@ Namespace VBClasses
                     End If
                 Next
                 If rect.Width > 0 Then
-                    Dim rcNew = New rcData(mask(rect), rect, 255) With {.ID = i}
-                    sortList.Add(rcNew.pixels, rcNew)
+                    Dim rc = New rcData(mask(rect), rect, 255) With {.ID = i}
+                    sortList.Add(rc.pixels, rc)
                 End If
             Next
 
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             rcMap.SetTo(0)
+            dst3 = task.redColor.dst3
             For Each rc In sortList.Values
                 Dim val = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val <> 0 Then Continue For ' already mapped...
@@ -77,7 +77,6 @@ Namespace VBClasses
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         rc.maxDStable = rcLast.maxDStable
-                        Circle(dst1, rc.maxDStable, task.DotSize, black, -1)
                     End If
                 End If
                 rcList.Add(rc)
@@ -94,13 +93,14 @@ Namespace VBClasses
                 If rcCurr IsNot Nothing Then SetTrueText(CStr(rcCurr.age), pt, 2)
             Next
 
-            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(rcList.Count) + " cells"
+            labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(rcList.Count) + " cells " +
+                        "without using depth data."
 
             If task.firstPass Then If rcList.Count > 1 Then task.clickPoint = rcList(1).maxDist
 
             Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             If rctmp IsNot Nothing Then
-                If task.mouseClickFlag Or task.rcD.ID <> rctmp.ID Then task.clickPoint = rctmp.maxDist
+                If task.mouseClickFlag Then task.clickPoint = rctmp.maxDist
                 task.rcD = rctmp
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
                 SetTrueText(task.rcD.displayCell, 3)
@@ -189,9 +189,9 @@ Namespace VBClasses
 
     Public Class XR_RedC_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Dim redColor As New RedColor_Basics
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Use CalcHist on FeatureLess_Tracker cells to merge Color8U floodfill regions."
         End Sub
         Public Shared Function displayCell(rclist As List(Of rcData), clickIndex As Integer) As String
@@ -209,29 +209,27 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap = rcMap.Clone
 
-            redColor.Run(src)
-
             Dim rc As rcData
             If standaloneTest() Then
-                labels(3) = redColor.labels(3)
-                dst3 = redColor.dst2.Clone
-                For Each rc In redColor.tracker.rcList
+                labels(3) = task.redColor.labels(3)
+                dst3 = task.redColor.dst2.Clone
+                For Each rc In task.redColor.tracker.rcList
                     If rc.ID = 0 Then Continue For
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 Next
             End If
 
-            Dim ranges() As Rangef = {New Rangef(0, redColor.rcList.Count)}
+            Dim ranges() As Rangef = {New Rangef(0, task.redColor.rcList.Count)}
             Dim histogram As New Mat
 
-            Dim rcFLess = New List(Of rcData)(redColor.tracker.rcList)
-            Dim rcOwner(redColor.rcList.Count - 1) As Integer
+            Dim rcFLess = New List(Of rcData)(task.redColor.tracker.rcList)
+            Dim rcOwner(task.redColor.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
 
             For Each rc In rcFLess
                 If rc.ID = 0 Then Continue For
 
-                CalcHist({redColor.rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, {redColor.rcList.Count}, ranges)
+                CalcHist({task.redColor.rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, {task.redColor.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
@@ -244,10 +242,10 @@ Namespace VBClasses
             rcMap.SetTo(0)
             For Each rc In rcFLess
                 If rc.ID = 0 Then Continue For
-                For i = 1 To redColor.rcList.Count - 1
+                For i = 1 To task.redColor.rcList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
                     If rcOwner(i) = rc.ID Then
-                        Dim rcTuple = redColor.rcList(i)
+                        Dim rcTuple = task.redColor.rcList(i)
                         rc.rect = rc.rect.Union(rcTuple.rect)
                         rcMap(rcTuple.rect).SetTo(rcOwner(i), rcTuple.mask)
                     End If
@@ -270,7 +268,7 @@ Namespace VBClasses
 
             dst2 = Palettize(rcMap, 0)
 
-            labels(2) = CStr(redColor.rcList.Count) + " input cells merged into the " +
+            labels(2) = CStr(task.redColor.rcList.Count) + " input cells merged into the " +
                         CStr(rcList.Count - 1) + " featureless cells."
         End Sub
     End Class

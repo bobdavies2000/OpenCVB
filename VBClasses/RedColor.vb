@@ -27,8 +27,7 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index) With {.ID = index}
-                            rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                            Dim rc = New rcData(dst1(rect), rect, index)
                             sortList.Add(rc.pixels, rc)
                         Else
                             If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
@@ -41,9 +40,13 @@ Namespace VBClasses
             rcList.Add(New rcData) ' placeholder for zero...
             For i = 0 To sortList.Values.Count - 1
                 Dim rc = sortList.Values(i)
-                rc.index = i + 1
+                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.index = rcList.Count
                 rcList.Add(rc)
             Next
+
+            dst3 = Palettize(rcMap, 0)
 
             labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
