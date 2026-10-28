@@ -340,7 +340,7 @@ Namespace VBClasses
             If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Each delaunay cell will select the line that it contains."
-            labels(3) = "The mouse is hovering over the Delaunay cell for the end cv.Point of the line."
+            labels(3) = "Use the task.goptions.debugSlider to select a line."
             desc = "Create a map for selecting lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -365,10 +365,11 @@ Namespace VBClasses
             Next
 
             Dim facet = delaunay.dst1.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim facetIndex = facetList.IndexOf(facet) \ 2
-            If facetIndex >= indexList.Count Then facetIndex = 0
             If task.lines.lpList.Count = 0 Then Exit Sub
-            task.lpD = task.lines.lpList(indexList(facetIndex))
+            If task.gOptions.DebugSlider.Value >= task.lines.lpList.Count Then
+                task.gOptions.DebugSlider.Value = 0
+            End If
+            task.lpD = task.lines.lpList(indexList(Math.Abs(task.gOptions.DebugSlider.Value)))
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
             Static saveID As Integer = p1GridIndex
@@ -378,8 +379,8 @@ Namespace VBClasses
             End If
 
             Dim index1 As Integer, index2 As Integer
-            index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
-            index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
+            index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X) - 1
+            index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X) - 1
 
             dst3.SetTo(0)
             Polylines(dst3, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
@@ -391,9 +392,10 @@ Namespace VBClasses
             strOut = task.lpD.lpDisplay()
             SetTrueText(strOut, 3)
 
+            dst1.SetTo(0)
             For Each lp In task.lines.lpList
-                index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X) - 1
+                index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X) - 1
 
                 Polylines(dst1, {delaunay.facetList(index1).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
                 Polylines(dst1, {delaunay.facetList(index2).ToArray}, True, white, task.lineWidth, LineTypes.Link4)
@@ -528,58 +530,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class Delaunay_Map : Inherits TaskParent
-        Dim subdiv As New Subdiv2D
-        Public rcList As List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels(3) = "Visualization of the rcMap with colors.  The rcMap contains integers."
-            desc = "Create a map using the rcList provided."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                Static redC As New RedColor_FLessBasics
-                redC.Run(src)
-                dst2 = redC.dst2
-                labels(2) = redC.labels(2)
-                strOut = redC.strOut
-                rcList = New List(Of rcData)(redC.rcList)
-            End If
-
-            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-
-            Dim inputPoints As New List(Of Point2f)
-            For Each rc In rcList
-                inputPoints.Add(rc.maxDist)
-            Next
-
-            subdiv.Insert(inputPoints)
-
-            Dim facets = New Point2f()() {Nothing}
-            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-            Dim facetList As New List(Of List(Of cv.Point))
-            For i = 0 To facets.Length - 1
-                Dim nextFacet As New List(Of cv.Point)
-                For j = 0 To facets(i).Length - 1
-                    nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-                Next
-
-                Dim rc = rcList(i)
-                FillConvexPoly(rcMap, nextFacet, rc.ID, LineTypes.Link4)
-                FillConvexPoly(dst3, nextFacet, task.scalarColors(rc.ID Mod 255), LineTypes.Link4)
-                facetList.Add(nextFacet)
-            Next
-
-            SetTrueText(strOut, 1)
-        End Sub
-    End Class
 
 
 

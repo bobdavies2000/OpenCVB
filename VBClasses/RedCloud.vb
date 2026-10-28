@@ -143,7 +143,6 @@ Namespace VBClasses
 
             Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))
-            ImShow("depth", depth)
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)

@@ -95,7 +95,6 @@ Delaunay_EmptyClone
 Delaunay_FeatureLess
 Delaunay_Generations
 Delaunay_LineSelect
-Delaunay_Map
 Depth_Basics
 Depth_GuidedFilter
 Depth_Holes
@@ -1626,7 +1625,6 @@ XR_RedColor_Basics
 XR_RedColor_Bricks
 XR_RedColor_Contour
 XR_RedColor_CPP
-XR_RedColor_DelaunayMap
 XR_RedColor_FeatureLess
 XR_RedColor_FeaturesKNN
 XR_RedColor_GoodCellInput

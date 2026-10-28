@@ -1154,28 +1154,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedColor_DelaunayMap : Inherits TaskParent
-        Public dMap As New Delaunay_Map
-        Dim redColor As New RedColor_Basics
-        Public Sub New()
-            desc = "Run RedColor as usual but use the Delaunay map to select cells."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redColor.Run(src)
-            dst2 = redColor.dst2
-            labels(2) = redColor.labels(2)
-
-            dMap.rcList = New List(Of rcData)(redColor.rcList)
-            dMap.Run(task.gray)
-            dst3 = dMap.dst3
-            SetTrueText(redColor.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
 
 
     ''' <summary>
@@ -1583,7 +1561,7 @@ Namespace VBClasses
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
-            If redC.rcList.Count = 0 Then Exit Sub
+            If redC.rcList.Count <= 2 Then Exit Sub
 
             dst0.SetTo(0)
             For i = redC.rcList.Count - 1 To 0 Step -1
