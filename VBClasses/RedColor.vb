@@ -2,7 +2,6 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Public tracker As New FeatureLess_Tracker
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
@@ -11,7 +10,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
 
-            tracker.Run(color8U.dst2)
             dst2 = color8U.dst3.Clone
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)

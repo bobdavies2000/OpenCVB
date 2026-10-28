@@ -213,7 +213,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 labels(3) = task.redColor.labels(3)
                 dst3 = task.redColor.dst2.Clone
-                For Each rc In task.redColor.tracker.rcList
+                For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
                 Next
@@ -222,7 +222,7 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, task.redColor.rcList.Count)}
             Dim histogram As New Mat
 
-            Dim rcFLess = New List(Of rcData)(task.redColor.tracker.rcList)
+            Dim rcFLess = New List(Of rcData)(task.fless.rcList)
             Dim rcOwner(task.redColor.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
 
