@@ -25,7 +25,7 @@ Namespace VBClasses
             mask.SetTo(0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                    If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = sortList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
@@ -344,8 +344,8 @@ Namespace VBClasses
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("lo Diff", 0, 100, 0)
-                sliders.setupTrackBar("up Diff", 0, 100, 0)
+                sliders.setupTrackBar("lo Diff", 0, 100, 5)
+                sliders.setupTrackBar("up Diff", 0, 100, 5)
             End If
             desc = "FloodFill the input with an upDiff and loDiff to create a list of rect's sorted by pixel count."
         End Sub
@@ -370,10 +370,10 @@ Namespace VBClasses
             mask.SetTo(0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                    If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = sortList.Count + 1
                         Dim flags As FloodFillFlags = FloodFillFlags.Link4 Or FloodFillFlags.FixedRange Or
-                                                      FloodFillFlags.MaskOnly Or CType(index << 8, FloodFillFlags)
+                                                      CType(index << 8, FloodFillFlags)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, loDiff, upDiff, flags)
                         If count >= task.minCellSize Then
                             sortList.Add(count, ValidateRect(rect))
@@ -420,10 +420,10 @@ Namespace VBClasses
             mask.SetTo(0)
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
-                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                    If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = sortList.Count + 1
                         Dim flags As FloodFillFlags = FloodFillFlags.Link4 Or FloodFillFlags.FixedRange Or
-                                                      FloodFillFlags.MaskOnly Or CType(index << 8, FloodFillFlags)
+                                                      CType(index << 8, FloodFillFlags)
                         Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, loDiff, upDiff, flags)
                         If count >= task.minCellSize Then
                             sortList.Add(count, ValidateRect(rect))
@@ -439,6 +439,186 @@ Namespace VBClasses
             rectList = New List(Of cv.Rect)(sortList.Values)
             indexList = New List(Of Integer)(sortIndexList.Values)
             labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Flood_LUT : Inherits TaskParent
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("lo Diff", 0, 100, 15)
+                sliders.setupTrackBar("up Diff", 0, 100, 15)
+            End If
+            task.gOptions.DebugSlider.Maximum = 255
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            desc = "FloodFill the input and create a list of rect's sorted by pixel count."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                src = color8u.dst2.Clone
+            Else
+                src = src.Clone
+            End If
+            dst1 = src.Clone
+
+            Static upSlider = OptionParent.FindSlider("up Diff")
+            Static loSlider = OptionParent.FindSlider("lo Diff")
+
+            Dim upDiff = cv.Scalar.All(upSlider.value)
+            Dim loDiff = cv.Scalar.All(loSlider.value)
+
+            Dim rectList As New List(Of cv.Rect)
+            Dim floodPoints As New List(Of cv.Point)
+            Dim grayPoints As New List(Of Byte)
+            Dim rect As cv.Rect
+            mask.SetTo(0)
+            Dim sortList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index = rectList.Count + 1
+                        Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                        Dim pt = New cv.Point(x, y)
+                        Dim count = FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
+                        If count >= task.minCellSize Then
+                            rectList.Add(ValidateRect(rect))
+                            floodPoints.Add(pt)
+                            Dim val = task.gray.Get(Of Byte)(pt.Y, pt.X)
+                            grayPoints.Add(val)
+                            sortList.Add(val, index)
+                        End If
+                    End If
+                Next
+            Next
+
+            dst2 = Palettize(dst1, 0)
+
+            Dim overlaps As New List(Of cv.Rect)
+            dst3.SetTo(0)
+            For i = 0 To rectList.Count - 1
+                Dim r1 = rectList(i)
+                For j = i + 1 To rectList.Count - 1
+                    Dim r2 = rectList(j)
+                    If r1.IntersectsWith(r2) Then
+                        If overlaps.Count < 5 Then Rectangle(dst2, r1.Union(r2), task.highlight, task.lineWidth)
+                        If overlaps.Count < 5 Then
+                            Rectangle(dst3, r1, white, task.lineWidth)
+                            Rectangle(dst3, r2, yellow, task.lineWidth)
+                        End If
+                        overlaps.Add(r1)
+                    End If
+                Next
+            Next
+            labels(2) = CStr(rectList.Count) + " regions found with " + CStr(overlaps.Count) + " overlapping rects."
+        End Sub
+    End Class
+
+
+
+
+    Public Class Flood_Gray : Inherits TaskParent
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("lo Diff", 0, 100, 10)
+                sliders.setupTrackBar("up Diff", 0, 100, 10)
+            End If
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "FloodFill the input and create a list of rect's sorted by pixel count."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+            dst1 = src.Clone
+
+            Static upSlider = OptionParent.FindSlider("up Diff")
+            Static loSlider = OptionParent.FindSlider("lo Diff")
+
+            Dim upDiff = cv.Scalar.All(upSlider.value)
+            Dim loDiff = cv.Scalar.All(loSlider.value)
+
+            Dim rectList As New List(Of cv.Rect)
+            Dim grayPoints As New List(Of Byte)
+            Dim indexList As New List(Of Integer)
+            Dim rect As cv.Rect
+            mask.SetTo(0)
+            Dim sortList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index = rectList.Count + 1
+                        Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                        Dim pt = New cv.Point(x, y)
+                        Dim count = FloodFill(dst1, mask, pt, index, rect, loDiff, upDiff, flags)
+                        If count >= task.minCellSize Then
+                            rectList.Add(ValidateRect(rect))
+                            Dim val = src.Get(Of Byte)(pt.Y, pt.X)
+                            grayPoints.Add(val)
+                            sortList.Add(val, index)
+                            indexList.Add(index)
+                        End If
+                    End If
+                Next
+            Next
+
+            dst2 = Palettize(dst1, 0)
+
+            Dim lutTable(255) As Byte
+            For i = 0 To sortList.Count - 1
+                Dim oldVal As Byte = sortList.Keys(i)
+                Dim newVal As Byte = sortList.Values(i)
+                lutTable(oldVal) = newVal
+            Next
+
+            Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8UC1)
+            Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
+
+            Cv2.LUT(dst2, lut, dst0)
+            dst3 = Palettize(dst0, 0)
+
+            Dim overlaps As New List(Of cv.Rect)
+            For i = 0 To rectList.Count - 1
+                Dim r1 = rectList(i)
+                For j = i + 1 To rectList.Count - 1
+                    Dim r2 = rectList(j)
+                    If r1.IntersectsWith(r2) Then
+                        Rectangle(dst2, r1.Union(r2), task.highlight, task.lineWidth)
+                        overlaps.Add(r1)
+                    End If
+                Next
+            Next
+
+            'Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            'Dim intersectCount As Integer
+            'dst0.SetTo(0)
+            'dst3.SetTo(0)
+            'For i = 0 To rectList.Count - 1
+            '    Dim r1 = rectList(i)
+            '    Dim val1 As Integer = grayPoints(i)
+            '    For j = i + 1 To rectList.Count - 1
+            '        Dim r2 = rectList(j)
+            '        Dim val2 As Integer = grayPoints(j)
+            '        If r1.IntersectsWith(r2) Then
+            '            If Math.Abs(val1 - val2) < 25 Then
+            '                dst0(r1.Union(r2)).SetTo(0)
+            '                InRange(dst1(r1), indexList(i), indexList(i), dst0(r1))
+            '                tmp(r1).SetTo(i, dst0(r1))
+            '                InRange(dst1(r2), indexList(j), indexList(j), dst0(r2))
+            '                tmp(r2).SetTo(i, dst0(r2))
+            '                intersectCount += 1
+            '            End If
+            '        End If
+            '    Next
+            'Next
+
+            ' dst3 = Palettize(tmp, 0)
+
+            labels(2) = CStr(rectList.Count) + " regions found"
         End Sub
     End Class
 End Namespace

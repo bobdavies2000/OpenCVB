@@ -239,6 +239,8 @@ FitLine_Basics
 FitLine_Conventional
 Flood_Basics
 Flood_Edges
+Flood_Gray
+Flood_LUT
 Flood_OriginalDemo
 Flood_OriginalMask
 Flood_UpLoDiff
