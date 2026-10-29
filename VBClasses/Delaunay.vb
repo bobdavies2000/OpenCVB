@@ -369,7 +369,12 @@ Namespace VBClasses
             If task.gOptions.DebugSlider.Value >= task.lines.lpList.Count Then
                 task.gOptions.DebugSlider.Value = 0
             End If
-            task.lpD = task.lines.lpList(indexList(Math.Abs(task.gOptions.DebugSlider.Value)))
+            Dim index = indexList(Math.Abs(task.gOptions.DebugSlider.Value)) - 1
+            If index >= 0 And index < task.lines.lpList.Count Then
+                task.lpD = task.lines.lpList(index)
+            Else
+                task.lpD = task.lines.lpList(0)
+            End If
 
             Dim p1GridIndex = task.gridMap.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
             Static saveID As Integer = p1GridIndex
@@ -388,7 +393,6 @@ Namespace VBClasses
 
             Line(dst3, task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth, task.lineWidth)
 
-            If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
             strOut = task.lpD.lpDisplay()
             SetTrueText(strOut, 3)
 

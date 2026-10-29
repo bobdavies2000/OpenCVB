@@ -58,6 +58,7 @@ Namespace VBClasses
             For Each rc In sortList.Values
                 rc.index = rcList.Count
                 Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                pt = validatePoint(pt)
                 rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(pt.Y, pt.X)
 
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
