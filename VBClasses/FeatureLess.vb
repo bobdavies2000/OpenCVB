@@ -45,7 +45,7 @@ Namespace VBClasses
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
                     ' it is difficult to track cells that are narrow...
-                    If rect.Width > task.gridWH Or rect.Height > task.gridWH Then
+                    If rect.Width > task.gridWH And rect.Height > task.gridWH Then
                         rc = New rcData(rcMap(rect), rect, index)
                         sortList.Add(rc.pixels, rc)
                     End If
@@ -57,7 +57,8 @@ Namespace VBClasses
             rcMap.SetTo(0)
             For Each rc In sortList.Values
                 rc.index = rcList.Count
-                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(pt.Y, pt.X)
 
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
@@ -74,9 +75,15 @@ Namespace VBClasses
                         rc.maxDStable = rclast.maxDStable
                     End If
                 End If
-                SetTrueText(CStr(rc.age), rc.maxDStable)
+                ' SetTrueText(CStr(rc.age), rc.maxDStable)
             Next
+
             dst2 = Palettize(rcMap, 0)
+
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                SetTrueText(CStr(rc.ID), rc.maxDist)
+            Next
 
             Dim rcNext = MyFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             If rcNext IsNot Nothing Then
@@ -2313,7 +2320,7 @@ Namespace VBClasses
             desc = "Update the featureless idMap using SteadyCam M."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            WarpAffine(src, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
+            WarpAffine(task.fless.dst2, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
             dst3 = task.steadyCam.dst2
         End Sub
     End Class
@@ -2325,7 +2332,6 @@ Namespace VBClasses
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public rcSnapshot As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             ' Hungarian Assignment algorithm - visual solution.
@@ -2336,16 +2342,13 @@ Namespace VBClasses
             dst1 = task.steadyCam.dst2
             If task.fless.rcList.Count = 0 Then Exit Sub
 
-            If task.heartBeatLT Or rcSnapshot.Count < 2 Then
-                rcSnapshot = New List(Of rcData)(task.fless.rcList)
-                dst3 = task.fless.dst3
-            End If
+            If task.heartBeatLT Or task.delaunayFLess.snapshotList.Count < 2 Then dst3 = task.fless.dst3
 
             rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData())
             Dim usedList As New List(Of Integer)
-            For Each rcPrev In rcSnapshot
+            For Each rcPrev In task.delaunayFLess.snapshotList
                 If rcPrev.index = 0 Then Continue For
                 Dim pt = WarpAffine_Basics.WarpPoint(rcPrev.maxDist, task.steadyCam.inverseM)
                 For Each rc In task.fless.rcList
@@ -2377,7 +2380,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = Palettize(rcMap, 0)
 
-                For Each rc In rcSnapshot
+                For Each rc In task.delaunayFLess.snapshotList
                     If rc.index = 0 Then Continue For
                     If rc.ID <> 0 Then
                         Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
@@ -2395,7 +2398,7 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
-            labels(3) = CStr(rcSnapshot.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+            labels(3) = CStr(task.delaunayFLess.snapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
 End Namespace

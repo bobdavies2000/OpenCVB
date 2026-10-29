@@ -71,34 +71,35 @@ Namespace VBClasses
     ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
     Public Class XR_CComp_Shapes : Inherits TaskParent
         Dim shapes As Mat
-        Dim mats As New Mat_4Click
+        Dim mats As New Mat_4to1
         Public Sub New()
             Dim filePath As String = task.homeDir + "Data/Shapes.png"
             shapes = New Mat(filePath, ImreadModes.Color)
+            Resize(shapes, shapes, task.workRes)
             labels(2) = "Largest connected component"
             labels(3) = "RectView, LabelView, Binary, grayscale"
             desc = "Use connected components to isolate objects in image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray As New Mat
-            CvtColor(shapes, gray, ColorConversionCodes.BGR2GRAY)
             Dim binary As New Mat
-            Threshold(gray, binary, 0, 255, ThresholdTypes.Otsu + ThresholdTypes.Binary)
-            Dim labelview = shapes.EmptyClone()
-            Dim rectView As New Mat
-            CvtColor(binary, rectView, ColorConversionCodes.GRAY2BGR)
+            CvtColor(shapes, binary, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(binary, binary, 0, 255, ThresholdTypes.Otsu + ThresholdTypes.Binary)
+            Dim rectView = binary.Clone
             Dim cc = ConnectedComponentsEx(binary)
             If cc.LabelCount <= 1 Then Exit Sub
 
-            cc.RenderBlobs(labelview)
+            cc.RenderBlobs(dst3)
             For Each blob In cc.Blobs.Skip(1)
-                Rectangle(rectView, blob.Rect, Scalar.red, 2)
+                Rectangle(rectView, blob.Rect, white, 2)
+                SetTrueText(CStr(blob.Label), blob.Centroid, 3)
+                FloodFill(dst3, blob.Centroid, task.scalarColors(blob.Label))
             Next
+            Dim labelView As New cv.Mat
+            CvtColor(dst3, labelview, cv.ColorConversionCodes.BGR2GRAY)
 
             Dim maxBlob = cc.GetLargestBlob()
             Dim filtered = New Mat
             cc.FilterByBlob(shapes, filtered, maxBlob)
-            ' dst3 = filtered.Resize(dst2.Size())
 
             mats.mat(0) = rectView
             mats.mat(1) = labelview

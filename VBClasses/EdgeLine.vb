@@ -111,7 +111,7 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each rc In edgeLine.rcList
-                If rc.ID > 0 Then
+                If rc.ID > 0 And rc.ID < 255 Then
                     If histarray(rc.ID - 1) > 0 And rc.contour.Count > 0 Then
                         count += 1
                         rc.ID = newList.Count + 1

@@ -609,7 +609,6 @@ Namespace VBClasses
             If task.algorithmActive Then
                 SetTrueText(traceName + " is a task algorithm that has already run", 3)
                 dst2 = task.delaunayFLess.dst2
-                dst3 = task.delaunayFLess.dst3
                 labels(2) = task.delaunayFLess.labels(2)
                 Exit Sub ' this is a task.algorithm that has already run...
             End If
@@ -622,9 +621,14 @@ Namespace VBClasses
                     ptList.Add(rc.maxDist)
                 Next
 
+                idMap.SetTo(0)
                 facetList = Delaunay_Basics.buildFacets(ptList)
-                For i = 1 To facetList.Count - 1
-                    FillConvexPoly(idMap, facetList(i), i, LineTypes.Link4)
+                For i = 0 To facetList.Count - 1
+                    If i = 0 Then
+                        FillConvexPoly(idMap, facetList(i), 255, LineTypes.Link4)
+                    Else
+                        FillConvexPoly(idMap, facetList(i), i, LineTypes.Link4)
+                    End If
                 Next
 
                 For Each rc In task.fless.rcList
@@ -633,17 +637,15 @@ Namespace VBClasses
                     DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
-                dst1 = Palettize(idMap, 0)
+                dst2 = Palettize(idMap, 0)
 
                 ' run after palettize
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawContours(dst1(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
             End If
-            WarpAffine(dst1, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
-            dst3 = task.steadyCam.dst2
         End Sub
     End Class
 End Namespace

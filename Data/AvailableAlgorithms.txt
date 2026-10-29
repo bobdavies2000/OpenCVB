@@ -1043,7 +1043,6 @@ XR_Disparity_Validate
 XR_Distance_Background
 XR_Distance_BinaryImage
 XR_Distance_ClickPoint
-XR_Distance_Contour
 XR_Distance_DepthBricks
 XR_Distance_DepthPeaks
 XR_Distance_Edges

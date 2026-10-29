@@ -505,38 +505,4 @@ Namespace VBClasses
             Next
         End Sub
     End Class
-
-
-
-
-
-
-
-    Public Class XR_Distance_Contour : Inherits TaskParent
-        Dim options As New Options_Distance
-        Dim contours As New Contour_Finder
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst0.Checked = True
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Compute the distance of each cv.Point from the top contour (or a selected contour.)"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-            contours.Run(src)
-            If contours.rcList.Count = 0 Then Exit Sub
-
-            task.rcD = contours.rcList.Last
-            dst2 = contours.dst2
-            labels(2) = contours.labels(2)
-
-            dst3 = src.Clone
-            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-
-            dst1.SetTo(255)
-
-            DistanceTransform(dst1(task.rcD.rect), dst0(task.rcD.rect), options.distanceType, DistanceTransformMasks.Precise, MatType.CV_32F)
-            dst1(task.rcD.rect).SetTo(0, task.rcD.mask)
-        End Sub
-    End Class
 End Namespace

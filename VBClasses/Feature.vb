@@ -109,8 +109,9 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each pt In ptlist
                 If lastFeatures.Contains(pt) Then
-                    Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
-                    Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)
+                    Circle(dst2, pt, task.DotSize + 1, white, -1, task.lineType)
+                    Circle(dst2, pt, task.DotSize, black, -1, task.lineType)
+                    Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
                 End If
             Next
 

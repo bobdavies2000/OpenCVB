@@ -10,8 +10,8 @@ Namespace VBClasses
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            labels(3) = "The circle shows the location of the current MaxDStable. The line is travel distance."
-            desc = "Identify each cell using color"
+            labels(3) = "The heartbeat maxDStable is show. The line is travel distance to the current maxDStable."
+            desc = "Track each cell and confirm with the cell's color.  Heartbeat updates colors."
         End Sub
         Private Shared Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
@@ -58,22 +58,26 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             rcMap.SetTo(0)
-            dst3 = task.redColor.dst3
+            dst3.SetTo(0)
             For Each rc In sortList.Values
                 Dim val = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val <> 0 Then Continue For ' already mapped...
                 rc.index = rcList.Count
                 Dim rcLast = rcFinder(rcListLast, rc.ID)
                 If rcLast IsNot Nothing Then
-                    Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDStable, task.steadyCam.M)
-                    ptx = validatePoint(ptx)
+                    Dim rcSnap = rcFinder(task.delaunayFLess.snapshotList, rc.ID)
+                    If rcSnap IsNot Nothing Then
+                        Dim ptx = WarpAffine_Basics.WarpPoint(rcSnap.maxDStable, task.steadyCam.inverseM)
+                        If ptx = validatePoint(ptx) Then
+                            Circle(dst3, rcSnap.maxDStable, task.DotSize + 1, white, -1)
+                            Line(dst3, rcSnap.maxDStable, ptx, white, task.lineWidth)
+                        End If
+                    End If
 
                     Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If idLast = rc.ID Then
                         Dim val2 = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If val2 <> idLast Then rc.maxDStable = rc.maxDist
-                        Circle(dst3, rc.maxDStable, task.DotSize + 1, white, -1)
-                        Line(dst3, rc.maxDStable, ptx, white, task.lineWidth)
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
                         rc.maxDStable = rcLast.maxDStable
@@ -830,7 +834,8 @@ Namespace VBClasses
             redC.Run(task.gray)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
+
+
         End Sub
     End Class
-
 End Namespace
