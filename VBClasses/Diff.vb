@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Diff_Basics : Inherits TaskParent
         Public changedPixels As Integer
-        Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 255)
+        Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             labels = {"", "", "Highlighting the changed pixels ", "AbsDiff output"}
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -10,8 +10,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = task.gray
-
-            If task.firstPass Then lastFrame.SetTo(0)
 
             dst3.SetTo(0)
             Absdiff(src, lastFrame, dst3)
@@ -255,4 +253,37 @@ Namespace VBClasses
             labels(3) = CStr(motionSort.Count) + " bricks different by more than " + CStr(options.millimeters) + " mm's"
         End Sub
     End Class
+
+
+
+
+    Public Class Diff_HSV : Inherits TaskParent
+        Public changedPixels As Integer
+        Public lastFrame As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public Sub New()
+            labels = {"", "", "Highlighting the changed pixels ", "AbsDiff output"}
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "HSV is better for diff because lighting effect can be removed from hue."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels() <> 3 Then src = task.color.Clone
+
+            Dim hsv As New cv.Mat
+            CvtColor(src, hsv, cv.ColorConversionCodes.BGR2HSV)
+
+            Cv2.ExtractChannel(hsv, dst1, 0)
+            Cv2.ExtractChannel(hsv, dst2, 1)
+            Cv2.ExtractChannel(hsv, dst3, 2)
+
+            'dst3.SetTo(0)
+            'Absdiff(src, lastFrame, dst3)
+            'Threshold(dst3, dst2, task.colorDiffThreshold, 255, ThresholdTypes.Binary)
+            'changedPixels = CountNonZero(dst2)
+            'lastFrame = src.Clone
+            'strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
+            '                 CStr(task.colorDiffThreshold)
+            'SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
 End Namespace

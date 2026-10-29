@@ -335,5 +335,111 @@ Namespace VBClasses
             labels(3) = redC.labels(2)
         End Sub
     End Class
+
+
+
+    Public Class Flood_UpLoDiff : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
+        Public indexList As New List(Of Integer)
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("lo Diff", 0, 100, 0)
+                sliders.setupTrackBar("up Diff", 0, 100, 0)
+            End If
+            desc = "FloodFill the input with an upDiff and loDiff to create a list of rect's sorted by pixel count."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static upSlider = OptionParent.FindSlider("up Diff")
+            Static loSlider = OptionParent.FindSlider("lo Diff")
+
+            Dim upDiff = cv.Scalar.All(upSlider.value)
+            Dim loDiff = cv.Scalar.All(loSlider.value)
+
+            If src.Channels <> 1 Then
+                Static color8u As New Color8U_Basics
+                color8u.Run(src)
+                dst1 = color8u.dst2.Clone
+            Else
+                dst1 = src.Clone
+            End If
+
+            Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+            Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            Dim rect As cv.Rect
+            mask.SetTo(0)
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                        Dim index = sortList.Count + 1
+                        Dim flags As FloodFillFlags = FloodFillFlags.Link4 Or FloodFillFlags.FixedRange Or
+                                                      FloodFillFlags.MaskOnly Or CType(index << 8, FloodFillFlags)
+                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, loDiff, upDiff, flags)
+                        If count >= task.minCellSize Then
+                            sortList.Add(count, ValidateRect(rect))
+                            sortIndexList.Add(count, index)
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            dst2 = Palettize(tmp, 0)
+
+            rectList = New List(Of cv.Rect)(sortList.Values)
+            indexList = New List(Of Integer)(sortIndexList.Values)
+            labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
+        End Sub
+    End Class
+
+
+
+    Public Class Flood_UpLoDiffColor : Inherits TaskParent
+        Public rectList As New List(Of cv.Rect)
+        Public indexList As New List(Of Integer)
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("lo Diff", 0, 100, 15)
+                sliders.setupTrackBar("up Diff", 0, 100, 15)
+            End If
+            desc = "FloodFill the input with an upDiff and loDiff to create a list of rect's sorted by pixel count."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static upSlider = OptionParent.FindSlider("up Diff")
+            Static loSlider = OptionParent.FindSlider("lo Diff")
+
+            Dim upDiff = cv.Scalar.All(upSlider.value)
+            Dim loDiff = cv.Scalar.All(loSlider.value)
+
+            If src.Channels <> 3 Then dst1 = task.color.Clone Else dst1 = src.Clone
+
+            Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+            Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            Dim rect As cv.Rect
+            mask.SetTo(0)
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then ' it is surprising how much performance benefits from this statement.
+                        Dim index = sortList.Count + 1
+                        Dim flags As FloodFillFlags = FloodFillFlags.Link4 Or FloodFillFlags.FixedRange Or
+                                                      FloodFillFlags.MaskOnly Or CType(index << 8, FloodFillFlags)
+                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, loDiff, upDiff, flags)
+                        If count >= task.minCellSize Then
+                            sortList.Add(count, ValidateRect(rect))
+                            sortIndexList.Add(count, index)
+                        End If
+                    End If
+                Next
+            Next
+
+            Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            dst2 = Palettize(tmp, 0)
+
+            rectList = New List(Of cv.Rect)(sortList.Values)
+            indexList = New List(Of Integer)(sortIndexList.Values)
+            labels(2) = CStr(rectList.Count) + " regions found, sorted by size"
+        End Sub
+    End Class
 End Namespace
 

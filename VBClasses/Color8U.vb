@@ -432,4 +432,31 @@ Namespace VBClasses
 
 
 
+    Public Class Color8U_Edges : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Dim edges As New Edge_Basics_TA
+        Dim diff As New Diff_Basics
+        Public Sub New()
+            desc = "find fake edges between shades of the same color."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(src)
+            dst2 = color8U.dst3
+            labels(2) = color8U.labels(2)
+
+            Dim tmp As New cv.Mat
+            CvtColor(dst2, tmp, cv.ColorConversionCodes.BGR2GRAY)
+            edges.Run(tmp)
+            dst3 = edges.dst2
+            labels(3) = edges.labels(2)
+
+            dst3.SetTo(0, task.edges.dst2)
+
+            Static lastFrame As cv.Mat = dst3
+            dst1 = dst3.Clone
+            dst1.SetTo(0, lastFrame)
+
+            lastFrame = dst3.Clone
+        End Sub
+    End Class
 End Namespace
