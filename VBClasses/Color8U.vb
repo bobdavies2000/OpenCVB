@@ -427,4 +427,9 @@ Namespace VBClasses
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
+
+
+
+
+
 End Namespace
