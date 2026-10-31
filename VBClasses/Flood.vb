@@ -448,11 +448,6 @@ Namespace VBClasses
     Public Class Flood_LUT : Inherits TaskParent
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("lo Diff", 0, 100, 15)
-                sliders.setupTrackBar("up Diff", 0, 100, 15)
-            End If
-            task.gOptions.DebugSlider.Maximum = 255
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "FloodFill the input and create a list of rect's sorted by pixel count."
         End Sub
@@ -460,61 +455,76 @@ Namespace VBClasses
             If src.Channels <> 1 Then
                 Static color8u As New Color8U_Basics
                 color8u.Run(src)
-                src = color8u.dst2.Clone
+                dst1 = color8u.dst2.Clone
             Else
-                src = src.Clone
+                dst1 = src.Clone
             End If
-            dst1 = src.Clone
-
-            Static upSlider = OptionParent.FindSlider("up Diff")
-            Static loSlider = OptionParent.FindSlider("lo Diff")
-
-            Dim upDiff = cv.Scalar.All(upSlider.value)
-            Dim loDiff = cv.Scalar.All(loSlider.value)
 
             Dim rectList As New List(Of cv.Rect)
             Dim floodPoints As New List(Of cv.Point)
-            Dim grayPoints As New List(Of Byte)
             Dim rect As cv.Rect
             mask.SetTo(0)
             Dim sortList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            Dim index As Integer
             For y = 0 To src.Height - 1
                 For x = 0 To src.Width - 1
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = rectList.Count + 1
-                        Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                        index = rectList.Count + 1
                         Dim pt = New cv.Point(x, y)
                         Dim count = FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             rectList.Add(ValidateRect(rect))
                             floodPoints.Add(pt)
-                            Dim val = task.gray.Get(Of Byte)(pt.Y, pt.X)
-                            grayPoints.Add(val)
-                            sortList.Add(val, index)
+                            sortList.Add(task.gray.Get(Of Byte)(pt.Y, pt.X), index)
                         End If
                     End If
                 Next
             Next
 
-            dst2 = Palettize(dst1, 0)
+            Dim combos(255) As Byte
+            Dim firstOldVal As Byte = 255, firstNewVal As Byte
+            Dim oldVal As Byte, newVal As Byte
+            For Each keyVal In sortList
+                oldVal = keyVal.Value
+                newVal = keyVal.Key
+                combos(oldVal) = newVal
 
-            Dim overlaps As New List(Of cv.Rect)
-            dst3.SetTo(0)
-            For i = 0 To rectList.Count - 1
-                Dim r1 = rectList(i)
-                For j = i + 1 To rectList.Count - 1
-                    Dim r2 = rectList(j)
-                    If r1.IntersectsWith(r2) Then
-                        If overlaps.Count < 5 Then Rectangle(dst2, r1.Union(r2), task.highlight, task.lineWidth)
-                        If overlaps.Count < 5 Then
-                            Rectangle(dst3, r1, white, task.lineWidth)
-                            Rectangle(dst3, r2, yellow, task.lineWidth)
-                        End If
-                        overlaps.Add(r1)
-                    End If
-                Next
+                If firstOldVal = 255 Then
+                    firstOldVal = oldVal
+                    firstNewVal = newVal
+                End If
             Next
-            labels(2) = CStr(rectList.Count) + " regions found with " + CStr(overlaps.Count) + " overlapping rects."
+
+            Dim lutTable(255) As Byte
+            oldval = firstOldVal
+            newVal = firstNewVal
+            Dim cIndex As Integer
+            For i = 0 To 255
+                If lutTable(i) = 0 Then
+                    index = sortList.Keys(cIndex)
+                    oldVal = sortList.Values(cIndex)
+                    For j = i To index
+                        lutTable(j) = oldVal
+                    Next
+                    newVal = index
+                    lutTable(newVal) = oldVal
+                    cIndex += 1
+                    If cIndex >= sortList.Count Then
+                        For j = index + 1 To 255
+                            lutTable(j) = newVal
+                        Next
+                        Exit For
+                    End If
+                End If
+            Next
+
+            Dim lut As New cv.Mat(1, 256, cv.MatType.CV_8UC1)
+            Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
+
+            Cv2.LUT(dst1, lut, dst2)
+
+            labels(2) = CStr(rectList.Count) + " regions found "
         End Sub
     End Class
 
@@ -593,33 +603,80 @@ Namespace VBClasses
                 Next
             Next
 
-            'Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            'Dim intersectCount As Integer
-            'dst0.SetTo(0)
-            'dst3.SetTo(0)
-            'For i = 0 To rectList.Count - 1
-            '    Dim r1 = rectList(i)
-            '    Dim val1 As Integer = grayPoints(i)
-            '    For j = i + 1 To rectList.Count - 1
-            '        Dim r2 = rectList(j)
-            '        Dim val2 As Integer = grayPoints(j)
-            '        If r1.IntersectsWith(r2) Then
-            '            If Math.Abs(val1 - val2) < 25 Then
-            '                dst0(r1.Union(r2)).SetTo(0)
-            '                InRange(dst1(r1), indexList(i), indexList(i), dst0(r1))
-            '                tmp(r1).SetTo(i, dst0(r1))
-            '                InRange(dst1(r2), indexList(j), indexList(j), dst0(r2))
-            '                tmp(r2).SetTo(i, dst0(r2))
-            '                intersectCount += 1
-            '            End If
-            '        End If
-            '    Next
-            'Next
-
-            ' dst3 = Palettize(tmp, 0)
-
             labels(2) = CStr(rectList.Count) + " regions found"
         End Sub
     End Class
+
+
+
+
+    Public Class Flood_Color8U : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public color8u As New Color8U_Basics
+        Public Sub New()
+            desc = "FloodFill the color8u input and keep the color about the same as the flooded cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8u.Run(src)
+            dst2 = color8u.dst2.Clone
+
+            If heartbeatX() Then
+                Dim rect As cv.Rect
+                Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+                Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                rcList.Clear()
+                For y = 0 To src.Height - 1
+                    For x = 0 To src.Width - 1
+                        If mask.Get(Of Byte)(y, x) = 0 Then
+                            Dim pt = New cv.Point(x, y)
+                            Dim color8u = task.gray.Get(Of Byte)(pt.Y, pt.X)
+                            Dim count = FloodFill(dst2, mask, pt, color8u, rect, 0, 0, flags)
+                            If count >= task.minCellSize Then
+                                rect = ValidateRect(rect)
+                                rcList.Add(New rcData(mask(rect), rect, color8u) With {.pt = pt, .color8U = color8u})
+                            End If
+                        End If
+                    Next
+                Next
+
+                labels(2) = CStr(rcList.Count) + " regions found "
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class Flood_MaxDist : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim flood As New Flood_Color8U
+        Public color8u As New Color8U_Basics
+        Public Sub New()
+            desc = "Flood_Color8U on the heartbeat and flood maxdist otherwise."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatX() Then
+                flood.Run(src)
+                dst2 = flood.dst2.Clone
+                labels(2) = flood.labels(2)
+                rcList = New List(Of rcData)(flood.rcList)
+            Else
+                Dim rectList As New List(Of cv.Rect)
+                Dim rect As cv.Rect
+                Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+                Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+                rcList.Clear()
+                For Each rc In flood.rcList
+                    Dim count = FloodFill(dst2, mask, rc.maxDist, rc.color8U, rect, 0, 0, flags)
+                    If count >= task.minCellSize Then
+                        rect = ValidateRect(rect)
+                        rectList.Add(rect)
+                        rcList.Add(New rcData(mask(rect), rect, rc.color8U) With {.pt = rc.maxDist, .color8U = rc.color8U})
+                    End If
+                Next
+            End If
+        End Sub
+    End Class
+
 End Namespace
 

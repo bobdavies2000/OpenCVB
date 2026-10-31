@@ -238,9 +238,11 @@ FitEllipse_Basics
 FitLine_Basics
 FitLine_Conventional
 Flood_Basics
+Flood_Color8U
 Flood_Edges
 Flood_Gray
 Flood_LUT
+Flood_MaxDist
 Flood_OriginalDemo
 Flood_OriginalMask
 Flood_UpLoDiff

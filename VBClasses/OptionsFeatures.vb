@@ -2,13 +2,13 @@ Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics",
-                                   "Hist3DColor_Basics", "KMeans_Basics", "LUT_Basics",
-                                   "Reduction_Basics", "PCA_NColor_CPP"}
+                                       "Hist3DColor_Basics", "KMeans_Basics", "LUT_Basics",
+                                       "Reduction_Basics", "PCA_NColor_CPP"}
     Public edgeList() As String = {"Bin4Way_Sobel", "Edge_BinarizedReduction", "Edge_Canny",
                                    "Edge_Laplacian", "Edge_Sobel", "EdgeLine_Basics",
                                    "XR_Edge_Scharr"}
     Public featureList() As String = {"AGAST", "AKAZE", "BrickPoint_Basics", "Corner_Basics", "Corner_HarrisDetector_CPP",
-                                  "Feature_BRISK", "GoodFeatures", "LineInput"}
+                                      "Feature_BRISK", "GoodFeatures", "LineInput"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = vbc.task.allOptions
         Me.Left = 0
@@ -29,12 +29,12 @@ Public Class OptionsFeatures
         ReDim grayCheckbox(vbc.task.filterBasics.grayFilter.filterList.Length - 1)
         For i = 0 To vbc.task.filterBasics.grayFilter.filterList.Length - 1
             Dim cb As New RadioButton With {.Text = vbc.task.filterBasics.grayFilter.filterList(i),
-                                        .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
+                                            .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
             GrayGroup.Controls.Add(cb)
             grayCheckbox(i) = cb
         Next
-        grayCheckbox(6).Checked = True ' Intensity_Basics for improved segmentation.
+        grayCheckbox(1).Checked = True ' Intensity_Basics for improved segmentation.
 
         ReDim colorCheckbox(vbc.task.filterBasics.filterList.Length - 1)
         For i = 0 To vbc.task.filterBasics.filterList.Length - 1

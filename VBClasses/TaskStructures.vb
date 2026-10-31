@@ -303,8 +303,10 @@ Namespace VBClasses
 
         Public Class rcData
             Public age As Integer = 1
+            Public color8U As Byte
             Public contour As New List(Of cv.Point)
             Public depth As Single
+            Public pt As cv.Point ' flood point...
             Public ID As Integer
             Public index As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)
@@ -318,7 +320,6 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
-                'Threshold(_mask, mask, 0, 255, cv.ThresholdTypes.Binary)
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
