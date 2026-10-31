@@ -303,10 +303,9 @@ Namespace VBClasses
 
         Public Class rcData
             Public age As Integer = 1
-            Public color8U As Byte
             Public contour As New List(Of cv.Point)
             Public depth As Single
-            Public pt As cv.Point ' flood point...
+            Public grayByte As Byte
             Public ID As Integer
             Public index As Integer
             Public mask As New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 0)

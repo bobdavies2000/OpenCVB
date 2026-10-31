@@ -497,8 +497,6 @@ Namespace VBClasses
             Next
 
             Dim lutTable(255) As Byte
-            oldval = firstOldVal
-            newVal = firstNewVal
             Dim cIndex As Integer
             For i = 0 To 255
                 If lutTable(i) = 0 Then
@@ -616,31 +614,37 @@ Namespace VBClasses
         Public Sub New()
             desc = "FloodFill the color8u input and keep the color about the same as the flooded cell."
         End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(src)
-            dst2 = color8u.dst2.Clone
-
-            If heartbeatX() Then
-                Dim rect As cv.Rect
-                Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-                Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
-                rcList.Clear()
-                For y = 0 To src.Height - 1
-                    For x = 0 To src.Width - 1
-                        If mask.Get(Of Byte)(y, x) = 0 Then
-                            Dim pt = New cv.Point(x, y)
-                            Dim color8u = task.gray.Get(Of Byte)(pt.Y, pt.X)
-                            Dim count = FloodFill(dst2, mask, pt, color8u, rect, 0, 0, flags)
-                            If count >= task.minCellSize Then
-                                rect = ValidateRect(rect)
-                                rcList.Add(New rcData(mask(rect), rect, color8u) With {.pt = pt, .color8U = color8u})
-                            End If
+        Public Shared Function floodAll(ByRef input As cv.Mat, mask As cv.Mat) As List(Of rcData)
+            Dim rcList As New List(Of rcData)
+            Dim rect As cv.Rect
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            For y As Integer = 0 To input.Height - 1
+                For x As Integer = 0 To input.Width - 1
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim pt = New cv.Point(x, y)
+                        Dim grayByte = task.gray.Get(Of Byte)(pt.Y, pt.X)
+                        Dim count = FloodFill(input, mask, pt, grayByte, rect, 0, 0, flags)
+                        If count >= task.minCellSize Then
+                            rect = ValidateRect(rect)
+                            Dim rc = New rcData(input(rect), rect, grayByte)
+                            Dim meanVal As Scalar = Cv2.Mean(task.gray(rect), rc.mask)
+                            rc.grayByte = CByte(meanVal(0))
+                            rcList.Add(rc)
                         End If
-                    Next
+                    End If
                 Next
+            Next
+            Return rcList
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim mask As New Mat(New cv.Size(CInt(dst2.Width + 2), CInt(dst2.Height + 2)), MatType.CV_8U, 0)
+            color8u.Run(src)
 
-                labels(2) = CStr(rcList.Count) + " regions found "
-            End If
+            dst2 = color8u.dst2.Clone
+            rcList.Clear()
+            rcList = New List(Of rcData)(floodAll(dst2, mask))
+
+            labels(2) = CStr(rcList.Count) + " regions found "
         End Sub
     End Class
 
@@ -657,26 +661,37 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If heartbeatX() Then
                 flood.Run(src)
-                dst2 = flood.dst2.Clone
                 labels(2) = flood.labels(2)
-                rcList = New List(Of rcData)(flood.rcList)
             Else
-                Dim rectList As New List(Of cv.Rect)
+                color8u.Run(src)
+
                 Dim rect As cv.Rect
                 Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
                 Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
                 rcList.Clear()
                 For Each rc In flood.rcList
-                    Dim count = FloodFill(dst2, mask, rc.maxDist, rc.color8U, rect, 0, 0, flags)
+                    Dim count = FloodFill(color8u.dst2, mask, rc.maxDist, rc.grayByte, rect, 0, 0, flags)
                     If count >= task.minCellSize Then
                         rect = ValidateRect(rect)
-                        rectList.Add(rect)
-                        rcList.Add(New rcData(mask(rect), rect, rc.color8U) With {.pt = rc.maxDist, .color8U = rc.color8U})
+                        Dim rcNew = New rcData(color8u.dst2(rect), rect, rc.grayByte)
+                        rcList.Add(rcNew)
                     End If
+                Next
+
+                Dim newList = Flood_Color8U.floodAll(color8u.dst2, mask)
+
+                For Each rc In newList
+                    rcList.Add(rc)
+                Next
+
+                dst2.SetTo(0)
+                For Each rc In rcList
+                    Dim meanVal As Scalar = Cv2.Mean(flood.dst2(rc.rect), rc.mask)
+                    rc.grayByte = CByte(meanVal(0))
+                    dst2(rc.rect).SetTo(rc.grayByte, rc.mask)
                 Next
             End If
         End Sub
     End Class
-
 End Namespace
 
