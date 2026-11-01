@@ -71,8 +71,8 @@ Namespace VBClasses
             Dim flags As FloodFillFlags = FloodFillFlags.Link4
             Dim rc As rcData
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y = 0 To input.Height - 1
-                For x = 0 To input.Width - 1
+            For y As Integer = 0 To input.Height - 1 Step task.gridWH
+                For x As Integer = 0 To input.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
                     ' skip the regions with no depth or those that were already floodfilled.
                     If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then

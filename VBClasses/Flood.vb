@@ -618,8 +618,8 @@ Namespace VBClasses
             Dim rcList As New List(Of rcData)
             Dim rect As cv.Rect
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
-            For y As Integer = 0 To input.Height - 1
-                For x As Integer = 0 To input.Width - 1
+            For y As Integer = 0 To input.Height - 1 Step task.gridWH
+                For x = 0 To input.Width - 1 Step task.gridWH
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim pt = New cv.Point(x, y)
                         Dim grayByte = task.gray.Get(Of Byte)(pt.Y, pt.X)
