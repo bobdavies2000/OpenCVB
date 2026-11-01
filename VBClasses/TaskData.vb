@@ -45,7 +45,7 @@ Namespace VBClasses
 
         Public workRes As Size
         Public smallRes As Size ' the recommended small resolution for this capture size.
-        Public smallBrick As Integer ' brick size for smallRes resolution.
+        Public smallBrick As Integer = 8 ' brick size for smallRes resolution.
         Public rows As Integer
         Public cols As Integer
         Public captureRes As Size

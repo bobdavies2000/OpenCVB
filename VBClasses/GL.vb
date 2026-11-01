@@ -682,7 +682,7 @@ Namespace VBClasses
 
 
     Public Class XR_GL_Featureless : Inherits TaskParent
-        Dim fLess As New XR_FeatureLess_Correlation
+        Dim fLess As New XR_FeatureLess_Color
         Public Sub New()
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             desc = "Display the pointcloud"

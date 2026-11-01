@@ -28,7 +28,6 @@ Public Class OptionsGlobal
 
         vbc.task.DotSize = 1
         vbc.task.gridWH = 8
-        vbc.task.smallBrick = 8
         vbc.task.DotSize = 1
         vbc.task.lineWidth = 1
         vbc.task.smallRes = New Size(320, 240)

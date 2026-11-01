@@ -323,7 +323,7 @@ Namespace VBClasses
         Public regionList As New List(Of List(Of cv.Rect))
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless grid rects using the gray scale range - see 'Correlation_Basics'."
+            desc = "Identify featureless grid rects using the gray scale range."
         End Sub
         Public Function buildMap(input As Mat) As Mat
             Dim regionIndex As Integer = regionList.Count
@@ -368,56 +368,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-    Public Class XR_FeatureLess_Depth : Inherits TaskParent
-        Public fLessList As New List(Of cv.Rect)
-        Public options As New Options_FeatureLess
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            dst3 = src
-            dst2.SetTo(0)
-            ' at higher resolutions, the correlation works but the fLessThreshold does not...
-            If task.workRes.Width >= 1280 Then
-                If src.Channels <> 1 Then src = task.grayOriginal ' only the raw image can be used with correlation.
-                Static corr As New Correlation_Basics
-                corr.Run(src)
-                fLessList = New List(Of cv.Rect)(corr.fLessList)
-            Else
-                If src.Channels <> 1 Then src = task.gray ' the motion-filtered image can be used a lower resolutions.
-                fLessList.Clear()
-                For Each r In task.gridRects
-                    Dim mm = GetMinMax(src(r))
-                    If mm.range < options.fLessThreshold Then
-                        dst2(r).SetTo(255)
-                        Rectangle(dst3, r, white, task.lineWidth)
-                        fLessList.Add(r)
-                    End If
-                Next
-            End If
-
-            'Dim index As Integer = 1
-            'For Each r In task.gridRects
-            '    Dim val = dst2.Get(Of Byte)(r.Y, r.X)
-            '    If val = 255 Then
-            '        Dim floodCount = dst2.FloodFill(r.TopLeft, index)
-            '        index += 1
-            '        If index >= 255 Then Exit For
-            '    End If
-            'Next
-
-            labels(2) = CStr(fLessList.Count) + " grid squares were found to be featureless (<gridRect>.mm.range < " +
-                CStr(options.fLessThreshold) + ")"
-        End Sub
-    End Class
 
 
 
@@ -470,7 +420,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_Correlation1 : Inherits TaskParent
+    Public Class XR_FeatureLess_Color1 : Inherits TaskParent
         Dim corr As New Correlation_Basics
         Public fLessList As New List(Of cv.Rect)
         Public Sub New()
@@ -492,68 +442,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_FeatureLess_Correlation : Inherits TaskParent
-        Public fLessList As New List(Of cv.Rect)
-        Dim smallGrid As New Grid_SquaresOnly
-        Public options As New Options_FeatureLess
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            ' couldn't put this in the constructor because motion is a task algorithm.
-            If task.firstPass Then smallGrid.Run(src) ' create the grid squares for the small resolution.
-            Dim input As Mat
-            If src.Channels <> 1 Then input = task.gray Else input = src
-
-            ' why do this resize?  Because the options.flessThreshold works at smallRes but not larger resolutions.
-            If task.workRes.Height > 270 Then Resize(input, input, task.smallRes, 0, 0, InterpolationFlags.Nearest)
-
-            Dim mask As New Mat(input.Size, MatType.CV_8U, 0)
-            For Each r In smallGrid.gridRects
-                r = ValidateRect(r)
-                Dim mm = GetMinMax(input(r))
-                If mm.range < options.fLessThreshold Then mask(r).SetTo(255)
-            Next
-
-            Resize(mask, dst2, src.Size, 0, 0, InterpolationFlags.Nearest)
-
-            fLessList.Clear()
-            For Each r In task.gridRects
-                If dst2.Get(Of Byte)(r.Y, r.X) Then fLessList.Add(r)
-            Next
-
-            If standaloneTest() Then
-                dst3 = task.gray.Clone
-                For Each r In fLessList
-                    Rectangle(dst3, r, white, task.lineWidth)
-                Next
-
-                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                Dim mm = GetMinMax(task.gray(task.gridRects(index)))
-                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
-                            "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
-                            "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
-                            "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf, 1)
-            End If
-
-            labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
-                        CStr(options.fLessThreshold) + ")"
-
-        End Sub
-    End Class
-
-
-
-
-    Public Class XR_FeatureLess_Correlations : Inherits TaskParent
+    Public Class XR_FeatureLess_Colors : Inherits TaskParent
         Dim corr As New Correlation_BasicsPlot
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range - see 'Correlation_Basics'."
+            desc = "Identify featureless squares using the gray scale range."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             corr.Run(src)
@@ -734,38 +627,6 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class XR_FeatureLess_History : Inherits TaskParent
-        Dim frames As New History_Basics
-        Dim fLess As New XR_FeatureLess_Correlation
-        Public Sub New()
-            labels(3) = "The brighter the grid square, the more recent appearance."
-            desc = "Accumulate the edges over a span of X images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fLess.Run(task.grayOriginal)
-
-            Threshold(fLess.dst2, dst2, 0, 255, ThresholdTypes.Binary)
-
-            frames.Run(dst2)
-            dst3 = frames.dst2
-
-            Dim countCurr = CountNonZero(dst2)
-            Dim countAll = CountNonZero(dst3)
-            Dim sqPixels = task.gridWH * task.gridWH
-            labels(2) = "Current frame: " + (countCurr / sqPixels).ToString(fmt0) + " grid squares and " +
-                        (countAll / sqPixels).ToString(fmt0) + " of all grid squares."
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
     Public Class XR_FeatureLess_LeftRight : Inherits TaskParent
         Dim fLessL As New FeatureLess_Basics
         Dim fLessR As New FeatureLess_Basics
@@ -866,7 +727,7 @@ Namespace VBClasses
 
     Public Class XR_FeatureLess_Cells : Inherits TaskParent
         Dim saveColorMap As Mat
-        Dim fLess As New XR_FeatureLess_Correlation
+        Dim fLess As New XR_FeatureLess_Color
         Public Sub New()
             saveColorMap = task.colorMap.Clone
             labels(3) = "Region Colors are ordered by size."
@@ -2400,6 +2261,55 @@ Namespace VBClasses
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
             labels(3) = CStr(task.delaunayFLess.snapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XR_FeatureLess_Color : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            task.fOptions.ColorDiffSlider.Value = 30
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Dim mask As New Mat(src.Size, MatType.CV_8U, 0)
+            For Each r In task.gridRects
+                r = ValidateRect(r)
+                Dim mm = GetMinMax(src(r))
+                If mm.range < task.fOptions.ColorDiffSlider.Value Then mask(r).SetTo(255)
+            Next
+
+            Resize(mask, dst2, src.Size, 0, 0, InterpolationFlags.Nearest)
+
+            fLessList.Clear()
+            For Each r In task.gridRects
+                If dst2.Get(Of Byte)(r.Y, r.X) Then fLessList.Add(r)
+            Next
+
+            If standaloneTest() Then
+                dst3 = task.gray.Clone
+                For Each r In fLessList
+                    Rectangle(dst3, r, white, task.lineWidth)
+                Next
+
+                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                Dim mm = GetMinMax(task.gray(task.gridRects(index)))
+                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
+                            "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
+                            "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
+                            "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf, 1)
+            End If
+
+            labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
+                        CStr(task.fOptions.ColorDiffSlider.Value) + ")"
         End Sub
     End Class
 End Namespace

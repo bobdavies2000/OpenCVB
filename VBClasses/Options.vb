@@ -7914,27 +7914,6 @@ Namespace VBClasses
 
 
 
-    Public Class Options_FeatureLess : Inherits OptionParent
-        Public fLessThreshold As Integer = 30
-        Public minPixels As Integer = 10
-        Public Sub New()
-            ' high resolution cameras need a higher threshold (but real high will use correlation.)
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Grid Min Threshold", 0, 200, minPixels)
-                sliders.setupTrackBar("Grid Range Threshold", 0, 255, fLessThreshold)
-            End If
-        End Sub
-        Public Sub Run()
-            Static pixelsSlider = FindSlider("Grid Min Threshold")
-            Static gridSlider = FindSlider("Grid Range Threshold")
-            minPixels = pixelsSlider.value
-            fLessThreshold = gridSlider.value
-        End Sub
-    End Class
-
-
-
-
     Public Class Options_DiffDepth : Inherits OptionParent
         Public millimeters As Integer
         Public meters As Double
