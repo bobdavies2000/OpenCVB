@@ -467,8 +467,8 @@ Namespace VBClasses
             Dim sortList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
             Dim index As Integer
-            For y = 0 To src.Height - 1
-                For x = 0 To src.Width - 1
+            For y = 0 To src.Height - 1 Step task.gridWH
+                For x = 0 To src.Width - 1 Step task.gridWH
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         index = rectList.Count + 1
                         Dim pt = New cv.Point(x, y)
@@ -521,6 +521,7 @@ Namespace VBClasses
             Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
 
             Cv2.LUT(dst1, lut, dst2)
+            dst3 = Palettize(dst1, 0)
 
             labels(2) = CStr(rectList.Count) + " regions found "
         End Sub
@@ -556,8 +557,8 @@ Namespace VBClasses
             Dim rect As cv.Rect
             mask.SetTo(0)
             Dim sortList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-            For y = 0 To src.Height - 1
-                For x = 0 To src.Width - 1
+            For y = 0 To src.Height - 1 Step task.gridWH
+                For x = 0 To src.Width - 1 Step task.gridWH
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = rectList.Count + 1
                         Dim flags = FloodFillFlags.FixedRange Or (255 << 8)

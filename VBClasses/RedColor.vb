@@ -10,25 +10,22 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
 
-            dst2 = color8U.dst3.Clone
-
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             Dim filled As New cv.Mat
-            dst1 = color8U.dst2.Clone
             rcMap.SetTo(0)
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y = 0 To dst2.Height - 1
-                For x = 0 To dst2.Width - 1
+            For y = 0 To dst2.Height - 1 Step task.gridWH
+                For x = 0 To dst2.Width - 1 Step task.gridWH
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = sortList.Count
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(dst1, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        Dim count = FloodFill(color8U.dst2, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(dst1(rect), rect, index)
+                            Dim rc = New rcData(color8U.dst2(rect), rect, index)
                             sortList.Add(rc.pixels, rc)
                         Else
-                            If count > 0 Then mask(rect).SetTo(0, dst1(rect)) ' add the small fragments back to the pool.
+                            If count > 0 Then mask(rect).SetTo(0, color8U.dst2(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
@@ -45,6 +42,11 @@ Namespace VBClasses
             Next
 
             dst3 = Palettize(rcMap, 0)
+            dst2 = dst3.Clone
+
+            For Each rc In rcList
+                DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+            Next
 
             labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
@@ -242,6 +244,19 @@ Namespace VBClasses
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_DepthMerge : Inherits TaskParent
+        Public Sub New()
+            desc = "Separate and merge cells based on depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+
         End Sub
     End Class
 End Namespace
