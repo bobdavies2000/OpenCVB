@@ -42,7 +42,7 @@ Namespace VBClasses
             task.gravityCloud = New Mat(task.workRes, MatType.CV_32FC3, 0)
             task.noDepthMask = New Mat(task.workRes, MatType.CV_8U, 0)
             task.depthmask = New Mat(task.workRes, MatType.CV_8U, 0)
-            task.foregroundMask = New Mat(task.workRes, MatType.CV_8U, 0)
+            'task.foregroundMask = New Mat(task.workRes, MatType.CV_8U, 0)
 
             task.colorizer = New DepthColorizer_Basics_TA
             task.gravityMatrix = New IMU_GMatrix_TA
@@ -60,7 +60,7 @@ Namespace VBClasses
             task.grid = New Grid_Basics_TA
 
             task.filterBasics = New Filter_Basics_TA
-            task.foreground = New Foreground_Basics_TA
+            'task.foreground = New Foreground_Basics_TA
             task.leftRightBrightness = New LeftRight_Brightness_TA
             task.steadyCam = New SteadyCam_Basics_TA
 
@@ -200,7 +200,7 @@ Namespace VBClasses
             If task.lines IsNot Nothing Then task.lines.Run(gray)
 
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
-            task.foreground.Run(New cv.Mat)
+            ' task.foreground.Run(New cv.Mat)
             If task.firstPass Then task.delaunayFLess.Run(gray)
             task.edges.Run(gray)
             task.fless.Run(gray)

@@ -25,32 +25,8 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyCam_BasicsMatch : Inherits TaskParent
-        Dim match As New Match_CenterRect
-        Public shiftXY As cv.Point
-        Public M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public inverseM As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
-        Public Sub New()
-            desc = "Use Match_CenterRect to determine the offset due to camera motion."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            match.Run(src)
-            dst2 = match.dst2
-            dst3 = match.dst3
-            labels = match.labels
-            shiftXY = match.shiftXY
-            M = match.M
-            InvertAffineTransform(M, inverseM)
-        End Sub
-    End Class
 
-
-
-
-
-
-    Public Class SteadyCam_BasicsOriginal : Inherits TaskParent
+    Public Class SteadyCam_MatchCenterRect : Inherits TaskParent
         Dim match As New Match_Basics
         Public shiftXY As cv.Point2f
         Public forceRecenter As Boolean
@@ -111,7 +87,7 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyCam_Kalman : Inherits TaskParent
+    Public Class XR_SteadyCam_Kalman : Inherits TaskParent
         Dim kalman As New Kalman_Basics
         Dim M As New cv.Mat(2, 3, cv.MatType.CV_64FC1)
         Public Sub New()
@@ -141,7 +117,7 @@ Namespace VBClasses
 
 
 
-    Public Class SteadyCam_LongestLine : Inherits TaskParent
+    Public Class XR_SteadyCam_LongestLine : Inherits TaskParent
         Dim matcher As New Line_Match
         Public shiftXY As cv.Point2f
         Public rotateAngle As Double
@@ -208,25 +184,6 @@ Namespace VBClasses
             labels(3) = "shift=" + shiftXY.ToString + "  rotate=" + rotateAngle.ToString(fmt2) + " deg"
         End Sub
     End Class
-
-
-
-
-    Public Class SteadyCam_FindLines : Inherits TaskParent
-        Dim steady As New SteadyCam_WarpAffine
-        Dim lines As New Line_Basics
-        Public Sub New()
-            desc = "Find the lines in the SteadyCam_Lines output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            steady.Run(task.gray)
-            dst2 = steady.dst3
-
-            lines.Run(dst2)
-            dst3 = lines.dst2
-        End Sub
-    End Class
-
 
 
 

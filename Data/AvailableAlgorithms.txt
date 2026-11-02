@@ -628,6 +628,7 @@ RedC_Neighbors
 RedCloud_Basics
 RedCloud_Core
 RedColor_Basics
+RedColor_DepthMerge
 RedColor_FLessBasics
 RedColor_FloodToID
 RedColor_GridRects
@@ -684,12 +685,8 @@ StableLine_Basics
 StDev_Highest
 StDev_Range
 SteadyCam_Basics_TA
-SteadyCam_BasicsMatch
-SteadyCam_BasicsOriginal
-SteadyCam_FindLines
-SteadyCam_Kalman
-SteadyCam_LongestLine
 SteadyCam_MapTest
+SteadyCam_MatchCenterRect
 SteadyCam_WarpAffine
 SteadyM_Basics
 SteadyM_Delaunay
@@ -1670,6 +1667,8 @@ XR_Stabilizer_Basics
 XR_StableLine_BasicsOldCount
 XR_StableLine_FAST
 XR_StableLine_Lines
+XR_SteadyCam_Kalman
+XR_SteadyCam_LongestLine
 XR_SteadyM_Cells
 XR_SteadyM_Longest
 XR_SteadyM_Longest1
