@@ -62,6 +62,12 @@ Public Class TreeviewForm
         End If
 
         PercentTime.Text = CPUTime.PrepareReport(treeData)
+
+        Dim length As Integer = PercentTime.Lines(PercentTime.Lines.Length - 1).Length
+        Dim start As Integer = PercentTime.GetFirstCharIndexFromLine(PercentTime.Lines.Length - 1)
+        PercentTime.Select(start, length)
+        PercentTime.SelectionFont = New Font(PercentTime.Font, FontStyle.Bold)
+
         PercentTime.Refresh()
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load

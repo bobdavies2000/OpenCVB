@@ -24,8 +24,8 @@ Partial Class TreeViewForm
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
         TreeView1 = New TreeView()
-        PercentTime = New TextBox()
         Timer2 = New Timer(components)
+        PercentTime = New RichTextBox()
         SuspendLayout()
         ' 
         ' TreeView1
@@ -36,19 +36,18 @@ Partial Class TreeViewForm
         TreeView1.Size = New Size(286, 1136)
         TreeView1.TabIndex = 0
         ' 
-        ' PercentTime
-        ' 
-        PercentTime.Location = New Point(294, 0)
-        PercentTime.Margin = New Padding(4)
-        PercentTime.Multiline = True
-        PercentTime.Name = "PercentTime"
-        PercentTime.Size = New Size(180, 36)
-        PercentTime.TabIndex = 1
-        ' 
         ' Timer2
         ' 
         Timer2.Enabled = True
         Timer2.Interval = 3000
+        ' 
+        ' PercentTime
+        ' 
+        PercentTime.Location = New Point(286, 5)
+        PercentTime.Name = "PercentTime"
+        PercentTime.Size = New Size(237, 29)
+        PercentTime.TabIndex = 2
+        PercentTime.Text = ""
         ' 
         ' TreeViewForm
         ' 
@@ -61,10 +60,9 @@ Partial Class TreeViewForm
         Name = "TreeViewForm"
         Text = "TreeViewForm"
         ResumeLayout(False)
-        PerformLayout()
     End Sub
 
     Friend WithEvents TreeView1 As TreeView
-    Friend WithEvents PercentTime As TextBox
     Friend WithEvents Timer2 As Timer
+    Friend WithEvents PercentTime As RichTextBox
 End Class
