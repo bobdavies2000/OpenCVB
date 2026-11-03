@@ -57,7 +57,7 @@ Namespace VBClasses
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In nextList
-                If rc.ID < 0 Then Continue For
+                If rc.ID < 0 Then Continue For ' remove duplicates.
                 rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count

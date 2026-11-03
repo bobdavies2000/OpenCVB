@@ -112,7 +112,7 @@ Namespace VBClasses
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, task.gridMask)
                 labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
-                                                     CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
+                                                CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
             End If
         End Sub
     End Class
