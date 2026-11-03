@@ -44,11 +44,9 @@ Namespace VBClasses
             For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
-                    ' it is difficult to track cells that are narrow...
-                    If rect.Width > task.gridWH And rect.Height > task.gridWH Then
-                        rc = New rcData(rcMap(rect), rect, index)
-                        sortList.Add(rc.pixels, rc)
-                    End If
+                    rc = New rcData(rcMap(rect), rect, index)
+                    sortList.Add(rc.pixels, rc)
+                    index += 1
                 End If
             Next
 
@@ -60,7 +58,6 @@ Namespace VBClasses
                 Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
                 pt = validatePoint(pt)
                 rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(pt.Y, pt.X)
-
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
                 rcList.Add(rc)
@@ -2143,7 +2140,6 @@ Namespace VBClasses
 
     Public Class FeatureLess_SteadyCam : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -2151,7 +2147,6 @@ Namespace VBClasses
             desc = "Track the FeatureLess cells points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            idMap = task.delaunayFLess.idMap
             dst0.SetTo(0)
             dst3.SetTo(0)
             rcList.Clear()
@@ -2160,7 +2155,7 @@ Namespace VBClasses
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.ID = idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(ptx.Y, ptx.X)
                 rcList.Add(rc)
                 dst0(rc.rect).SetTo(rc.ID, rc.mask)
             Next
@@ -2171,19 +2166,6 @@ Namespace VBClasses
 
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
-        End Sub
-    End Class
-
-
-
-
-    Public Class FeatureLess_ReMap : Inherits TaskParent
-        Public Sub New()
-            desc = "Update the featureless idMap using SteadyCam M."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            WarpAffine(task.fless.dst2, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
-            dst3 = task.steadyCam.dst2
         End Sub
     End Class
 

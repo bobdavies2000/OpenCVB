@@ -111,6 +111,8 @@ Namespace VBClasses
             Else
                 If rcList.Count > 1 Then task.rcD = rcList(1)
             End If
+
+            WarpAffine(dst2, dst2, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
         End Sub
     End Class
 

@@ -217,7 +217,6 @@ FeatureLess_Gravity
 FeatureLess_Matching
 FeatureLess_Ordered
 FeatureLess_OrderKNN
-FeatureLess_ReMap
 FeatureLess_SteadyCam
 FeatureLess_Tracker
 FeatureMatch_Basics

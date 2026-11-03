@@ -646,6 +646,7 @@ Namespace VBClasses
                 ' run after palettize
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
+                    Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                     DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
