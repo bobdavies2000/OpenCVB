@@ -30,7 +30,7 @@ Namespace VBClasses
             Next
 
             For Each rc In task.redColor.rcList
-                Dim id = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                Dim id = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If id < rcLists.Count Then rcLists(id).Add(rc.index)
             Next
 
@@ -74,9 +74,9 @@ Namespace VBClasses
                         End If
                     End If
 
-                    Dim idLast = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim idLast = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If idLast = rc.ID Then
-                        Dim val2 = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        Dim val2 = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If val2 <> idLast Then rc.maxDStable = rc.maxDist
                         rc.age = rcLast.age + 1
                         If rc.age >= 1000 Then rc.age = 10
@@ -148,7 +148,7 @@ Namespace VBClasses
             For Each rc In task.redColor.rcList
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
-                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
                 rcList.Add(rc)

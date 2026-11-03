@@ -303,7 +303,6 @@ Namespace VBClasses
 
         Public Class rcData
             Public age As Integer = 1
-            Public anchorID As Byte
             Public contour As New List(Of cv.Point)
             Public depth As Single
             Public grayByte As Byte
@@ -324,7 +323,7 @@ Namespace VBClasses
                 If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
-                anchorID = task.fless.rcMap.Get(Of Byte)(maxDist.Y, maxDist.X)
+                ID = task.delaunayFLess.rcMap.Get(Of Byte)(maxDist.Y, maxDist.X)
                 depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
             End Sub
             Public Function buildMaxDist(mask As cv.Mat) As cv.Point

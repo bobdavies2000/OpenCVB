@@ -57,7 +57,7 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
                 pt = validatePoint(pt)
-                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(pt.Y, pt.X)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(pt.Y, pt.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.pixels = CountNonZero(rc.mask)
                 rcList.Add(rc)
@@ -2155,7 +2155,7 @@ Namespace VBClasses
                 Dim ptx = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.M)
                 ptx = validatePoint(ptx)
                 Line(dst3, rc.maxDist, ptx, white, task.lineWidth)
-                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(ptx.Y, ptx.X)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(ptx.Y, ptx.X)
                 rcList.Add(rc)
                 dst0(rc.rect).SetTo(rc.ID, rc.mask)
             Next

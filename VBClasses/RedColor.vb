@@ -58,7 +58,7 @@ Namespace VBClasses
             rcList.Add(New rcData) ' placeholder for zero...
             For Each rc In nextList
                 If rc.ID < 0 Then Continue For ' remove duplicates.
-                rc.ID = task.delaunayFLess.idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count
                 rcList.Add(rc)
@@ -277,12 +277,104 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_DepthMerge : Inherits TaskParent
+    Public Class RedColor_BasicsNew : Inherits TaskParent
+        Dim color8U As New Color8U_Basics
+        Public rcList As New List(Of rcData)
+        Public colorList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            desc = "Separate and merge cells based on depth."
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(task.gray)
 
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim rect As cv.Rect
+            Dim filled As New cv.Mat
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            For y = 0 To dst2.Height - 1 Step task.gridWH
+                For x = 0 To dst2.Width - 1 Step task.gridWH
+                    Dim pt = New cv.Point(x, y)
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+                        Dim index = sortList.Count
+                        Dim count = FloodFill(color8U.dst2, mask, pt, index, rect, 0, 0, flags)
+                        If count >= task.minCellSize Then
+                            Dim rc = New rcData(color8U.dst2(rect), rect, index) With {.index = index}
+                            Dim testID = task.delaunayFLess.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                            sortList.Add(rc.ID, rc)
+                        Else
+                            If count > 0 Then mask(rect).SetTo(0, color8U.dst2(rect)) ' add the small fragments back to the pool.
+                        End If
+                    End If
+                Next
+            Next
+
+            ' remove cells that are completely contained in other cells
+            colorList = New List(Of rcData)(sortList.Values)
+            Dim containedCount As Integer
+            For Each rc In sortList.Values
+                For i = rc.index + 1 To sortList.Values.Count - 1
+                    Dim rcNext = sortList.Values(i)
+                    If rcNext.rect = rc.rect Then Continue For
+                    If rc.rect.Contains(rcNext.rect) Then
+                        If rcNext.index >= 0 Then
+                            mask(rc.rect).SetTo(0)
+                            mask(rcNext.rect).SetTo(255, rcNext.mask)
+                            mask(rc.rect) = mask(rc.rect) And rc.mask
+                            If rcNext.pixels = CountNonZero(mask(rc.rect)) Then
+                                ' Optionally display the overlapping rects.
+                                If standaloneTest() Then
+                                    Rectangle(task.color, rc.rect, task.highlight, task.lineWidth)
+                                    Rectangle(task.color, rcNext.rect, task.highlight, task.lineWidth + 1)
+                                End If
+                                colorList.Remove(rcNext)
+                                containedCount += 1
+                            End If
+                        End If
+                    End If
+                Next
+            Next
+
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            For i = 0 To colorList.Count - 1
+                Dim rc = colorList(i)
+                If rc.ID < 0 Then Continue For
+                For j = i + 1 To colorList.Count - 1
+                    Dim rcNext = colorList(j)
+                    If rc.ID = rcNext.ID Then
+                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
+                        mask(r).SetTo(0)
+                        mask(rc.rect).SetTo(255, rc.mask)
+                        mask(rcNext.rect).SetTo(255, rcNext.mask)
+                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+                        rcNext.ID = -1
+                        colorList(j) = rcNext
+                    End If
+                Next
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.index = rcList.Count
+                rcList.Add(rc)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            If standaloneTest() Then
+                dst3 = dst2.Clone
+                For Each rc In colorList
+                    DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                Next
+                labels(3) = CStr(containedCount) + " cells fully contained are highlighted " +
+                            "in the upper left image (when standalone.)"
+            End If
+
+            labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
+            If rcList.Count > 255 Then
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
+            End If
         End Sub
     End Class
 End Namespace

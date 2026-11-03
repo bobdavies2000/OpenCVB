@@ -602,7 +602,7 @@ Namespace VBClasses
 
 
     Public Class Delaunay_FeatureLess : Inherits TaskParent
-        Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public ptList As New List(Of cv.Point2f)
         Public ptLatest As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
@@ -626,23 +626,23 @@ Namespace VBClasses
                     ptList.Add(rc.maxDist)
                 Next
 
-                idMap.SetTo(0)
+                rcMap.SetTo(0)
                 facetList = Delaunay_Basics.buildFacets(ptList)
                 For i = 0 To facetList.Count - 1
                     If i = 0 Then
-                        FillConvexPoly(idMap, facetList(i), 255, LineTypes.Link4)
+                        FillConvexPoly(rcMap, facetList(i), 255, LineTypes.Link4)
                     Else
-                        FillConvexPoly(idMap, facetList(i), i, LineTypes.Link4)
+                        FillConvexPoly(rcMap, facetList(i), i, LineTypes.Link4)
                     End If
                 Next
 
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    rc.ID = idMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
+                    rc.ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    DrawContours(rcMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
-                dst2 = ApplyPalette(idMap, 0)
+                dst2 = ApplyPalette(rcMap, 0)
 
                 ' run after ApplyPalette
                 For Each rc In task.fless.rcList
@@ -650,7 +650,7 @@ Namespace VBClasses
                     Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
                     DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
                 Next
-                labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
+                labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
             End If
 
             ptLatest.Clear()
