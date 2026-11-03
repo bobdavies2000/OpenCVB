@@ -83,7 +83,7 @@ Namespace VBClasses
             classCount += 1
             dst2.SetTo(classCount, task.depthClippedMask)
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
             Threshold(dst2, dst0, 0, 255, ThresholdTypes.Binary)
         End Sub

@@ -175,7 +175,7 @@ Namespace VBClasses
             Next
 
             dst1.ConvertTo(dst0, MatType.CV_8U)
-            dst3 = Palettize(dst0)
+            dst3 = ApplyPalette(dst0)
             labels(3) = CStr(masks.Count) + " Connected Components"
         End Sub
     End Class

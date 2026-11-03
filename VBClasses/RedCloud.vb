@@ -108,7 +108,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             If rcList.Count >= 255 Then MsgBox("RedCloud_Core has exceeded the 8-bit max.  Increase task.minCellSize?")
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class

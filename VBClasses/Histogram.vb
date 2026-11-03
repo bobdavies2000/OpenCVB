@@ -1222,7 +1222,7 @@ Namespace VBClasses
                 dst1.SetTo(i + 1, mask)
             Next
             dst1.SetTo(0, task.noDepthMask)
-            dst3 = Palettize((dst1 + 1))
+            dst3 = ApplyPalette((dst1 + 1))
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
@@ -1427,7 +1427,7 @@ Namespace VBClasses
                     labels(2) = "2D plot of the resulting 3D histogram."
             End Select
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
 
             Dim histArray(histogram.Total - 1) As Single
             histogram.GetArray(Of Single)(histArray)
@@ -1519,7 +1519,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             LUT(splitMats(1), lutTable2, dst0)
             dst0 += 1
-            dst3 = Palettize(dst0)
+            dst3 = ApplyPalette(dst0)
         End Sub
     End Class
 

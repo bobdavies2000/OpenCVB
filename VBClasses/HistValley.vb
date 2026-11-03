@@ -354,7 +354,7 @@ Namespace VBClasses
 
             CalcBackProject({src}, {0}, histogram, dst1, kalman.hist.ranges)
 
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
             labels(3) = CStr(auto.valleyOrder.Count + 1) + " colors in the back projection"
         End Sub
     End Class
@@ -486,7 +486,7 @@ Namespace VBClasses
             InRange(task.pcSplit(2), marks(marks.Length - 1), 100, dst0)
             dst2.SetTo(marks.Length, dst0)
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 

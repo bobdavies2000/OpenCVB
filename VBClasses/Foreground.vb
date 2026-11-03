@@ -142,7 +142,7 @@ Namespace VBClasses
                 Dim tmp = depthMats(index)
                 dst1.SetTo(index + 1, tmp)
             Next
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             Threshold(task.pcSplit(2), fg, fgDepth, 255, ThresholdTypes.BinaryInv)
             ConvertScaleAbs(fg, fg)
             dst0 = fg

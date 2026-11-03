@@ -187,7 +187,7 @@ Namespace VBClasses
 
             ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
             dst1 += 1
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
@@ -682,7 +682,7 @@ Namespace VBClasses
             dst0 = src.Clone
             dst0.SetTo(white, dst3)
 
-            If standaloneTest() Then dst2 = Palettize(dst2)
+            If standaloneTest() Then dst2 = ApplyPalette(dst2)
             labels(2) = classCount.ToString("000") + " regions were found"
         End Sub
     End Class
@@ -715,7 +715,7 @@ Namespace VBClasses
             dst0.ConvertTo(dst2, MatType.CV_8U)
             dst2.SetTo(0, task.noDepthMask)
 
-            If standaloneTest() Then dst3 = Palettize(dst2)
+            If standaloneTest() Then dst3 = ApplyPalette(dst2)
             labels(2) = CStr(classCount) + " regions defined in the depth data"
         End Sub
     End Class
@@ -1130,7 +1130,7 @@ Namespace VBClasses
             Next
 
             Dim mm = GetMinMax(dst1)
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             ' dst2.SetTo(0, task.noDepthMask)
             labels(3) = "Error estimates vary from " + mm.minVal.ToString(fmt3) + " to " + mm.maxVal.ToString(fmt3)
             If task.brickD Is Nothing Then Exit Sub
@@ -1428,7 +1428,7 @@ Namespace VBClasses
                 End If
             End If
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(2) = $"{classCount} regions found."
         End Sub
     End Class
@@ -1459,7 +1459,7 @@ Namespace VBClasses
             If heartbeatX() Or everyFrame Then
                 CalcBackProject({src}, {0}, histogram, dst1, ranges)
                 dst1.ConvertTo(dst2, MatType.CV_8U)
-                dst3 = Palettize(dst2)
+                dst3 = ApplyPalette(dst2)
                 labels(3) = "Depth range: 0.1 to " + task.MaxZmeters.ToString(fmt3)
             End If
         End Sub

@@ -95,7 +95,7 @@ Namespace VBClasses
                 SetTrueText(strOut, 1)
             End If
             dst0 = dst1.Clone()
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
         End Sub
     End Class
 
@@ -142,7 +142,7 @@ Namespace VBClasses
                 End If
             Next
 
-            dst3 = Palettize(dst1, 0)
+            dst3 = ApplyPalette(dst1, 0)
             If standalone Then
                 Dim index = task.gOptions.DebugSlider.Value
                 For Each lp In lpList
@@ -814,7 +814,7 @@ Namespace VBClasses
                 If lpList.Count > 10 Then Exit For
             Next
 
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
         End Sub
     End Class
 
@@ -980,7 +980,7 @@ Namespace VBClasses
                 If fillTriangle(botleft) Then Continue For
             Next
 
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
             Dim pcZ = task.pcSplit(2).Clone
             For Each lp In task.lines.lpList
                 Dim mask1 = dst3(lp.rect).Clone
@@ -1034,7 +1034,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(task.lines.lpList.Count) + " non-overlapping lines were found."
 
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
 
             Dim index = dst3.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
             If task.lines.lpList.Count > 0 And index < task.lines.lpList.Count Then

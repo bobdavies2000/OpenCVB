@@ -99,7 +99,7 @@ Namespace VBClasses
             reduction.Run(src)
             dst3 = reduction.dst2
 
-            dst2 = Palettize(dst3)
+            dst2 = ApplyPalette(dst3)
         End Sub
     End Class
 
@@ -113,7 +113,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             draw.Run(src)
-            dst2 = Palettize(draw.dst2)
+            dst2 = ApplyPalette(draw.dst2)
         End Sub
     End Class
 
@@ -270,8 +270,8 @@ Namespace VBClasses
             Dim leftView As New Mat, rightView As New Mat
             ConvertScaleAbs(task.leftView, leftView)
             ConvertScaleAbs(task.rightView, rightView)
-            dst2 = Palettize(leftView)
-            dst3 = Palettize(rightView)
+            dst2 = ApplyPalette(leftView)
+            dst3 = ApplyPalette(rightView)
         End Sub
     End Class
     Public Class XR_Palette_TaskColors : Inherits TaskParent
@@ -537,7 +537,7 @@ Namespace VBClasses
             dst2 += tiers.dst2
             classCount = tiers.classCount + 4
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 

@@ -30,7 +30,7 @@ Namespace VBClasses
                 dst2.SetTo(i + 1, tmp)
             Next
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
 
             If standalone Then
                 Static redC As New RedColor_FLessBasics

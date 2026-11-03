@@ -33,7 +33,7 @@ Namespace VBClasses
             dst2 *= classCount / 255
             dst2 += 1 ' stay away from zero...
 
-            If standaloneTest() Then dst3 = Palettize(dst2)
+            If standaloneTest() Then dst3 = ApplyPalette(dst2)
             labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
         End Sub
     End Class

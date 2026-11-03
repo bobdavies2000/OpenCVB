@@ -87,7 +87,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
 
             For Each rc In task.delaunayFLess.snapshotList
                 Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
@@ -169,7 +169,7 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.maxDist, 2)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
 
@@ -255,7 +255,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(rcMap, 0)
+            dst3 = ApplyPalette(rcMap, 0)
 
             labels(2) = CStr(rcList.Count) + " cells were found "
         End Sub
@@ -666,7 +666,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(rcMap, 0)
+            dst3 = ApplyPalette(rcMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned an index."
         End Sub
     End Class
@@ -756,7 +756,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
 
             labels(2) = CStr(task.redColor.rcList.Count) + " input cells merged into the " +
                         CStr(rcList.Count - 1) + " featureless cells."
@@ -836,7 +836,7 @@ Namespace VBClasses
             Static lastFrame As Integer = -1
             If lastFrame < task.frameCount Then
                 redC.Run(task.gray)
-                dst2 = Palettize(task.redColor.rcMap, 0)
+                dst2 = ApplyPalette(task.redColor.rcMap, 0)
                 labels(2) = redC.labels(2)
                 rcTarget = task.rcD
             End If

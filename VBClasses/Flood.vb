@@ -17,7 +17,7 @@ Namespace VBClasses
                 dst1 = src.Clone
             End If
 
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -327,11 +327,11 @@ Namespace VBClasses
 
             Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
             redC.Run(dst1)
-            dst2 = Palettize(redC.rcMap, 0)
+            dst2 = ApplyPalette(redC.rcMap, 0)
             labels(2) = redC.labels(2)
 
             redC.Run(Not dst1)
-            dst3 = Palettize(redC.rcMap, 0)
+            dst3 = ApplyPalette(redC.rcMap, 0)
             labels(3) = redC.labels(2)
         End Sub
     End Class
@@ -384,7 +384,7 @@ Namespace VBClasses
             Next
 
             Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
-            dst2 = Palettize(tmp, 0)
+            dst2 = ApplyPalette(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)
             indexList = New List(Of Integer)(sortIndexList.Values)
@@ -434,7 +434,7 @@ Namespace VBClasses
             Next
 
             Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
-            dst2 = Palettize(tmp, 0)
+            dst2 = ApplyPalette(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)
             indexList = New List(Of Integer)(sortIndexList.Values)
@@ -521,7 +521,7 @@ Namespace VBClasses
             Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
 
             Cv2.LUT(dst1, lut, dst2)
-            dst3 = Palettize(dst1, 0)
+            dst3 = ApplyPalette(dst1, 0)
 
             labels(2) = CStr(rectList.Count) + " regions found "
         End Sub
@@ -575,7 +575,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             Dim lutTable(255) As Byte
             For i = 0 To sortList.Count - 1
@@ -588,7 +588,7 @@ Namespace VBClasses
             Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
 
             Cv2.LUT(dst2, lut, dst0)
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
 
             Dim overlaps As New List(Of cv.Rect)
             For i = 0 To rectList.Count - 1

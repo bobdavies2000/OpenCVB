@@ -44,7 +44,7 @@ Namespace VBClasses
                 Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
             Next
 
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
             if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
                         CStr(ptList.Count - validList.Count) + " were lost..."
@@ -142,7 +142,7 @@ Namespace VBClasses
                     Dim lpSteady = New lpData(p1, p2)
                     Line(dst0, lpSteady.ptE1, lpSteady.ptE2, cv.Scalar.All(1), lineWidth, cv.LineTypes.Link8)
 
-                    dst3 = Palettize(dst0, 0)
+                    dst3 = ApplyPalette(dst0, 0)
                     labels(2) = "Longest line was found and tracked (see color)"
                 Else
                     labels(2) = "Longest line was NOT found or could not be tracked."
@@ -295,7 +295,7 @@ Namespace VBClasses
                 Line(dst1, lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth, task.lineType)
             Next
 
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
             if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " lines were tracked (see color) while " +
                             CStr(lpList.Count - validList.Count) + " were lost..."
@@ -358,7 +358,7 @@ Namespace VBClasses
                 Circle(dst0, ptSteady, task.DotSize * 5, cv.Scalar.All(indexList(i) + 1), -1, task.lineType)
             Next
 
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
             if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " features were tracked (see color) while " +
                         CStr(ptList.Count - validList.Count) + " were lost..."
@@ -411,7 +411,7 @@ Namespace VBClasses
                 Line(dst0, lp.p1, lp.p2, cv.Scalar.All(lp.index), task.steadyLineWidth, cv.LineTypes.Link8)
             Next
 
-            dst3 = Palettize(dst0, 0)
+            dst3 = ApplyPalette(dst0, 0)
             if heartbeatx() then 
                 labels(2) = CStr(validList.Count) + " lines were tracked while " +
                         CStr(task.lines.lpList.Count - validList.Count) + " were lost..."
@@ -486,7 +486,7 @@ Namespace VBClasses
                 If rc.ID > 0 Then dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst3 = Palettize(dst1, 0)
+            dst3 = ApplyPalette(dst1, 0)
         End Sub
     End Class
 End Namespace

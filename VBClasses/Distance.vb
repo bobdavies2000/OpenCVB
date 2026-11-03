@@ -313,7 +313,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, MatType.CV_8UC1)
             CvtColor(dst2, dst2, ColorConversionCodes.GRAY2BGR)
 
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
             If standalone Then dst3.SetTo(0, task.depthmask)
         End Sub
     End Class

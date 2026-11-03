@@ -392,7 +392,7 @@ Namespace VBClasses
                 sortlist.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
-            dst1 = Palettize(dst2 + 1, 0)
+            dst1 = ApplyPalette(dst2 + 1, 0)
             dst1.SetTo(0, dst3)
             labels(1) = "There were " + CStr(sortlist.Count) + " contour > 100 points."
         End Sub
@@ -459,7 +459,7 @@ Namespace VBClasses
                 sortlist.Add(contours(i).Length, New cv.Point(i, maskID))
             Next
 
-            dst2 = Palettize(reduction.dst2)
+            dst2 = ApplyPalette(reduction.dst2)
             dst2.SetTo(0, dst3)
         End Sub
     End Class
@@ -712,7 +712,7 @@ Namespace VBClasses
                     If count > 0 Then rcList.Add(New rcData(rcMap(rect), rect, id))
                 End If
             Next
-            dst2 = Palettize(rcMap)
+            dst2 = ApplyPalette(rcMap)
 
             If task.rcD IsNot Nothing And standaloneTest() Then Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
 
@@ -833,13 +833,13 @@ Namespace VBClasses
             reduction.Run(task.leftView)
 
             redLeft.Run(reduction.dst2)
-            dst2 = Palettize(redLeft.dst2, 0)
+            dst2 = ApplyPalette(redLeft.dst2, 0)
             labels(2) = redLeft.labels(2) + " In the left image"
 
             reduction.Run(task.rightView)
 
             redRight.Run(reduction.dst2)
-            dst3 = Palettize(redRight.dst2, 0)
+            dst3 = ApplyPalette(redRight.dst2, 0)
             labels(3) = redRight.labels(2) + " In the right image"
         End Sub
     End Class
@@ -939,7 +939,7 @@ Namespace VBClasses
                     rclist.Add(rc)
                 End If
             Next
-            dst3 = Palettize(rcMap)
+            dst3 = ApplyPalette(rcMap)
             labels(3) = CStr(rclist.Count) + " hulls identified below.  " + CStr(defectCount) +
                         " hulls failed building the defect list."
         End Sub
@@ -1356,7 +1356,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst3 = Palettize(rcMap, 0)
+            dst3 = ApplyPalette(rcMap, 0)
             SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
             If task.rcD IsNot Nothing Then
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
@@ -1496,7 +1496,7 @@ Namespace VBClasses
             Next
 
             rcList = New List(Of rcData)(redC.rcList)
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
             labels(3) = CStr(redC.rcList.Count) + " hulls with the smallest on top."
         End Sub
     End Class

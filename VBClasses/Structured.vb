@@ -808,7 +808,7 @@ Namespace VBClasses
                 classCount += 1
             Next
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(3) = "ClassCount = " + CStr(classCount)
         End Sub
     End Class

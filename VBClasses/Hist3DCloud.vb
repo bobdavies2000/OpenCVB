@@ -40,7 +40,7 @@ Namespace VBClasses
 
             dst2.SetTo(0, task.noDepthMask)
             'dst2.SetTo(classCount, task.depthClippedMask)
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
 
             labels(2) = simK.labels(2) + " with " + CStr(bins) + " histogram bins"
             labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)

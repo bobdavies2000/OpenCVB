@@ -19,7 +19,7 @@ Namespace VBClasses
             dst1 = Mat.FromPixelData(dst0.Rows, dst0.Cols, MatType.CV_32S, imagePtr)
 
             dst1.ConvertTo(dst0, MatType.CV_8U)
-            dst2 = Palettize(dst0)
+            dst2 = ApplyPalette(dst0)
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
             dst3 = Mat.FromPixelData(dst2.Rows, dst2.Cols, MatType.CV_8UC3, imagePtr)
 
@@ -98,7 +98,7 @@ Namespace VBClasses
             task.gOptions.DebugCheckBox.Checked = False
             dst1 = Mat.FromPixelData(dst1.Rows, dst1.Cols, MatType.CV_32S, imagePtr)
             dst1.ConvertTo(dst0, MatType.CV_8U)
-            dst2 = Palettize(dst0)
+            dst2 = ApplyPalette(dst0)
         End Sub
         Protected Overrides Sub Finalize()
             OEX_Points_Classifier_Close(cPtr)

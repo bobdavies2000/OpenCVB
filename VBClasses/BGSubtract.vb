@@ -345,7 +345,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(src)
             Dim mm = GetMinMax(reduction.dst2)
-            dst2 = Palettize(reduction.dst2)
+            dst2 = ApplyPalette(reduction.dst2)
 
             bgSub.Run(dst2)
             dst3 = bgSub.dst2.Clone

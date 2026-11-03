@@ -55,7 +55,7 @@ Namespace VBClasses
                     Rectangle_Basics.DrawRotatedRect(minRect, dst1, contourCount Mod 256)
                 End If
             Next
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             labels(2) = "There were " + CStr(contourCount) + " contours found"
             SetTrueText("Wave at the camera to see algorithm working...", 3)
         End Sub

@@ -19,7 +19,7 @@ Namespace VBClasses
             If dst1.Get(Of Byte)(p3.Y, p3.X) = 0 Then FloodFill(dst1, New Mat, p3, 3 * 255 / 4, rect, 0, 0, flags)
             If dst1.Get(Of Byte)(p4.Y, p4.X) = 0 Then FloodFill(dst1, New Mat, p4, 4 * 255 / 4, rect, 0, 0, flags)
 
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
         End Sub
     End Class
 End Namespace

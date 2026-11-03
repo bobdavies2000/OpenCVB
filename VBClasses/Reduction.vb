@@ -14,7 +14,7 @@ Namespace VBClasses
             dst2 = src / reduction
             labels(2) = "Reduced image - factor = " + CStr(reduction)
 
-            dst3 = Palettize(dst2 + 1, 0)
+            dst3 = ApplyPalette(dst2 + 1, 0)
 
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
         End Sub
@@ -37,7 +37,7 @@ Namespace VBClasses
             dst2 = src / reductionFactor
             labels(2) = "Reduced image - factor = " + CStr(reductionFactor)
 
-            dst3 = Palettize(dst2 + 1, 0)
+            dst3 = ApplyPalette(dst2 + 1, 0)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
         End Sub
     End Class
@@ -192,7 +192,7 @@ Namespace VBClasses
             For i = 0 To 2
                 reduction.Run(splitMats(i))
                 If standaloneTest() Then
-                    mats.mat(i) = Palettize(reduction.dst2)
+                    mats.mat(i) = ApplyPalette(reduction.dst2)
                 End If
             Next
 
@@ -253,7 +253,7 @@ Namespace VBClasses
             reduction.dst2.ConvertTo(dst2, MatType.CV_32F)
 
             dst2.ConvertTo(dst2, MatType.CV_8U)
-            dst3 = Palettize(dst2 + 1)
+            dst3 = ApplyPalette(dst2 + 1)
         End Sub
     End Class
 

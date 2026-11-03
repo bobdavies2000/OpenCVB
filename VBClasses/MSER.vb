@@ -118,7 +118,7 @@ Namespace VBClasses
                 rclist.Add(rc)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
 
             labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
         End Sub
@@ -630,7 +630,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bin4.Run(src)
-            dst2 = Palettize(bin4.dst2)
+            dst2 = ApplyPalette(bin4.dst2)
 
             mser.Run(dst2)
             dst3 = mser.dst2
@@ -700,7 +700,7 @@ Namespace VBClasses
                 maskCounts.Add(maskData.Get(Of Integer)(index, 0))
             Next
 
-            dst2 = Palettize(dst0)
+            dst2 = ApplyPalette(dst0)
             If standaloneTest() Then
                 dst3 = src
                 For i = 0 To boxes.Count - 1

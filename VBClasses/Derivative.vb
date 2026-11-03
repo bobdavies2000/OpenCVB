@@ -222,7 +222,7 @@ Namespace VBClasses
             For i = 0 To deriv.plotHist.histArray.Length - 1
                 If deriv.plotHist.histArray(i) > 0 Then derivClassCount += 1
             Next
-            dst = Palettize(deriv.dst0)
+            dst = ApplyPalette(deriv.dst0)
             dst.SetTo(0, task.noDepthMask)
             Return derivClassCount
         End Function

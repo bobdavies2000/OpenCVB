@@ -62,7 +62,7 @@ Namespace VBClasses
                             histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
             Resize(histogram, dst2, dst2.Size(), 0, 0, InterpolationFlags.Nearest)
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
         End Sub
     End Class
 

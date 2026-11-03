@@ -22,7 +22,7 @@ Namespace VBClasses
             hCloud.dst2.CopyTo(dst2, task.depthmask)
             classCount = hColor.classCount + hCloud.classCount
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(3) = CStr(classCount) + " classes "
         End Sub
     End Class
@@ -202,7 +202,7 @@ Namespace VBClasses
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
             CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 

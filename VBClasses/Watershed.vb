@@ -38,7 +38,7 @@ Namespace VBClasses
                 markers *= Math.Truncate(255 / rects.Count)
                 Dim tmp As New Mat
                 markers.ConvertTo(tmp, MatType.CV_8U)
-                dst3 = Palettize(tmp)
+                dst3 = ApplyPalette(tmp)
 
                 dst2 = ShowAddweighted(dst3, src, labels(2))
             Else

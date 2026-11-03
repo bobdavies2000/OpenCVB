@@ -41,7 +41,7 @@ Namespace VBClasses
             dst2.Reshape(1, src.Height).ConvertTo(dst2, MatType.CV_8U)
             dst2 += 1 ' stay away from zero...
 
-            If standaloneTest() Then dst3 = Palettize(dst2)
+            If standaloneTest() Then dst3 = ApplyPalette(dst2)
             labels(2) = "KMeans labels 0-" + CStr(classCount - 1) + " spread out across 255 values."
         End Sub
     End Class
@@ -65,7 +65,7 @@ Namespace VBClasses
             km.Run(src)
             dst3 = km.dst2
 
-            dst2 = Palettize(dst3)
+            dst2 = ApplyPalette(dst3)
         End Sub
     End Class
 
@@ -175,7 +175,7 @@ Namespace VBClasses
             End If
 
             km.Run(dst0)
-            dst2 = Palettize(km.dst2)
+            dst2 = ApplyPalette(km.dst2)
         End Sub
     End Class
 
@@ -258,7 +258,7 @@ Namespace VBClasses
             km.Run(src)
             dst2 = km.dst2
 
-            dst2 = Palettize(dst2)
+            dst2 = ApplyPalette(dst2)
 
             multi.Run(src)
             dst3 = multi.dst2
@@ -292,7 +292,7 @@ Namespace VBClasses
             km.Run(task.pcSplit(2))
             dst2 = km.dst2 * 255 / km.classCount
             dst2.SetTo(0, task.noDepthMask)
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(2) = "There were " + CStr(classCount) + " tiers (on average) found in the depth valleys histogram."
         End Sub
     End Class
@@ -316,7 +316,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             km.Run(src)
-            dst2 = Palettize(km.dst2)
+            dst2 = ApplyPalette(km.dst2)
             classCount = km.options.kMeansK
 
             masks.Clear()
@@ -364,7 +364,7 @@ Namespace VBClasses
             dst3 = km.dst2
             dst3.SetTo(0, task.noDepthMask)
 
-            If standaloneTest() Then dst2 = Palettize(km.dst2)
+            If standaloneTest() Then dst2 = ApplyPalette(km.dst2)
         End Sub
     End Class
 
@@ -422,7 +422,7 @@ Namespace VBClasses
             labels(3) = labels(2)
 
             dst2 = km.dst2 + 1
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 
@@ -449,7 +449,7 @@ Namespace VBClasses
             km.Run(task.pcSplit(2))
             dst2 = km.dst2 + 1
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
@@ -474,7 +474,7 @@ Namespace VBClasses
             dst2.SetTo(0, task.noDepthMask)
 
             classCount = km.classCount
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(2) = "Palettized version of the " + CStr(classCount) + " 8UC1 classes"
         End Sub
     End Class
@@ -508,7 +508,7 @@ Namespace VBClasses
 
             CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.rangesBGR)
 
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
         End Sub
     End Class
@@ -539,7 +539,7 @@ Namespace VBClasses
             CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
             ConvertScaleAbs(dst1, dst1)
 
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
 
             labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
         End Sub

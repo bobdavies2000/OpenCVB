@@ -123,7 +123,7 @@ Namespace VBClasses
             Next
 
             dst2.ConvertTo(dst1, MatType.CV_8U)
-            dst3 = Palettize(dst1, 0)
+            dst3 = ApplyPalette(dst1, 0)
 
             rcList = New List(Of rcData)(newList)
             classCount = rcList.Count
@@ -318,7 +318,7 @@ Namespace VBClasses
             labels(2) = bPoint.labels(2)
 
             dst2 = edgeline.dst2
-            dst3 = Palettize(edgeline.dst2, 0)
+            dst3 = ApplyPalette(edgeline.dst2, 0)
 
             Dim segments(edgeline.classCount) As List(Of Point2f)
             Dim brickCount As Integer, segmentCount As Integer

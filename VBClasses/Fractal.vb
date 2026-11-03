@@ -96,7 +96,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If zoom.mandel.options.resetCheck.Checked Then zoom.mandel.reset()
             zoom.Run(src)
-            dst2 = Palettize(zoom.dst2)
+            dst2 = ApplyPalette(zoom.dst2)
             labels(2) = zoom.labels(2)
         End Sub
     End Class
@@ -150,7 +150,7 @@ Namespace VBClasses
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 Next
-                dst2 = Palettize(dst2)
+                dst2 = ApplyPalette(dst2)
             End If
         End Sub
     End Class

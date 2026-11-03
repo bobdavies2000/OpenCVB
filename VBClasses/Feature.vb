@@ -1869,7 +1869,7 @@ Namespace VBClasses
                 If facetList(i).Count >= 3 Then FillConvexPoly(dst2, facetList(i), i Mod 256, task.lineType)
             Next
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
 
             For Each pt In feat.ptlist
                 Circle(dst3, pt, task.DotSize, task.highlight, -1, task.lineType)

@@ -164,7 +164,7 @@ Namespace VBClasses
             dst2.SetTo(1, bin3.bin3.mats.mat(0))
             dst2.SetTo(2, bin3.bin3.mats.mat(1))
             dst2.SetTo(3, bin3.bin3.mats.mat(2))
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 

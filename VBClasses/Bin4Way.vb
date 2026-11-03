@@ -25,7 +25,7 @@ Namespace VBClasses
             dst2.SetTo(3, binary.mats.mat(2))
             dst2.SetTo(4, binary.mats.mat(3))
 
-            If standaloneTest() Then dst3 = Palettize(dst2)
+            If standaloneTest() Then dst3 = ApplyPalette(dst2)
         End Sub
     End Class
 
@@ -489,7 +489,7 @@ Namespace VBClasses
             dst0.SetTo(3, binaryLeft.mats.mat(2))
             dst0.SetTo(4, binaryLeft.mats.mat(3))
 
-            dst2 = Palettize(dst0)
+            dst2 = ApplyPalette(dst0)
 
             binaryRight.Run(task.rightView)
 
@@ -498,7 +498,7 @@ Namespace VBClasses
             dst1.SetTo(3, binaryRight.mats.mat(2))
             dst1.SetTo(4, binaryRight.mats.mat(3))
 
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
         End Sub
     End Class
 

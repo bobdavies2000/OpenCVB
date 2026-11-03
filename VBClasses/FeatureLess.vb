@@ -76,7 +76,7 @@ Namespace VBClasses
                 ' SetTrueText(CStr(rc.age), rc.maxDStable)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
 
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
@@ -179,7 +179,7 @@ Namespace VBClasses
                 rcList(i).index = i
             Next
 
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             If standaloneTest() Then
                 For Each rc In rcList
@@ -260,7 +260,7 @@ Namespace VBClasses
                     index += 1
                 End If
             Next
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
 
             labels(2) = CStr(regions.Count) + " regions were found."
         End Sub
@@ -305,7 +305,7 @@ Namespace VBClasses
             Dim countRects = brickList.Count
 
             dst1 = buildMap(brickList, dst1)
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid regions "
         End Sub
@@ -358,7 +358,7 @@ Namespace VBClasses
             Dim countRects = brickList.Count
 
             dst3 = buildMap(dst1.Clone)
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid rects"
             labels(3) = CStr(regionList.Count) + " featureless regions "
@@ -672,7 +672,7 @@ Namespace VBClasses
             Next
 
             fLessLast = dst2.Clone
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
         End Sub
     End Class
 
@@ -755,7 +755,7 @@ Namespace VBClasses
                 Dim countIndex = countList.Values.ElementAt(i)
                 task.colorMap.Set(Of Vec3b)(countIndex, 0, saveColorMap.Get(Of Vec3b)(i, 0))
             Next
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
             labels(2) = CStr(index - 1) + " featureless regions were found below (8UC1)."
         End Sub
     End Class
@@ -962,7 +962,7 @@ Namespace VBClasses
                     Dim nextVal = CInt(ml.predictions.Get(Of Single)(j, 0))
                     If nextVal > 0 Then dst0(task.gridRects(j)).SetTo(nextVal)
                 Next
-                dst1 = Palettize(dst0, 0)
+                dst1 = ApplyPalette(dst0, 0)
             End If
 
             ml.Run(emptyMat)
@@ -975,7 +975,7 @@ Namespace VBClasses
                 If nextVal > 0 Then dst3(task.gridRects(j)).SetTo(nextVal)
             Next
 
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
             labels(2) = CStr(maxClass) + " grid cell clusters found with prediction."
         End Sub
     End Class
@@ -1022,7 +1022,7 @@ Namespace VBClasses
                 End If
             Next
 
-            dst3 = Palettize(dst2, 0)
+            dst3 = ApplyPalette(dst2, 0)
 
             labels(2) = CStr(index) + " regions were found."
         End Sub
@@ -1148,7 +1148,7 @@ Namespace VBClasses
 
             dst3 = backProjectHistArray(histogram, ranges)
             Dim clusterCount = GetMinMax(dst3).maxVal - 1
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
 
             labels(2) = CStr(clusterCount) + " clusters were found for the " + "X scale is mean grayscale color and the Y scale is mean depth."
             labels(3) = CStr(clusterCount) + " clusters were identified."
@@ -1324,7 +1324,7 @@ Namespace VBClasses
                 Next
             End If
             dst3 = buildMap(brickList, dst1.Clone)
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid regions "
         End Sub
@@ -1373,7 +1373,7 @@ Namespace VBClasses
                 Dim val = dst1.Get(Of Byte)(r.Y, r.X)
                 If val > 0 Then brickList.Add(r)
             Next
-            dst2 = Palettize(dst3, 0)
+            dst2 = ApplyPalette(dst3, 0)
             labels(2) = CStr(index) + " regions were found."
         End Sub
     End Class
@@ -1415,7 +1415,7 @@ Namespace VBClasses
                 End If
             Next
 
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             labels(2) = CStr(brickList.Count) + " featureless grid regions with " + CStr(countRects) + " input grid rects"
         End Sub
@@ -1522,7 +1522,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 SetTrueText(CStr(rc.ID), rc.maxDist)
             Next
-            dst2 = Palettize(dst1, 0)
+            dst2 = ApplyPalette(dst1, 0)
 
             labels(2) = CStr(rcList.Count - 1) + " featureless cells with stable indices"
         End Sub
@@ -1558,7 +1558,7 @@ Namespace VBClasses
                 Next
             End If
 
-            dst3 = Palettize(dst1, 0)
+            dst3 = ApplyPalette(dst1, 0)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -1594,7 +1594,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
         End Sub
     End Class
 
@@ -2160,7 +2160,7 @@ Namespace VBClasses
                 dst0(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = Palettize(dst0, 0)
+            dst2 = ApplyPalette(dst0, 0)
 
             WarpAffine(task.delaunayFLess.dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0))
 
@@ -2222,7 +2222,7 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                dst2 = Palettize(rcMap, 0)
+                dst2 = ApplyPalette(rcMap, 0)
 
                 For Each rc In task.delaunayFLess.snapshotList
                     If rc.index = 0 Then Continue For

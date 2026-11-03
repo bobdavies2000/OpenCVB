@@ -116,7 +116,7 @@ Namespace VBClasses
                 task.optionsChanged Then Return True
             Return False
         End Function
-        Public Shared Function Palettize(input As Mat, Optional firstEntry As Byte = 1) As Mat
+        Public Shared Function ApplyPalette(input As Mat, Optional firstEntry As Byte = 1) As Mat
             task.colorMap.Set(Of Vec3b)(0, 0, If(firstEntry = 0, New Vec3b(0, 0, 0), task.vecColors(0)))
 
             Dim output As New Mat

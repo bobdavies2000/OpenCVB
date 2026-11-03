@@ -46,7 +46,7 @@ Namespace VBClasses
                 FillConvexPoly(dst1, facetList(i), i + 1, LineTypes.Link4)
             Next
 
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
 
             labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
@@ -528,7 +528,7 @@ Namespace VBClasses
                 facetList.Add(nextFacet)
             Next
 
-            dst2 = Palettize(dst3)
+            dst2 = ApplyPalette(dst3)
 
             labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
         End Sub
@@ -591,7 +591,7 @@ Namespace VBClasses
 
             ' Convert to 8U and colorize
             dst3.ConvertTo(dst1, MatType.CV_8U)
-            dst2 = Palettize(dst1)
+            dst2 = ApplyPalette(dst1)
 
             labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
         End Sub
@@ -604,6 +604,7 @@ Namespace VBClasses
     Public Class Delaunay_FeatureLess : Inherits TaskParent
         Public idMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public ptList As New List(Of cv.Point2f)
+        Public ptLatest As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Public snapshotList As New List(Of rcData)
         Public Sub New()
@@ -641,9 +642,9 @@ Namespace VBClasses
                     DrawContours(idMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                 Next
 
-                dst2 = Palettize(idMap, 0)
+                dst2 = ApplyPalette(idMap, 0)
 
-                ' run after palettize
+                ' run after ApplyPalette
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
                     Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
@@ -651,6 +652,11 @@ Namespace VBClasses
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the idMap"
             End If
+
+            ptLatest.Clear()
+            For i = 0 To ptList.Count - 1
+                ptLatest.Add(WarpAffine_Basics.WarpPoint(ptList(i), task.steadyCam.M))
+            Next
         End Sub
     End Class
 End Namespace

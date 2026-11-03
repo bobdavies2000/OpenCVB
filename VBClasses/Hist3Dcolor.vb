@@ -32,7 +32,7 @@ Namespace VBClasses
 
             CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
 
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
 
             labels(2) = simK.labels(2)
             labels(3) = "Backprojection of " + CStr(classCount) + " histogram entries."
@@ -165,7 +165,7 @@ Namespace VBClasses
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
             CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
-            dst3 = Palettize(dst2)
+            dst3 = ApplyPalette(dst2)
             labels(2) = "NR_Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
         End Sub
     End Class
@@ -267,7 +267,7 @@ Namespace VBClasses
 
                 Dim mm As mmData = GetMinMax(dst2)
 
-                dst3 = Palettize(dst2)
+                dst3 = ApplyPalette(dst2)
                 labels(2) = simK.labels(2)
                 labels(3) = CStr(mm.maxVal) + " different levels in the backprojection."
             End If

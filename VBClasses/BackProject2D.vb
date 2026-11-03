@@ -32,7 +32,7 @@ Namespace VBClasses
             If backProjectByGrid Then
                 Dim mm = GetMinMax(dst0)
                 classCount = mm.maxVal
-                dst3 = Palettize(dst0)
+                dst3 = ApplyPalette(dst0)
             Else
                 dst3.SetTo(0)
                 dst3.SetTo(Scalar.Yellow, dst0)
@@ -99,7 +99,7 @@ Namespace VBClasses
             CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
             ConvertScaleAbs(dst1, dst1)
             dst1.ConvertTo(dst1, MatType.CV_8U)
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
         End Sub
     End Class
 
@@ -120,7 +120,7 @@ Namespace VBClasses
             CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
             ConvertScaleAbs(dst1, dst1)
             dst1.ConvertTo(dst1, MatType.CV_8U)
-            dst3 = Palettize(dst1)
+            dst3 = ApplyPalette(dst1)
         End Sub
     End Class
 

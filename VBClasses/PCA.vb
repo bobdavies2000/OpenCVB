@@ -746,7 +746,7 @@ Namespace VBClasses
             Dim paletteCount = CountNonZero(tmp)
 
             If standaloneTest() Then
-                dst3 = Palettize(img8u)
+                dst3 = ApplyPalette(img8u)
                 labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
             End If
 

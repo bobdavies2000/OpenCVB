@@ -64,7 +64,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
 
             If standaloneTest() Then
                 dst3 = dst2.Clone
@@ -136,7 +136,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = Palettize(rcMap, 0)
+            dst3 = ApplyPalette(rcMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned index."
         End Sub
     End Class
@@ -266,7 +266,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = Palettize(rcMap, 0)
+            dst2 = ApplyPalette(rcMap, 0)
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
