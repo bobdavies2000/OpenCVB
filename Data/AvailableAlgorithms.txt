@@ -627,7 +627,6 @@ RedC_Neighbors
 RedCloud_Basics
 RedCloud_Core
 RedColor_Basics
-RedColor_BasicsNew
 RedColor_FLessBasics
 RedColor_FloodToID
 RedColor_GridRects
@@ -1623,6 +1622,7 @@ XR_RedCloud_Matches
 XR_RedCloud_Motion
 XR_RedCloud_MotionFilter
 XR_RedColor_Basics
+XR_RedColor_BasicsUnMerged
 XR_RedColor_Bricks
 XR_RedColor_Contour
 XR_RedColor_CPP
