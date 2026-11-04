@@ -698,7 +698,6 @@ Namespace VBClasses
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
-            Dim filled As New cv.Mat
             rcMap.SetTo(0)
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)

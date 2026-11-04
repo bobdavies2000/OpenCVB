@@ -628,9 +628,11 @@ RedCloud_Basics
 RedCloud_Core
 RedColor_Basics
 RedColor_FLessBasics
+RedColor_Flippers
 RedColor_FloodToID
 RedColor_GridRects
 RedColor_InRange
+RedColor_Missing
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP

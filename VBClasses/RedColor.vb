@@ -6,6 +6,8 @@ Namespace VBClasses
         Public colorList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
+            labels(3) = "Color cells are drawn on the merged cells."
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13,52 +15,32 @@ Namespace VBClasses
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
-            Dim filled As New cv.Mat
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            Dim index As Integer = 1
             For y = 0 To dst2.Height - 1 Step task.gridWH
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
                     If mask.Get(Of Byte)(y, x) = 0 Then
-                        Dim index = sortList.Count
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(color8U.dst2, mask, pt, index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(color8U.dst2(rect), rect, index) With {.index = index}
-                            Dim testID = task.delaunayFLess.rcMap.Get(Of Byte)(pt.Y, pt.X)
-                            sortList.Add(rc.ID, rc)
+                            Dim rc = New rcData(mask(rect), rect, index) With {.index = index}
+                            sortList.Add(rc.pixels, rc)
+                            index += 1
                         Else
-                            If count > 0 Then mask(rect).SetTo(0, color8U.dst2(rect)) ' add the small fragments back to the pool.
+                            If count > 0 Then mask(rect).SetTo(0, mask(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
             Next
 
-            ' remove cells that are completely contained in other cells
-            colorList = New List(Of rcData)(sortList.Values)
-            Dim containedCount As Integer
+            Dim sortUsed As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
             For Each rc In sortList.Values
-                For i = rc.index + 1 To sortList.Values.Count - 1
-                    Dim rcNext = sortList.Values(i)
-                    If rcNext.rect = rc.rect Then Continue For
-                    If rc.rect.Contains(rcNext.rect) Then
-                        If rcNext.index >= 0 Then
-                            mask(rc.rect).SetTo(0)
-                            mask(rcNext.rect).SetTo(255, rcNext.mask)
-                            mask(rc.rect) = mask(rc.rect) And rc.mask
-                            If rcNext.pixels / CountNonZero(mask(rc.rect)) > 0.95 Then
-                                ' Optionally display the overlapping rects.
-                                If standaloneTest() Then
-                                    Rectangle(task.color, rc.rect, task.highlight, task.lineWidth)
-                                    Rectangle(task.color, rcNext.rect, task.highlight, task.lineWidth + 1)
-                                End If
-                                colorList.Remove(rcNext)
-                                containedCount += 1
-                            End If
-                        End If
-                    End If
-                Next
+                If rc.ID > 0 Then Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                If sortUsed.ContainsKey(rc.ID) = False Then sortUsed.Add(rc.ID, rc.index)
             Next
 
+            colorList = New List(Of rcData)(sortList.Values)
             rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
@@ -85,13 +67,18 @@ Namespace VBClasses
 
             dst2 = ApplyPalette(rcMap, 0)
 
+            ' run after ApplyPalette
+            For Each rc In task.fless.rcList
+                If rc.ID = 0 Then Continue For
+                Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+            Next
+
             If standaloneTest() Then
                 dst3 = dst2.Clone
                 For Each rc In colorList
                     DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
                 Next
-                labels(3) = CStr(containedCount) + " cells fully contained are highlighted " +
-                            "in the upper left image (when standalone.)"
             End If
 
             labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
@@ -290,6 +277,74 @@ Namespace VBClasses
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_Flippers : Inherits TaskParent
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Find the cells which are flipping."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastList As New List(Of rcData)(task.redColor.rcList)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
+
+            Dim usedList As New List(Of Byte)
+            For Each rc In task.redColor.rcList
+                If rc.index = 0 Then Continue For
+                Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                If usedList.Contains(rc.ID) = False Then usedList.Add(rc.ID)
+            Next
+
+            dst1.SetTo(0)
+            For Each rc In task.redColor.rcList
+                If rc.ID = 255 Then
+                    dst1(rc.rect).SetTo(rc.ID, rc.mask)
+                End If
+            Next
+            dst3 = ApplyPalette(dst1, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_Missing : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Find the cells which are missing."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastList As New List(Of rcData)(task.redColor.rcList)
+            dst2 = task.redColor.dst2
+            dst3 = task.delaunayFLess.dst2
+            labels(2) = task.redColor.labels(2)
+
+            Dim sortUsed As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
+            For Each rc In task.redColor.rcList
+                If rc.ID > 0 Then Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                If sortUsed.ContainsKey(rc.ID) = False Then sortUsed.Add(rc.ID, rc.index)
+            Next
+
+            dst0.SetTo(0)
+            Dim lastIndex As Integer = -1
+            For i = 0 To sortUsed.Keys.Count - 1
+                If sortUsed.Keys(i) <> lastIndex + 1 Then
+                    Dim rc = task.redColor.rcList(sortUsed.Values(i))
+                    dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                End If
+                lastIndex = sortUsed.Keys(i)
+            Next
+
+            dst1 = ApplyPalette(dst0, 0)
         End Sub
     End Class
 End Namespace
