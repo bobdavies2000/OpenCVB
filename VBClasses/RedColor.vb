@@ -8,7 +8,7 @@ Namespace VBClasses
         Public colorList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
-            labels(3) = "Color cells are drawn on the merged cells."
+            labels(3) = "Select any cell in dst2 to see details below."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
@@ -34,23 +34,22 @@ Namespace VBClasses
                     End If
                 Next
             Next
-            colorList = New List(Of rcData)(sortList.Values)
 
             Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
             Dim histogram As New Mat
             Dim histArray() As Single = Nothing
+            colorList.Clear()
             With task.delaunayFLess
-                For Each rc In colorList
+                For Each rc In sortList.Values
                     CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
                     histogram.GetArray(Of Single)(histArray)
                     Dim hList = histArray.ToList
-                    hList(0) = 0 ' ignore zeros...
                     rc.ID = hList.IndexOf(hList.Max)
-                    If rc.ID <= 0 Then Dim k = 0
+                    If rc.ID >= 0 Then colorList.Add(rc)
                 Next
             End With
 
-            rcMap.SetTo(255)
+            rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
@@ -73,32 +72,6 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 rcList.Add(rc)
             Next
-            Dim mm = GetMinMax(rcMap)
-            If mm.minVal <> 1 Then Dim k = 0
-
-
-
-
-
-
-
-
-            Dim usedList As New SortedList(Of Integer, Byte)
-            For Each rc In rcList
-                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
-            Next
-
-            Dim lastIndex As Integer = -1
-            For i = 0 To usedList.Keys.Count - 1
-                If usedList.Keys(i) <> lastIndex + 1 Then
-                    rc = rcList(usedList.Values(i))
-                End If
-                lastIndex = usedList.Keys(i)
-            Next
-
-
-
-
 
             'rcMap.SetTo(0)
             'rcList.Clear()
@@ -139,11 +112,16 @@ Namespace VBClasses
             '    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
             'Next
 
-            If standaloneTest() Then
-                dst3 = dst2.Clone
-                For Each rc In colorList
-                    DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
-                Next
+            If standalone Then
+                Dim rctmp = RedC_Basics.rcFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+                If rctmp IsNot Nothing Then
+                    task.rcD = rctmp
+                    Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    SetTrueText(task.rcD.displayCell, 3)
+                Else
+                    If rcList.Count > 1 Then task.rcD = rcList(1)
+                End If
             End If
 
             labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"

@@ -13,7 +13,7 @@ Namespace VBClasses
             labels(3) = "The heartbeat maxDStable is show. The line is travel distance to the current maxDStable."
             desc = "Track each cell and confirm with the cell's color.  Heartbeat updates colors."
         End Sub
-        Private Shared Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
+        Public Shared Function rcFinder(inputList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
             For Each rc In inputList
                 If rc.ID = id And rc.ID < inputList.Count Then Return inputList(rc.index)
@@ -825,6 +825,8 @@ Namespace VBClasses
 
 
 
+
+
     Public Class RedC_Neighbors : Inherits TaskParent
         Dim redC As New RedC_Basics
         Dim rcTarget As rcData
@@ -861,7 +863,6 @@ Namespace VBClasses
                     Next
                 End If
             Next
-
         End Sub
     End Class
 End Namespace

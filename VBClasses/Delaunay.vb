@@ -634,9 +634,6 @@ Namespace VBClasses
                     index += 1
                 Next
 
-                Dim mm = GetMinMax(rcMap)
-                If mm.minVal = 2 Then Dim k = 0
-
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
                     rc.ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
