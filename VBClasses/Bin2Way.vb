@@ -5,6 +5,7 @@ Namespace VBClasses
         Public mats As New Mat_4Click
         Public fraction As Single
         Dim halfSplit As Integer
+        Public classCount As Integer = 2
         Public Sub New()
             fraction = dst2.Total / 2
             task.gOptions.setHistogramBins(255)
@@ -72,9 +73,9 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedC : Inherits TaskParent
+    Public Class XR_Bin2Way_RedC : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
-        Dim redC As New RedColor_FLessBasics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Identify 4 gradations of light and combine them for input to RedColor"

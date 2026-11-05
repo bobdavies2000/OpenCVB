@@ -104,7 +104,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_FloodToID : Inherits TaskParent
+    Public Class XR_RedColor_FloodToID : Inherits TaskParent
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
@@ -163,17 +163,17 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_GridRects : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
+    Public Class XR_RedColor_GridRects : Inherits TaskParent
         Public rcGridMap As New Mat(dst2.Size, MatType.CV_8U, 0) ' map of rc data to grid map
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "RedColor output mapped into the gridRects."
             desc = "Create a triangle representation of the cv.Point cloud with RedCloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redColor.Run(src)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             rcGridMap.SetTo(0)
             dst3.SetTo(0)
@@ -181,9 +181,9 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index As Integer = redC.rcMap.Get(Of Single)(center.Y, center.X) - 1
-                If index >= redC.rcList.Count Or index < 0 Then Continue For
-                Dim rc = redC.rcList(index)
+                Dim index As Integer = task.redColor.rcMap.Get(Of Single)(center.Y, center.X) - 1
+                If index >= task.redColor.rcList.Count Or index < 0 Then Continue For
+                Dim rc = task.redColor.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.ID Mod 255))
                 rcGridMap(r).SetTo(rc.ID)
             Next
@@ -194,14 +194,14 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_InRange : Inherits TaskParent
+    Public Class XR_RedColor_InRange : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_FLessBasics
         Dim color8U As New Color8U_Basics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-            desc = "Use InRange to prepare an 8U input image for RedColor_FLessBasics"
+            desc = "Use InRange to prepare an 8U input image for RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
@@ -211,13 +211,13 @@ Namespace VBClasses
 
             src.SetTo(0, inputRemoved)
 
-            redC.Run(src)
-            labels(2) = redC.labels(2)
-            dst2 = redC.dst2.SetTo(0, inputRemoved)
+            task.redColor.Run(src)
+            labels(2) = task.redColor.labels(2)
+            dst2 = task.redColor.dst2.SetTo(0, inputRemoved)
 
-            labels(2) = $"{redC.rcList.Count} cells identified"
+            labels(2) = $"{task.redColor.rcList.Count} cells identified"
 
-            If showSelected Then SetTrueText(redC.strOut, 3)
+            If showSelected Then SetTrueText(task.redColor.strOut, 3)
         End Sub
     End Class
 
@@ -294,7 +294,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Flippers : Inherits TaskParent
+    Public Class XR_RedColor_Flippers : Inherits TaskParent
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -326,7 +326,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_Missing : Inherits TaskParent
+    Public Class XR_RedColor_Missing : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)

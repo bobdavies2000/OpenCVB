@@ -1,9 +1,8 @@
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
-    Public colorMethods() As String = {"Bin4Way_Basics", "BinNWay_Basics",
-                                       "Hist3DColor_Basics", "KMeans_Basics", "LUT_Basics",
-                                       "Reduction_Basics", "PCA_NColor_CPP"}
+    Public colorMethods() As String = {"BinNWay_Basics", "Hist3DColor_Basics", "KMeans_Basics",
+                                       "LUT_Basics", "Reduction_Basics", "PCA_NColor_CPP"}
     Public edgeList() As String = {"Bin4Way_Sobel", "Edge_BinarizedReduction", "Edge_Canny",
                                    "Edge_Laplacian", "Edge_Sobel", "EdgeLine_Basics",
                                    "XR_Edge_Scharr"}

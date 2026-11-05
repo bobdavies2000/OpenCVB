@@ -5,6 +5,7 @@ Namespace VBClasses
         Dim binSplit(0) As Integer
         Public classCount As Integer
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Run RedColor for each gradation from light to dark."
@@ -14,14 +15,12 @@ Namespace VBClasses
 
             classCount = options.gradations
 
-            If task.optionsChanged Then
-                ReDim binSplit(classCount)
-                Dim incr = 255 / classCount
-                For i = 0 To binSplit.Length - 1
-                    binSplit(i) = i * incr
-                Next
-                labels(2) = CStr(classCount) + " separate RedColor inputs combined"
-            End If
+            ReDim binSplit(classCount)
+            Dim incr = 255 / classCount
+            For i = 0 To binSplit.Length - 1
+                binSplit(i) = i * incr
+            Next
+            labels(2) = CStr(classCount) + " separate RedColor inputs combined"
 
             For i = 0 To classCount - 1
                 Dim tmp As New Mat
@@ -33,12 +32,11 @@ Namespace VBClasses
             dst3 = ApplyPalette(dst2)
 
             If standalone Then
-                Static redC As New RedColor_FLessBasics
-                redC.Run(dst2)
-                labels(2) = redC.labels(2)
-                dst2 = redC.dst2
+                task.redColor.Run(dst2)
+                labels(2) = task.redColor.labels(2)
+                dst2 = task.redColor.dst2
 
-                SetTrueText(redC.strOut, 1)
+                SetTrueText(task.redColor.strOut, 1)
             End If
             labels(3) = CStr(classCount) + " classes in the motion-adjusted gray image."
         End Sub

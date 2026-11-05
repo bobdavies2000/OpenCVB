@@ -4,6 +4,7 @@ Namespace VBClasses
         Dim hist As New Histogram_Basics
         Public mats As New Mat_4Click
         Dim firstThird As Integer, lastThird As Integer
+        Public classCount As Integer = 3
         Public Sub New()
             task.gOptions.setHistogramBins(255)
             labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
@@ -172,7 +173,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin3Way_RedC : Inherits TaskParent
+    Public Class XR_Bin3Way_RedC : Inherits TaskParent
         Dim redColor As New RedColor_Basics
         Dim bin3 As New Bin3Way_GrayScale
         Public Sub New()
