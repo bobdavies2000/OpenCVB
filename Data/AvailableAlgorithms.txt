@@ -1204,7 +1204,7 @@ XR_Flood_Minimal
 XR_Flood_Original
 XR_Flood_Tiers
 XR_Font_FlowMsgs
-XR_Foreground_Basics_TA
+XR_Foreground_Basics
 XR_Foreground_Hist3D
 XR_Foreground_KMeans
 XR_Foreground_KMeansDepth

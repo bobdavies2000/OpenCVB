@@ -28,7 +28,6 @@ Namespace VBClasses
 
         Public depthmask As Mat
         Public noDepthMask As Mat
-        Public foregroundMask As Mat
         Public fLessMask As Mat
 
         Public firstPass As Boolean = True

@@ -91,11 +91,7 @@ Namespace VBClasses
             If filterIndex > 0 Then
                 filters(filterIndex).Run(dst2)
                 dst2 = filters(filterIndex).dst2
-                If dst2.Channels <> 1 Then
-                    MessageBox.Show("Filter_Basics_Gray failure - " + filterList(filterIndex) +
-                                    " needs to return " + vbCrLf + "an 8UC1 image, not 8UC3.  " +
-                                    "Reevaluate any new filters added above!")
-                End If
+                If dst2.Channels <> 1 Then CvtColor(dst2, dst2, cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst2 = src
             End If

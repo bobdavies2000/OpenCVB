@@ -61,9 +61,10 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Foreground_Basics_TA : Inherits TaskParent
+    Public Class XR_Foreground_Basics : Inherits TaskParent
         Dim hist As New Histogram_Depth
         Public foregroundMaxDepth As Single
+        Public foreGroundMask As New Mat
         Public Sub New()
             task.gOptions.MaxDepthBar.Value = 5
             task.gOptions.HistBinBar.Value = task.gOptions.HistBinBar.Maximum
@@ -95,11 +96,11 @@ Namespace VBClasses
                 Next
             End If
 
-            Threshold(task.pcSplit(2), task.foregroundMask, foregroundMaxDepth, 255, ThresholdTypes.BinaryInv)
-            ConvertScaleAbs(task.foregroundMask, task.foregroundMask)
-            task.foregroundMask.SetTo(0, task.noDepthMask)
+            Threshold(task.pcSplit(2), foreGroundMask, foregroundMaxDepth, 255, ThresholdTypes.BinaryInv)
+            ConvertScaleAbs(foreGroundMask, foreGroundMask)
+            foreGroundMask.SetTo(0, task.noDepthMask)
 
-            If standaloneTest() Then dst3 = task.foregroundMask
+            If standaloneTest() Then dst3 = foreGroundMask
             labels(2) = "Foreground is defined as anything closer that " + foregroundMaxDepth.ToString(fmt1) + " meters"
         End Sub
     End Class

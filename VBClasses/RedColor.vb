@@ -14,7 +14,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
-            Dim rc As rcData
+            Dim rc As rcData, rcNext As rcData
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
@@ -57,7 +57,7 @@ Namespace VBClasses
                 rc = colorList(i)
                 If rc.ID < 0 Then Continue For
                 For j = i + 1 To colorList.Count - 1
-                    Dim rcNext = colorList(j)
+                    rcNext = colorList(j)
                     If rc.ID = rcNext.ID Then
                         Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
                         mask(r).SetTo(0)
@@ -73,44 +73,12 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            'rcMap.SetTo(0)
-            'rcList.Clear()
-            'rcList.Add(New rcData) ' placeholder for zero...
-            'mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
-            'Dim lastID As Integer = usedList.Keys(0)
-            'For i = 0 To usedList.Count - 1
-            '    rc = colorList(usedList.Values(i))
-            '    While rc.ID = lastID
-            '        If i + 1 < usedList.Count Then
-            '            rcNext = colorList(usedList.Values(i + 1))
-            '        Else
-            '            Exit While
-            '        End If
-
-            '        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
-            '        mask(r).SetTo(0)
-            '        mask(rc.rect).SetTo(255, rc.mask)
-            '        mask(rcNext.rect).SetTo(255, rcNext.mask)
-            '        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
-            '        colorList(usedList.Values(i + 1)) = rcNext
-            '        i += 1
-            '        lastID = rcNext.ID
-            '    End While
-            '    rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-            '    rc.index = rcList.Count
-            '    rcList.Add(rc)
-
-            '    If Not (i + 1 < usedList.Count) Then Exit For
-            'Next
+            Dim usedList As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
+            For Each rc In colorList
+                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
+            Next
 
             dst2 = ApplyPalette(rcMap, 0)
-
-            ' run after ApplyPalette
-            'For Each rc In task.fless.rcList
-            '    If rc.ID = 0 Then Continue For
-            '    Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-            '    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
-            'Next
 
             If standalone Then
                 Dim rctmp = RedC_Basics.rcFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
