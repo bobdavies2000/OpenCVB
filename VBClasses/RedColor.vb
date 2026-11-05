@@ -1,4 +1,6 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp :
+Imports OpenCvSharp.Cv2 :
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Dim color8U As New Color8U_Basics
@@ -12,6 +14,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(task.gray)
+            Dim rc As rcData
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
@@ -24,29 +27,35 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(color8U.dst2, mask, pt, index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(mask(rect), rect, index) With {.index = index}
+                            rc = New rcData(mask(rect), rect, index) With {.index = index}
                             sortList.Add(rc.pixels, rc)
                             index += 1
-                        Else
-                            If count > 0 Then mask(rect).SetTo(0, mask(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
             Next
-
-            Dim sortUsed As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
-            For Each rc In sortList.Values
-                If rc.ID > 0 Then Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                If sortUsed.ContainsKey(rc.ID) = False Then sortUsed.Add(rc.ID, rc.index)
-            Next
-
             colorList = New List(Of rcData)(sortList.Values)
-            rcMap.SetTo(0)
+
+            Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
+            Dim histogram As New Mat
+            Dim histArray() As Single = Nothing
+            With task.delaunayFLess
+                For Each rc In colorList
+                    CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
+                    histogram.GetArray(Of Single)(histArray)
+                    Dim hList = histArray.ToList
+                    hList(0) = 0 ' ignore zeros...
+                    rc.ID = hList.IndexOf(hList.Max)
+                    If rc.ID <= 0 Then Dim k = 0
+                Next
+            End With
+
+            rcMap.SetTo(255)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
             mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
             For i = 0 To colorList.Count - 1
-                Dim rc = colorList(i)
+                rc = colorList(i)
                 If rc.ID < 0 Then Continue For
                 For j = i + 1 To colorList.Count - 1
                     Dim rcNext = colorList(j)
@@ -64,15 +73,71 @@ Namespace VBClasses
                 rc.index = rcList.Count
                 rcList.Add(rc)
             Next
+            Dim mm = GetMinMax(rcMap)
+            If mm.minVal <> 1 Then Dim k = 0
+
+
+
+
+
+
+
+
+            Dim usedList As New SortedList(Of Integer, Byte)
+            For Each rc In rcList
+                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
+            Next
+
+            Dim lastIndex As Integer = -1
+            For i = 0 To usedList.Keys.Count - 1
+                If usedList.Keys(i) <> lastIndex + 1 Then
+                    rc = rcList(usedList.Values(i))
+                End If
+                lastIndex = usedList.Keys(i)
+            Next
+
+
+
+
+
+            'rcMap.SetTo(0)
+            'rcList.Clear()
+            'rcList.Add(New rcData) ' placeholder for zero...
+            'mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            'Dim lastID As Integer = usedList.Keys(0)
+            'For i = 0 To usedList.Count - 1
+            '    rc = colorList(usedList.Values(i))
+            '    While rc.ID = lastID
+            '        If i + 1 < usedList.Count Then
+            '            rcNext = colorList(usedList.Values(i + 1))
+            '        Else
+            '            Exit While
+            '        End If
+
+            '        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
+            '        mask(r).SetTo(0)
+            '        mask(rc.rect).SetTo(255, rc.mask)
+            '        mask(rcNext.rect).SetTo(255, rcNext.mask)
+            '        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+            '        colorList(usedList.Values(i + 1)) = rcNext
+            '        i += 1
+            '        lastID = rcNext.ID
+            '    End While
+            '    rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            '    rc.index = rcList.Count
+            '    rcList.Add(rc)
+
+            '    If Not (i + 1 < usedList.Count) Then Exit For
+            'Next
 
             dst2 = ApplyPalette(rcMap, 0)
 
             ' run after ApplyPalette
-            For Each rc In task.fless.rcList
-                If rc.ID = 0 Then Continue For
-                Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
-            Next
+            'For Each rc In task.fless.rcList
+            '    If rc.ID = 0 Then Continue For
+            '    Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+            '    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+            'Next
 
             If standaloneTest() Then
                 dst3 = dst2.Clone
@@ -328,20 +393,20 @@ Namespace VBClasses
             dst3 = task.delaunayFLess.dst2
             labels(2) = task.redColor.labels(2)
 
-            Dim sortUsed As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
+            Dim usedList As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
             For Each rc In task.redColor.rcList
-                If rc.ID > 0 Then Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                If sortUsed.ContainsKey(rc.ID) = False Then sortUsed.Add(rc.ID, rc.index)
+                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
             Next
 
             dst0.SetTo(0)
             Dim lastIndex As Integer = -1
-            For i = 0 To sortUsed.Keys.Count - 1
-                If sortUsed.Keys(i) <> lastIndex + 1 Then
-                    Dim rc = task.redColor.rcList(sortUsed.Values(i))
+            For i = 0 To usedList.Keys.Count - 1
+                If usedList.Keys(i) <> lastIndex + 1 Then
+                    Dim rc = task.redColor.rcList(usedList.Values(i))
                     dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                    dst2(rc.rect).SetTo(rc.ID, rc.mask)
                 End If
-                lastIndex = sortUsed.Keys(i)
+                lastIndex = usedList.Keys(i)
             Next
 
             dst1 = ApplyPalette(dst0, 0)
