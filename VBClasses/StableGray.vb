@@ -33,7 +33,7 @@ Namespace VBClasses
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             labels(2) = "Accumulated pixels were updated with new min/max pixels."
-            desc = "Accumulate Min values where there is no motion and don't compute difference in dst3."
+            desc = "Accumulate Min values where there is no motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.gray

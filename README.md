@@ -1,7 +1,8 @@
-**October 31, 2026 – FeatureLess, Resolution, TreeView,**
+**November 6, 2026 – ReadMe Change, Task Algorithms, TreeView, RedColor_Basics**
 
 -   There are over 1700 algorithms in various stages of development.
     -   Readme.md had to be trimmed – too big lately…
+    -   Readme_TLDR.md is the old version if you have the patience.
 -   The UI_Generator report:
     -   1722 classes will be visible in the user interface
     -   Total source lines for visible classes: 66142
@@ -12,20 +13,23 @@
 -   FeatureLess_Basics and Delaunay_FeatureLess are now task algorithms.
     -   These algorithms allow each RedC cell to be tracked.
     -   The color of the cell is used to confirm the tracking results.
-    -   On the heartbeat, the colors are reset along with the maxDStable points.
+    -   On the heartbeat, the colors are reset along with the ID.
 -   An improved TreeView display now handles duplicate references to algorithms.
-    -   Duplicate algorithms needed to be distinctly identified.
-    -   Treeview code is now much simpler to read and review.
+    -   Duplicate algorithms exist when multiple algorithms call the same algorithm**.**
+    -   The context of the duplicate algorithm is maintained and correctly displayed.
+    -   TreeView code is now much simpler to read and review.
 -   Task algorithms may be selected as the current active algorithm.
     -   Rather than rerun the algorithm that has already run, just present results.
     -   A list of task algorithms is now maintained in MainUI.vb.
 -   RedC cells are the combination of RedColor cells connected to a Delaunay cell.
     -   Colors and map are consistent for the duration of the heartbeat.
--   
+-   RedColor_Basics merges the cells with the same ID.
+    -   The ID is assigned based on the Delaunay_FeatureLess.
+    -   The color cells are all still available in addition to the merged cells.
 
-**![](media/6fa6d2ece99c003dea443ab576435e37.gif)**
+![](media/3a7fab3ce7421f56eb7dab68a8d67f3f.png)
 
-**FeatureLess_SteadyCam:** *When the colors remain the same in the lower left image even with camera movement, it indicates the main objects are being tracked. The mechanism to track objects is the upper right which shows the Delaunay map taken on the heartbeat (enhanced with the featureless cells.) The maxDist point for each cell is tracked in the lower right using the SteadyCam M transform to back project the maxDist point to the original map. The map in the upper right is updated on the heartbeat. The cells in the lower left can come and go as well as change shape but are still likely to be mapped correctly. Radical camera motion can cause a color change.*
+**RedColor_Basics:** *The RedColor_Basics algorithm consolidate the cells that are based strictly on color. The featureless cells in combination with a Delaunay map provide the means for combining cells. Click on the TreeView entries for FeatureLess_Basics and Delaunay_FeatureLess to see how this is done. The updated FeatureLess_Tracker visualizes the mechanism involved. The older version of FeatureLess_Tracker is shown below.*
 
 **October 15, 2026 – FeatureLess Cells, Air Gap Cells, Line_Basics, Octree, Rasterization, Intensity Transform, LineIterator, Guided Filter, “XR_”**
 

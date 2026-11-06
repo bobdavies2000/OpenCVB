@@ -2173,6 +2173,54 @@ Namespace VBClasses
 
 
 
+    Public Class XR_FeatureLess_Color : Inherits TaskParent
+        Public fLessList As New List(Of cv.Rect)
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            task.fOptions.ColorDiffSlider.Value = 30
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Identify featureless squares using the gray scale range."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.gray
+
+            Dim mask As New Mat(src.Size, MatType.CV_8U, 0)
+            For Each r In task.gridRects
+                r = ValidateRect(r)
+                Dim mm = GetMinMax(src(r))
+                If mm.range < task.fOptions.ColorDiffSlider.Value Then mask(r).SetTo(255)
+            Next
+
+            Resize(mask, dst2, src.Size, 0, 0, InterpolationFlags.Nearest)
+
+            fLessList.Clear()
+            For Each r In task.gridRects
+                If dst2.Get(Of Byte)(r.Y, r.X) Then fLessList.Add(r)
+            Next
+
+            If standaloneTest() Then
+                dst3 = task.gray.Clone
+                For Each r In fLessList
+                    Rectangle(dst3, r, white, task.lineWidth)
+                Next
+
+                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+                Dim mm = GetMinMax(task.gray(task.gridRects(index)))
+                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
+                            "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
+                            "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
+                            "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf, 1)
+            End If
+
+            labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
+                        CStr(task.fOptions.ColorDiffSlider.Value) + ")"
+        End Sub
+    End Class
+
+
+
+
+
     Public Class FeatureLess_Tracker : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -2183,7 +2231,7 @@ Namespace VBClasses
                    "  No cost function needed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = task.steadyCam.dst2
+            dst1 = task.delaunayFLess.dst2
             If task.fless.rcList.Count = 0 Then Exit Sub
 
             If task.heartBeatLT Or task.delaunayFLess.snapshotList.Count < 2 Then dst3 = task.fless.dst3
@@ -2243,55 +2291,6 @@ Namespace VBClasses
 
             labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
             labels(3) = CStr(task.delaunayFLess.snapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XR_FeatureLess_Color : Inherits TaskParent
-        Public fLessList As New List(Of cv.Rect)
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            task.fOptions.ColorDiffSlider.Value = 30
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Identify featureless squares using the gray scale range."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-
-            Dim mask As New Mat(src.Size, MatType.CV_8U, 0)
-            For Each r In task.gridRects
-                r = ValidateRect(r)
-                Dim mm = GetMinMax(src(r))
-                If mm.range < task.fOptions.ColorDiffSlider.Value Then mask(r).SetTo(255)
-            Next
-
-            Resize(mask, dst2, src.Size, 0, 0, InterpolationFlags.Nearest)
-
-            fLessList.Clear()
-            For Each r In task.gridRects
-                If dst2.Get(Of Byte)(r.Y, r.X) Then fLessList.Add(r)
-            Next
-
-            If standaloneTest() Then
-                dst3 = task.gray.Clone
-                For Each r In fLessList
-                    Rectangle(dst3, r, white, task.lineWidth)
-                Next
-
-                Dim index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-                Dim mm = GetMinMax(task.gray(task.gridRects(index)))
-                SetTrueText("Click on any grid rect to see its grayscale range." + vbCrLf +
-                            "Min gray = " + mm.minVal.ToString(fmt0) + vbCrLf +
-                            "Max Gray = " + mm.maxVal.ToString(fmt0) + vbCrLf +
-                            "Range = " + mm.range.ToString(fmt0) + vbCrLf + vbCrLf, 1)
-            End If
-
-            labels(3) = CStr(fLessList.Count) + " grid squares were found to be featureless (range < " +
-                        CStr(task.fOptions.ColorDiffSlider.Value) + ")"
         End Sub
     End Class
 End Namespace
