@@ -7,8 +7,8 @@ Namespace VBClasses
         Public objectList As New List(Of Vec4f)
         Public showRectangles As Boolean = True
         Dim histTop As New Projection_HistTop
-        Public redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Find all the masks, rects, and counts in the input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -16,12 +16,10 @@ Namespace VBClasses
                 histTop.Run(src)
                 src = histTop.dst2
 
-                ' redC.inputRemoved = Not histTop.dst3
-                redC.Run(histTop.dst3)
-                dst2 = redC.dst2
-                labels(2) = redC.labels(2)
+                dst2 = task.redColor.dst2
+                labels(2) = task.redColor.labels(2)
 
-                redCellInput = redC.rcList
+                redCellInput = task.redColor.rcList
             End If
 
             Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -245,24 +243,23 @@ Namespace VBClasses
     Public Class Projection_Cell : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatCell As New HeatMap_Basics
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New Mat(dst0.Size(), MatType.CV_32FC3, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "Top View projection of the selected cell", "RedColor_FLessBasics output - select a cell to project at right and above", "Side projection of the selected cell"}
             desc = "Create a top and side projection of the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             heat.Run(src)
             dst1 = heat.dst2.Clone
             dst3 = heat.dst3.Clone
 
-            If redC.rcList.Count > 0 Then
-                Dim rc = redC.rcList(0) ' just pick the biggest cell for now...
+            If task.redColor.rcList.Count > 0 Then
+                Dim rc = task.redColor.rcList(0) ' just pick the biggest cell for now...
                 dst0.SetTo(0)
                 task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
             End If
@@ -335,15 +332,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histTop.Run(src)
 
-            objects.redC.Run(histTop.dst3)
+            task.redColor.Run(histTop.dst3)
 
-            objects.redCellInput = objects.redC.rcList
-            objects.dst2 = objects.redC.dst2
-            objects.labels(2) = objects.redC.labels(2)
+            objects.redCellInput = task.redColor.rcList
+            objects.dst2 = task.redColor.dst2
+            objects.labels(2) = task.redColor.labels(2)
             objects.Run(histTop.dst2)
 
             dst2 = objects.dst2
-            labels(2) = objects.redC.labels(2)
+            labels(2) = task.redcolor.labels(2)
             SetTrueText(objects.strOut, 3)
         End Sub
     End Class
@@ -365,15 +362,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histSide.Run(src)
 
-            objects.redC.Run(histSide.dst3)
+            task.redColor.Run(histSide.dst3)
 
-            objects.redCellInput = objects.redC.rcList
-            objects.dst2 = objects.redC.dst2
-            objects.labels(2) = objects.redC.labels(2)
+            objects.redCellInput = task.redColor.rcList
+            objects.dst2 = task.redColor.dst2
+            objects.labels(2) = task.redColor.labels(2)
             objects.Run(histSide.dst2)
 
             dst2 = objects.dst2
-            labels(2) = objects.redC.labels(2)
+            labels(2) = task.redColor.labels(2)
             SetTrueText(objects.strOut, 3)
         End Sub
     End Class

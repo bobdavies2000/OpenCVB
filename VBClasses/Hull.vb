@@ -34,17 +34,17 @@ Namespace VBClasses
 
 
     Public Class Hull_Edges : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            labels(3) = "Edges found for the RedColor cells."
             desc = "Match hull edges that are also real edges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
             Next
         End Sub
@@ -147,20 +147,19 @@ Namespace VBClasses
 
 
     Public Class Hull_Contour : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Contour is in white and hull is highlighted."
             desc = "Compare the hull to the contour of a cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            If redC.rcList.Count <= 1 Then Exit Sub
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
+            If task.redColor.rcList.Count <= 1 Then Exit Sub
 
             Dim rc = task.rcD
-            If rc Is Nothing Then rc = redC.rcList(1)
+            If rc Is Nothing Then rc = task.redColor.rcList(1)
 
             Dim newSize = New cv.Size(rc.rect.Width, rc.rect.Width * dst2.Height / dst2.Width)
             If rc.rect.Width * dst2.Height / dst2.Width Then
@@ -217,26 +216,25 @@ Namespace VBClasses
 
 
 
-    Public Class Hull_RedC : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
+    Public Class XR_Hull_RedC : Inherits TaskParent
         Public hulls As New List(Of List(Of cv.Point))
         Public rclist As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels = {"", "Cells where convexity defects failed", "", "Defect regions filled for each RedC hull"}
             desc = "Cursor.ai: Fill convexity defect regions for each hull in RedC.rcList"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             Dim defectCount As Integer
             Dim filledDefects As Integer
             rcMap.SetTo(0)
             dst3.SetTo(0)
             rclist.Clear()
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 If rc.contour.Count >= 3 Then
                     Dim hull = ConvexHull(rc.contour.ToArray, True).ToList
                     hulls.Add(hull.ToList)

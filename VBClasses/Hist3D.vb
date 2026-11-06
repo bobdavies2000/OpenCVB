@@ -86,64 +86,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class XR_Hist3D_RedC : Inherits TaskParent
-        Dim hist3D As New Hist3D_Basics
-        Dim redC As New RedColor_FLessBasics
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Run RedFlood_List on the combined Hist3D color/cloud output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            hist3D.Run(src)
-            dst2 = hist3D.dst3
-            labels(2) = hist3D.labels(3)
-
-            redC.Run(hist3D.dst2)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
-
-            SetTrueText(redC.strOut, 1)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class XR_Hist3D_RedC1 : Inherits TaskParent
-        Dim hColor As New Hist3Dcolor_Basics
-        Dim redC As New RedColor_FLessBasics
-        Public Sub New()
-            desc = "Use the Hist3D color classes to segment the image with RedColor_FLessBasics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            hColor.Run(src)
-            dst3 = hColor.dst3
-            labels(3) = hColor.labels(3)
-
-            redC.Run(hColor.dst2)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            If redC.rcList.Count > 0 Then
-                If task.rcD IsNot Nothing Then
-                    If task.rcD.pixels > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
-                End If
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class XR_Hist3D_DepthWithMask : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public depthMask As New Mat
@@ -255,8 +197,8 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixels.Run(src)
-            dst2 = pixels.redC.rcMap
-            dst0 = pixels.redC.rcMap
+            dst2 = task.redColor.rcMap
+            dst0 = task.redColor.rcMap
 
             InRange(dst2, 0, 0, dst3)
             If pixels.pixelVector.Count = 0 Then Exit Sub

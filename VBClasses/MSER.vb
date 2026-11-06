@@ -25,14 +25,13 @@ Namespace VBClasses
         Dim detect As New MSER_CPP
         Public mserCells As New List(Of rcData)
         Public floodPoints As New List(Of cv.Point)
-        Public redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
+            dst3 = task.redColor.dst2
+            labels(3) = task.redColor.labels(2)
 
             detect.Run(src)
             Dim boxInput = New List(Of cv.Rect)(detect.boxes)
@@ -58,18 +57,18 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                Dim indexLast = redC.rcMap.Get(Of Single)(rc.maxDist.Y, rc.maxDist.X)
-                If indexLast <> 0 And indexLast < redC.rcList.Count Then
-                    Dim lrc = redC.rcList(indexLast)
+                Dim indexLast = task.redColor.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If indexLast <> 0 And indexLast < task.redColor.rcList.Count Then
+                    Dim lrc = task.redColor.rcList(indexLast)
                     matched.Add(indexLast)
                 End If
 
                 If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
             Next
 
-            redC.rcList = New List(Of rcData)(sortedCells.Values)
+            task.redColor.rcList = New List(Of rcData)(sortedCells.Values)
 
-            labels(2) = CStr(redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+            labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub
     End Class
 
@@ -576,8 +575,8 @@ Namespace VBClasses
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             options.Run()
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
@@ -608,9 +607,9 @@ Namespace VBClasses
             labels(3) = CStr(classCount) + " regions identified"
 
             src.SetTo(white, dst3)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redColor.Run(src)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
         End Sub
         Protected Overrides Sub Finalize()
             MSER_Close(cPtr)

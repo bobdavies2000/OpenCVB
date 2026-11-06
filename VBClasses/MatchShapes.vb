@@ -63,8 +63,8 @@ Namespace VBClasses
         Public similarCells As New List(Of rcData)
         Public rc As New rcData
         Dim options As New Options_MatchShapes
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "All the shapes that match since the last heartbeat."
             desc = "Find similar shapes in the redC cells."
         End Sub
@@ -73,18 +73,17 @@ Namespace VBClasses
             Dim selectMsg = "select any cell to match its shape to other cells"
 
             If standalone Then
-                redC.Run(src)
-                dst2 = redC.dst2.Clone
-                labels(2) = redC.labels(2)
-                If redC.rcList.Count = 0 Or task.rcD Is Nothing Then
+                dst2 = task.redColor.dst2.Clone
+                labels(2) = task.redColor.labels(2)
+                If task.redColor.rcList.Count = 0 Or task.rcD Is Nothing Then
                     SetTrueText(selectMsg, 3)
                     Exit Sub
                 End If
             End If
 
             Static rcListLast As New List(Of rcData)
-            if heartbeatx() then 
-                rcListLast = New List(Of rcData)(redC.rcList)
+            if heartbeatx() Then
+                rcListLast = New List(Of rcData)(task.redColor.rcList)
                 dst3.SetTo(0)
             End If
 
@@ -165,9 +164,8 @@ Namespace VBClasses
 
     Public Class XR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             OptionParent.FindSlider("Match Threshold %").Value = 3
             labels = {"", "", "Output of RedFlood_List", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
@@ -175,17 +173,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
-            if heartbeatx() then  dst3.SetTo(0)
-            SetTrueText(redC.strOut, 1)
+            If heartbeatx() then  dst3.SetTo(0)
+            SetTrueText(task.redColor.strOut, 1)
 
             Dim rcX = task.rcD
             If task.rcD Is Nothing Then Exit Sub
-            If rcX Is Nothing Then rcX = redC.rcList(0)
-            For Each rc In redC.rcList
+            If rcX Is Nothing Then rcX = task.redColor.rcList(0)
+            For Each rc In task.redColor.rcList
                 If rc.contour Is Nothing Then Continue For
                 Dim matchVal = MatchShapes(rcX.contour, rc.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)

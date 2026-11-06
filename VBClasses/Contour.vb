@@ -12,7 +12,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
             Dim dst = task.color.Clone
-            Dim clickIndex = rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X) - 1
+            Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
                 task.rcD = rcList(clickIndex)
                 dst(task.rcD.rect).SetTo(white, task.rcD.mask)

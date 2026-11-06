@@ -3,15 +3,14 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Triangle_Basics : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels = {"", "", "RedColor_FLessBasics output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             If task.rcD Is Nothing Then Exit Sub
 
@@ -86,18 +85,17 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
-            SetTrueText(redC.strOut, 1)
+            SetTrueText(task.redColor.strOut, 1)
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub
@@ -148,19 +146,18 @@ Namespace VBClasses
 
     Public Class XR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of Point3f)
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels = {"", "", "RedFlood_List output", "Selected rc.mask - each pixel has depth. red dot is maxDist."}
             desc = "Given a RedCloud cell, resize it and show the points with depth."
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
-            SetTrueText(redC.strOut, 1)
+            SetTrueText(task.redColor.strOut, 1)
 
             Dim rc = task.rcD
             If rc Is Nothing Then Exit Sub

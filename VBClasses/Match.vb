@@ -232,17 +232,16 @@ Namespace VBClasses
 
     Public Class XR_Match_TraceRedC : Inherits TaskParent
         Dim frameList As New List(Of Mat)
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             dst0 = New Mat(dst0.Size(), MatType.CV_32S, 0)
             dst1 = New Mat(dst1.Size(), MatType.CV_32S, 0)
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
+            dst3 = task.redColor.dst2
+            labels(3) = task.redColor.labels(2)
 
             If heartbeatX() Then dst2.SetTo(0)
             If task.optionsChanged Then frameList.Clear()
@@ -250,10 +249,10 @@ Namespace VBClasses
             dst0.SetTo(0)
             Dim points As New List(Of cv.Point)
 
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
             Next
-            labels(2) = CStr(redC.rcList.Count) + " cells added"
+            labels(2) = CStr(task.redColor.rcList.Count) + " cells added"
 
             frameList.Add(dst0.Clone)
             If frameList.Count >= task.fOptions.FrameHistoryCount.Value Then
@@ -691,18 +690,17 @@ Namespace VBClasses
 
 
     Public Class Match_RedC : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
         Dim matchFeat As New Match_Features
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Create a stable RedC output image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             matchFeat.ptList.Clear()
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 matchFeat.ptList.Add(rc.maxDStable)
                 If rc.ID >= 10 Then Exit For
             Next
@@ -737,7 +735,7 @@ Namespace VBClasses
 
             Static clickIndex As Integer
             If task.mouseClickFlag Then
-                clickIndex = redColor.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)
+                clickIndex = redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             Else
                 clickIndex = 1
             End If

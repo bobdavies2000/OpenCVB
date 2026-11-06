@@ -2,17 +2,16 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class SuperPixel_Basics : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "A superpixel algorithm that might be better"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             dst3 = src
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
             Next
         End Sub

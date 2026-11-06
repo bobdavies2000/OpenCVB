@@ -247,7 +247,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            SetTrueText(displayCell(rcList, rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             If task.rcD IsNot Nothing Then
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
@@ -364,7 +364,7 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
 
             If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -592,7 +592,7 @@ Namespace VBClasses
             If redC.rcList.Count = 0 Then Exit Sub
             If task.rcD Is Nothing Then task.rcD = redC.rcList(0)
 
-            Dim index As Integer = redC.rcMap.Get(Of Single)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
+            Dim index As Integer = redC.rcMap.Get(Of Byte)(task.rcD.maxDist.Y, task.rcD.maxDist.X)
 
             neighbors.Clear()
             For Each rc In redC.rcList

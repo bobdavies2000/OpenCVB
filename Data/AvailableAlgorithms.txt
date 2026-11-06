@@ -354,7 +354,6 @@ Hull_Basics
 Hull_Contour
 Hull_Defect
 Hull_Edges
-Hull_RedC
 IMU_Average
 IMU_Basics_TA
 IMU_FindVertical
@@ -624,6 +623,7 @@ RedC_NeighborHist
 RedC_Neighbors
 RedCloud_Basics
 RedCloud_Core
+RedCloud_Features
 RedColor_Basics
 RedColor_FLessBasics
 RedPrep_Basics
@@ -1273,8 +1273,6 @@ XR_Hist2D_Depth
 XR_Hist2D_PlotHistogram1D
 XR_Hist3D_DepthWithMask
 XR_Hist3D_PixelDiffMask
-XR_Hist3D_RedC
-XR_Hist3D_RedC1
 XR_Hist3D_RedCloudGrid
 XR_Hist3Dcloud_BP_Filter
 XR_Hist3Dcloud_DepthSplit
@@ -1332,6 +1330,7 @@ XR_Hough_Probabilistic
 XR_Hough_Structural
 XR_Hough_Sudoku
 XR_Hull_Basics
+XR_Hull_RedC
 XR_Image_Basics
 XR_Image_Icon
 XR_Image_MSER
@@ -1635,7 +1634,6 @@ XR_RedColor_LeftRight
 XR_RedColor_Lines
 XR_RedColor_LineSingle
 XR_RedColor_Missing
-XR_RedColor_NWay
 XR_RedColor_Points
 XR_Reduction_BGR
 XR_Reduction_Edges

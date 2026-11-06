@@ -13,7 +13,11 @@ Namespace VBClasses
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(task.gray)
+            If src.Channels <> 1 Then
+                color8U.Run(task.gray)
+                src = color8U.dst2
+            End If
+
             Dim rc As rcData, rcNext As rcData
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
@@ -25,7 +29,7 @@ Namespace VBClasses
                     Dim pt = New cv.Point(x, y)
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
-                        Dim count = FloodFill(color8U.dst2, mask, pt, index, rect, 0, 0, flags)
+                        Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
                             rc = New rcData(mask(rect), rect, index) With {.index = index}
                             sortList.Add(rc.pixels, rc)
@@ -181,7 +185,7 @@ Namespace VBClasses
                 Dim r = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-                Dim index As Integer = task.redColor.rcMap.Get(Of Single)(center.Y, center.X) - 1
+                Dim index As Integer = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X) - 1
                 If index >= task.redColor.rcList.Count Or index < 0 Then Continue For
                 Dim rc = task.redColor.rcList(index)
                 dst3(r).SetTo(task.scalarColors(rc.ID Mod 255))

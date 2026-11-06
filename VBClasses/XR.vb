@@ -906,8 +906,8 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_LeftRight : Inherits TaskParent
-        Dim redLeft As New RedColor_FLessBasics
-        Dim redRight As New RedColor_FLessBasics
+        Dim redLeft As New RedColor_Basics
+        Dim redRight As New RedColor_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
             desc = "Display the RedColor_FLessBasics output For both the left And right images."
@@ -931,32 +931,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedColor_NWay : Inherits TaskParent
-        Dim binN As New BinNWay_Basics
-        Dim redC As New RedColor_FLessBasics
-        Public Sub New()
-            desc = "Run RedColor On the output Of the BinNWay_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            binN.Run(src)
-            dst3 = binN.dst3
-            labels(3) = binN.labels(3)
-
-            redC.Run(binN.dst2)
-            labels(2) = redC.labels(2)
-            dst2 = redC.dst2
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_RedColor_Bricks : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
-        Dim redC As New RedColor_FLessBasics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
             desc = "Attach an color8u Class To Each r."
@@ -1073,10 +1052,10 @@ Namespace VBClasses
         Public Sub New()
             desc = "Create a line between the rightmost and leftmost good feature to show camera motion"
         End Sub
-        Private Function findNearest(pt As cv.Point) As Integer
+        Private Shared Function findNearest(pt As cv.Point) As Integer
             Dim bestDistance As Single = Single.MaxValue
             Dim bestIndex As Integer
-            For Each rc In track.redC.rcList
+            For Each rc In task.redColor.rcList
                 Dim d = pt.DistanceTo(rc.maxDist)
                 If d < bestDistance Then
                     bestDistance = d
@@ -1088,12 +1067,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             track.Run(src)
             dst2 = track.dst2
-            If track.redC.rcList.Count = 0 Then
+            If task.redColor.rcList.Count = 0 Then
                 SetTrueText("No lines found to track.", 3)
                 Exit Sub
             End If
             Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each rc In track.redC.rcList
+            For Each rc In task.redColor.rcList
                 If rc.ID = 0 Then Continue For
                 xList.Add(rc.rect.X, rc.ID)
             Next
@@ -1107,8 +1086,8 @@ Namespace VBClasses
                 While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                     leftMost = task.msRNG.Next(minLeft, minRight)
                     rightmost = task.msRNG.Next(minLeft, minRight)
-                    leftCenter = track.redC.rcList(leftMost).maxDist
-                    rightCenter = track.redC.rcList(rightmost).maxDist
+                    leftCenter = task.redColor.rcList(leftMost).maxDist
+                    rightCenter = task.redColor.rcList(rightmost).maxDist
                     iterations += 1
                     If iterations > 10 Then Exit Sub
                 End While
@@ -1116,14 +1095,14 @@ Namespace VBClasses
 
             leftMost = findNearest(leftCenter) - 1
             rightmost = findNearest(rightCenter) - 1
-            If leftMost >= 0 And leftMost < track.redC.rcList.Count And
-                    rightmost >= 0 And rightmost < track.redC.rcList.Count Then
-                leftCenter = track.redC.rcList(leftMost).maxDist
-                rightCenter = track.redC.rcList(rightmost).maxDist
+            If leftMost >= 0 And leftMost < task.redColor.rcList.Count And
+                    rightmost >= 0 And rightmost < task.redColor.rcList.Count Then
+                leftCenter = task.redColor.rcList(leftMost).maxDist
+                rightCenter = task.redColor.rcList(rightmost).maxDist
 
                 Line(dst2, leftCenter, rightCenter, white, task.lineWidth, task.lineType)
             End If
-            labels(2) = track.redC.labels(2)
+            labels(2) = task.redColor.labels(2)
         End Sub
     End Class
 
@@ -1245,7 +1224,7 @@ Namespace VBClasses
     ''' Click a cell (task.rcD) when available to override the auto-picked subject.
     ''' </summary>
     Public Class XR_RedColor_Isolate : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Cursor.ai: Isolate subject via RedColor cells: auto-pick center cell (non-background size); use selected cell if set."
         End Sub
@@ -1282,7 +1261,7 @@ Namespace VBClasses
 
             Dim cx = task.workRes.Width \ 2
             Dim cy = task.workRes.Height \ 2
-            Dim idxCenter As Integer = rcMap.Get(Of Single)(cy, cx) - 1
+            Dim idxCenter As Integer = rcMap.Get(Of Byte)(cy, cx) - 1
             If idxCenter >= 0 And idxCenter < rcList.Count Then
                 Dim rc0 = rcList(idxCenter)
                 If rc0.pixels >= minPx And rc0.pixels <= maxPx Then Return rc0
@@ -1295,7 +1274,7 @@ Namespace VBClasses
                 For dx = -4 To 4
                     Dim y = Clip(cy + dy, 0, rcMap.Rows - 1)
                     Dim x = Clip(cx + dx, 0, rcMap.Cols - 1)
-                    Dim ix = rcMap.Get(Of Single)(y, x)
+                    Dim ix = rcMap.Get(Of Byte)(y, x)
                     If ix <= 0 OrElse ix > rcList.Count Then Continue For
                     Dim rc = rcList(ix - 1)
                     If rc.pixels < minPx OrElse rc.pixels > maxPx Then Continue For
@@ -1383,18 +1362,17 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_Contour : Inherits TaskParent
-        Public redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If New Size(task.workRes.Width, task.workRes.Height) <> New Size(168, 94) Then task.fOptions.FrameHistoryCount.Value = 1
             desc = "Get stats on each RedColor cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
+            dst3 = task.redColor.dst2
+            labels(3) = task.redColor.labels(2)
 
             dst2.SetTo(0)
-            For Each rc In redC.rcList
+            For Each rc In task.redColor.rcList
                 DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.ID Mod 255), -1)
                 If task.rcD IsNot Nothing Then
                     If rc.ID = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
@@ -1440,7 +1418,7 @@ Namespace VBClasses
             Next
 
             dst3 = ApplyPalette(rcMap, 0)
-            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
             If task.rcD IsNot Nothing Then
                 Circle(dst2, task.rcD.maxDist, task.DotSize + 1, white, -1)
                 Circle(dst2, task.rcD.maxDStable, task.DotSize + 1, black, -1)
@@ -1612,7 +1590,7 @@ Namespace VBClasses
                 If nextHull IsNot Nothing Then FillPoly(dst0(rc.rect), {nextHull}, rc.ID)
             Next
             If task.rcD Is Nothing Then Exit Sub
-            SetTrueText(XR_RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Single)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(XR_RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             dst3.SetTo(0)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)

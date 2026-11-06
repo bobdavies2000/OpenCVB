@@ -27,15 +27,14 @@ Namespace VBClasses
         Public colorList As New List(Of Scalar)
         Public oglOptions As New Options_OpenGLFunctions
         Const depthListMaxCount As Integer = 10
-        Dim redc As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "Values indicate the depth of the brick at that location."
             desc = "Create a representation of the cv.Point cloud with RedCloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redc.Run(src)
-            dst2 = redc.dst2
-            labels(2) = redc.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             oglOptions.Run()
             Dim ptM = oglOptions.moveAmount
@@ -60,16 +59,16 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = redc.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X)
 
-                If index <= 0 Or index >= redc.rcList.Count Then
+                If index <= 0 Or index >= task.redColor.rcList.Count Then
                     depthList1(i).Clear()
                     depthList2(i).Clear()
                     colorList(i) = black
                     Continue For
                 End If
 
-                Dim rc = redc.rcList(index)
+                Dim rc = task.redColor.rcList(index)
 
                 If colorList(i) <> task.scalarColors(rc.ID Mod 255) Then
                     depthList1(i).Clear()
@@ -159,7 +158,7 @@ Namespace VBClasses
                 Dim gRect = task.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gRect.X + gRect.Width / 2), CInt(gRect.Y + gRect.Height / 2))
-                Dim index = hulls.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = hulls.rcMap.Get(Of Byte)(center.Y, center.X)
 
                 If index <= 0 Then
                     depthList(i).Clear()
@@ -212,14 +211,13 @@ Namespace VBClasses
         Dim depthMinList As New List(Of List(Of Single))
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Create triangles from each gRect in cv.Point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             If task.optionsChanged Then
                 depthMinList.Clear()
@@ -241,11 +239,11 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim gRect = task.gridRects(i)
                 Dim center = New cv.Point(gRect.X + gRect.Width / 2, gRect.Y + gRect.Height / 2)
-                Dim index = redC.rcMap.Get(Of Single)(center.Y, center.X)
+                Dim index = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X)
                 Dim depthMin As Double = 0, depthMax As Double = 0, minLoc As cv.Point, maxLoc As cv.Point
-                If index > 0 And index < redC.rcList.Count Then
+                If index > 0 And index < task.redColor.rcList.Count Then
                     MinMaxLoc(task.pcSplit(2)(gRect), depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))
-                    Dim rc = redC.rcList(index - 1)
+                    Dim rc = task.redColor.rcList(index - 1)
                     depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
                     If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then

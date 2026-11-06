@@ -344,4 +344,103 @@ Namespace VBClasses
             dst2 = addw.dst2
         End Sub
     End Class
+
+
+
+
+    Public Class RedCloud_Features : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst1.Size, MatType.CV_8U, 0)
+        Dim rcListLast As New List(Of rcData)
+        Public fLessBricks As New List(Of cv.Rect)
+        Public Sub New()
+            desc = "Identify regions by depth."
+        End Sub
+        Public Shared Function MyFinder(myList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
+            For Each rc In myList
+                If rc.ID = id Then Return myList(rc.index)
+            Next
+            Return Nothing
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.algorithmActive Then
+                SetTrueText(traceName + " is a task algorithm that has already run", 3)
+                dst2 = task.fless.dst2
+                labels(2) = task.fless.labels(2)
+                trueData = New List(Of TrueText)(task.fless.trueData)
+                Exit Sub ' this is a task.algorithm that has already run...
+            End If
+
+            rcListLast = New List(Of rcData)(rcList)
+
+            rcMap.SetTo(0)
+            fLessBricks.Clear()
+            For Each r In task.gridRects
+                If CountNonZero(task.edges.dst2(r)) > 0 Then Continue For
+                If r.Height <> task.gridWH Or r.Width <> task.gridWH Then Continue For ' odd sizes.
+                rcMap(r).SetTo(255)
+                fLessBricks.Add(r)
+            Next
+
+            Dim rect As cv.Rect
+            Dim mask = New Mat(New Size(rcMap.Width + 2, rcMap.Height + 2), MatType.CV_8U, 0)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim rc As rcData
+            Dim index As Integer = 1
+            Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            For Each r In fLessBricks
+                If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
+                    Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    rc = New rcData(rcMap(rect), rect, index)
+                    sortList.Add(rc.pixels, rc)
+                    index += 1
+                End If
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            rcMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                Dim pt = WarpAffine_Basics.WarpPoint(rc.maxDist, task.steadyCam.inverseM)
+                pt = validatePoint(pt)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.pixels = CountNonZero(rc.mask)
+                rcList.Add(rc)
+            Next
+
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                If rc.motionPixels = 0 Then
+                    Dim rclast = MyFinder(rcListLast, rc.ID)
+                    If rclast IsNot Nothing Then
+                        rc.age = rclast.age + 1
+                        If rc.age >= 1000 Then rc.age = 10
+                        rc.maxDStable = rclast.maxDStable
+                    End If
+                End If
+                ' SetTrueText(CStr(rc.age), rc.maxDStable)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            For Each rc In rcList
+                If rc.index = 0 Then Continue For
+                SetTrueText(CStr(rc.ID), rc.maxDist)
+            Next
+
+            Dim rcNext = MyFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rcNext IsNot Nothing Then
+                task.rcD = rcNext
+                Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
+                SetTrueText(task.rcD.displayCell, 3)
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
+
+            labels(2) = CStr(rcList.Count - 1) + " featureless regions found.  Age is shown."
+        End Sub
+    End Class
 End Namespace
