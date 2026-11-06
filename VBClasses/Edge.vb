@@ -846,8 +846,8 @@ Namespace VBClasses
     Public Class XR_Edge_RedC : Inherits TaskParent
         Dim edges As New Edge_Basics_TA
         Public mats As New Mat_4Click
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(2) = "Canny Edges (0), RedCloud output (1), RedCloud Edges(2), 0 And'd with 2"
             labels(3) = "Cell boundaries that are also real edges."
             desc = "Identify cell boundaries that are also edges."
@@ -855,12 +855,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             mats.mat(0) = task.edges.dst2
 
-            redC.Run(src)
-            mats.mat(1) = redC.dst2
-            labels(3) = redC.labels(2)
+            edges.Run(task.redColor.dst2)
+            mats.mat(1) = edges.dst2
+            labels(3) = task.redColor.labels(2)
 
             Dim _edges_cvt As New Mat
-            CvtColor(redC.dst2, _edges_cvt, ColorConversionCodes.BGR2GRAY)
+            CvtColor(task.redColor.dst2, _edges_cvt, ColorConversionCodes.BGR2GRAY)
             edges.Run(_edges_cvt)
             mats.mat(2) = edges.dst2
 

@@ -1069,18 +1069,17 @@ Namespace VBClasses
 
     Public Class XR_Depth_CellTiers : Inherits TaskParent
         Public valley As New HistValley_Count
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Find the number of valleys (tiers) in a RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             valley.standaloneFlag = standalone
-            For i = 0 To Math.Min(10, redC.rcList.Count - 1)
-                Dim rc = redC.rcList(i)
+            For i = 0 To Math.Min(10, task.redColor.rcList.Count - 1)
+                Dim rc = task.redColor.rcList(i)
                 Dim depthData = task.pcSplit(2)(rc.rect).Clone
                 depthData.SetTo(0, Not rc.mask)
 
@@ -1089,7 +1088,7 @@ Namespace VBClasses
                     dst3 = valley.dst2.Clone
                     labels(3) = valley.strOut
                     task.clickPoint = rc.maxDist
-                    SetTrueText(redC.strOut, 3)
+                    SetTrueText(task.redColor.strOut, 3)
                 End If
                 If heartbeatX() Then
                     If valley.classCount <= 1 Then

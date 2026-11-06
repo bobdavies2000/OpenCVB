@@ -184,7 +184,7 @@ Namespace VBClasses
             dst2 = flood.dst2
             dst3 = flood.dst3
 
-            SetTrueText(flood.redC.strOut, 1)
+            SetTrueText(task.redColor.strOut, 1)
         End Sub
     End Class
 
@@ -260,9 +260,9 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Public redC As New RedColor_FLessBasics
         Dim color8U As New Color8U_Basics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
             desc = "Floodfill by color as usual."
         End Sub
@@ -274,13 +274,12 @@ Namespace VBClasses
 
             src.SetTo(0, inputRemoved)
 
-            redC.Run(src)
-            labels(2) = redC.labels(2)
-            dst2 = redC.dst2.SetTo(0, inputRemoved)
+            labels(2) = task.redColor.labels(2)
+            dst2 = task.redColor.dst2.SetTo(0, inputRemoved)
 
-            labels(2) = $"{redC.rcList.Count} cells identified"
+            labels(2) = $"{task.redColor.rcList.Count} cells identified"
 
-            If showSelected Then SetTrueText(redC.strOut, 3)
+            If showSelected Then SetTrueText(task.redColor.strOut, 3)
         End Sub
     End Class
 
@@ -289,9 +288,9 @@ Namespace VBClasses
 
     Public Class XR_Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim redC As New RedColor_FLessBasics
         Dim edges As New Edge_Basics_TA
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Match flooded cells with FeatureLess clusters"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -299,42 +298,18 @@ Namespace VBClasses
             dst2 = fLess.dst2
             labels(2) = fLess.labels(2)
 
-            redC.Run(src)
-            dst3 = redC.dst2
-            labels(3) = redC.labels(2)
+            dst3 = task.redColor.dst2
+            labels(3) = task.redColor.labels(2)
 
             Dim _edges_cvt As New Mat
             CvtColor(dst2, _edges_cvt, ColorConversionCodes.BGR2GRAY)
             edges.Run(_edges_cvt)
             dst3.SetTo(white, edges.dst2)
 
-            SetTrueText(redC.strOut, 1)
+            SetTrueText(task.redColor.strOut, 1)
         End Sub
     End Class
 
-
-
-
-
-    Public Class XR_Flood_DarkLight : Inherits TaskParent
-        Dim redC As New RedColor_FLessBasics
-        Dim options As New Options_CComp
-        Public Sub New()
-            desc = "FloodFill the light half of the image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Threshold(task.gray, dst1, options.light, 255, ThresholdTypes.Binary)
-            redC.Run(dst1)
-            dst2 = ApplyPalette(redC.rcMap, 0)
-            labels(2) = redC.labels(2)
-
-            redC.Run(Not dst1)
-            dst3 = ApplyPalette(redC.rcMap, 0)
-            labels(3) = redC.labels(2)
-        End Sub
-    End Class
 
 
 

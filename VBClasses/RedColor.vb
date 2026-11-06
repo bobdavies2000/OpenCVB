@@ -224,6 +224,75 @@ Namespace VBClasses
 
 
 
+
+    Public Class XR_RedColor_Flippers : Inherits TaskParent
+        Public Sub New()
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Find the cells which are flipping."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastList As New List(Of rcData)(task.redColor.rcList)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
+
+            Dim usedList As New List(Of Byte)
+            For Each rc In task.redColor.rcList
+                If rc.index = 0 Then Continue For
+                Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
+                If usedList.Contains(rc.ID) = False Then usedList.Add(rc.ID)
+            Next
+
+            dst1.SetTo(0)
+            For Each rc In task.redColor.rcList
+                If rc.ID = 255 Then
+                    dst1(rc.rect).SetTo(rc.ID, rc.mask)
+                End If
+            Next
+            dst3 = ApplyPalette(dst1, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class XR_RedColor_Missing : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Find the cells which are missing."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim lastList As New List(Of rcData)(task.redColor.rcList)
+            dst2 = task.redColor.dst2
+            dst3 = task.delaunayFLess.dst2
+            labels(2) = task.redColor.labels(2)
+
+            Dim usedList As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
+            For Each rc In task.redColor.rcList
+                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
+            Next
+
+            dst0.SetTo(0)
+            Dim lastIndex As Integer = -1
+            For i = 0 To usedList.Keys.Count - 1
+                If usedList.Keys(i) <> lastIndex + 1 Then
+                    Dim rc = task.redColor.rcList(usedList.Values(i))
+                    dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                    dst2(rc.rect).SetTo(rc.ID, rc.mask)
+                End If
+                lastIndex = usedList.Keys(i)
+            Next
+
+            dst1 = ApplyPalette(dst0, 0)
+        End Sub
+    End Class
+
+
+
+
     Public Class RedColor_FLessBasics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
@@ -288,74 +357,6 @@ Namespace VBClasses
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
-        End Sub
-    End Class
-
-
-
-
-    Public Class XR_RedColor_Flippers : Inherits TaskParent
-        Public Sub New()
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            desc = "Find the cells which are flipping."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastList As New List(Of rcData)(task.redColor.rcList)
-            dst2 = task.redColor.dst2
-            labels(2) = task.redColor.labels(2)
-
-            Dim usedList As New List(Of Byte)
-            For Each rc In task.redColor.rcList
-                If rc.index = 0 Then Continue For
-                Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                If usedList.Contains(rc.ID) = False Then usedList.Add(rc.ID)
-            Next
-
-            dst1.SetTo(0)
-            For Each rc In task.redColor.rcList
-                If rc.ID = 255 Then
-                    dst1(rc.rect).SetTo(rc.ID, rc.mask)
-                End If
-            Next
-            dst3 = ApplyPalette(dst1, 0)
-        End Sub
-    End Class
-
-
-
-
-    Public Class XR_RedColor_Missing : Inherits TaskParent
-        Public Sub New()
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            desc = "Find the cells which are missing."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastList As New List(Of rcData)(task.redColor.rcList)
-            dst2 = task.redColor.dst2
-            dst3 = task.delaunayFLess.dst2
-            labels(2) = task.redColor.labels(2)
-
-            Dim usedList As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
-            For Each rc In task.redColor.rcList
-                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
-            Next
-
-            dst0.SetTo(0)
-            Dim lastIndex As Integer = -1
-            For i = 0 To usedList.Keys.Count - 1
-                If usedList.Keys(i) <> lastIndex + 1 Then
-                    Dim rc = task.redColor.rcList(usedList.Values(i))
-                    dst0(rc.rect).SetTo(rc.ID, rc.mask)
-                    dst2(rc.rect).SetTo(rc.ID, rc.mask)
-                End If
-                lastIndex = usedList.Keys(i)
-            Next
-
-            dst1 = ApplyPalette(dst0, 0)
         End Sub
     End Class
 End Namespace

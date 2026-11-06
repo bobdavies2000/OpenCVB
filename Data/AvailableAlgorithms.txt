@@ -1193,7 +1193,6 @@ XR_FitLine_Grid
 XR_FitLine_Lines
 XR_FitLine_Simple
 XR_FitLine_Simple3D
-XR_Flood_DarkLight
 XR_Flood_FeatureLess
 XR_Flood_Minimal
 XR_Flood_Original

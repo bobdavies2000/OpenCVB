@@ -568,16 +568,15 @@ Namespace VBClasses
 
     Public Class XR_Feature_RedC : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Show the feature points in the RedC output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             feat.Run(src)
 
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             For Each pt In feat.ptlist
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)

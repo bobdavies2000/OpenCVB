@@ -574,18 +574,17 @@ Namespace VBClasses
 
     Public Class XR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
-            SetTrueText(redC.strOut, 3)
+            SetTrueText(task.redColor.strOut, 3)
             If task.rcD Is Nothing Then Exit Sub
             Dim tmp = task.rcD.mask.Clone
 
@@ -606,8 +605,8 @@ Namespace VBClasses
 
     Public Class XR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
             desc = "Compare contours of the selected cell.  Approximation has a lot fewer points."
@@ -615,12 +614,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redC.Run(src)
-            dst2 = redC.dst2
-            If redC.rcList.Count <= 1 Then Exit Sub
+            dst2 = task.redColor.dst2
+            If task.redColor.rcList.Count <= 1 Then Exit Sub
 
             Dim rc = task.rcD
-            If rc Is Nothing Then rc = redC.rcList(1)
+            If rc Is Nothing Then rc = task.redColor.rcList(1)
             If rc.contour Is Nothing Then Exit Sub
 
             dst1.SetTo(0)

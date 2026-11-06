@@ -134,8 +134,8 @@ Namespace VBClasses
 
     Public Class XR_FitEllipse_RedC : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
-        Dim redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Create an ellipse from a contour"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -143,14 +143,13 @@ Namespace VBClasses
 
             If Not heartbeatX() Then Exit Sub
 
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
-            SetTrueText(redC.strOut, 3)
+            SetTrueText(task.redColor.strOut, 3)
             If task.rcD Is Nothing Then Exit Sub
 
-            If task.rcD.contour Is Nothing Then task.rcD = redC.rcList(0)
+            If task.rcD.contour Is Nothing Then task.rcD = task.redColor.rcList(0)
             fitE.inputPoints.Clear()
             For Each pt In task.rcD.contour
                 fitE.inputPoints.Add(New Point2f(pt.X, pt.Y))

@@ -175,7 +175,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(0)
             flood.Run(bin2.mats.mat(0))
             dst2 = flood.dst2
-            labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
+            labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified"
         End Sub
     End Class
 
@@ -196,7 +196,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(3)
             flood.Run(bin2.mats.mat(3))
             dst2 = flood.dst2
-            labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
+            labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified"
         End Sub
     End Class
 
