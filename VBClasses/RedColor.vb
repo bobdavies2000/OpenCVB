@@ -297,7 +297,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_FLessBasics : Inherits TaskParent
+    Public Class XR_RedColor_FLessBasics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_32F, 0)
         Public Sub New()

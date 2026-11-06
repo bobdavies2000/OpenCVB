@@ -910,7 +910,7 @@ Namespace VBClasses
         Dim redRight As New RedColor_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            desc = "Display the RedColor_FLessBasics output For both the left And right images."
+            desc = "Display the RedColor_Basics output For both the left And right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
@@ -1325,7 +1325,7 @@ Namespace VBClasses
             labels(2) = "Subject index=" + CStr(subject.index) + ", pixels=" + CStr(subject.pixels) +
                     " (RedColor cell cutout; not ML portrait matting)."
             labels(3) = "white = kept region. Select another cell with RedColor UI to retarget."
-            strOut = "Uses RedCloud color flood cells (RedColor_FLessBasics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
+            strOut = "Uses RedCloud color flood cells (RedColor_Basics). Auto-pick avoids cells covering most of the frame." + vbCrLf +
                  "For iPhone-like quality you would need a learned segmenter; this is a fast geometric proxy."
             SetTrueText(strOut, 3)
         End Sub
@@ -1341,7 +1341,7 @@ Namespace VBClasses
         Dim fLess As New XR_FeatureLess_BasicsOld
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            desc = "Use the output of the FeatureLess_BasicsOld as input the RedColor_FLessBasics."
+            desc = "Use the output of the FeatureLess_BasicsOld as input the RedColor_Basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLess.Run(task.gray)

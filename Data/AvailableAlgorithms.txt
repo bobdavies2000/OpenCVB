@@ -625,7 +625,6 @@ RedCloud_Basics
 RedCloud_Core
 RedCloud_Features
 RedColor_Basics
-RedColor_FLessBasics
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP
@@ -1623,6 +1622,7 @@ XR_RedColor_Contour
 XR_RedColor_CPP
 XR_RedColor_FeatureLess
 XR_RedColor_FeaturesKNN
+XR_RedColor_FLessBasics
 XR_RedColor_Flippers
 XR_RedColor_FloodToID
 XR_RedColor_GoodCellInput

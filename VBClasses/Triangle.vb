@@ -5,7 +5,7 @@ Namespace VBClasses
         Public triangles As New List(Of Point3f)
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            labels = {"", "", "RedColor_FLessBasics output", "Selected contour - each pixel has depth"}
+            labels = {"", "", "RedColor_Basics output", "Selected contour - each pixel has depth"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -49,7 +49,7 @@ Namespace VBClasses
         Dim hulls As New XR_RedC_Hulls
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
-            labels = {"", "Selected hull", "RedColor_FLessBasics output", "Selected contour"}
+            labels = {"", "Selected hull", "RedColor_Basics output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

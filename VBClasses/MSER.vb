@@ -3,17 +3,17 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Basics : Inherits TaskParent
         Dim detect As New MSER_CPP
-        Public redC As New RedColor_FLessBasics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
             desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             detect.Run(src)
             CvtColor(detect.dst2, dst3, ColorConversionCodes.BGR2GRAY)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            task.redColor.Run(src)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
         End Sub
     End Class
 
