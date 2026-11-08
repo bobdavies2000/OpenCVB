@@ -1,7 +1,7 @@
 Imports System.IO : Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Edge_Basics_TA : Inherits TaskParent
+    Public Class Edge_Basics : Inherits TaskParent
         Dim canny As Edge_Canny
         Dim binRed As Edge_BinarizedReduction
         Dim binSobel As Bin4Way_Sobel
@@ -255,7 +255,7 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_DCTinput : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Dim dct As New DCT_FeatureLess
         Public Sub New()
             labels(2) = "Canny edges produced from original grayscale image"
@@ -330,7 +330,7 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_BinarizedBrightness : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Dim bright As New Brightness_Basics
         Public Sub New()
             labels(2) = "Edges for the same image before brightness."
@@ -609,7 +609,7 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_DepthTiers : Inherits TaskParent
-        Dim edge As New Edge_Basics_TA
+        Dim edge As New Edge_Basics
         Dim tiers As New Depth_Tiers
         Public Sub New()
             labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
@@ -815,7 +815,7 @@ Namespace VBClasses
 
     Public Class XR_Edge_Projection : Inherits TaskParent
         Dim valley As New HistValley_OptionsAuto
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             labels(3) = "Canny edges (red) and edges in back projection (blue)"
             desc = "Find the edges in the HistValley_FromPeaks backprojection"
@@ -844,7 +844,7 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_RedC : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public mats As New Mat_4Click
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
@@ -1231,7 +1231,7 @@ Namespace VBClasses
 
     Public Class XR_Edge_CloudData : Inherits TaskParent
         Dim prep As New RedPrep_Core
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Find the lines in the RedPrep_Core output"
         End Sub
@@ -1438,7 +1438,7 @@ Namespace VBClasses
 
 
     Public Class Edge_LeftRight : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "A general view of the different edge algorithms applied to the left and right images."
         End Sub
@@ -1487,7 +1487,7 @@ Namespace VBClasses
 
     Public Class Edge_StableLeftRight : Inherits TaskParent
         Dim stableLR As New StableGray_LeftRight
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Show the edges of the stableLeft/Right images."
         End Sub
@@ -1691,7 +1691,7 @@ Namespace VBClasses
 
     Public Class XR_Edge_Color8U : Inherits TaskParent
         Public color8u As New Color8U_Basics
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             labels(2) = "Input to edges algorithm"
             desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
@@ -1712,7 +1712,7 @@ Namespace VBClasses
 
     Public Class Edge_RedEdges : Inherits TaskParent
         Dim color8u As New Color8U_Basics
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Find the edges in the RedColor output."
         End Sub

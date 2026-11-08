@@ -8,7 +8,7 @@ Public Class TaskAlgorithms
         task.imuBasics = New IMU_Basics_TA
         task.motion = New Motion_Basics_TA With {.standalone = False}
         task.heartBeats = New HeartBeat_Basics_TA
-        task.edges = New Edge_Basics_TA
+        task.edges = New Edge_Basics
         task.delaunayFLess = New Delaunay_FeatureLess
         task.fless = New FeatureLess_Basics
 

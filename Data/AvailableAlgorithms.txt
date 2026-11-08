@@ -151,7 +151,7 @@ Draw_Shapes
 Draw_SymmetricalShapes
 Duster_Basics
 Duster_MaskZ
-Edge_Basics_TA
+Edge_Basics
 Edge_BinarizedReduction
 Edge_Canny
 Edge_CannyAccum

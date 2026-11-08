@@ -139,7 +139,7 @@ Namespace VBClasses
 
 
     Public Class XR_Bin4Way_Edges : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Dim binary As New Bin4Way_SplitMean
         Dim mats As New Mat_4Click
         Public Sub New()

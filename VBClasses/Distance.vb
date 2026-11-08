@@ -367,7 +367,7 @@ Namespace VBClasses
     Public Class XR_Distance_Edges : Inherits TaskParent
         Dim distance As New Distance_Basics
         Public Sub New()
-            desc = "Combine the output of Edge_Basics_TA and distance_basics."
+            desc = "Combine the output of Edge_Basics and distance_basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             distance.Run(task.depthmask)

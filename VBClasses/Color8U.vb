@@ -432,7 +432,7 @@ Namespace VBClasses
 
     Public Class Color8U_Edges : Inherits TaskParent
         Dim color8U As New Color8U_Basics
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
             desc = "find fake edges between shades of the same color."

@@ -57,7 +57,7 @@ Namespace VBClasses
     Public Class Contour_Core : Inherits TaskParent
         Implements IDisposable
         Public rcList As New List(Of rcData)
-        Dim edgeMethod As New Edge_Basics_TA
+        Dim edgeMethod As New Edge_Basics
         Dim options As New Options_Contours
         Dim allContours As cv.Point()()
         Public Sub New()

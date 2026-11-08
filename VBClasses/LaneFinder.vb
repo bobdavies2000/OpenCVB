@@ -54,7 +54,7 @@ Namespace VBClasses
     ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
     Public Class XR_LaneFinder_Edges : Inherits TaskParent
         Dim input As New LaneFinder_Videos
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Using the videos provided, find the lane markers."
         End Sub

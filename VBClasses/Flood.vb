@@ -288,7 +288,7 @@ Namespace VBClasses
 
     Public Class XR_Flood_FeatureLess : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Match flooded cells with FeatureLess clusters"

@@ -92,7 +92,7 @@ Namespace VBClasses
         Public stableDepth As StableDepth_Basics_TA
         Public stableGray As StableGray_Basics_TA
         Public heartBeats As HeartBeat_Basics_TA
-        Public edges As Edge_Basics_TA
+        Public edges As Edge_Basics
 
         Public motionFeatures As Point2f
         Public palette As Palette_LoadColorMap

@@ -1210,7 +1210,7 @@ Namespace VBClasses
 
 
     Public Class XR_Line_FindSimple : Inherits TaskParent
-        Dim edges As New Edge_Basics_TA
+        Dim edges As New Edge_Basics
         Dim side As Integer
         Dim pixels(side * side) As cv.Point
         Public Sub New()
