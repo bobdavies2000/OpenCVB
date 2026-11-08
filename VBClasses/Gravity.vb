@@ -57,7 +57,7 @@ Namespace VBClasses
             Return (p1, p2)
         End Function
 
-        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix_TA: roll=X, pitch=Y, yaw=Z).</summary>
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
         Public Shared Function AnglesToGravityVector(accRadians As Point3f) As Point3f
             Dim cx = CSng(Math.Cos(accRadians.X))
             Dim sx = CSng(Math.Sin(accRadians.X))
@@ -217,7 +217,7 @@ Namespace VBClasses
         Private maskHistory As New Queue(Of Mat)
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics
-            desc = "Cursor.ai: Fuse gravity vector and LineTrack_Basics_TA.lpCurr to stabilize grayscale."
+            desc = "Cursor.ai: Fuse gravity vector and LineTrack_Basics.lpCurr to stabilize grayscale."
         End Sub
         Private Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
             Dim x = pt.X

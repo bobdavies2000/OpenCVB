@@ -213,8 +213,8 @@ Public Class OptionsGlobal
     End Sub
     Private Sub stableDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stableDepthRGB.CheckedChanged
         If task.stableGray Is Nothing And task.gOptions.stableDepthRGB.Checked Then
-            task.stableDepth = New StableDepth_Basics_TA
-            task.stableGray = New StableGray_Basics_TA
+            task.stableDepth = New StableDepth_Basics
+            task.stableGray = New StableGray_Basics
         End If
         task.optionsChanged = True
     End Sub

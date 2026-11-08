@@ -29,7 +29,7 @@ Namespace VBClasses
 
 
 
-    Public Class StableGray_Basics_TA : Inherits TaskParent
+    Public Class StableGray_Basics : Inherits TaskParent
         Public Sub New()
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             labels(2) = "Accumulated pixels were updated with new min/max pixels."
@@ -324,8 +324,8 @@ Namespace VBClasses
 
 
     Public Class StableGray_LeftRight : Inherits TaskParent
-        Dim stableLeft As New StableGray_Basics_TA
-        Dim stableRight As New StableGray_Basics_TA
+        Dim stableLeft As New StableGray_Basics
+        Dim stableRight As New StableGray_Basics
         Public Sub New()
             labels = {"", "", "Stable gray left image", "Stable gray right image"}
             desc = "Create the stable gray left and right images."
@@ -351,7 +351,7 @@ Namespace VBClasses
 
 
     Public Class StableGray_Right : Inherits TaskParent
-        Dim stableRight As New StableGray_Basics_TA
+        Dim stableRight As New StableGray_Basics
         Public Sub New()
             labels = {"", "", "Stable gray left image", "Stable gray right image"}
             desc = "Create the stable gray right image."

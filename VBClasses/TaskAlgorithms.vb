@@ -3,7 +3,7 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Public Class TaskAlgorithms
     Public Sub New()
         task.colorizer = New DepthColorizer_Basics
-        task.gravityMatrix = New IMU_GMatrix_TA
+        task.gravityMatrix = New IMU_GMatrix
         task.gravityBasics = New Gravity_Basics
         task.imuBasics = New IMU_Basics
         task.motion = New Motion_Basics With {.standalone = False}
@@ -13,8 +13,8 @@ Public Class TaskAlgorithms
         task.fless = New FeatureLess_Basics
 
         If task.gOptions.stableDepthRGB.Checked Then
-            task.stableDepth = New StableDepth_Basics_TA
-            task.stableGray = New StableGray_Basics_TA
+            task.stableDepth = New StableDepth_Basics
+            task.stableGray = New StableGray_Basics
         End If
 
         task.grid = New Grid_Basics

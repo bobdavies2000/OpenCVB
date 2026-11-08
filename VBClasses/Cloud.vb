@@ -863,7 +863,7 @@ Namespace VBClasses
                      "accRadians X = " + task.accRadians.X.ToString(fmt3) + vbCrLf +
                      "accRadians Y = " + task.accRadians.Y.ToString(fmt3) + vbCrLf +
                      "accRadians Z = " + task.accRadians.Z.ToString(fmt3) + vbCrLf + vbCrLf +
-                     IMU_GMatrix_TA.gMatrixToStr(task.gMatrix)
+                     IMU_GMatrix.gMatrixToStr(task.gMatrix)
             SetTrueText(strOut, 1)
         End Sub
     End Class

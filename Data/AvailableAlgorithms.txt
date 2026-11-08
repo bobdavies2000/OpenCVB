@@ -357,8 +357,8 @@ Hull_Edges
 IMU_Average
 IMU_Basics
 IMU_FindVertical
-IMU_GMatrix_TA
-IMU_GMatrix_TAWithOptions
+IMU_GMatrix
+IMU_GMatrixWithOptions
 IMU_GravityComplementary
 IMU_Kalman
 IMU_Methods
@@ -576,7 +576,7 @@ PlotTime_FixedScale
 PlotTime_Scalar
 PlotTime_Single
 PlyFormat_Basics
-PolyLine_BasicsOld_TA
+PolyLine_BasicsOld
 PongWars_Basics
 ProCon_Basics
 ProCon_Variation
@@ -658,9 +658,9 @@ Stabilizer_FullProfile
 Stabilizer_IMU
 Stabilizer_OrientationPRY
 Stabilizer_PRYaw
-StableDepth_Basics_TA
+StableDepth_Basics
 StableDepth_Max
-StableGray_Basics_TA
+StableGray_Basics
 StableGray_BasicsMax
 StableGray_BasicsMin
 StableGray_LeftRight

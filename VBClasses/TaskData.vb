@@ -81,7 +81,7 @@ Namespace VBClasses
         Public redColor As RedColor_Basics
         Public foreground As Foreground_Basics
         Public gravityBasics As Gravity_Basics
-        Public gravityMatrix As IMU_GMatrix_TA
+        Public gravityMatrix As IMU_GMatrix
         Public grid As Grid_Basics
         Public imuBasics As IMU_Basics
         Public leftRightBrightness As LeftRight_Brightness
@@ -89,8 +89,8 @@ Namespace VBClasses
 
         Public motion As Motion_Basics
         Public colorizer As DepthColorizer_Basics
-        Public stableDepth As StableDepth_Basics_TA
-        Public stableGray As StableGray_Basics_TA
+        Public stableDepth As StableDepth_Basics
+        Public stableGray As StableGray_Basics
         Public heartBeats As HeartBeat_Basics
         Public edges As Edge_Basics
 

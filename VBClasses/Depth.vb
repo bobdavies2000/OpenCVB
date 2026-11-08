@@ -895,7 +895,7 @@ Namespace VBClasses
 
 
     Public Class XR_Depth_StableMinMax : Inherits TaskParent
-        Public dMin As New StableDepth_Basics_TA
+        Public dMin As New StableDepth_Basics
         Public dMax As New StableDepth_Max
         Public options As New Options_MinMaxNone
         Public Sub New()

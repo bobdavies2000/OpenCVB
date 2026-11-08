@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class PolyLine_BasicsOld_TA : Inherits TaskParent
+    Public Class PolyLine_BasicsOld : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             desc = "Hook to Polyline usage in EdgeLine_Motion"

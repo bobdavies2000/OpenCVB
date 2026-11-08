@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class StableDepth_Basics_TA : Inherits TaskParent
+    Public Class StableDepth_Basics : Inherits TaskParent
         Dim colorize As New DepthColorizer_CPP
         Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         Public pcSplit(2) As cv.Mat
@@ -85,7 +85,7 @@ Namespace VBClasses
             End If
 
             If myHeartbeat = False Then
-                dst3 = StableDepth_Basics_TA.updateXY(pcSplit(2), accumDepth)
+                dst3 = StableDepth_Basics.updateXY(pcSplit(2), accumDepth)
             End If
 
             colorize.Run(accumDepth)

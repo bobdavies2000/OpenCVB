@@ -304,7 +304,7 @@ Namespace VBClasses
             Return (p1, p2)
         End Function
 
-        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix_TA: roll=X, pitch=Y, yaw=Z).</summary>
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
         Public Shared Function AnglesToGravityVector(accRadians As Point3f) As Point3f
             Dim cx = CSng(Math.Cos(accRadians.X))
             Dim sx = CSng(Math.Sin(accRadians.X))
@@ -480,7 +480,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-    Public Class IMU_GMatrix_TA : Inherits TaskParent
+    Public Class IMU_GMatrix : Inherits TaskParent
         Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
         Public gMatrix As Mat
         Public Sub New()
@@ -518,7 +518,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                labels(2) = "IMU_GMatrix_TA builds the gMatrix (gravity matrix) on every iteration."
+                labels(2) = "IMU_GMatrix builds the gMatrix (gravity matrix) on every iteration."
             End If
 
             '[cos(a) -sin(a)    0]
@@ -985,7 +985,7 @@ Namespace VBClasses
             dst2 = plot.dst2
             dst3 = plot.dst3
 
-            if heartbeatx() then 
+            If heartbeatX() Then
                 strOut = "Pitch X1000 (blue): " + vbTab + (task.pitchIMU * 1000).ToString(fmt1) + vbCrLf +
                          "Yaw X1000 (green): " + vbTab + (task.yawIMU * 1000).ToString(fmt1) + vbCrLf +
                          "Roll X1000 (red): " + vbTab + (task.rollIMU * 1000).ToString(fmt1)
@@ -1012,7 +1012,7 @@ Namespace VBClasses
             task.pitchIMU = task.IMU_AngularVelocity.X
             task.yawIMU = task.IMU_AngularVelocity.Y
             task.rollIMU = task.IMU_AngularVelocity.Z
-            if heartbeatx() then 
+            If heartbeatX() Then
                 strOut = "Pitch X1000 (blue): " + vbTab + (task.pitchIMU * 1000).ToString(fmt1) + vbCrLf +
                      "Yaw X1000 (green): " + vbTab + (task.yawIMU * 1000).ToString(fmt1) + vbCrLf +
                      "Roll X1000 (red): " + vbTab + (task.rollIMU * 1000).ToString(fmt1)
@@ -1064,7 +1064,7 @@ Namespace VBClasses
             If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
             Static sampledCPUFrameTime = task.CPU_FrameTime
-            if heartbeatx() then  sampledCPUFrameTime = task.CPU_FrameTime
+            If heartbeatX() Then sampledCPUFrameTime = task.CPU_FrameTime
 
             hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
@@ -1130,7 +1130,7 @@ Namespace VBClasses
             If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = options.minDelayHost
 
             Static sampledCPUFrameTime = task.CPU_FrameTime
-            if heartbeatx() then  sampledCPUFrameTime = task.CPU_FrameTime
+            If heartbeatX() Then sampledCPUFrameTime = task.CPU_FrameTime
 
             If standaloneTest() Then
                 strOut = "IMU_TimeStamp (ms) " + task.IMU_TimeStamp.ToString("00") + vbCrLf +
@@ -1160,7 +1160,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
-    Public Class IMU_GMatrix_TAWithOptions : Inherits TaskParent
+    Public Class IMU_GMatrixWithOptions : Inherits TaskParent
         Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0
         Public gMatrix As Mat
         Dim xSlider As TrackBar
@@ -1242,11 +1242,11 @@ Namespace VBClasses
                               "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
                 Dim tmpGMat1 = buildGmatrix()
-                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + IMU_GMatrix_TA.gMatrixToStr(tmpGMat1)
+                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat1)
 
                 getSliderValues()
                 Dim tmpGMat2 = buildGmatrix()
-                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + IMU_GMatrix_TA.gMatrixToStr(tmpGMat2)
+                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat2)
             End If
             SetTrueText(strOut)
             task.gMatrix = gMatrix
