@@ -54,8 +54,10 @@ Namespace VBClasses
             task.delaunayFLess = New Delaunay_FeatureLess
             task.fless = New FeatureLess_Basics
 
-            task.stableDepth = New StableDepth_Basics_TA
-            task.stableGray = New StableGray_Basics_TA
+            If task.gOptions.stableDepthRGB.Checked Then
+                task.stableDepth = New StableDepth_Basics_TA
+                task.stableGray = New StableGray_Basics_TA
+            End If
 
             task.grid = New Grid_Basics_TA
 
@@ -138,15 +140,13 @@ Namespace VBClasses
             task.leftView = task.leftRightBrightness.dst2
             task.rightView = task.leftRightBrightness.dst3
 
-            If task.gOptions.stableDepthRGB.Checked Then
-                ' motionStable.Run(task.gray)
-
-                task.motion.Run(task.gray)
-                task.stableGray.Run(task.gray)
-            Else
+            If task.stableGray Is Nothing Then
                 task.motion.motionMask.SetTo(255)
                 task.motion.motionSort.Clear()
                 task.motion.Run(gray)
+            Else
+                task.motion.Run(task.gray)
+                task.stableGray.Run(task.gray)
             End If
 
             If vbc.task.pixelViewerOn Then

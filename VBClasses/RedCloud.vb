@@ -1,4 +1,6 @@
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
@@ -9,7 +11,7 @@ Namespace VBClasses
         Public runSelectCell As Boolean = True
         Public Sub New()
             reduction.reductionFactor = 50
-            task.gOptions.stableDepthRGB.Checked = True
+            'task.gOptions.stableDepthRGB.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -443,4 +445,37 @@ Namespace VBClasses
             labels(2) = CStr(rcList.Count - 1) + " featureless regions found.  Age is shown."
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedCloud_Delaunay : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim delaunay As New Delaunay_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat
+        Public Sub New()
+            desc = "Create a Delaunay map using the RedCloud maxDist points."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                redC.Run(src)
+                labels(2) = redC.labels(2)
+                rclist = New List(Of rcData)(redC.rcList)
+
+                delaunay.ptList.Clear()
+                For Each rc In rcList
+                    delaunay.ptList.Add(rc.maxDist)
+                Next
+                delaunay.Run(src)
+
+                dst2 = ApplyPalette(redC.rcMap, 0)
+                dst3 = delaunay.dst2
+
+            End If
+
+        End Sub
+    End Class
+
 End Namespace

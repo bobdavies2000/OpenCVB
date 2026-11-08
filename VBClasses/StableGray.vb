@@ -36,14 +36,12 @@ Namespace VBClasses
             desc = "Accumulate Min values where there is no motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            Static lastGray As Mat = src.Clone
-
-            ' if heartbeatx() then  lastGray = src.Clone
+            CvtColor(task.color, dst3, ColorConversionCodes.BGR2GRAY)
+            Static lastGray As Mat = dst3.Clone
 
             ' the following statement can be min as well as max.
-            Min(src, lastGray, dst2)
-            src.CopyTo(dst2, task.motion.motionMask)
+            Min(dst3, lastGray, dst2)
+            dst3.CopyTo(dst2, task.motion.motionMask)
 
             lastGray = dst2.Clone
 

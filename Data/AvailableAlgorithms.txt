@@ -623,6 +623,7 @@ RedC_NeighborHist
 RedC_Neighbors
 RedCloud_Basics
 RedCloud_Core
+RedCloud_Delaunay
 RedCloud_Features
 RedColor_Basics
 RedPrep_Basics

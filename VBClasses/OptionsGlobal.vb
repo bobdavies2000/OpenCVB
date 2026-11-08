@@ -212,6 +212,10 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
     End Sub
     Private Sub stableDepthRGB_CheckedChanged(sender As Object, e As EventArgs) Handles stableDepthRGB.CheckedChanged
+        If task.stableGray Is Nothing And task.gOptions.stableDepthRGB.Checked Then
+            task.stableDepth = New StableDepth_Basics_TA
+            task.stableGray = New StableGray_Basics_TA
+        End If
         vbc.task.optionsChanged = True
     End Sub
     Private Sub CrossHairs_CheckedChanged(sender As Object, e As EventArgs) Handles CrossHairs.CheckedChanged

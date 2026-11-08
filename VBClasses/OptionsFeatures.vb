@@ -51,7 +51,7 @@ Public Class OptionsFeatures
         Next
         Color8USource.SelectedItem = "LUT_Basics"
         ReductionColor.Value = 32
-        ReductionDepth.Value = 350
+        ReductionDepth.Value = 100
 
         ColorDiffSlider.Value = 10
         MotionPixelSlider.Maximum = 10

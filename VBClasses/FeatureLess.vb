@@ -2257,7 +2257,6 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim unusedCount = task.fless.rcList.Count - usedList.Count
             Dim nextSlot As Integer = task.fless.rcList.Count
             For Each rc In task.fless.rcList
                 If rc.ID = 0 Then Continue For
@@ -2289,7 +2288,8 @@ Namespace VBClasses
             strOut += "- Multiple circles in a cell represent cells that have expanded and covered other snapshot cells." + vbCrLf
             SetTrueText(strOut, 3)
 
-            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " + CStr(unusedCount) + " could not be matched."
+            labels(2) = CStr(rcList.Count - 1) + " cells were tracked and " +
+                        CStr(task.fless.rcList.Count - usedList.Count) + " could not be matched."
             labels(3) = CStr(task.delaunayFLess.snapshotList.Count) + " cells found in the heartbeat snapshot that is used to identify and track cells."
         End Sub
     End Class
