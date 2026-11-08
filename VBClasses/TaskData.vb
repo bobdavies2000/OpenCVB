@@ -75,7 +75,7 @@ Namespace VBClasses
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public Algorithms As TaskAlgorithms
-        Public filterBasics As Filter_Basics_TA
+        Public filterBasics As Filter_Basics
         Public fless As FeatureLess_Basics
         Public delaunayFLess As Delaunay_FeatureLess
         Public redColor As RedColor_Basics
@@ -87,8 +87,8 @@ Namespace VBClasses
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
 
-        Public motion As Motion_Basics_TA
-        Public colorizer As DepthColorizer_Basics_TA
+        Public motion As Motion_Basics
+        Public colorizer As DepthColorizer_Basics
         Public stableDepth As StableDepth_Basics_TA
         Public stableGray As StableGray_Basics_TA
         Public heartBeats As HeartBeat_Basics_TA

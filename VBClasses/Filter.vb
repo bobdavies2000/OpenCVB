@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Filter_Basics_TA : Inherits TaskParent
+    Public Class Filter_Basics : Inherits TaskParent
         Public filterList As String() = {"Original", "PhotoShop_HSV",
                                          "PhotoShop_SharpenDetail",
                                          "PhotoShop_WhiteBalance"}

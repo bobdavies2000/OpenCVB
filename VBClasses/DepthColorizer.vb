@@ -1,7 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class DepthColorizer_Basics_TA : Inherits TaskParent
+    Public Class DepthColorizer_Basics : Inherits TaskParent
         Implements IDisposable
         Public saveDepthColorMap As Mat
         Public saveVecColors(0) As Vec3b

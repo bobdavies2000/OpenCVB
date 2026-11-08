@@ -2,11 +2,11 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Public Class TaskAlgorithms
     Public Sub New()
-        task.colorizer = New DepthColorizer_Basics_TA
+        task.colorizer = New DepthColorizer_Basics
         task.gravityMatrix = New IMU_GMatrix_TA
         task.gravityBasics = New Gravity_Basics_TA
         task.imuBasics = New IMU_Basics_TA
-        task.motion = New Motion_Basics_TA With {.standalone = False}
+        task.motion = New Motion_Basics With {.standalone = False}
         task.heartBeats = New HeartBeat_Basics_TA
         task.edges = New Edge_Basics
         task.delaunayFLess = New Delaunay_FeatureLess
@@ -19,7 +19,7 @@ Public Class TaskAlgorithms
 
         task.grid = New Grid_Basics_TA
 
-        task.filterBasics = New Filter_Basics_TA
+        task.filterBasics = New Filter_Basics
         task.leftRightBrightness = New LeftRight_Brightness_TA
         task.steadyCam = New SteadyCam_Basics_TA
 

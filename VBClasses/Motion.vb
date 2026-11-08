@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Motion_Basics_TA : Inherits TaskParent
+    Public Class Motion_Basics : Inherits TaskParent
         Public motionSort As New List(Of Integer) ' sorted in order of grid rect index (without actually sorting.)
         Public diff As New Diff_Basics
         Public motionMask As New Mat(dst2.Size, MatType.CV_8U, 255)
@@ -96,7 +96,7 @@ Namespace VBClasses
             labels(1) = "Current grayscale image"
             labels(2) = "Grayscale image constructed from previous images + motion updates."
             labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
-            desc = "Compare task.gray to constructed images to verify Motion_Basics_TA is working"
+            desc = "Compare task.gray to constructed images to verify Motion_Basics is working"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = task.gray
@@ -217,7 +217,7 @@ Namespace VBClasses
 
 
     Public Class Motion_Right : Inherits TaskParent
-        Public motion As New Motion_Basics_TA
+        Public motion As New Motion_Basics
         Public Sub New()
             desc = "Build the MotionMask for the right camera."
         End Sub
@@ -234,7 +234,7 @@ Namespace VBClasses
 
 
     Public Class Motion_Left : Inherits TaskParent
-        Public motion As New Motion_Basics_TA
+        Public motion As New Motion_Basics
         Public Sub New()
             desc = "Build the MotionMask for the left camera."
         End Sub

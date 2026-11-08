@@ -872,7 +872,7 @@ Namespace VBClasses
         Dim extrema As New XR_Depth_StableMinMax
         Public Sub New()
             OptionParent.findRadio("Use farthest distance").Checked = True
-            desc = "Use Depth_StableMax_TA to remove the artifacts from the depth averaging"
+            desc = "Use XR_Depth_StableMinMax to remove the artifacts from the depth averaging"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static unchangedRadio = OptionParent.findRadio("Use unchanged depth input")

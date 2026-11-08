@@ -105,7 +105,7 @@ Depth_TierCount
 Depth_Tiers
 Depth_World
 Depth_WorldXYZ
-DepthColorizer_Basics_TA
+DepthColorizer_Basics
 DepthColorizer_CloudPixels
 DepthColorizer_CPP
 DepthColorizer_Mean
@@ -492,7 +492,7 @@ ML_RandomForest
 ML_RemoveDups_CPP
 ModNet_Basics
 Moments_Basics
-Motion_Basics_TA
+Motion_Basics
 Motion_CloudGrid
 Motion_CloudPixel
 Motion_Correlation

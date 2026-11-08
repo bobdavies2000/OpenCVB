@@ -700,7 +700,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lines As New XR_Line_BasicsOld
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics_TA
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics_TA
             If standalone Then task.gOptions.showMyDst0.Checked = True

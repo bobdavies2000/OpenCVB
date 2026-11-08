@@ -223,7 +223,7 @@ Namespace VBClasses
 
     Public Class XR_ML_DepthFromColor : Inherits TaskParent
         Implements IDisposable
-        Dim colorPal As New DepthColorizer_Basics_TA
+        Dim colorPal As New DepthColorizer_Basics
         Dim mats As New Mat_4Click
         Dim resizer As New Resize_Smaller
         Dim rtree As RTrees

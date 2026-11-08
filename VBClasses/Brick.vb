@@ -777,7 +777,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics_TA
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             labels(2) = "The lines are for the left image."
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -844,7 +844,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
-        Dim motionLeft As New Motion_Basics_TA
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
             labels(2) = "The lines are for the left image."
