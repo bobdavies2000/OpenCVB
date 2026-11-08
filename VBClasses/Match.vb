@@ -54,7 +54,7 @@ Namespace VBClasses
         Public correlation As Single
         Public newRect As New cv.Rect
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                    "(allows multiple targets per image.)"
         End Sub
@@ -88,7 +88,7 @@ Namespace VBClasses
         Public match As New Match_Basics
         Dim matchRect As cv.Rect
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest cv.Point below"}
             desc = "Test the Match_Basics algorithm"
         End Sub
@@ -368,7 +368,7 @@ Namespace VBClasses
         Public correlation As Single
         Public deltaX As Single, deltaY As Single
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Match a gRect's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -484,7 +484,7 @@ Namespace VBClasses
         Public trainInput As New List(Of Vec4f)
         Public queries As New List(Of Vec4f)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels(2) = "Match lines on the heartbeat using the line extended to the image edges."
             desc = "Use the 2 points from a line as input to a 4-dimension KNN"
         End Sub
@@ -633,7 +633,7 @@ Namespace VBClasses
     Public Class Match_Lines : Inherits TaskParent
         Dim accum As New AddWeighted_Accumulate
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels(3) = "The current set of lines after steadycam filter."
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Accumulate the lines in dst2 as a measure of how closely the lines will land."

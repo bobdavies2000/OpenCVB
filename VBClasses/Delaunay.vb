@@ -337,7 +337,7 @@ Namespace VBClasses
     Public Class Delaunay_LineSelect : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(2) = "Each delaunay cell will select the line that it contains."
             labels(3) = "Use the task.goptions.debugSlider to select a line."

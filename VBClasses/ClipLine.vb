@@ -4,7 +4,7 @@ Namespace VBClasses
         Public rect As cv.Rect ' supply this 
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Find all the line in the specified rect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -32,7 +32,7 @@ Namespace VBClasses
     Public Class ClipLine_CenterRect : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels(3) = "Only the lines withing the seelected rectangle"
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Use ClipLine to find the lines in the center rect."
@@ -63,7 +63,7 @@ Namespace VBClasses
     Public Class ClipLine_KNN : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Use KNN to connect the each endpoint to its nearest neighbor"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

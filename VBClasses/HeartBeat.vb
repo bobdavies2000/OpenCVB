@@ -1,6 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class HeartBeat_Basics_TA : Inherits TaskParent
+    Public Class HeartBeat_Basics : Inherits TaskParent
         Const ms1000 = 1000
         Public Sub New()
             desc = "Update the heart beat variables"
@@ -30,12 +30,12 @@ Namespace VBClasses
                     task.quarter(i) = True
                 End If
             Next
-            if heartbeatx() then  ReDim task.quarter(4)
-            if heartbeatx() then  task.heartbeatFrame = task.frameCount
+            If heartbeatX() Then ReDim task.quarter(4)
+            If heartbeatX() Then task.heartbeatFrame = task.frameCount
 
             If task.frameCount = 1 Then task.heartBeat = True
 
-            if heartbeatx() then 
+            If heartbeatX() Then
                 task.heartBeatCount += 1
                 If task.heartBeatCount Mod 5 = 0 Then task.heartBeatLT = True
             End If
@@ -44,7 +44,7 @@ Namespace VBClasses
             task.almostHeartBeat = msWatch - msLast + frameDuration * 1.5 > ms1000
 
             If (msWatch - msLast) > ms1000 Then msLast = msWatch
-            if heartbeatltx() then  task.toggleOn = Not task.toggleOn
+            If heartbeatLTX() Then task.toggleOn = Not task.toggleOn
 
             Static lastHeartBeatLT As Boolean = False
             Static lastHeartBeat As Boolean = False

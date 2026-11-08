@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class Stabilizer_Basics : Inherits TaskParent
         Private refLine As lpData
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Cursor.ai: Use lpCurr to stabilize the grayscale image (rotation + translation to a reference line)."
             labels(2) = "Stabilized grayscale image from tracked line (lpCurr)"
         End Sub
@@ -114,7 +114,7 @@ Namespace VBClasses
         Private yawRad As Single
 
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Cursor.ai Pitch/roll from IMU gravity (accRadians); yaw from gyro integration; overlay longest tracked line (lpCurr)."
             labels(2) = "Pitch, roll, yaw (see labels(3) for line + sync state)"
             labels(3) = "lpCurr vs gravity; reSyncImage when longest line is lost"
@@ -180,7 +180,7 @@ Namespace VBClasses
     ''' </summary>
     Public Class Stabilizer_PRYaw : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Cursor.ai: Pitch, roll, yaw from task.lines.lplist(0) and task.lpGravity (image-plane geometry; yaw assumes scene line is horizontal in world)."
             labels(2) = "PRYaw (deg) from longest line + gravity"
             labels(3) = "red = lines.lplist(0), yellow = lpGravity"

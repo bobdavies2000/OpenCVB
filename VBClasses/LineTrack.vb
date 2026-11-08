@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim matcher() As Line_Match
         Dim refreshCount As New List(Of Integer)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             task.fOptions.MatchCorrSlider.Value = 98 ' high threshold for validating the correlation of the endpoints.
             desc = "Identify the lines to track - the top X longest lines."
@@ -68,7 +68,7 @@ Namespace VBClasses
         Dim slices As New XR_LineTrack_Slices
         Public lpMapLast As cv.Mat
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -139,7 +139,7 @@ Namespace VBClasses
         Public diffX As Integer
         Public diffY As Integer
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Search for the requested line in the previous frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -182,7 +182,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Public correlation As Single
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(3) = "Correlation measures how similar the previous template is to the current one."
             desc = "Concatenate the end cv.Point templates to return a single correlation to the previous frame."
@@ -231,7 +231,7 @@ Namespace VBClasses
         Public p1Correlation As Single
         Public p2Correlation As Single
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Compare area around end points of a line to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -271,7 +271,7 @@ Namespace VBClasses
     Public Class XR_LineTrack_Tester : Inherits TaskParent
         Dim match As New LineTrack_Match
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             task.gOptions.DebugCheckBox.Checked = True
             desc = "Test the line match algorithm by just occasionally capturing the current state."
         End Sub
@@ -327,7 +327,7 @@ Namespace VBClasses
         Public ySlices As New List(Of List(Of Byte))
         Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels(2) = "white lines are slices used to find previous line locations."
             desc = "Build slices in X and Y from the previous image near the each line's center."
         End Sub
@@ -418,7 +418,7 @@ Namespace VBClasses
         Dim bricks As New Brick_Basics
         Public options As New Options_LineRect
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -474,7 +474,7 @@ Namespace VBClasses
         Public options As New Options_LineRect
         Dim bricks As New Brick_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -574,7 +574,7 @@ Namespace VBClasses
         Dim lastImage As Mat
         Dim searchCount As Integer = 9
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst1 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
@@ -640,7 +640,7 @@ Namespace VBClasses
 
     Public Class XR_LineTrack_Changes : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             labels(2) = "Move camera or wave at camera to see the impact on the lines."
             labels(3) = "Current lines.  dst2 is the difference between lines in current vs. previous image."
             desc = "Track the changes in the lines."
@@ -704,7 +704,7 @@ Namespace VBClasses
         Dim match1 As New Match_Basics
         Dim match2 As New Match_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Compare area around end points of a line to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -766,7 +766,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lpListLast As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Cursor.ai: Match lines between frames; lpList holds confirmed current matches."
         End Sub
         Private Shared Function MatchScore(curr As lpData, prev As lpData) As Single
@@ -849,7 +849,7 @@ Namespace VBClasses
         Public roll As Single
         Public yaw As Single
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Measure the camera motion using Line_Basics results"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

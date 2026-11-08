@@ -685,7 +685,7 @@ Namespace VBClasses
         Dim ranges() As Rangef = New Rangef() {New Rangef(0, 256)}
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Find and display lines that are between featureless regions."
         End Sub
@@ -794,7 +794,7 @@ Namespace VBClasses
         Dim feat As New Feature_Basics
         Dim fLess As New XR_FeatureLess_DepthFull
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Isolate features in the not of the featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -825,7 +825,7 @@ Namespace VBClasses
     Public Class XR_FeatureLess_FeatureLines : Inherits TaskParent
         Dim fLess As New XR_FeatureLess_DepthFull
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Use lines to further divide featureless from features."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

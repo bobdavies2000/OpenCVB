@@ -5,7 +5,7 @@ Namespace VBClasses
         Public core As New LineSeg_Core
         Public rect As cv.Rect
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Run LSD (Line Segment Detector) with sobel input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -469,7 +469,7 @@ Namespace VBClasses
                 hammingList.Add(h)
             Next
 
-            ' Dim lpListStable = Line_Basics_TA.setAge(lpList, lpPrev, dst0)
+            ' Dim lpListStable = Line_Basics.setAge(lpList, lpPrev, dst0)
 
             For k = 0 To lpList.Count - 1
 
@@ -652,7 +652,7 @@ Namespace VBClasses
         Dim lSeg As New LineSeg_Core
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Merge the results of Line Segment Descriptor and Fast Line Detector."
@@ -686,7 +686,7 @@ Namespace VBClasses
         Dim lSeg As New LineSeg_Core
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst0 = New Mat(dst0.Size, MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Compare the results of the line segment detector and fast line detector."

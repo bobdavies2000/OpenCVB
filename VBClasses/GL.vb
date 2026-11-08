@@ -76,7 +76,7 @@ Namespace VBClasses
 
     Public Class XR_GL_Line3DNoMotionInput : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
             desc = "Build a 3D model of the lines found in the rgb data."
         End Sub
@@ -188,7 +188,7 @@ Namespace VBClasses
 
     Public Class XR_GL_Line3DWhite : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
             task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
@@ -229,7 +229,7 @@ Namespace VBClasses
 
     Public Class XR_GL_Line3DReconstructed : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_32FC3, 0)
             task.fOptions.FeatureSizeSlider.Value = 1000 ' want all the lines 
@@ -292,7 +292,7 @@ Namespace VBClasses
 
     Public Class XR_GL_LinePointsAll : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Visualize all the reconstructed 3D lines found in the RGB image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -463,7 +463,7 @@ Namespace VBClasses
     Public Class XR_GL_ReadLines : Inherits TaskParent
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Draw lines in SharpGL and read them back."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -511,7 +511,7 @@ Namespace VBClasses
     Public Class XR_GL_Line3D : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Display the cv.Point cloud with the 3D lines drawn"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -724,7 +724,7 @@ Namespace VBClasses
 
     Public Class XR_GL_Draw3DLines : Inherits TaskParent
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Draw the RGB lines in SharpGL"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

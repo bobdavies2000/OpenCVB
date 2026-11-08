@@ -2,7 +2,7 @@ Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class IMU_Basics_TA : Inherits TaskParent
+    Public Class IMU_Basics : Inherits TaskParent
         Public noCameraMotion As Boolean
         Dim lastTimeStamp As Double
         Dim lastAcc As Point3f
@@ -49,7 +49,7 @@ Namespace VBClasses
             noCameraMotion = Math.Abs(lastAcc.X - task.accRadians.X) < 0.02F And Math.Abs(lastAcc.Y - task.accRadians.Y) < 0.02F
             lastAcc = task.accRadians
 
-            if heartbeatx() then 
+            If heartbeatX() Then
                 labels(2) = "verticalize=" + task.verticalizeAngle.ToString(fmt2) + " deg  stable=" + CStr(noCameraMotion)
             End If
         End Sub
@@ -71,7 +71,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                labels(2) = "IMU_Basics_TA gets the IMU data on every iteration."
+                labels(2) = "IMU_Basics gets the IMU data on every iteration."
             End If
 
             Dim gyroAngle As Point3f
@@ -210,7 +210,7 @@ Namespace VBClasses
             If mag < 0.001F Then mag = 1.0F
             gravityVector = New Point3f(g.X / mag, g.Y / mag, g.Z / mag)
 
-            ' Image-plane tilt from vertical: Atan2 of lateral vs vertical accel (same convention as IMU_Basics_TA).
+            ' Image-plane tilt from vertical: Atan2 of lateral vs vertical accel (same convention as IMU_Basics).
             Dim accX = CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)))
             Dim accY = CSng(Math.Abs(Math.Atan2(g.X, g.Y)))
             Dim y1 = accY - PI
@@ -655,7 +655,7 @@ Namespace VBClasses
             If IMUtoCaptureEstimate < options.minDelayIMU Then IMUtoCaptureEstimate = options.minDelayIMU
 
             Static sampledIMUFrameTime = task.IMU_FrameTime
-            if heartbeatx() then  sampledIMUFrameTime = task.IMU_FrameTime
+            If heartbeatX() Then sampledIMUFrameTime = task.IMU_FrameTime
 
             histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
@@ -723,7 +723,7 @@ Namespace VBClasses
             Static sampledIMUDelay = imu.IMUtoCaptureEstimate
             Static sampledTotalDelay = totaldelay
             Static sampledSmooth = kalman.stateResult
-            if heartbeatx() then 
+            If heartbeatX() Then
                 sampledCPUDelay = host.HostInterruptDelayEstimate
                 sampledIMUDelay = imu.IMUtoCaptureEstimate
                 sampledTotalDelay = totaldelay
@@ -944,7 +944,7 @@ Namespace VBClasses
 
 
     Public Class IMU_Methods : Inherits TaskParent
-        Dim basics As New IMU_Basics_TA
+        Dim basics As New IMU_Basics
         Dim imuAvg As New IMU_Average
         Dim kalman As New IMU_Kalman
         Public Sub New()

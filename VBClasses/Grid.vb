@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Imports System.Threading
 Namespace VBClasses
-    Public Class Grid_Basics_TA : Inherits TaskParent
+    Public Class Grid_Basics : Inherits TaskParent
         Public nabeRectSide As Integer
         Public Sub New()
             task.gridMap = New Mat(dst2.Size, MatType.CV_32S, 0)
@@ -111,7 +111,7 @@ Namespace VBClasses
                 dst2 = New Mat(dst2.Size(), MatType.CV_8U)
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, task.gridMask)
-                labels(2) = "Grid_Basics_TA " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
+                labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
                                                 CStr(task.gridWH) + "X" + CStr(task.gridWH) + " regions"
             End If
         End Sub
@@ -123,11 +123,11 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Grid_Basics_TATest : Inherits TaskParent
+    Public Class XR_Grid_BasicsTest : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.GridSlider.Value = 16
             labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each r.  Bottom might be a shortened r."}
-            If standalone Then desc = "Validation test for Grid_Basics_TA algorithm"
+            If standalone Then desc = "Validation test for Grid_Basics algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim meanVal = Mean(src)
@@ -271,7 +271,7 @@ Namespace VBClasses
                 dst2.SetTo(0)
                 For i = 0 To minMaxLocs.Length - 1
                     Dim lp = minMaxLocs(i)
-                    Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.red, -1, task.lineType)
+                    Circle(dst2(task.gridRects(i)), lp.p2, task.DotSize, Scalar.Red, -1, task.lineType)
                     Circle(dst2(task.gridRects(i)), lp.p1, task.DotSize, white, -1, task.lineType)
                 Next
                 dst2.SetTo(white, task.gridMask)
@@ -311,7 +311,7 @@ Namespace VBClasses
                 Rectangle(dst2, match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
                 Circle(dst2, center, task.DotSize, white, -1, task.lineType)
 
-                if heartbeatx() then  dst3.SetTo(0)
+                If heartbeatX() Then dst3.SetTo(0)
                 Circle(dst3, center, task.DotSize, task.highlight, -1, task.lineType)
                 SetTrueText(match.correlation.ToString(fmt3), center, 3)
 
@@ -392,7 +392,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 task.color.CopyTo(dst2)
                 dst2.SetTo(white, gridMask)
-                labels(2) = "Grid_Basics_TA " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
+                labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
                               CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
             End If
         End Sub

@@ -4,10 +4,10 @@ Public Class TaskAlgorithms
     Public Sub New()
         task.colorizer = New DepthColorizer_Basics
         task.gravityMatrix = New IMU_GMatrix_TA
-        task.gravityBasics = New Gravity_Basics_TA
-        task.imuBasics = New IMU_Basics_TA
+        task.gravityBasics = New Gravity_Basics
+        task.imuBasics = New IMU_Basics
         task.motion = New Motion_Basics With {.standalone = False}
-        task.heartBeats = New HeartBeat_Basics_TA
+        task.heartBeats = New HeartBeat_Basics
         task.edges = New Edge_Basics
         task.delaunayFLess = New Delaunay_FeatureLess
         task.fless = New FeatureLess_Basics
@@ -17,13 +17,13 @@ Public Class TaskAlgorithms
             task.stableGray = New StableGray_Basics_TA
         End If
 
-        task.grid = New Grid_Basics_TA
+        task.grid = New Grid_Basics
 
         task.filterBasics = New Filter_Basics
-        task.leftRightBrightness = New LeftRight_Brightness_TA
+        task.leftRightBrightness = New LeftRight_Brightness
         task.steadyCam = New SteadyCam_Basics_TA
 
-        HeartBeat_Basics_TA.setHeartBeat()
+        HeartBeat_Basics.setHeartBeat()
     End Sub
     Public Shared Sub RunTasks()
         ' run any task algorithms here

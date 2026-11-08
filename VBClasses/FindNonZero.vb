@@ -79,7 +79,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public veclist As New List(Of Vec3f) ' Reconstructed cv.Point cloud vectors.
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find 3D points behind an RGB line and compute their world coordinates."
         End Sub
@@ -125,7 +125,7 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point)
         Public veclist As New List(Of Vec3f) ' Reconstructed cv.Point cloud vectors.
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find 3D points behind an RGB line and linearly interpolate their values."
         End Sub

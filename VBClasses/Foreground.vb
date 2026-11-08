@@ -1,6 +1,6 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Foreground_Basics_TA : Inherits TaskParent
+    Public Class Foreground_Basics : Inherits TaskParent
         Public splitValue As Single
         Public fgMean As Single
         Public bgMean As Single
@@ -13,7 +13,7 @@ Namespace VBClasses
             Dim depth = task.pcSplit(2).Clone
             depth.SetTo(task.MaxZmeters, task.noDepthMask)
 
-            if heartbeatx() then 
+            If heartbeatX() Then
                 Threshold(depth, depth, task.MaxZmeters + 0.001, task.MaxZmeters, cv.ThresholdTypes.Binary)
                 Dim columnVector = depth.Reshape(1, depth.Rows * depth.Cols)
                 Dim labelsMat As New Mat
@@ -40,7 +40,7 @@ Namespace VBClasses
 
                 labels(2) = "Foreground depth < " + splitValue.ToString(fmt3) + "m" + respectiveMeans
                 labels(3) = "Background depth >= " + splitValue.ToString(fmt3) + "m"
-                if heartbeatx() then 
+                If heartbeatX() Then
                     strOut = "splitValue = " + splitValue.ToString(fmt3) + "m" + vbCrLf +
                                  "fgMean = " + fgMean.ToString(fmt3) + "m" + vbCrLf +
                                  "bgMean = " + bgMean.ToString(fmt3) + "m"

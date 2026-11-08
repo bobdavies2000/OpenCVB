@@ -224,8 +224,8 @@ FeatureMatch_ORB
 FeatureMatch_SIFT
 FeatureMatch_SURF
 FeatureMatch_Tracker
+Filter_Basics
 Filter_Basics_Gray
-Filter_Basics_TA
 Filter_Equalize
 Filter_Laplacian
 FindMinRect_Basics
@@ -246,7 +246,7 @@ Flood_UpLoDiff
 Flood_UpLoDiffColor
 Font_Basics
 Font_FlowText
-Foreground_Basics_TA
+Foreground_Basics
 Fractal_Mandelbrot
 Fractal_MandelbrotZoom
 Fractal_MandelbrotZoomColor
@@ -270,7 +270,7 @@ Gradient_Basics
 Gradient_CartToPolar
 Gradient_Color
 Gradient_PhaseDepth
-Gravity_Basics_TA
+Gravity_Basics
 Gravity_CloudMethod
 Gravity_Jitter
 Gravity_LineTrackStabilize
@@ -278,7 +278,7 @@ GravityRGB_Basics
 GravityRGB_RotateRGB
 GravityRGB_SteadyCam
 GravityRGB_Vertical
-Grid_Basics_TA
+Grid_Basics
 Grid_FPS
 Grid_Rectangles
 Grid_SquaresOnly
@@ -293,7 +293,7 @@ GuidedBP_HotPoints
 GuidedBP_MultiSlice
 GuidedBP_Top
 GuidedBP_TopView
-HeartBeat_Basics_TA
+HeartBeat_Basics
 HeatMap_Basics
 HeatMap_Cell
 HeatMap_Hot
@@ -355,7 +355,7 @@ Hull_Contour
 Hull_Defect
 Hull_Edges
 IMU_Average
-IMU_Basics_TA
+IMU_Basics
 IMU_FindVertical
 IMU_GMatrix_TA
 IMU_GMatrix_TAWithOptions
@@ -409,12 +409,11 @@ LaneFinder_Videos
 Laplacian_Basics
 Laplacian_PyramidFilter
 LeftRight_Basics
-LeftRight_Brightness_TA
+LeftRight_Brightness
 LeftRight_Lines
 LeftRight_Reduction
 LeftRight_Stable
 Line_Basics
-Line_Basics_TA
 Line_Core
 Line_Depth
 Line_DepthSimple
@@ -592,7 +591,7 @@ Projection_ViewTop
 Puzzle_Basics
 Puzzle_Solver
 Pyramid_Basics
-PyrFilter_Basics_TA
+PyrFilter_Basics
 QRcode_Basics
 Quad_Hulls
 Quadrant_Basics
@@ -1239,7 +1238,7 @@ XR_GrabCut_FineTune
 XR_GrabCut_ImageMask
 XR_GrabCut_ImageRect
 XR_Gravity_Basics_Original
-XR_Gravity_Basics_TAOld
+XR_Gravity_BasicsOld
 XR_Gravity_BrickRotate
 XR_Gravity_RGB
 XR_GravityRGB_Compare
@@ -1249,7 +1248,7 @@ XR_GravityRGB_LineRotate
 XR_GravityRGB_Motion
 XR_GravityRGB_Rotate
 XR_GravityRGB_UsingVerticalLine
-XR_Grid_Basics_TATest
+XR_Grid_BasicsTest
 XR_Grid_List
 XR_Grid_MinMaxDepth
 XR_Grid_TrackCenter
@@ -1386,6 +1385,7 @@ XR_LeftRight_EdgesColor
 XR_LeftRight_Features
 XR_LeftRight_RawLeft
 XR_LeftRight_RGBAlignLeft
+XR_Line_Basics
 XR_Line_BasicsLSD
 XR_Line_BasicsOld
 XR_Line_BasicsOldEmboss

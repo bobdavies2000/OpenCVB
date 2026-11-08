@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
-    Public Class Gravity_Basics_TA : Inherits TaskParent
+    Public Class Gravity_Basics : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim optionsIMU As New Options_IMU
         ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
@@ -216,7 +216,7 @@ Namespace VBClasses
         Private frameHistory As New Queue(Of Mat)
         Private maskHistory As New Queue(Of Mat)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Cursor.ai: Fuse gravity vector and LineTrack_Basics_TA.lpCurr to stabilize grayscale."
         End Sub
         Private Shared Function WarpPoint(pt As Point2f, M As Mat) As Point2f
@@ -469,7 +469,7 @@ Namespace VBClasses
             End If
 
             dst2 = task.color.Clone
-            Gravity_Basics_TA.showVectors(dst2)
+            Gravity_Basics.showVectors(dst2)
 
             xDelta = task.lpGravity.ptE1.DistanceTo(lastGravity.ptE1)
             yDelta = task.lpHorizon.ptE1.DistanceTo(lastHorizon.ptE1)

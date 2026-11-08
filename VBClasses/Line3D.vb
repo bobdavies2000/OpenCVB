@@ -4,7 +4,7 @@ Namespace VBClasses
         Public lines3D As New List(Of Point3f)
         Public lines3DMat As New Mat
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.fOptions.FeatureSizeSlider.Value = 10
             desc = "Find the end cv.Point depth for the top X longest lines."
         End Sub
@@ -49,7 +49,7 @@ Namespace VBClasses
     Public Class XR_Line3D_Longest : Inherits TaskParent
         Dim bricks As New Brick_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst0 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
@@ -114,7 +114,7 @@ Namespace VBClasses
         Public selectLine As New Delaunay_LineSelect
         Public pointcloud As New Mat(dst2.Size, MatType.CV_32FC3, 0)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Build the 3D lines found in Line_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -222,7 +222,7 @@ Namespace VBClasses
         Public debugRequest As Boolean
         Dim allPoints As New Mat
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_32F, 0)
             dst2 = New Mat(dst2.Size, MatType.CV_32FC3, 0)
             dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -333,7 +333,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim selection As New Line3D_Selection
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             desc = "Recompute the depth for the lines found."
@@ -359,7 +359,7 @@ Namespace VBClasses
     Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         Dim Selection As New Line3D_Selection
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst3 = New Mat(dst3.Size, MatType.CV_8U, 0)
             Selection.debugRequest = True
             desc = "Use the debug slider in Global Options to select which line to test."
@@ -395,7 +395,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim selection As New Line3D_Selection
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Create logical lines for all the lines detected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

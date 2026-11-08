@@ -79,19 +79,19 @@ Namespace VBClasses
         Public fless As FeatureLess_Basics
         Public delaunayFLess As Delaunay_FeatureLess
         Public redColor As RedColor_Basics
-        Public foreground As Foreground_Basics_TA
-        Public gravityBasics As Gravity_Basics_TA
+        Public foreground As Foreground_Basics
+        Public gravityBasics As Gravity_Basics
         Public gravityMatrix As IMU_GMatrix_TA
-        Public grid As Grid_Basics_TA
-        Public imuBasics As IMU_Basics_TA
-        Public leftRightBrightness As LeftRight_Brightness_TA
-        Public lines As Line_Basics_TA
+        Public grid As Grid_Basics
+        Public imuBasics As IMU_Basics
+        Public leftRightBrightness As LeftRight_Brightness
+        Public lines As Line_Basics
 
         Public motion As Motion_Basics
         Public colorizer As DepthColorizer_Basics
         Public stableDepth As StableDepth_Basics_TA
         Public stableGray As StableGray_Basics_TA
-        Public heartBeats As HeartBeat_Basics_TA
+        Public heartBeats As HeartBeat_Basics
         Public edges As Edge_Basics
 
         Public motionFeatures As Point2f

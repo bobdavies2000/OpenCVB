@@ -4,7 +4,7 @@ Namespace VBClasses
         Public lp As lpData
         Public lpLast As lpData
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
         End Sub
         Public Shared Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
@@ -116,7 +116,7 @@ Namespace VBClasses
     Public Class XR_StableLine_Lines : Inherits TaskParent
         Public basics As New XR_FeatureMap_StablePoints
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Track the line end points found in the BGR image and keep those that are stable."
         End Sub

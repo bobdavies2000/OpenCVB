@@ -70,7 +70,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.FindSlider("DrawCount").Value = 2
             labels(2) = "If the contours overlap, then one line the trendline for both is found.  Otherwise, 2 lines are found."
-            labels(3) = "FitLine_BasicsOld_TA contour input - if they overlap, a trendline will be found."
+            labels(3) = "FitLine_Basics contour input - if they overlap, a trendline will be found."
             desc = "Show how Fitline API works.  When the lines overlap the image has a single contour " +
                    "and the lines are occasionally not found."
         End Sub

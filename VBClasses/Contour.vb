@@ -326,7 +326,7 @@ Namespace VBClasses
     Public Class XR_Contour_LineRGB : Inherits TaskParent
         Dim contours As New Contour_Finder
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Identify contour by its Lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -831,7 +831,7 @@ Namespace VBClasses
         Dim rangeVal As Integer = 3
         Dim contours As New XR_Contour_Finder
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             plot.useFixedRange = True
             plot.max = rangeVal
             plot.min = -rangeVal
@@ -1007,7 +1007,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Connect each contour to the line that shares the most points"
@@ -1080,7 +1080,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Find the contour for a line overlapping the contour points"
@@ -1143,7 +1143,7 @@ Namespace VBClasses
         Dim contours As New Contour_Basics
         Public rcLpList As New List(Of (lp As lpData, rc As rcData))
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Cursor.ai: Connect each line to the contour containing the lines center point"

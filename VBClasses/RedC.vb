@@ -382,7 +382,7 @@ Namespace VBClasses
     Public Class RedC_CellLines : Inherits TaskParent
         Dim redC As New XR_RedC_Core
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Find any lines connected to a cell contour."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -549,7 +549,7 @@ Namespace VBClasses
         Dim feat As New Feature_Basics
         Dim redC As New XR_RedC_Core
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
             labels(1) = "Ages for the top X lines..."
             desc = "Find the features in a RedC cell."

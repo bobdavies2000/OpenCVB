@@ -380,7 +380,7 @@ Namespace VBClasses
         Dim knn As New KNN_Basics
         Public lplist As New List(Of lpData)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Join the 2 nearest points to each grid square cv.Point to help find lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

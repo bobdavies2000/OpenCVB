@@ -4,8 +4,8 @@ Namespace VBClasses
         Public lp As lpData
         Public depthList As New List(Of Single)
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
-            labels(2) = "Longest line from Line_Basics_TA"
+            If task.lines Is Nothing Then task.lines = New Line_Basics
+            labels(2) = "Longest line from Line_Basics"
             labels(3) = "Depth along that line"
             desc = "Cursor.ai: Walk the longest line and read depth from task.pcSplit(2)."
         End Sub

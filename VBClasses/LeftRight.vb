@@ -171,7 +171,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_Brightness_TA : Inherits TaskParent
+    Public Class LeftRight_Brightness : Inherits TaskParent
         Dim Options As New Options_BrightnessContrast
         Public Sub New()
             OptionParent.FindSlider("Alpha (contrast)").Value = 650
@@ -278,7 +278,7 @@ Namespace VBClasses
         Public rightList As New List(Of lpData)
         Dim linesRight As New Line_Core
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
             dst3 = New Mat(dst2.Size, MatType.CV_8U, 0)
             desc = "Find the lines in the left and right images - use StableGray_LeftRight for left/right images."

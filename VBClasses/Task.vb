@@ -138,7 +138,7 @@ Namespace VBClasses
                 Next
             End If
 
-            If task.gOptions.CrossHairs.Checked Then Gravity_Basics_TA.showVectors(task.dstList(0))
+            If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.dstList(0))
 
             task.trueData.Clear()
             task.trueData.Add(New TrueText(task.depthAndDepthRange,

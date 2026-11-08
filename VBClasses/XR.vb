@@ -619,7 +619,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_Gravity_Basics_TAOld : Inherits TaskParent
+    Public Class XR_Gravity_BasicsOld : Inherits TaskParent
         Public points As New List(Of Point2f)
         Public autoDisplay As Boolean
         Public Sub New()
@@ -1015,7 +1015,7 @@ Namespace VBClasses
     Public Class XR_RedColor_Lines : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, 0)
             desc = "Identify and track the lines in an image as RedCloud Cells"
         End Sub
@@ -1191,7 +1191,7 @@ Namespace VBClasses
     Public Class XR_RedColor_Points : Inherits TaskParent
         Dim track As New XR_RedColor_Contour
         Public Sub New()
-            If task.lines Is Nothing Then task.lines = New Line_Basics_TA
+            If task.lines Is Nothing Then task.lines = New Line_Basics
             dst3 = New Mat(dst3.Size(), MatType.CV_8U, Scalar.All(0))
             labels = {"", "", "RedCloudX_Track output", "Input to RedCloudX_Track"}
             desc = "Identify and track the end points of lines in an image of RedCloud Cells"
