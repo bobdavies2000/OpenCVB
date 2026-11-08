@@ -9,7 +9,7 @@ Public Class OptionsFeatures
     Public featureList() As String = {"AGAST", "AKAZE", "BrickPoint_Basics", "Corner_Basics", "Corner_HarrisDetector_CPP",
                                       "Feature_BRISK", "GoodFeatures", "LineInput"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = vbc.task.allOptions
+        Me.MdiParent = task.allOptions
         Me.Left = 0
         Me.Top = 0
 
@@ -25,9 +25,9 @@ Public Class OptionsFeatures
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(vbc.task.filterBasics.grayFilter.filterList.Length - 1)
-        For i = 0 To vbc.task.filterBasics.grayFilter.filterList.Length - 1
-            Dim cb As New RadioButton With {.Text = vbc.task.filterBasics.grayFilter.filterList(i),
+        ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Length - 1)
+        For i = 0 To task.filterBasics.grayFilter.filterList.Length - 1
+            Dim cb As New RadioButton With {.Text = task.filterBasics.grayFilter.filterList(i),
                                             .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
             GrayGroup.Controls.Add(cb)
@@ -35,9 +35,9 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(1).Checked = True ' Intensity_Basics for improved segmentation.
 
-        ReDim colorCheckbox(vbc.task.filterBasics.filterList.Length - 1)
-        For i = 0 To vbc.task.filterBasics.filterList.Length - 1
-            Dim cb As New RadioButton With {.Text = vbc.task.filterBasics.filterList(i),
+        ReDim colorCheckbox(task.filterBasics.filterList.Length - 1)
+        For i = 0 To task.filterBasics.filterList.Length - 1
+            Dim cb As New RadioButton With {.Text = task.filterBasics.filterList(i),
                                         .Location = New Point(20, 20 + i * 20), .AutoSize = True, .Tag = i}
             AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
             ColorGroup.Controls.Add(cb)
@@ -56,7 +56,7 @@ Public Class OptionsFeatures
         ColorDiffSlider.Value = 10
         MotionPixelSlider.Maximum = 10
         MotionPixelSlider.Value = 10
-        Select Case vbc.task.workRes.Width
+        Select Case task.workRes.Width
             Case 1920
                 ColorDiffSlider.Value = 25
                 MotionPixelSlider.Maximum = 100
@@ -83,20 +83,20 @@ Public Class OptionsFeatures
 
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         task.filterBasics.grayFilter.filterIndex = -1
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
-        vbc.task.verticalLines = True
+        task.verticalLines = True
     End Sub
     Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
-        vbc.task.verticalLines = False
+        task.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 
 
@@ -104,43 +104,43 @@ Public Class OptionsFeatures
 
     Private Sub ReductionColor_ValueChanged(sender As Object, e As EventArgs) Handles ReductionColor.ValueChanged
         Lab1.Text = ReductionColor.Value.ToString(fmt0)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub ReductionDepth_ValueChanged(sender As Object, e As EventArgs) Handles ReductionDepth.ValueChanged
         Lab9.Text = ReductionDepth.Value.ToString(fmt0)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
-        vbc.task.fCorrThreshold = MatchCorrSlider.Value / 100
-        vbc.task.optionsChanged = True
-        FeatureCorrelationLabel.Text = vbc.task.fCorrThreshold.ToString(fmt2)
+        task.fCorrThreshold = MatchCorrSlider.Value / 100
+        task.optionsChanged = True
+        FeatureCorrelationLabel.Text = task.fCorrThreshold.ToString(fmt2)
     End Sub
     Private Sub FrameHistoryCount_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistoryCount.ValueChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         FrameHistoryLabel.Text = CStr(FrameHistoryCount.Value)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSizeSlider.ValueChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         FeatureSamplesLabel.Text = CStr(FeatureSizeSlider.Value)
     End Sub
     Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
-        vbc.task.colorDiffThreshold = ColorDiffSlider.Value
-        vbc.task.optionsChanged = True
-        ColorDiffLabel.Text = CStr(vbc.task.colorDiffThreshold)
+        task.colorDiffThreshold = ColorDiffSlider.Value
+        task.optionsChanged = True
+        ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
     End Sub
     Private Sub MotionPixelSlider_ValueChanged(sender As Object, e As EventArgs) Handles MotionPixelSlider.ValueChanged
-        vbc.task.motionThreshold = MotionPixelSlider.Value
-        vbc.task.optionsChanged = True
-        MotionPixelLabel1.Text = CStr(vbc.task.motionThreshold)
+        task.motionThreshold = MotionPixelSlider.Value
+        task.optionsChanged = True
+        MotionPixelLabel1.Text = CStr(task.motionThreshold)
     End Sub
 
 
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 
     Private Sub LineCombo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineCombo.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 End Class

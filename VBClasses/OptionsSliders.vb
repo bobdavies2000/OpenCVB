@@ -7,9 +7,9 @@ Public Class OptionsSliders
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
-        If vbc.task.allOptions.Text <> "" Then Me.MdiParent = vbc.task.allOptions
+        If task.allOptions.Text <> "" Then Me.MdiParent = task.allOptions
         Me.Text = traceName + " Sliders"
-        vbc.task.allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
 
         FlowLayoutPanel1.Width = Me.Width - 40
         FlowLayoutPanel1.Height = Me.Height - 60
@@ -47,7 +47,7 @@ Public Class OptionsSliders
         Dim outStr = myLabels(sender.tag).Text
         Dim splitStr = outStr.Split("=")
         myLabels(sender.tag).Text = splitStr(0) + "= " + CStr(mytrackbars(sender.tag).Value)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth

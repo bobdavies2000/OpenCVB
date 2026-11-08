@@ -2,9 +2,9 @@ Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
-        Me.MdiParent = vbc.task.allOptions
+        Me.MdiParent = task.allOptions
         Me.Text = traceName + " Radio Buttons"
-        vbc.task.allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
         Return True
     End Function
     Public Sub addRadio(labelStr As String)
@@ -16,7 +16,7 @@ Public Class OptionsRadioButtons
         FlowLayoutPanel1.Controls.Add(check(index))
     End Sub
     Private Sub radio_CheckChanged(sender As Object, e As EventArgs)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 
     Protected Overrides Sub Dispose(disposing As Boolean)

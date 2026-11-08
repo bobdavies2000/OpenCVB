@@ -5,7 +5,7 @@ Public Class OptionsGlobal
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = vbc.task.allOptions
+        Me.MdiParent = task.allOptions
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -24,65 +24,65 @@ Public Class OptionsGlobal
         highlight.Items.Add("red")
         highlight.SelectedIndex = 0
 
-        ShowAllOptions.Checked = vbc.task.Settings.ShowAllOptions
+        ShowAllOptions.Checked = task.Settings.ShowAllOptions
 
-        vbc.task.DotSize = 1
-        vbc.task.gridWH = 8
-        vbc.task.DotSize = 1
-        vbc.task.lineWidth = 1
-        vbc.task.smallRes = New Size(320, 240)
-        Select Case vbc.task.workRes.Width
+        task.DotSize = 1
+        task.gridWH = 8
+        task.DotSize = 1
+        task.lineWidth = 1
+        task.smallRes = New Size(320, 240)
+        Select Case task.workRes.Width
             Case 1920
-                vbc.task.DotSize = 5
-                vbc.task.lineWidth = 5
-                vbc.task.gridWH = 48
-                vbc.task.smallRes = New Size(240, 135)
+                task.DotSize = 5
+                task.lineWidth = 5
+                task.gridWH = 48
+                task.smallRes = New Size(240, 135)
             Case 1280
-                vbc.task.DotSize = 5
-                vbc.task.lineWidth = 4
-                vbc.task.gridWH = 36
+                task.DotSize = 5
+                task.lineWidth = 4
+                task.gridWH = 36
             Case 960
-                vbc.task.DotSize = 2
-                vbc.task.lineWidth = 2
-                vbc.task.gridWH = 24
-                vbc.task.smallRes = New Size(336, 188)
+                task.DotSize = 2
+                task.lineWidth = 2
+                task.gridWH = 24
+                task.smallRes = New Size(336, 188)
             Case 672
-                vbc.task.DotSize = 2
-                vbc.task.lineWidth = 2
-                vbc.task.gridWH = 16
-                vbc.task.smallRes = New Size(336, 188)
+                task.DotSize = 2
+                task.lineWidth = 2
+                task.gridWH = 16
+                task.smallRes = New Size(336, 188)
             Case 640
-                vbc.task.lineWidth = 2
-                vbc.task.DotSize = 2
-                vbc.task.gridWH = 16
+                task.lineWidth = 2
+                task.DotSize = 2
+                task.gridWH = 16
             Case 480
-                vbc.task.smallRes = New Size(480, 270)
-                vbc.task.gridWH = 12
+                task.smallRes = New Size(480, 270)
+                task.gridWH = 12
             Case 240
-                vbc.task.smallRes = New Size(240, 150)
+                task.smallRes = New Size(240, 150)
             Case 336
-                vbc.task.smallRes = New Size(336, 188)
+                task.smallRes = New Size(336, 188)
             Case 320
             Case 168
-                vbc.task.smallRes = New Size(168, 94)
-                vbc.task.gridWH = 5
+                task.smallRes = New Size(168, 94)
+                task.gridWH = 5
             Case 160
-                vbc.task.smallRes = New Size(160, 120)
-                vbc.task.gridWH = 5
+                task.smallRes = New Size(160, 120)
+                task.gridWH = 5
         End Select
 
-        GridSlider.Value = vbc.task.gridWH
-        DotSizeSlider.Value = vbc.task.DotSize
+        GridSlider.Value = task.gridWH
+        DotSizeSlider.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        LineWidth.Value = vbc.task.lineWidth
+        LineWidth.Value = task.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
-        vbc.task.steadyLineWidth = vbc.task.lineWidth * 3
+        task.steadyLineWidth = task.lineWidth * 3
 
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
         ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
-        PaintFrequencyLabel.Text = vbc.task.Settings.paintFrequency
+        PaintFrequencyLabel.Text = task.Settings.paintFrequency
 
         Me.Left = 0
         Me.Top = 30
@@ -90,85 +90,85 @@ Public Class OptionsGlobal
         GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                vbc.task.lineType = LineTypes.AntiAlias
+                task.lineType = LineTypes.AntiAlias
             Case "Link4"
-                vbc.task.lineType = LineTypes.Link4
+                task.lineType = LineTypes.Link4
             Case "Link8"
-                vbc.task.lineType = LineTypes.Link8
+                task.lineType = LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
         LineThicknessAmount.Text = CStr(LineWidth.Value)
-        vbc.task.lineWidth = LineWidth.Value
-        vbc.task.optionsChanged = True
+        task.lineWidth = LineWidth.Value
+        task.optionsChanged = True
     End Sub
     Private Sub DotSizeSlider_ValueChanged(sender As Object, e As EventArgs) Handles DotSizeSlider.ValueChanged
-        vbc.task.DotSize = DotSizeSlider.Value
-        DotSizeLabel.Text = CStr(vbc.task.DotSize)
-        vbc.task.optionsChanged = True
+        task.DotSize = DotSizeSlider.Value
+        DotSizeLabel.Text = CStr(task.DotSize)
+        task.optionsChanged = True
     End Sub
     Private Sub showMyDst0_CheckedChanged(sender As Object, e As EventArgs) Handles showMyDst0.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub showMyDst1_CheckedChanged(sender As Object, e As EventArgs) Handles showMyDst1.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
         ' why add anything?  Because histograms are exclusive on ranges.
-        vbc.task.MaxZmeters = MaxDepthBar.Value + 0.01
-        vbc.task.optionsChanged = True
+        task.MaxZmeters = MaxDepthBar.Value + 0.01
+        task.optionsChanged = True
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         GridSizeLabel.Text = CStr(GridSlider.Value)
-        vbc.task.gridWH = GridSlider.Value
-        vbc.task.optionsChanged = True
+        task.gridWH = GridSlider.Value
+        task.optionsChanged = True
     End Sub
     Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
-        vbc.task.histogramBins = HistBinBar.Value
-        labelBinsCount.Text = CStr(vbc.task.histogramBins)
-        vbc.task.optionsChanged = True
+        task.histogramBins = HistBinBar.Value
+        labelBinsCount.Text = CStr(task.histogramBins)
+        task.optionsChanged = True
     End Sub
     Private Sub PaintFreqSlider_ValueChanged(sender As Object, e As EventArgs) Handles PaintFreqSlider.ValueChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         PaintFrequencyLabel.Text = CStr(PaintFreqSlider.Value)
-        vbc.task.Settings.paintFrequency = PaintFreqSlider.Value
+        task.Settings.paintFrequency = PaintFreqSlider.Value
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
-        vbc.task.optionsChanged = True
-        vbc.task.paletteIndex = mapNames.IndexOf(Palettes.Text)
+        task.optionsChanged = True
+        task.paletteIndex = mapNames.IndexOf(Palettes.Text)
     End Sub
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        vbc.task.optionsChanged = True
-        vbc.task.Settings.ShowAllOptions = ShowAllOptions.Checked
+        task.optionsChanged = True
+        task.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
-        vbc.task.optionsChanged = False ' this is a debug slider, not an option
+        task.optionsChanged = False ' this is a debug slider, not an option
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
 
 
 
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
         Select Case highlight.Text
             Case "Yellow"
-                vbc.task.highlight = Scalar.Yellow
+                task.highlight = Scalar.Yellow
             Case "Black"
-                vbc.task.highlight = Scalar.Black
+                task.highlight = Scalar.Black
             Case "white"
-                vbc.task.highlight = Scalar.white
+                task.highlight = Scalar.white
             Case "red"
-                vbc.task.highlight = Scalar.red
+                task.highlight = Scalar.red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)
@@ -200,13 +200,13 @@ Public Class OptionsGlobal
         LineWidth.Value = val
     End Sub
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs)
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
@@ -216,12 +216,12 @@ Public Class OptionsGlobal
             task.stableDepth = New StableDepth_Basics_TA
             task.stableGray = New StableGray_Basics_TA
         End If
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub CrossHairs_CheckedChanged(sender As Object, e As EventArgs) Handles CrossHairs.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
     Private Sub ShowGrid_CheckedChanged(sender As Object, e As EventArgs) Handles ShowGrid.CheckedChanged
-        vbc.task.optionsChanged = True
+        task.optionsChanged = True
     End Sub
 End Class
