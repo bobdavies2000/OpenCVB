@@ -70,8 +70,11 @@ Namespace VBClasses
         Public colorMapDepth As Mat
         Public colorMap As Mat
         Public colorMapBricks As Mat
+        Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
+        Public steadyLineWidth As Integer
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
+        Public Algorithms As TaskAlgorithms
         Public filterBasics As Filter_Basics_TA
         Public fless As FeatureLess_Basics
         Public delaunayFLess As Delaunay_FeatureLess
@@ -83,8 +86,6 @@ Namespace VBClasses
         Public imuBasics As IMU_Basics_TA
         Public leftRightBrightness As LeftRight_Brightness_TA
         Public lines As Line_Basics_TA
-        Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
-        Public steadyLineWidth As Integer
 
         Public motion As Motion_Basics_TA
         Public colorizer As DepthColorizer_Basics_TA
