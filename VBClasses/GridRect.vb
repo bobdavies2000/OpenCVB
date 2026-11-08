@@ -464,7 +464,7 @@ Namespace VBClasses
                 If roi.X = 0 Then Continue For
                 Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
                 MatchTemplate(src(roi), task.rightView(r), correlationMat, TemplateMatchModes.CCoeffNormed)
-                Dim mm = vbc.GetMinMax(correlationMat)
+                Dim mm = GetMinMax(correlationMat)
                 If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
             Next
             labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + task.fCorrThreshold.ToString(fmt3)

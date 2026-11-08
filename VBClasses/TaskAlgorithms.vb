@@ -55,7 +55,7 @@ Public Class TaskAlgorithms
             task.stableGray.Run(task.gray)
         End If
 
-        If vbc.task.pixelViewerOn Then
+        If task.pixelViewerOn Then
             If task.PixelViewer Is Nothing Then
                 task.PixelViewer = New PixelViewer.Pixel_Viewer
             End If

@@ -153,7 +153,7 @@ Namespace VBClasses
             If task.gOptions.showMyDst1.Checked = False Then task.labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
         Private Sub pixelViewerOrGIFProcessing(src As Mat, dst1 As Mat, dst2 As Mat, dst3 As Mat)
-            If vbc.task.pixelViewerOn Then
+            If task.pixelViewerOn Then
                 If task.PixelViewer IsNot Nothing Then
                     task.PixelViewer.viewerForm.Visible = True
                     task.PixelViewer.viewerForm.Show()

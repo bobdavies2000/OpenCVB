@@ -600,7 +600,7 @@ Namespace VBClasses
                 Rectangle(tmp, New cv.Rect(0, 0, rc.mask.Width, rc.mask.Height), Scalar.All(0), 1)
                 Dim distance32f As New Mat
                 DistanceTransform(tmp, distance32f, DistanceTypes.L1, DistanceTransformMasks.Precise, MatType.CV_32F)
-                Dim mm As mmData = vbc.GetMinMax(distance32f)
+                Dim mm As mmData = GetMinMax(distance32f)
                 rc.maxDist.X = mm.maxLoc.X + rc.rect.X
                 rc.maxDist.Y = mm.maxLoc.Y + rc.rect.Y
             End If
