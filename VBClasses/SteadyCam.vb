@@ -1,6 +1,6 @@
 ﻿Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class SteadyCam_Basics_TA : Inherits TaskParent
+    Public Class SteadyCam_Basics : Inherits TaskParent
         Dim feat As New Feature_WithRotation
         Public shiftXY As cv.Point
         Public rotateAngle As Single
@@ -93,7 +93,7 @@ Namespace VBClasses
         Public Sub New()
             M.Set(Of Double)(0, 0, 1) : M.Set(Of Double)(0, 1, 0) : M.Set(Of Double)(0, 2, 0)
             M.Set(Of Double)(1, 0, 0) : M.Set(Of Double)(1, 1, 1) : M.Set(Of Double)(1, 2, 0)
-            desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics_TA"
+            desc = "Use Kalman to smooth the behavior of ShiftXY in SteadyCam_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim shiftXY = task.steadyCam.shiftXY

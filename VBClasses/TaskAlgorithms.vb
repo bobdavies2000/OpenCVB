@@ -1,6 +1,11 @@
 ﻿Imports System.IO
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Public Class TaskAlgorithms
+    Public algTaskList() As String = {"DepthColorizer_Basics", "IMU_GMatrix", "Gravity_Basics",
+                                      "IMU_Basics", "Motion_Basics", "HeartBeat_Basics",
+                                      "Edge_Basics", "Delaunay_FeatureLess", "FeatureLess_Basics",
+                                      "StableDepth_Basics", "StableGray_Basics", "Grid_Basics",
+                                      "Filter_Basics", "LeftRight_Brightness", "SteadyCam_Basics"}
     Public Sub New()
         task.colorizer = New DepthColorizer_Basics
         task.gravityMatrix = New IMU_GMatrix
@@ -21,7 +26,7 @@ Public Class TaskAlgorithms
 
         task.filterBasics = New Filter_Basics
         task.leftRightBrightness = New LeftRight_Brightness
-        task.steadyCam = New SteadyCam_Basics_TA
+        task.steadyCam = New SteadyCam_Basics
 
         HeartBeat_Basics.setHeartBeat()
     End Sub
