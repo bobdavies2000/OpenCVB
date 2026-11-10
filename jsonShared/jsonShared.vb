@@ -21,7 +21,7 @@ Namespace jsonShared
         Public workRes As New cv.Size(320, 180)
 
         Public desiredFPS As Integer = 60
-        Public displayRes As cv.Size = New cv.Size(320, 180)
+        Public displayRes As New cv.Size(320, 180)
 
         Public Image_Basics_Name As String = ""
 

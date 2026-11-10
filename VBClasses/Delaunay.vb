@@ -611,13 +611,6 @@ Namespace VBClasses
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.algorithmActive Then
-                SetTrueText(traceName + " is a task algorithm that has already run", 3)
-                dst2 = task.delaunayFLess.dst2
-                labels(2) = task.delaunayFLess.labels(2)
-                Exit Sub ' this is a task.algorithm that has already run...
-            End If
-
             If heartbeatLTX() Or ptList.Count <= 2 Then
                 snapshotList = New List(Of rcData)(task.fless.rcList)
 

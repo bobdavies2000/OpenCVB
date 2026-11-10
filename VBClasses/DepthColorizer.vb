@@ -93,7 +93,7 @@ Namespace VBClasses
             Else
                 task.depthAndDepthRange = ""
             End If
-            If standaloneTest() Then dst2 = task.depthRGB
+            dst2 = task.depthRGB
         End Sub
         Protected Overrides Sub Finalize()
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)

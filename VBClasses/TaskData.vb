@@ -31,7 +31,8 @@ Namespace VBClasses
         Public fLessMask As Mat
 
         Public firstPass As Boolean = True
-        Public algorithmActive As Boolean
+        Public needtoRunAlgorithm As Boolean = True ' Don't need to run the algorithm if it is a task algorithm.
+        Public Algorithms As TaskAlgorithms
 
         ' treeview data
         Public cpu As New CPUTime
@@ -73,8 +74,6 @@ Namespace VBClasses
         Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
         Public steadyLineWidth As Integer
 
-        ' task algorithms - operate on every frame regardless of which algorithm is being run.
-        Public Algorithms As TaskAlgorithms
         Public filterBasics As Filter_Basics
         Public fless As FeatureLess_Basics
         Public delaunayFLess As Delaunay_FeatureLess

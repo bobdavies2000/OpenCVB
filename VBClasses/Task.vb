@@ -73,14 +73,16 @@ Namespace VBClasses
             task.quads(1) = New cv.Rect(w, 0, w, h)
             task.quads(2) = New cv.Rect(0, h, w, h)
             task.quads(3) = New cv.Rect(w, h, w, h)
+
+            ' if not a task algorithm, then we need to run the algorithm.  
+            task.needtoRunAlgorithm = Not task.Algorithms.algTasks.Contains(task.Settings.algorithm)
         End Sub
         Public Sub RunAlgorithm()
+            Dim displayObject = task.MainUI_Algorithm
             If task.allOptions.titlesAdded Then
                 task.allOptions.titlesAdded = False
                 task.allOptions.layoutOptions(normalRequest:=True)
             End If
-
-            task.heartBeats.Run(Nothing)
 
             If task.firstPass Then task.cpu.initialize(Settings.algorithm)
 
@@ -91,18 +93,26 @@ Namespace VBClasses
 
             task.IMU_FrameTime = task.IMU_AlphaFilter = 0.5
             task.lineMaxCount = task.fOptions.FeatureSizeSlider.Value
-
-            TaskAlgorithms.RunTasks()
-
-
-
-            task.algorithmActive = True ' every task algorithm can use this to avoid rerunning...
-            task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-            task.algorithmActive = False
+            TaskAlgorithms.RunTaskAlgorithms()
 
 
 
-            Dim displayObject = task.MainUI_Algorithm
+
+
+            If task.needtoRunAlgorithm Then
+                task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+            Else
+                If task.cpu.displayObjectName = task.Settings.algorithm Then
+                    Dim compoundName = task.Settings.algorithm + "\TaskAlgorithms\" + task.Settings.algorithm + "\"
+                    task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(compoundName)
+                    task.cpu.displayObjectName = compoundName
+                End If
+            End If
+
+
+
+
+
             If task.cpu.displayObjectName <> displayObject.traceName Then
                 displayObject = cpu.activeObjects(task.cpu.displayObjectIndex)
             End If

@@ -16,14 +16,6 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.algorithmActive Then
-                SetTrueText(traceName + " is a task algorithm that has already run", 3)
-                dst2 = task.fless.dst2
-                labels(2) = task.fless.labels(2)
-                trueData = New List(Of TrueText)(task.fless.trueData)
-                Exit Sub ' this is a task.algorithm that has already run...
-            End If
-
             rcListLast = New List(Of rcData)(rcList)
 
             rcMap.SetTo(0)
