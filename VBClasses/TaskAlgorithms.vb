@@ -40,6 +40,11 @@ Namespace VBClasses
             HeartBeat_Basics.setHeartBeat()
         End Sub
         Public Shared Sub RunTaskAlgorithms()
+            If task.stableGray Is Nothing AndAlso task.gOptions.stableDepthRGB.Checked Then
+                task.stableDepth = New StableDepth_Basics
+                task.stableGray = New StableGray_Basics
+            End If
+
             ' run any task algorithms here
             task.heartBeats.Run(Nothing)
             task.grid.Run(task.color)
@@ -126,7 +131,7 @@ Namespace VBClasses
             task.edges.Run(task.gray)
             task.fless.Run(task.gray)
             task.delaunayFLess.Run(task.gray)
-            If task.redColor IsNot Nothing Then task.redColor.Run(task.gray)
+            If task.redColor IsNot Nothing Then task.redColor.Run(task.color.Clone)
         End Sub
     End Class
 End Namespace

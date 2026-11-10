@@ -347,10 +347,13 @@ Namespace VBClasses
                 Circle(dst2, pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
 
-            delaunay.bPoint.ptList = New List(Of cv.Point)(feat.ptlist)
+            delaunay.ptList.Clear()
+            For Each pt In feat.ptlist
+                delaunay.ptList.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
             delaunay.Run(src)
             dst3 = delaunay.dst2
-            For Each pt In delaunay.bPoint.ptList
+            For Each pt In delaunay.ptList
                 Circle(dst3, pt, task.DotSize, white, -1, task.lineType)
             Next
             labels(3) = "There were " + CStr(feat.ptlist.Count) + " Delaunay contours"

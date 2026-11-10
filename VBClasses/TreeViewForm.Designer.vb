@@ -58,7 +58,7 @@ Partial Class TreeViewForm
         Controls.Add(TreeView1)
         Margin = New Padding(4)
         Name = "TreeViewForm"
-        Text = "TreeViewForm"
+        Text = "OpenCVB Task TreeView"
         ResumeLayout(False)
     End Sub
 

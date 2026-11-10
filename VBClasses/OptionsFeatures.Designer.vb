@@ -280,7 +280,7 @@ Partial Class OptionsFeatures
         ReductionDepth.Name = "ReductionDepth"
         ReductionDepth.Size = New Size(550, 69)
         ReductionDepth.TabIndex = 1005
-        ReductionDepth.Value = 100
+        ReductionDepth.Value = 300
         ' 
         ' Label8
         ' 

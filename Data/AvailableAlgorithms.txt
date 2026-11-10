@@ -625,6 +625,7 @@ RedCloud_Core
 RedCloud_Delaunay
 RedCloud_Features
 RedColor_Basics
+RedColor_MapHoles
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP

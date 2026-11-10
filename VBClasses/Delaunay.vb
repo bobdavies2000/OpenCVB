@@ -415,44 +415,6 @@ Namespace VBClasses
 
 
 
-    Public Class Delaunay_Contours : Inherits TaskParent
-        Dim subdiv As New Subdiv2D
-        Public bPoint As New BrickPoint_Basics
-        Public Sub New()
-            dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
-            labels(3) = "CV_8U map of Delaunay cells"
-            desc = "Subdivide an image based on the points provided."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim ptlist2f As New List(Of Point2f)
-            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-            If standalone Then
-                bPoint.Run(src)
-                For Each pt In bPoint.ptList
-                    ptlist2f.Add(New Point2f(pt.X, pt.Y))
-                Next
-                subdiv.Insert(ptlist2f)
-            End If
-
-            Dim facets = New Point2f()() {Nothing}
-            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-            dst2.SetTo(0)
-            For i = 0 To facets.Length - 1
-                Dim ptList As New List(Of cv.Point)
-                For j = 0 To facets(i).Length - 1
-                    ptList.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-                Next
-
-                DrawTour(dst2, ptList, 255, 1)
-            Next
-            labels(2) = traceName + ": " + bPoint.ptList.Count.ToString("000") + " cells were present."
-        End Sub
-    End Class
-
-
-
-
 
 
     Public Class XR_Delaunay_Contours : Inherits TaskParent
@@ -487,53 +449,6 @@ Namespace VBClasses
             labels(2) = traceName + ": " + bPoint.ptList.Count.ToString("000") + " cells were present."
         End Sub
     End Class
-
-
-
-
-    Public Class Delaunay_Color : Inherits TaskParent
-        Public inputPoints As New List(Of Point2f)
-        Public inputColors As New List(Of Integer)
-        Public facetList As New List(Of List(Of cv.Point))
-        Dim subdiv As New Subdiv2D
-        Public Sub New()
-            dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
-            desc = "Subdivide an image based on the points provided."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatX() And standalone Then
-                Static random As New Random_Basics
-                random.Run(src)
-                inputPoints = New List(Of Point2f)(random.PointList)
-            End If
-
-            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-            subdiv.Insert(inputPoints)
-
-            Dim facets = New Point2f()() {Nothing}
-            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
-
-            facetList.Clear()
-            For i = 0 To facets.Length - 1
-                Dim nextFacet As New List(Of cv.Point)
-                For j = 0 To facets(i).Length - 1
-                    nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
-                Next
-
-                If inputColors.Count = 0 Then
-                    FillConvexPoly(dst3, nextFacet, i, LineTypes.Link4)
-                Else
-                    FillConvexPoly(dst3, nextFacet, inputColors(i), LineTypes.Link4)
-                End If
-                facetList.Add(nextFacet)
-            Next
-
-            dst2 = ApplyPalette(dst3)
-
-            labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
-        End Sub
-    End Class
-
 
 
 
@@ -648,6 +563,88 @@ Namespace VBClasses
             For i = 0 To ptList.Count - 1
                 ptLatest.Add(WarpAffine_Basics.WarpPoint(ptList(i), task.steadyCam.M))
             Next
+        End Sub
+    End Class
+
+
+
+
+    Public Class Delaunay_Color : Inherits TaskParent
+        Public inputPoints As New List(Of Point2f)
+        Public facetList As New List(Of List(Of cv.Point))
+        Dim subdiv As New Subdiv2D
+        Public Sub New()
+            If standalone Then If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            dst3 = New Mat(dst2.Size(), MatType.CV_32SC1, 0)
+            desc = "Subdivide an image based on the points provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatX() And standaloneTest() Then
+                inputPoints.Clear()
+                For Each rc In task.redColor.rcList
+                    inputPoints.Add(rc.maxDist)
+                Next
+            End If
+
+            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            subdiv.Insert(inputPoints)
+
+            Dim facets = New Point2f()() {Nothing}
+            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+            facetList.Clear()
+            For i = 0 To facets.Length - 1
+                Dim nextFacet As New List(Of cv.Point)
+                For j = 0 To facets(i).Length - 1
+                    nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+                Next
+
+                FillConvexPoly(dst3, nextFacet, i, LineTypes.Link4)
+                facetList.Add(nextFacet)
+            Next
+
+            dst2 = ApplyPalette(dst3)
+
+            labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
+        End Sub
+    End Class
+
+
+
+
+    Public Class Delaunay_Contours : Inherits TaskParent
+        Public ptList As New List(Of cv.Point2f)
+        Dim subdiv As New Subdiv2D
+        Public Sub New()
+            If standalone Then If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
+            labels(3) = "CV_8U map of Delaunay cells"
+            desc = "Subdivide an image based on the points provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatX() And standaloneTest() Then
+                ptList.Clear()
+                For Each rc In task.redColor.rcList
+                    ptList.Add(New cv.Point2f(rc.maxDist.X, rc.maxDist.Y))
+                Next
+            End If
+
+            subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            subdiv.Insert(ptList)
+
+            Dim facets = New Point2f()() {Nothing}
+            subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+            dst2.SetTo(0)
+            For i = 0 To facets.Length - 1
+                Dim ptList As New List(Of cv.Point)
+                For j = 0 To facets(i).Length - 1
+                    ptList.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+                Next
+
+                DrawTour(dst2, ptList, 255, 1)
+            Next
+            labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
         End Sub
     End Class
 End Namespace

@@ -13,10 +13,8 @@ Namespace VBClasses
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                color8U.Run(task.gray)
-                src = color8U.dst2
-            End If
+            color8U.Run(src)
+            src = color8U.dst2
 
             Dim rc As rcData, rcNext As rcData
 
@@ -363,4 +361,21 @@ Namespace VBClasses
             labels(2) = CStr(rcList.Count) + " cells were identified."
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedColor_MapHoles : Inherits TaskParent
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Display the holes in the RedColor rcMap output."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.redColor.dst2
+            labels(3) = task.redColor.labels(2)
+            Threshold(task.redColor.rcMap, dst2, 0, 255, ThresholdTypes.BinaryInv)
+        End Sub
+    End Class
+
 End Namespace

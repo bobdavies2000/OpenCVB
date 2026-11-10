@@ -1,3 +1,4 @@
+Imports System.Windows.Documents
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
@@ -444,29 +445,53 @@ Namespace VBClasses
 
     Public Class RedCloud_Delaunay : Inherits TaskParent
         Dim redC As New RedCloud_Basics
-        Dim delaunay As New Delaunay_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim ptList As New List(Of cv.Point2f)
+        Dim facetList As New List(Of List(Of cv.Point))
         Public Sub New()
+            task.MaxZmeters = 20
+            task.gOptions.stableDepthRGB.Checked = True
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Create a Delaunay map using the RedCloud maxDist points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
-                redC.Run(src)
-                labels(2) = redC.labels(2)
-                rclist = New List(Of rcData)(redC.rcList)
+            Static myHeartBeat As Boolean
+            If heartbeatLTX() Then myHeartBeat = True
+            If task.almostHeartBeat Or task.firstPass Then
+                If myHeartBeat Then
+                    myHeartBeat = False
+                    redC.Run(src)
+                    labels(2) = redC.labels(2)
+                    rcList = New List(Of rcData)(redC.rcList)
 
-                delaunay.ptList.Clear()
-                For Each rc In rcList
-                    delaunay.ptList.Add(rc.maxDist)
-                Next
-                delaunay.Run(src)
+                    ptList.Clear()
+                    For Each rc In redC.rcList
+                        ptList.Add(rc.maxDist)
+                    Next
 
-                dst2 = ApplyPalette(redC.rcMap, 0)
-                dst3 = delaunay.dst2
+                    rcMap.SetTo(0)
+                    facetList = Delaunay_Basics.buildFacets(ptList)
+                    For i = 0 To facetList.Count - 1
+                        Dim index = task.delaunayFLess.rcMap.Get(Of Byte)(ptList(i).Y, ptList(i).X)
+                        FillConvexPoly(rcMap, facetList(i), index, LineTypes.Link4)
+                    Next
 
+                    dst2 = ApplyPalette(rcMap, 0)
+
+                    For Each rc In task.fless.rcList
+                        If rc.contour.Count = 0 Then Continue For
+                        DrawContours(dst2(rc.rect), {rc.contour}, 0, task.scalarColors(rc.ID), -1)
+                        DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth)
+                    Next
+
+                    For Each pt In ptList
+                        Circle(dst2, pt, task.DotSize, white, -1)
+                    Next
+
+                    dst3 = task.depthRGB.Clone
+                End If
             End If
-
         End Sub
     End Class
 
