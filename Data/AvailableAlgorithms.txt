@@ -623,11 +623,12 @@ RedC_NeighborHist
 RedC_Neighbors
 RedCloud_Basics
 RedCloud_CellHistogram
-RedCloud_CellHistogramNew
+RedCloud_CellHistogramOld
 RedCloud_Core
 RedCloud_Delaunay
 RedCloud_Features
 RedColor_Basics
+RedColor_CellHistogram
 RedColor_MapHoles
 RedPrep_Basics
 RedPrep_Core
@@ -1613,6 +1614,7 @@ XR_RedC_Sizes
 XR_RedC_Smoothing
 XR_RedC_SteadyCam
 XR_RedC_TrackHull
+XR_RedCloud_CellHistogram
 XR_RedCloud_KNN
 XR_RedCloud_LeftRight
 XR_RedCloud_Matches

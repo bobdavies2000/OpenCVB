@@ -1,3 +1,5 @@
+Imports System.Buffers
+Imports System.Diagnostics.Metrics
 Imports System.Windows.Documents
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
@@ -464,12 +466,13 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellHistogram : Inherits TaskParent
+    Public Class RedCloud_CellHistogramOld : Inherits TaskParent
         Dim plot As New PlotBar_Basics
         Dim redC As New RedC_Core
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             plot.createHistogram = True
+            plot.removeZeroEntry = True
             desc = "Display the histogram of the RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -503,32 +506,78 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellHistogramNew : Inherits TaskParent
+    Public Class XR_RedCloud_CellHistogram : Inherits TaskParent
         Dim plot As New PlotBar_Basics
         Dim redC As New RedCloud_Basics
         Public Sub New()
-            task.gOptions.setHistogramBins(100)
-            plot.createHistogram = True
             desc = "Display the histogram of the RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             redC.Run(src)
-            dst2 = redC.dst2
             labels(2) = redC.labels(2)
 
-            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            Dim depths(redC.rcList.Count - 1) As Single
+            For i = 1 To redC.rcList.Count - 1
+                depths(i) = redC.rcList(i).depth
+            Next
+            Dim depthMat = Mat.FromPixelData(depths.Length, 1, MatType.CV_32F, depths)
+
+            Dim histogram As New Mat
+            Dim ranges = {New Rangef(0, task.MaxZmeters)}
+            CalcHist({depthMat}, {0}, New Mat, histogram, 1, {task.histogramBins}, ranges)
+
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
-            plot.Run(depth)
-            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
+            plot.Run(histogram)
+            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0)
 
-            Dim incr = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters - 1)
-                Dim x = incr * i
-                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
-            Next
             dst3 = plot.dst2
+
+            For Each rc In redC.rcList
+                If rc.ID = 0 Then Continue For
+
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_CellHistogram : Inherits TaskParent
+        Dim redC As New RedCloud_Basics
+        Dim redColor As New RedColor_Basics
+        Public Sub New()
+            desc = "Display the histogram of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                redColor.Run(src)
+
+                redC.Run(src)
+                labels(2) = redC.labels(2)
+
+                Dim depths As New List(Of Single)
+                For Each rc In redC.rcList
+                    depths.Add(rc.depth)
+                Next
+
+                Dim maxval = depths.Max
+                Static maxDepth = Math.Ceiling(maxval)
+                maxDepth = Math.Ceiling(maxval)
+                For Each rc In redC.rcList
+                    rc.ID = Math.Floor(task.histogramBins * rc.depth / maxDepth)
+                Next
+
+                redC.rcMap.SetTo(0)
+                For Each rc In redC.rcList
+                    If rc.ID = 0 Then Continue For
+                    DrawContours(redC.rcMap(rc.rect), {rc.contour}, 0, New cv.Scalar(rc.ID), -1)
+                Next
+
+                dst2 = ApplyPalette(redC.rcMap, 0)
+            End If
         End Sub
     End Class
 End Namespace

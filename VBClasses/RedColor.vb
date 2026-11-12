@@ -378,4 +378,41 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class RedColor_CellHistogram : Inherits TaskParent
+        Dim redColor As New RedColor_Basics
+        Public Sub New()
+            desc = "Display the histogram of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                redColor.Run(src)
+
+                Dim depths As New List(Of Single)
+                For Each rc In redColor.rcList
+                    depths.Add(rc.depth)
+                Next
+
+                Dim maxval = depths.Max
+                Static maxDepth = Math.Ceiling(maxval)
+                maxDepth = Math.Ceiling(maxval)
+                For Each rc In redColor.rcList
+                    rc.ID = Math.Floor(task.histogramBins * rc.depth / maxDepth) + 1
+                Next
+
+                redColor.rcMap.SetTo(0)
+                For Each rc In redColor.rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    DrawContours(redColor.rcMap(rc.rect), {rc.contour}, 0, New cv.Scalar(rc.ID), -1)
+                    SetTrueText(CStr(rc.index), rc.maxDist)
+                Next
+
+                dst2 = ApplyPalette(redColor.rcMap, 0)
+            End If
+        End Sub
+    End Class
 End Namespace
