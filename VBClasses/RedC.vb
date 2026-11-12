@@ -364,7 +364,7 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
 
             If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -380,7 +380,7 @@ Namespace VBClasses
 
 
     Public Class RedC_CellLines : Inherits TaskParent
-        Dim redC As New XR_RedC_Core
+        Dim redC As New RedC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Find any lines connected to a cell contour."
@@ -421,7 +421,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedC_DepthMerge : Inherits TaskParent
-        Public redC As New XR_RedC_Core
+        Public redC As New RedC_Core
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             labels(3) = "rcMap version of cells"
@@ -529,7 +529,7 @@ Namespace VBClasses
             Next
 
             Dim mm = cellDepthRange(task.rcD)
-            strOut = XR_RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            strOut = RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             SetTrueText(strOut + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m" + vbCrLf +
                         "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
                         mm.maxVal.ToString(fmt2) + "m", 1)
@@ -547,7 +547,7 @@ Namespace VBClasses
 
     Public Class RedC_Features : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New XR_RedC_Core
+        Dim redC As New RedC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -652,7 +652,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -677,7 +677,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_Core : Inherits TaskParent
+    Public Class RedC_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -712,25 +712,22 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, task.redColor.rcList.Count)}
             Dim histogram As New Mat
 
-            Dim rcFLess = New List(Of rcData)(task.fless.rcList)
             Dim rcOwner(task.redColor.rcList.Count - 1) As Integer
             Dim histArray() As Single = Nothing
 
-            For Each rc In rcFLess
+            For Each rc In task.fless.rcList
                 If rc.ID = 0 Then Continue For
 
                 CalcHist({task.redColor.rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, {task.redColor.rcList.Count}, ranges)
                 histogram.GetArray(Of Single)(histArray)
 
                 For i = 1 To histArray.Length - 1
-                    If histArray(i) > 0 And rcOwner(i) = 0 Then
-                        rcOwner(i) = rc.ID
-                    End If
+                    If histArray(i) > 0 And rcOwner(i) = 0 Then rcOwner(i) = rc.ID
                 Next
             Next
 
             rcMap.SetTo(0)
-            For Each rc In rcFLess
+            For Each rc In task.fless.rcList
                 If rc.ID = 0 Then Continue For
                 For i = 1 To task.redColor.rcList.Count - 1
                     If rcOwner(i) = 0 Then Continue For
@@ -744,7 +741,8 @@ Namespace VBClasses
 
             ' update all the rc.mask's with the merged cells.
             rcList.Clear()
-            For Each rc In rcFLess
+            rcList.Add(New rcData) ' placeholder for zero...
+            For Each rc In task.fless.rcList
                 If rc.ID = 0 Then Continue For
                 InRange(rcMap(rc.rect), rc.ID, rc.ID, rc.mask)
                 rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxSimple)

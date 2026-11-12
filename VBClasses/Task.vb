@@ -99,7 +99,7 @@ Namespace VBClasses
 
 
 
-            If task.needtoRunAlgorithm Then
+            If task.needtoRunAlgorithm or task.cpu.displayObjectIndex < 0 Then
                 task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             Else
                 If task.cpu.displayObjectName = task.Settings.algorithm Then
@@ -113,7 +113,7 @@ Namespace VBClasses
 
 
 
-            If task.cpu.displayObjectName <> displayObject.traceName Then
+            If task.cpu.displayObjectName <> displayObject.traceName And task.cpu.displayObjectIndex >= 0 Then
                 displayObject = cpu.activeObjects(task.cpu.displayObjectIndex)
             End If
 

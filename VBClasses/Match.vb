@@ -743,7 +743,7 @@ Namespace VBClasses
             task.rcD = findCell(redColor.rcList, clickIndex)
             If task.rcD Is Nothing Then task.rcD = redColor.rcList(1)
 
-            SetTrueText(XR_RedC_Core.displayCell(redColor.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
+            SetTrueText(RedC_Core.displayCell(redColor.rcList, clickIndex) + vbCrLf + "tracking: " + task.clickPoint.ToString +
                         vbCrLf + "Tracking cell " + CStr(clickIndex), 1)
 
             Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)

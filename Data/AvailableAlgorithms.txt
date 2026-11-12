@@ -615,12 +615,15 @@ Rectangle_Rotated
 RedC_Basics
 RedC_BasicsOld
 RedC_CellLines
+RedC_Core
 RedC_Depth
 RedC_Features
 RedC_FloodToRC
 RedC_NeighborHist
 RedC_Neighbors
 RedCloud_Basics
+RedCloud_CellHistogram
+RedCloud_CellHistogramNew
 RedCloud_Core
 RedCloud_Delaunay
 RedCloud_Features
@@ -1598,9 +1601,7 @@ XR_Rectangle_MultiOverlap
 XR_Rectangle_Overlap
 XR_Rectangle_Union
 XR_RecursiveBilateralFilter_CPP
-XR_RedC_CellDepthHistogram
 XR_RedC_CellMerge1
-XR_RedC_Core
 XR_RedC_CoreOld
 XR_RedC_DepthMerge
 XR_RedC_FeatureLessTestSingle

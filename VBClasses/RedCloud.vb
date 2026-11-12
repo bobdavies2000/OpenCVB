@@ -37,14 +37,14 @@ Namespace VBClasses
             For Each rc In redCore.rcList
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
-                rc.ID = dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count
                 If rc.pixels < task.minCellSize Then Continue For
                 rcList.Add(rc)
-
-                dst2(rc.rect).SetTo(task.scalarColors(rc.ID), rc.mask)
             Next
+
+            dst2 = ApplyPalette(rcMap, 0)
 
             If rcList.Count >= 255 Then
                 MsgBox("RedCloud_Basics has exceeded the 8-bit max.  Increase task.minCellSize?")
@@ -116,49 +116,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-
-
-
-
-    Public Class XR_RedC_CellDepthHistogram : Inherits TaskParent
-        Dim plot As New PlotBar_Basics
-        Dim redC As New XR_RedC_Core
-        Public Sub New()
-            task.gOptions.setHistogramBins(100)
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            plot.createHistogram = True
-            desc = "Display the histogram of a selected RedCloud cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-            If task.rcD Is Nothing Then Exit Sub
-
-            SetTrueText(redC.strOut, 1)
-
-            labels(3) = "Select a RedCloud cell to see the histogram"
-
-            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
-            plot.minRange = 0
-            plot.maxRange = task.MaxZmeters
-            plot.Run(depth)
-            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
-
-            Dim incr = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters - 1)
-                Dim x = incr * i
-                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
-            Next
-            dst3 = plot.dst2
-        End Sub
-    End Class
 
 
 
@@ -477,22 +434,101 @@ Namespace VBClasses
                         FillConvexPoly(rcMap, facetList(i), index, LineTypes.Link4)
                     Next
 
-                    dst2 = ApplyPalette(rcMap, 0)
-
-                    For Each rc In task.fless.rcList
+                    For Each rc In redC.rcList
                         If rc.contour.Count = 0 Then Continue For
                         DrawContours(dst2(rc.rect), {rc.contour}, 0, task.scalarColors(rc.ID), -1)
+                        rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        DrawContours(rcMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
                         DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth)
                     Next
+                    rcMap.SetTo(0, task.edges.dst2)
+
+                    dst2 = ApplyPalette(rcMap, 0)
+
+                    'For Each rc In redC.rcList
+                    '    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth)
+                    'Next
 
                     For Each pt In ptList
                         Circle(dst2, pt, task.DotSize, white, -1)
                     Next
 
-                    dst3 = task.depthRGB.Clone
+                    dst3 = redC.dst2
                 End If
             End If
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class RedCloud_CellHistogram : Inherits TaskParent
+        Dim plot As New PlotBar_Basics
+        Dim redC As New RedC_Core
+        Public Sub New()
+            task.gOptions.setHistogramBins(100)
+            plot.createHistogram = True
+            desc = "Display the histogram of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            If task.rcD Is Nothing Then Exit Sub
+
+            SetTrueText(redC.strOut, 1)
+
+            labels(3) = "Select a RedCloud cell to see the histogram"
+
+            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            plot.minRange = 0
+            plot.maxRange = task.MaxZmeters
+            plot.Run(depth)
+            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
+
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
+                Dim x = incr * i
+                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
+            Next
+            dst3 = plot.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_CellHistogramNew : Inherits TaskParent
+        Dim plot As New PlotBar_Basics
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            task.gOptions.setHistogramBins(100)
+            plot.createHistogram = True
+            desc = "Display the histogram of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            plot.minRange = 0
+            plot.maxRange = task.MaxZmeters
+            plot.Run(depth)
+            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
+
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
+                Dim x = incr * i
+                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
+            Next
+            dst3 = plot.dst2
+        End Sub
+    End Class
 End Namespace

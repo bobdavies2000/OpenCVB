@@ -141,7 +141,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(XR_RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
