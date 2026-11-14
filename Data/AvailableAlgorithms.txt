@@ -630,8 +630,8 @@ RedColor_Basics
 RedColor_CellHistogram
 RedColor_MapHoles
 RedPrep_Basics
+RedPrep_BasicsNew
 RedPrep_Core
-RedPrep_CoreTest
 RedPrep_Edges_CPP
 Reduction_Basics
 Reduction_BasicsParmInput

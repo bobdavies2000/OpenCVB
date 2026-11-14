@@ -1,6 +1,34 @@
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
+    Public Class RedPrep_BasicsNew : Inherits TaskParent
+        Public Const wcMinVal As Single = -1000
+        Public Const wcMaxVal As Single = 1000
+        Public Sub New()
+            desc = "Reduction transform for the cv.Point cloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim reduction = task.fOptions.ReductionDepth.Value
+            Dim depthClasses As New cv.Mat
+            task.pcSplit(2).ConvertTo(depthClasses, MatType.CV_32S, 1000 / reduction)
+
+            Dim reduced32s As cv.Mat = depthClasses * reduction
+
+            dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
+            Normalize(dst2, dst2, 255, 0, cv.NormTypes.MinMax)
+            dst2.SetTo(0, task.noDepthMask)
+
+            labels(2) = "Using reduction amount = " + CStr(reduction)
+
+            dst2.ConvertTo(dst1, cv.MatType.CV_8U)
+            dst3 = ApplyPalette(dst2, 0)
+        End Sub
+    End Class
+
+
+
+
+
     Public Class RedPrep_Basics : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
@@ -109,8 +137,6 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Core : Inherits TaskParent
-        Public options As New Options_RedPrep
-        Public reduced32s As New Mat
         Public reduced32f As New Mat
         Public presetReductionName As String = ""
         Public Const wcMinVal As Single = -1000
@@ -119,8 +145,6 @@ Namespace VBClasses
             desc = "Reduction transform for the cv.Point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             Dim reduction = task.fOptions.ReductionDepth.Value
             Dim split() = {New Mat, New Mat, New Mat}
             task.pcSplit(0).ConvertTo(split(0), MatType.CV_32S, 1000 / reduction)
@@ -129,61 +153,7 @@ Namespace VBClasses
 
             If presetReductionName <> "" Then task.reductionName = presetReductionName
 
-            Select Case task.reductionName
-                Case "X Reduction"
-                    reduced32s = split(0) * reduction
-                Case "Y Reduction"
-                    reduced32s = split(1) * reduction
-                Case "Z Reduction"
-                    reduced32s = split(2) * reduction
-                Case "XY Reduction"
-                    reduced32s = (split(0) + split(1)) * reduction
-                Case "XZ Reduction"
-                    reduced32s = (split(0) + split(2)) * reduction
-                Case "YZ Reduction"
-                    reduced32s = (split(1) + split(2)) * reduction
-                Case "XYZ Reduction"
-                    reduced32s = (split(0) + split(1) + split(2)) * reduction
-            End Select
-
-            reduced32s.ConvertTo(reduced32f, MatType.CV_32F)
-
-            ' everything gets slammed between -1000 and 1000.  Good idea? I dunno...
-            dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
-            Normalize(dst2, dst2, 255, 0, cv.NormTypes.MinMax)
-            dst2.SetTo(0, task.noDepthMask)
-
-            labels(2) = "Using reduction amount = " + CStr(reduction)
-
-            dst2.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst3 = ApplyPalette(dst2, 0)
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedPrep_CoreTest : Inherits TaskParent
-        Public options As New Options_RedPrep
-        Public reduced32s As New Mat
-        Public reduced32f As New Mat
-        Public presetReductionName As String = ""
-        Public Const wcMinVal As Single = -1000
-        Public Const wcMaxVal As Single = 1000
-        Public Sub New()
-            desc = "Reduction transform for the cv.Point cloud"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Dim reduction = task.fOptions.ReductionDepth.Value
-            Dim split() = {New Mat, New Mat, New Mat}
-            task.pcSplit(0).ConvertTo(split(0), MatType.CV_32S, 1000 / reduction)
-            task.pcSplit(1).ConvertTo(split(1), MatType.CV_32S, 1000 / reduction)
-            task.pcSplit(2).ConvertTo(split(2), MatType.CV_32S, 1000 / reduction)
-
-            If presetReductionName <> "" Then task.reductionName = presetReductionName
-
+            Dim reduced32s As New Mat
             Select Case task.reductionName
                 Case "X Reduction"
                     reduced32s = split(0) * reduction
