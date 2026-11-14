@@ -1,5 +1,7 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedPrep_BasicsNew : Inherits TaskParent
         Public Const wcMinVal As Single = -1000
@@ -14,14 +16,23 @@ Namespace VBClasses
 
             Dim reduced32s As cv.Mat = depthClasses * reduction
 
-            dst2 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
-            Normalize(dst2, dst2, 255, 0, cv.NormTypes.MinMax)
-            dst2.SetTo(0, task.noDepthMask)
+            dst1 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
+            Normalize(dst1, dst1, 255, 0, cv.NormTypes.MinMax)
+            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
+            If task.drawRect.Width > 0 Then
+                Dim histogram As New cv.Mat
+                CalcHist({dst1(task.drawRect)}, {0}, New Mat(), histogram, 1, {task.histogramBins, task.histogramBins}, task.rangesBGR)
+                Dim histArray(0) As Single
+                histogram.GetArray(Of Single)(histArray)
+                Dim mm = GetMinMax(dst1(task.drawRect))
+                Dim k = 0
+                'dst1.ConvertTo(dst3, cv.MatType.CV_8U)
+                'Threshold(dst3, dst3, 250, 0, cv.ThresholdTypes.BinaryInv)
+            End If
             labels(2) = "Using reduction amount = " + CStr(reduction)
 
-            dst2.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst3 = ApplyPalette(dst2, 0)
+            dst2 = ApplyPalette(dst1, 0)
         End Sub
     End Class
 

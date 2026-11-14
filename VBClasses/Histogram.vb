@@ -8,7 +8,7 @@ Namespace VBClasses
         Public plotHist As New PlotBar_Basics
         Public ranges() As Rangef
 
-        Public histArray() As Single
+        Public histArray(0) As Single
         Public fixedRanges() As Rangef
         Public bins As Integer
         Public autoDisplay As Boolean
@@ -42,7 +42,6 @@ Namespace VBClasses
                 CalcHist({src}, {splitIndex}, histMask, histogram, 1, {bins}, ranges)
             End If
 
-            ReDim histArray(histogram.Total - 1)
             histogram.GetArray(Of Single)(histArray)
 
             plotHist.Run(histogram)
@@ -1136,7 +1135,7 @@ Namespace VBClasses
 
     Public Class Histogram_DepthSimple : Inherits TaskParent
         Public histList As New List(Of Single)
-        Public histArray() As Single
+        Public histArray(0) As Single
         Public histogram As New Mat
         Dim plotHist As New PlotBar_Basics
         Dim mm As mmData
@@ -1145,6 +1144,7 @@ Namespace VBClasses
         Public Sub New()
             labels(2) = "Histogram of depth from 0 to maxZMeters."
             plotHist.addLabels = False
+            plotHist.removeZeroEntry = True
             desc = "Use Kalman to smooth the histogram sharedResults.images.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1155,7 +1155,6 @@ Namespace VBClasses
             End If
 
             CalcHist({task.pcSplit(2)}, {0}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
-            ReDim histArray(histogram.Total - 1)
             histogram.GetArray(Of Single)(histArray)
 
             If standaloneTest() Then
@@ -1242,7 +1241,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone And src.Channels = 3 Then src = task.gray
             Dim mm = GetMinMax(src)
-            ReDim histarray(mm.maxVal)
             If mm.maxVal > 0 Then
                 CalcHist({src}, {0}, mask, histogram, 1, {mm.maxVal + 1}, New Rangef() {New Rangef(0, mm.maxVal + 1)})
                 If histogram.Rows > 0 Then

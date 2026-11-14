@@ -164,7 +164,7 @@ Namespace VBClasses
                 Static randslider = OptionParent.FindSlider("Random Pixel Count")
                 If task.firstPass Then randslider.Value = 50
                 If randslider.Value < k Then randslider.Value = k
-                if heartbeatx() then  random.Run(src)
+                If heartbeatx() Then random.Run(src)
 
                 Dim input As New List(Of Single)
                 For Each pt In random.PointList
@@ -328,7 +328,7 @@ Namespace VBClasses
                 masks.Add(mask)
                 counts.Add(CountNonZero(mask))
             Next
-            if heartbeatx() then  maskIndex += 1
+            If heartbeatx() Then maskIndex += 1
             If maskIndex >= masks.Count Then maskIndex = 0
             dst3 = masks(maskIndex)
         End Sub
@@ -496,7 +496,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
-            if heartbeatx() then 
+            If heartbeatx() Then
                 plot1D.Run(src)
                 dst3 = plot1D.dst2
                 labels(3) = "The 3D histogram of the RGB image stream in 1D - note the number of gaps"
@@ -509,38 +509,6 @@ Namespace VBClasses
             CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.rangesBGR)
 
             dst2 = ApplyPalette(dst1)
-            labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class XR_KMeans_SimKDepth : Inherits TaskParent
-        Dim plot1D As New Hist3Dcloud_PlotHist1D
-        Dim simK As New Hist3D_BuildHistogram
-        Public classCount As Integer
-        Public Sub New()
-            desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the task.results.."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
-            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-            if heartbeatx() then 
-                plot1D.Run(src)
-                dst3 = plot1D.dst2
-                labels(3) = "The 3D histogram of the depth stream in 1D"
-
-                simK.Run(plot1D.histogram)
-                plot1D.histogram = simK.dst2
-                classCount = simK.classCount
-            End If
-            CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
-            ConvertScaleAbs(dst1, dst1)
-
-            dst2 = ApplyPalette(dst1)
-
             labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
         End Sub
     End Class

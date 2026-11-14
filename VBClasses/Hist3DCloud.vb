@@ -143,7 +143,7 @@ Namespace VBClasses
             Marshal.Copy(samples, 0, histogram.Data, samples.Length)
             CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
 
-            if heartbeatx() then  maskval += 1
+            If heartbeatX() Then maskval += 1
 
             If sortedHist.ElementAt(maskval).Key = 0 Then maskval = 0
             Dim index = sortedHist.ElementAt(maskval).Value
@@ -191,39 +191,6 @@ Namespace VBClasses
             dst2.SetTo(0, task.noDepthMask)
             dst3.SetTo(0)
             task.pointCloud.CopyTo(dst3, dst2)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-    Public Class Hist3Dcloud_PlotHist1D : Inherits TaskParent
-        Dim hcloud As New Hist3Dcloud_Basics
-        Dim plotHist As New PlotBar_Basics
-        Public histogram As Mat
-        Public histArray() As Single
-        Dim simK As New Hist3D_BuildHistogram
-        Public Sub New()
-            plotHist.removeZeroEntry = False
-            labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
-            desc = "Present the 3D histogram as a typical histogram bar chart."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> MatType.CV_32FC3 Then src = task.pointCloud
-            hcloud.Run(src)
-            ReDim histArray(hcloud.histogram.Total - 1)
-            Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
-
-            histogram = Mat.FromPixelData(histArray.Length, 1, MatType.CV_32F, histArray)
-            plotHist.Run(histogram)
-            dst2 = plotHist.dst2
-
-            simK.Run(histogram)
-            labels(3) = simK.labels(2)
         End Sub
     End Class
 End Namespace

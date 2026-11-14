@@ -2,7 +2,7 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class PlotBar_Basics : Inherits TaskParent
         Public histogram As New Mat
-        Public histArray() As Single
+        Public histArray(0) As Single
         Public minRange As Single
         Public maxRange As Single
         Public ranges() As Rangef
@@ -47,13 +47,11 @@ Namespace VBClasses
             Dim incr = 255 / histogram.Cols
             Dim maxIndex As Integer = histogram.Cols
             If histogram.Cols = 1 Then
-                ReDim histArray(histogram.Rows - 1)
                 barWidth = dst2.Width / histogram.Rows
                 plotCenter = barWidth * histogram.Rows / 2 + barWidth / 2
                 incr = 255 / histogram.Rows
                 maxIndex = histogram.Rows
             Else
-                ReDim histArray(histogram.Cols - 1)
                 barWidth = dst2.Width / histogram.Cols
                 plotCenter = barWidth * histogram.Cols / 2 + barWidth / 2
             End If

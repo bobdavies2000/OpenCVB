@@ -77,7 +77,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New Mat
-            Dim histarray(edgeLine.rcList.Count - 1) As Single
+            Dim histarray(0) As Single
             If task.motion.motionSort.Count = 0 Then Exit Sub ' no change!
 
             Dim newList As New List(Of rcData)
@@ -102,7 +102,6 @@ Namespace VBClasses
 
             edgeLine.Run(src)
             If edgeLine.classCount = 0 Then Exit Sub
-            ReDim histarray(edgeLine.classCount - 1)
 
             Dim ranges2 = New Rangef() {New Rangef(0, edgeLine.classCount)}
             CalcHist({edgeLine.dst2}, {0}, task.motion.motionMask, histogram,

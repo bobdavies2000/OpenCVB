@@ -119,7 +119,7 @@ Namespace VBClasses
         Public hist As New Histogram_Basics
         Public options As New Options_Boundary
         Public peaks As New List(Of Integer)
-        Public histArray() As Single
+        Public histArray(0) As Single
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             OptionParent.FindSlider("Desired boundary count").Value = 5
@@ -134,10 +134,8 @@ Namespace VBClasses
                 src = task.pcSplit(2)
                 hist.Run(src)
                 dst2 = hist.dst2
-                ReDim histArray(hist.histogram.Rows - 1)
                 hist.histogram.GetArray(Of Single)(histArray)
             Else
-                ReDim histArray(src.Rows - 1)
                 src.GetArray(Of Single)(histArray)
             End If
 
@@ -656,7 +654,7 @@ Namespace VBClasses
                 dst2 = plot.dst2
             End If
 
-            Dim histArray(histogram.Total - 1) As Single
+            Dim histArray(0) As Single
             histogram.GetArray(Of Single)(histArray)
 
             Dim histList = histArray.ToList()
@@ -683,11 +681,9 @@ Namespace VBClasses
                 Dim y = dst2.Height * (maxVal - threshold) / maxVal
                 Line(dst2, New cv.Point(0, y), New cv.Point(dst2.Width, y), Scalar.White, task.lineWidth)
             End If
-            If heartbeatx() then  strOut = CStr(classCount) + " depth classes were found - " +
+            If heartbeatx() Then strOut = CStr(classCount) + " depth classes were found - " +
                                             "marked by vertical lines."
             SetTrueText(strOut, 3)
-
-            ReDim histArray(0)
         End Sub
     End Class
 End Namespace

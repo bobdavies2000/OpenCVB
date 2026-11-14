@@ -307,7 +307,6 @@ Hist3D_Basics
 Hist3D_BuildHistogram
 Hist3D_Pixel
 Hist3Dcloud_Basics
-Hist3Dcloud_PlotHist1D
 Hist3Dcolor_Basics
 Hist3Dcolor_PlotHist1D
 Hist3Dcolor_TopXColors
@@ -1376,7 +1375,6 @@ XR_KMeans_Fuzzy
 XR_KMeans_k2_to_k8
 XR_KMeans_MultiGaussian_CPP
 XR_KMeans_SimKColor
-XR_KMeans_SimKDepth
 XR_KMeans_Simple_CPP
 XR_KMeans_Valleys
 XR_KNN_Grid
