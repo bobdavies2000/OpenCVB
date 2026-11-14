@@ -4,8 +4,6 @@ Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedPrep_BasicsNew : Inherits TaskParent
-        Public Const wcMinVal As Single = -1000
-        Public Const wcMaxVal As Single = 1000
         Public Sub New()
             desc = "Reduction transform for the cv.Point cloud"
         End Sub
@@ -16,20 +14,20 @@ Namespace VBClasses
 
             Dim reduced32s As cv.Mat = depthClasses * reduction
 
+            Const wcMinVal As Single = -1000
+            Const wcMaxVal As Single = 1000
             dst1 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
             Normalize(dst1, dst1, 255, 0, cv.NormTypes.MinMax)
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
 
-            If task.drawRect.Width > 0 Then
+            If standalone Then
                 Dim histogram As New cv.Mat
-                CalcHist({dst1(task.drawRect)}, {0}, New Mat(), histogram, 1, {task.histogramBins, task.histogramBins}, task.rangesBGR)
+                CalcHist({dst1}, {0}, New Mat(), histogram, 1, {task.histogramBins, task.histogramBins}, task.rangesBGR)
                 Dim histArray(0) As Single
                 histogram.GetArray(Of Single)(histArray)
-                Dim mm = GetMinMax(dst1(task.drawRect))
-                Dim k = 0
-                'dst1.ConvertTo(dst3, cv.MatType.CV_8U)
-                'Threshold(dst3, dst3, 250, 0, cv.ThresholdTypes.BinaryInv)
+                Dim mm = GetMinMax(dst1)
             End If
+
             labels(2) = "Using reduction amount = " + CStr(reduction)
 
             dst2 = ApplyPalette(dst1, 0)

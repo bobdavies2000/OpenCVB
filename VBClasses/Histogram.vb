@@ -1151,10 +1151,10 @@ Namespace VBClasses
             If standaloneTest() Then
                 mm = GetMinMax(task.pcSplit(2))
                 If mm.minVal = mm.maxVal Then Exit Sub
-                ranges = {New Rangef(mm.minVal, mm.maxVal)}
+                ranges = {New Rangef(mm.minVal, Math.Min(task.MaxZmeters, mm.maxVal))}
             End If
 
-            CalcHist({task.pcSplit(2)}, {0}, inputOnlyMask, histogram, 1, {task.histogramBins}, ranges)
+            CalcHist({task.pcSplit(2)}, {0}, inputOnlyMask, histogram, 1, {255}, ranges)
             histogram.GetArray(Of Single)(histArray)
 
             If standaloneTest() Then
