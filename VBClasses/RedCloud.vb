@@ -1,9 +1,4 @@
-Imports System.Buffers
-Imports System.Diagnostics.Metrics
-Imports System.Windows.Documents
-Imports OpenCvSharp
-Imports OpenCvSharp.Cv2
-Imports cv = OpenCvSharp
+Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redCore As New RedCloud_Core
@@ -14,7 +9,6 @@ Namespace VBClasses
         Public runSelectCell As Boolean = True
         Public Sub New()
             reduction.reductionFactor = 50
-            'task.gOptions.stableDepthRGB.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -438,17 +432,17 @@ Namespace VBClasses
 
                     For Each rc In redC.rcList
                         If rc.contour.Count = 0 Then Continue For
-                        DrawContours(dst2(rc.rect), {rc.contour}, 0, task.scalarColors(rc.ID), -1)
+                        DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.ID), -1)
                         rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                        DrawContours(rcMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
-                        DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth)
+                        DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
+                        DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth)
                     Next
                     rcMap.SetTo(0, task.edges.dst2)
 
                     dst2 = ApplyPalette(rcMap, 0)
 
                     'For Each rc In redC.rcList
-                    '    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth)
+                    '    DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth)
                     'Next
 
                     For Each pt In ptList
@@ -466,7 +460,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellHistogramOld : Inherits TaskParent
+    Public Class XR_RedCloud_CellHistogram2 : Inherits TaskParent
         Dim plot As New PlotBar_Basics
         Dim redC As New RedC_Core
         Public Sub New()
@@ -506,7 +500,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedCloud_CellHistogram : Inherits TaskParent
+    Public Class XR_RedCloud_CellHistogram1 : Inherits TaskParent
         Dim plot As New PlotBar_Basics
         Dim redC As New RedCloud_Basics
         Public Sub New()
@@ -518,7 +512,7 @@ Namespace VBClasses
 
             Dim depths(redC.rcList.Count - 1) As Single
             For i = 1 To redC.rcList.Count - 1
-                depths(i) = redC.rcList(i).depth
+                depths(i) = redC.rcList(i).depthAvg
             Next
             Dim depthMat = Mat.FromPixelData(depths.Length, 1, MatType.CV_32F, depths)
 
@@ -545,7 +539,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellHistogram : Inherits TaskParent
+    Public Class XR_RedCloud_CellHistogram : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim redColor As New RedColor_Basics
         Public Sub New()
@@ -560,23 +554,67 @@ Namespace VBClasses
 
                 Dim depths As New List(Of Single)
                 For Each rc In redC.rcList
-                    depths.Add(rc.depth)
+                    depths.Add(rc.depthAvg)
                 Next
 
                 Dim maxval = depths.Max
                 Static maxDepth = Math.Ceiling(maxval)
                 maxDepth = Math.Ceiling(maxval)
                 For Each rc In redC.rcList
-                    rc.ID = Math.Floor(task.histogramBins * rc.depth / maxDepth)
+                    rc.ID = Math.Floor(task.histogramBins * rc.depthAvg / maxDepth)
                 Next
 
                 redC.rcMap.SetTo(0)
                 For Each rc In redC.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawContours(redC.rcMap(rc.rect), {rc.contour}, 0, New cv.Scalar(rc.ID), -1)
+                    DrawTour(redC.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
                 Next
 
                 dst2 = ApplyPalette(redC.rcMap, 0)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedCloud_TierRanges : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Dim redC As New RedCloud_Basics
+        Public Sub New()
+            task.gOptions.HistBinBar.Value = 32
+            desc = "Identify the ranges of the different layers of depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Then
+                redC.Run(src)
+                labels(2) = redC.labels(2)
+
+                Dim depths As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+                Dim maxDepth As Single
+                For Each rc In redC.rcList
+                    depths.Add(rc.depthMin, rc.index)
+                    If maxDepth < rc.depthMax Then maxDepth = rc.depthMax
+                Next
+
+                Dim usedTiers As New List(Of Integer)
+                For Each index In depths.Values
+                    Dim rc = redC.rcList(index)
+                    If rc.ID = 0 Then Continue For
+                    Dim ID = Math.Floor(task.histogramBins * rc.depthAvg / Math.Ceiling(maxDepth)) + 1
+                    redC.rcList(index).ID = ID
+                    If usedTiers.Contains(ID) = False Then usedTiers.Add(ID)
+                Next
+
+                redC.rcMap.SetTo(0)
+                For Each rc In redC.rcList
+                    If rc.ID = 0 Then Continue For
+                    DrawTour(redC.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
+                Next
+                dst2 = ApplyPalette(redC.rcMap, 0)
+                labels(3) = CStr(usedTiers.Count) + " depth tiers"
             End If
         End Sub
     End Class

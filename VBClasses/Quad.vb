@@ -169,11 +169,11 @@ Namespace VBClasses
                 If index >= hulls.rclist.Count Then Continue For
                 Dim rc = hulls.rclist(index)
 
-                If rc.depth = 0 Then Continue For
+                If rc.depthAvg = 0 Then Continue For
 
                 If colorList(i) <> task.scalarColors(rc.ID Mod 255) Then depthList(i).Clear()
 
-                depthList(i).Add(rc.depth)
+                depthList(i).Add(rc.depthAvg)
                 colorList(i) = task.scalarColors(rc.ID Mod 255)
 
                 If depthList(i).Count > 0 Then
@@ -244,7 +244,7 @@ Namespace VBClasses
                 If index > 0 And index < task.redColor.rcList.Count Then
                     MinMaxLoc(task.pcSplit(2)(gRect), depthMin, depthMax, minLoc, maxLoc, task.depthmask(gRect))
                     Dim rc = task.redColor.rcList(index - 1)
-                    depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
+                    depthMin = If(depthMax > rc.depthAvg, rc.depthAvg, depthMin)
 
                     If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then
                         depthMinList(i).Add(depthMin)

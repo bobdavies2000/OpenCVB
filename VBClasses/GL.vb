@@ -853,7 +853,7 @@ Namespace VBClasses
                 Next
             End If
             If z0 <= 0 AndAlso count > 0 Then z0 = CSng(sum / count)
-            If z0 <= 0 AndAlso rc.depth > 0 AndAlso Single.IsFinite(rc.depth) Then z0 = rc.depth
+            If z0 <= 0 AndAlso rc.depthAvg > 0 AndAlso Single.IsFinite(rc.depthAvg) Then z0 = rc.depthAvg
             If z0 <= 0 Then Return (0, 0, 0)
             If count = 0 Then
                 lo = z0

@@ -1367,15 +1367,12 @@ Namespace VBClasses
         Dim grid As New Grid_Basics
         Public histogram As New Mat
         Public histArray() As Single
-        Dim options As New Options_PrepData
         Public Sub New()
             task.gOptions.setHistogramBins(9)
             labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
             desc = "Create a 2D histogram of the cv.Point cloud data - which 2D inputs is in options."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             Select Case task.reductionName
                 Case "X Reduction", "Y Reduction", "Z Reduction"
                     CalcHist({task.pointCloud}, task.channels, New Mat(), histogram,

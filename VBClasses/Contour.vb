@@ -1052,7 +1052,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For i = 0 To rcLpList.Count - 1
                 Line(dst3, rcLpList(i).lp.p1, rcLpList(i).lp.p2, task.highlight, task.lineWidth)
-                DrawContours(dst3, {rcLpList(i).rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst3, rcLpList(i).rc.contour, task.highlight, task.lineWidth, task.lineType)
             Next
             labels(3) = CStr(rcLpList.Count) + " contour/line connections"
 
@@ -1062,7 +1062,7 @@ Namespace VBClasses
                 If index < rcLpList.Count Then
                     Dim rc = rcLpList(index).rc
                     Dim lp = rcLpList(index).lp
-                    DrawContours(dst1, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    DrawTour(dst1, rc.contour, white, task.lineWidth, task.lineType)
                     Line(dst1, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
                     strOut = rc.displayCell
                 Else
@@ -1092,7 +1092,7 @@ Namespace VBClasses
 
             dst0.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst0, {rc.contour}, 0, rc.ID, task.lineWidth, task.lineType)
+                DrawTour(dst0, rc.contour, rc.ID, task.lineWidth, task.lineType)
             Next
 
             rcLpList.Clear()
@@ -1124,7 +1124,7 @@ Namespace VBClasses
                 If index < rcLpList.Count Then
                     Dim rc = rcLpList(index).rc
                     Dim lp = rcLpList(index).lp
-                    DrawContours(dst3, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    DrawTour(dst3, rc.contour, white, task.lineWidth, task.lineType)
                     Line(dst3, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
                     strOut = rc.displayCell
                 Else
@@ -1156,13 +1156,13 @@ Namespace VBClasses
             ' Build a CV_8U map of contours: pixel value = rc.ID
             dst0.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst0, {rc.contour}, 0, rc.ID, -1, task.lineType)
+                DrawTour(dst0, rc.contour, rc.ID, -1, task.lineType)
             Next
 
             ' Outline map - used to require the line actually touches the contour
             dst1.SetTo(0)
             For Each rc In contours.rcList
-                DrawContours(dst1, {rc.contour}, 0, rc.ID, Math.Max(task.lineWidth, 2), task.lineType)
+                DrawTour(dst1, rc.contour, rc.ID, Math.Max(task.lineWidth, 2), task.lineType)
             Next
 
             rcLpList.Clear()
@@ -1200,7 +1200,7 @@ Namespace VBClasses
                 If index < rcLpList.Count Then
                     Dim rc = rcLpList(index).rc
                     Dim lp = rcLpList(index).lp
-                    DrawContours(dst3, {rc.contour}, 0, white, task.lineWidth, task.lineType)
+                    DrawTour(dst3, rc.contour, white, task.lineWidth, task.lineType)
                     Line(dst3, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
                     strOut = rc.displayCell
                 Else
@@ -1289,7 +1289,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 DrawContours(tmp, listOfPoints, 0, New Scalar(sortList.Count), -1, LineTypes.Link8)
                 Threshold(tmp(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
-                rc.depth = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
+                rc.depthAvg = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
                 rc.maxDist = rc.buildMaxDist(rc.mask)
                 rc.ID = sortList.Count + 1
                 If rc.pixels < task.minCellSize Then rc.ID = 0
@@ -1367,7 +1367,7 @@ Namespace VBClasses
                 Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
                 DrawContours(tmp, listOfPoints, 0, New Scalar(sortList.Count), -1, LineTypes.Link8)
                 Threshold(tmp(rc.rect), rc.mask, 0, 255, ThresholdTypes.Binary)
-                rc.depth = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
+                rc.depthAvg = Mean(task.pcSplit(2)(rc.rect), task.depthmask(rc.rect))(0)
                 rc.maxDist = rc.buildMaxDist(rc.mask)
                 rc.ID = sortList.Count + 1
                 If rc.pixels < task.minCellSize Then rc.ID = 0

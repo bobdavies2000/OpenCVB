@@ -1439,7 +1439,7 @@ Namespace VBClasses
                 queries.Add(color(1))
                 queries.Add(color(2))
                 queries.Add(rc.pixels)
-                queries.Add(rc.depth)
+                queries.Add(rc.depthAvg)
             Next
 
             If task.firstPass Then
@@ -1554,7 +1554,7 @@ Namespace VBClasses
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
-                DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
         End Sub
@@ -1962,8 +1962,8 @@ Namespace VBClasses
                 Next
             Next
             If count > 0 Then Return New Point3f(CSng(x / count), CSng(y / count), CSng(z / count))
-            If rc IsNot Nothing AndAlso rc.depth > 0 AndAlso Single.IsFinite(rc.depth) Then
-                Return Cloud_Basics.worldCoordinates(rc.maxDist, rc.depth)
+            If rc IsNot Nothing AndAlso rc.depthAvg > 0 AndAlso Single.IsFinite(rc.depthAvg) Then
+                Return Cloud_Basics.worldCoordinates(rc.maxDist, rc.depthAvg)
             End If
             Return New Point3f
         End Function

@@ -304,7 +304,9 @@ Namespace VBClasses
         Public Class rcData
             Public age As Integer = 1
             Public contour As New List(Of cv.Point)
-            Public depth As Single
+            Public depthAvg As Single
+            Public depthMax As Single
+            Public depthMin As Single
             Public grayByte As Byte
             Public ID As Integer
             Public index As Integer
@@ -323,7 +325,10 @@ Namespace VBClasses
                 If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
-                depth = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
+                depthAvg = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
+                Dim mm = GetMinMax(task.pcSplit(2)(rect), task.depthmask(rect))
+                depthMax = mm.maxVal
+                depthMin = mm.minVal
             End Sub
             Public Function buildMaxDist(mask As cv.Mat) As cv.Point
                 Dim tmpMask = mask.Clone

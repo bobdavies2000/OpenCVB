@@ -355,7 +355,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             Dim depthCount As Integer
             For Each rc In redColor.rcList
-                Dim depth8u = CByte(Math.Min(255, rc.depth * 255.0 / task.MaxZmeters))
+                Dim depth8u = CByte(Math.Min(255, rc.depthAvg * 255.0 / task.MaxZmeters))
                 dst0(rc.rect).SetTo(depth8u, rc.mask)
                 depthCount += 1
             Next
@@ -366,7 +366,7 @@ Namespace VBClasses
             If task.firstPass Then task.rcD = redColor.rcList(1)
             SetTrueText(RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
-            SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m", 1)
+            SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             dst2(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
             Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
@@ -530,7 +530,7 @@ Namespace VBClasses
 
             Dim mm = cellDepthRange(task.rcD)
             strOut = RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-            SetTrueText(strOut + "Mean depth = " + task.rcD.depth.ToString(fmt2) + "m" + vbCrLf +
+            SetTrueText(strOut + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m" + vbCrLf +
                         "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
                         mm.maxVal.ToString(fmt2) + "m", 1)
 
@@ -705,7 +705,7 @@ Namespace VBClasses
                 dst3 = task.redColor.dst2.Clone
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawContours(dst3(rc.rect), {rc.contour}, 0, task.highlight, task.lineWidth)
+                    DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -856,7 +856,7 @@ Namespace VBClasses
                 If histArray(i) > 0 Then
                     For Each rc In task.redColor.rcList
                         If rc.ID = i Then
-                            DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                            DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
                         End If
                     Next
                 End If

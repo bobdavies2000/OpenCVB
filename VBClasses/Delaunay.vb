@@ -545,7 +545,7 @@ Namespace VBClasses
                 For Each rc In task.fless.rcList
                     If rc.contour.Count = 0 Then Continue For
                     rc.ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    DrawContours(rcMap(rc.rect), {rc.contour}, 0, rc.ID, -1)
+                    DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
                 Next
 
                 dst2 = ApplyPalette(rcMap, 0)
@@ -554,7 +554,7 @@ Namespace VBClasses
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
                     Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                    DrawContours(dst2(rc.rect), {rc.contour}, 0, black, task.lineWidth, task.lineType)
+                    DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth, task.lineType)
                 Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
             End If

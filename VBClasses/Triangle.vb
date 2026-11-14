@@ -20,7 +20,7 @@ Namespace VBClasses
                 pt = New cv.Point(pt.X + task.rcD.rect.X, pt.Y + task.rcD.rect.Y)
                 Dim vec = task.pointCloud.Get(Of Point3f)(pt.Y, pt.X)
                 If vec.Z = 0 Then
-                    vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcD.depth))
+                    vec = Cloud_Basics.worldCoordinates(New Point3f(pt.X, pt.Y, task.rcD.depthAvg))
                 End If
                 Circle(dst3, pt, task.DotSize, Scalar.Yellow, -1, task.lineType)
                 pt3D.Add(vec)

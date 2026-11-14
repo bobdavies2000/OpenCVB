@@ -754,7 +754,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst3 = dst2.Clone
                 For Each rc In rcList
-                    DrawContours(dst3(rc.rect), {rc.contour}, 0, white, task.lineWidth)
+                    DrawTour(dst3(rc.rect), rc.contour, 0, white, task.lineWidth)
                 Next
             End If
 
@@ -1472,7 +1472,7 @@ Namespace VBClasses
                     Dim simplified() As Point = Cv2.ApproxPolyDP(rc.contour.ToArray, epsilon, True)
                     rc.contour = simplified.ToList
                 End If
-                DrawContours(dst2(rc.rect), {rc.contour.ToArray}, 0, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst2(rc.rect), rc.contour, task.highlight, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
