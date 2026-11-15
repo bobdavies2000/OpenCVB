@@ -3,18 +3,21 @@ Imports OpenCvSharp.Cv2 :
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
-        Public colorList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public classCount As Integer
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            src = color8U.dst2
+            If src.Channels <> 1 Then
+                Static color8U As New Color8U_Basics
+                color8U.Run(src)
+                src = color8U.dst2
+                classCount = color8U.classCount
+            End If
 
             Dim rc As rcData, rcNext As rcData
 
@@ -40,7 +43,7 @@ Namespace VBClasses
             Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
             Dim histogram As New Mat
             Dim histArray() As Single = Nothing
-            colorList.Clear()
+            Dim colorList As New List(Of rcData)
             With task.delaunayFLess
                 For Each rc In sortList.Values
                     CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
@@ -94,7 +97,7 @@ Namespace VBClasses
                 End If
             End If
 
-            labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
+            labels(2) = CStr(classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If

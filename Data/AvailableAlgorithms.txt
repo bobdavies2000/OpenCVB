@@ -623,15 +623,17 @@ RedC_Neighbors
 RedCloud_Basics
 RedCloud_Core
 RedCloud_Delaunay
+RedCloud_DepthTiers
 RedCloud_Features
 RedCloud_TierRanges
 RedColor_Basics
 RedColor_CellHistogram
 RedColor_MapHoles
 RedPrep_Basics
-RedPrep_BasicsNew
 RedPrep_Core
 RedPrep_Edges_CPP
+RedPrep_Map
+RedPrep_MapList
 Reduction_Basics
 Reduction_BasicsParmInput
 Reduction_PointCloud
@@ -1620,6 +1622,7 @@ XR_RedCloud_LeftRight
 XR_RedCloud_Matches
 XR_RedCloud_Motion
 XR_RedCloud_MotionFilter
+XR_RedCloud_TierRanges
 XR_RedColor_Basics
 XR_RedColor_BasicsUnMerged
 XR_RedColor_Bricks

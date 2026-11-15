@@ -3,41 +3,6 @@ Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedPrep_BasicsNew : Inherits TaskParent
-        Public Sub New()
-            desc = "Reduction transform for the cv.Point cloud"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reduction = task.fOptions.ReductionDepth.Value
-            Dim depthClasses As New cv.Mat
-            task.pcSplit(2).ConvertTo(depthClasses, MatType.CV_32S, 1000 / reduction)
-
-            Dim reduced32s As cv.Mat = depthClasses * reduction
-
-            Const wcMinVal As Single = -1000
-            Const wcMaxVal As Single = 1000
-            dst1 = (reduced32s - wcMinVal) * 254 / (wcMaxVal - wcMinVal)
-            Normalize(dst1, dst1, 255, 0, cv.NormTypes.MinMax)
-            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-
-            If standalone Then
-                Dim histogram As New cv.Mat
-                CalcHist({dst1}, {0}, New Mat(), histogram, 1, {task.histogramBins, task.histogramBins}, task.rangesBGR)
-                Dim histArray(0) As Single
-                histogram.GetArray(Of Single)(histArray)
-                Dim mm = GetMinMax(dst1)
-            End If
-
-            labels(2) = "Using reduction amount = " + CStr(reduction)
-
-            dst2 = ApplyPalette(dst1, 0)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class RedPrep_Basics : Inherits TaskParent
         Dim prepEdges As New RedPrep_Edges_CPP
         Public options As New Options_RedPrep
@@ -191,6 +156,64 @@ Namespace VBClasses
 
             dst2.ConvertTo(dst1, cv.MatType.CV_8U)
             dst3 = ApplyPalette(dst2, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedPrep_Map : Inherits TaskParent
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public Sub New()
+            desc = "Reduction transform for the Depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim reduction = task.fOptions.ReductionDepth.Value
+            Dim depth32S As New cv.Mat
+            task.pcSplit(2).ConvertTo(depth32S, MatType.CV_32S, 1000 / reduction)
+
+            depth32S *= reduction
+
+            Const wcMinVal As Single = -1000
+            Const wcMaxVal As Single = 1000
+            dst1 = (depth32S - wcMinVal) * 255 / (wcMaxVal - wcMinVal)
+            Normalize(dst1, dst1, 255, 0, cv.NormTypes.MinMax)
+            dst1.ConvertTo(rcMap, cv.MatType.CV_8U)
+            rcMap.SetTo(0, task.noDepthMask)
+
+            If standalone Then
+                Dim histogram As New cv.Mat
+                CalcHist({rcMap}, {0}, New Mat(), histogram, 1, {task.histogramBins, task.histogramBins}, task.rangesBGR)
+                Dim histArray(0) As Single
+                histogram.GetArray(Of Single)(histArray)
+            End If
+
+            labels(2) = "Using reduction amount = " + CStr(reduction)
+
+            dst2 = ApplyPalette(rcMap, 0)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedPrep_MapList : Inherits TaskParent
+        Public redColor As New RedColor_Basics
+        Public redMap As New RedPrep_Map
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Run RedColor_Basics with the output of the RedPrep_Map.rcMap"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redMap.Run(emptyMat)
+            dst1 = redMap.rcMap.Clone
+            labels(2) = redMap.labels(2)
+
+            redColor.Run(redMap.rcMap)
+
+            dst2 = redColor.dst2
+            dst2.SetTo(0, task.noDepthMask)
+            labels(2) = redColor.labels(2)
         End Sub
     End Class
 End Namespace
