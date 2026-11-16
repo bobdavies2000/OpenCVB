@@ -72,9 +72,8 @@ Namespace VBClasses
             imagePtr = RedFlood_Run(cPtr, handleInput.AddrOfPinnedObject(), dst2.Rows, dst2.Cols, minSize)
             handleInput.Free()
 
-            Dim rMask = New cv.Rect(1, 1, dst2.Width, dst2.Height)
             Dim mask = Mat.FromPixelData(dst2.Rows + 2, dst2.Cols + 2, MatType.CV_8U, imagePtr)
-            dst0 = mask(rMask).Clone
+            dst0 = mask(task.maskRect).Clone
 
             Dim classCount = RedFlood_Count(cPtr)
             If classCount = 0 Then Exit Sub ' no data to process.
@@ -211,7 +210,7 @@ Namespace VBClasses
                 Dim flags = FloodFillFlags.FixedRange Or (255 << 8) Or FloodFillFlags.MaskOnly
                 Dim count = FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
                 dst1.SetTo(0)
-                dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
+                dst3 = mask(task.maskRect).Clone
                 Rectangle(dst1, rect, Scalar.All(255), task.lineWidth)
             End If
         End Sub
@@ -358,7 +357,7 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            Dim tmp = mask(task.maskRect)
             dst2 = ApplyPalette(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)
@@ -408,7 +407,7 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim tmp = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            Dim tmp = mask(task.maskRect)
             dst2 = ApplyPalette(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)

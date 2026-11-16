@@ -621,6 +621,7 @@ RedC_FloodToRC
 RedC_NeighborHist
 RedC_Neighbors
 RedCloud_Basics
+RedCloud_BasicsTest
 RedCloud_Core
 RedCloud_Delaunay
 RedCloud_DepthTiers
@@ -628,7 +629,9 @@ RedCloud_Features
 RedCloud_TierRanges
 RedColor_Basics
 RedColor_CellHistogram
+RedColor_DepthBoundaries
 RedColor_MapHoles
+RedColor_NoDepth
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP

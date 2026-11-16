@@ -92,6 +92,7 @@ Namespace VBClasses
         Public stableGray As StableGray_Basics
         Public heartBeats As HeartBeat_Basics
         Public edges As Edge_Basics
+        Public maskRect As cv.Rect
 
         Public motionFeatures As Point2f
         Public palette As Palette_LoadColorMap

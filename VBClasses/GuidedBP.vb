@@ -231,7 +231,6 @@ Namespace VBClasses
         Public histSide As New Projection_HistSide
         Public topRects As New List(Of cv.Rect)
         Public sideRects As New List(Of cv.Rect)
-        Dim floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
         Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U)
         Public Sub New()
             task.useXYRange = False
@@ -258,7 +257,7 @@ Namespace VBClasses
                 rectList.Add(New cv.Rect(rect.X - 1, rect.Y - 1, rect.Width, rect.Height))
             Next
 
-            mask(floodRect).CopyTo(view)
+            mask(task.maskRect).CopyTo(view)
             Return rectList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -116,12 +116,16 @@ Public Module vbc
         Dim allContours As cv.Point()() = Nothing
         FindContours(mask, allContours, Nothing, RetrievalModes.External, approxMode)
 
-        Dim tourCount As New List(Of Integer)
-        For Each tour In allContours
-            tourCount.Add(tour.Length)
+        Dim maxIndex As Integer = -1
+        Dim maxLen As Integer
+        For i = 0 To allContours.Length - 1
+            If maxIndex < allContours(i).Length Then
+                maxIndex = i
+                maxLen = allContours(i).Length
+            End If
         Next
-        If tourCount.Count > 0 Then
-            Return New List(Of cv.Point)(allContours(tourCount.IndexOf(tourCount.Max)).ToList)
+        If maxIndex >= 0 Then
+            Return New List(Of cv.Point)(allContours(maxIndex).ToList)
         End If
         Return New List(Of cv.Point)
     End Function

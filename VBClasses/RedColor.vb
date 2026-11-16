@@ -6,6 +6,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public classCount As Integer
+        Public initialMask As cv.Mat
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -22,6 +23,7 @@ Namespace VBClasses
             Dim rc As rcData, rcNext As rcData
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            If initialMask IsNot Nothing Then initialMask.CopyTo(mask(task.maskRect))
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim index As Integer = 1
@@ -57,7 +59,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            mask = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height))
+            mask = mask(task.maskRect)
             For i = 0 To colorList.Count - 1
                 rc = colorList(i)
                 If rc.ID < 0 Then Continue For
@@ -416,6 +418,77 @@ Namespace VBClasses
 
                 dst2 = ApplyPalette(redColor.rcMap, 0)
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_DepthBoundaries : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Dim redPrep As New RedPrep_Basics
+        Dim redNoDepth As New RedColor_NoDepth
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            desc = "Limit the floodfill of colors with the depth boundaries."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redPrep.Run(src)
+
+            dst3 = redPrep.dst2
+            dst1 = Not dst3
+            redNoDepth.Run(dst1)
+
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            redNoDepth.rcList.RemoveAt(0) ' remove the placeholder - it is copied in below.
+            For Each rc In redNoDepth.rcList
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            For Each rc In task.redColor.rcList
+                sortList.Add(rc.pixels, rc)
+
+            Next
+
+            rcList.Clear()
+
+            For Each rc In sortList.Values
+                rc.ID = rcList.Count
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            labels(2) = CStr(rcList.Count) + " cells found from " + CStr(redNoDepth.rcList.Count) + " and " +
+                        CStr(task.redColor.rcList.Count) + " cells."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_NoDepth : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Dim redColor As New RedColor_Basics
+        Dim color8U As New Color8U_Basics
+        Public Sub New()
+            task.gOptions.stableDepthRGB.Checked = True
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Limit the floodfill of colors to areas with no depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(src)
+            redColor.initialMask = task.depthmask
+            redColor.Run(color8U.dst2)
+            rcList = New List(Of rcData)(redColor.rcList)
+            dst2 = redColor.dst2
+            labels(2) = CStr(rcList.Count) + " cells were found where there was no depth."
         End Sub
     End Class
 End Namespace

@@ -68,6 +68,7 @@ Namespace VBClasses
                 Case "Oak-3D camera", "Oak-4D camera"
             End Select
 
+            task.maskRect = New cv.Rect(1, 1, task.workRes.Width, task.workRes.Height)
             Dim w As Integer = task.workRes.Width / 2, h As Integer = task.workRes.Height / 2
             task.quads(0) = New cv.Rect(0, 0, w, h)
             task.quads(1) = New cv.Rect(w, 0, w, h)

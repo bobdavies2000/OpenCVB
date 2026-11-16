@@ -24,8 +24,86 @@ Namespace VBClasses
 
             rcList.Clear()
             rcList.Add(New rcData)
+            For Each rc In redCore.rcList
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.index = rcList.Count
+                If rc.pixels < task.minCellSize Then Continue For
+                rcList.Add(rc)
+            Next
+
+            Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            Dim tmpList As New List(Of rcData)
+            For Each rc In rcList
+                If rc.ID = 0 Then Continue For
+                For i = rc.index + 1 To rcList.Count - 1
+                    If rcList(i).index < 0 Then Continue For
+                    If rc.ID = rcList(i).ID Then
+                        Dim rect = rc.rect.Union(rcList(i).rect)
+                        tmp(rect).SetTo(0)
+                        rc.mask.CopyTo(tmp(rc.rect))
+                        rcList(i).mask.CopyTo(tmp(rcList(i).rect))
+                        rc = New rcData(tmp(rect), rect, 255) With {.ID = rcList(i).ID}
+                        rcList(i).index = -1
+                    End If
+                Next
+                tmpList.Add(rc)
+            Next
+
             rcMap.SetTo(0)
-            dst2.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData)
+            For Each rc In tmplist
+                If rc.index < 0 Then Continue For
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            If standalone Then
+                Dim clickID = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+                If clickID > 0 Then
+                    Dim rctmp = RedC_Basics.rcFinder(rcList, clickID)
+                    If rctmp IsNot Nothing Then
+                        Rectangle(dst2, rctmp.rect, task.highlight, task.lineWidth)
+                        SetTrueText(rctmp.displayCell(), 3)
+                    End If
+                End If
+            End If
+
+            labels(2) = CStr(rcList.Count) + " cells found "
+            labels(3) = redCore.labels(3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedCloud_BasicsTest : Inherits TaskParent
+        Public redCore As New RedCloud_Core
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public options As New Options_RedCloud
+        Dim reduction As New Reduction_BasicsParmInput
+        Public runSelectCell As Boolean = True
+        Public Sub New()
+            reduction.reductionFactor = 50
+            desc = "Build contours for each cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If task.quarterBeat Then
+                reduction.Run(task.gray)
+                dst1 = reduction.dst2
+            End If
+
+            redCore.Run(src)
+            labels(3) = redCore.labels(3)
+
+            rcList.Clear()
+            rcList.Add(New rcData)
             Dim matchCount As Integer
             Dim unMatched As Integer
             Dim matchAverage As Single
@@ -34,10 +112,27 @@ Namespace VBClasses
                 If rc.age = 1 Then unMatched += 1 Else matchCount += 1
                 matchAverage += rc.age
                 rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count
                 If rc.pixels < task.minCellSize Then Continue For
                 rcList.Add(rc)
+            Next
+
+            Dim depths As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+            Dim maxDepth As Single
+            For Each rc In rcList
+                depths.Add(rc.depthMin, rc.index)
+                If maxDepth < rc.depthMax Then maxDepth = rc.depthMax
+            Next
+
+            Dim usedTiers As New List(Of Integer)
+            rcMap.SetTo(0)
+            For Each index In depths.Values
+                Dim rc = rcList(index)
+                If rc.ID = 0 Then Continue For
+                rc.ID = Math.Floor(task.histogramBins * rc.depthMin / Math.Ceiling(maxDepth)) + 1
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rcList(index) = rc
+                If usedTiers.Contains(rc.ID) = False Then usedTiers.Add(rc.ID)
             Next
 
             dst2 = ApplyPalette(rcMap, 0)

@@ -7705,8 +7705,7 @@ Namespace VBClasses
                 check.addCheckBox("Prep Edges in Y")
                 check.addCheckBox("Prep Edges in Z")
                 check.addCheckBox("Add RGB Edges")
-                check.Box(0).Checked = True
-                check.Box(1).Checked = True
+                check.Box(2).Checked = True
             End If
         End Sub
         Public Sub Run()
