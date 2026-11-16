@@ -12,6 +12,19 @@ Namespace VBClasses
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
+        Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
+            Dim rctmp = RedCC_Basics.rcFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rctmp IsNot Nothing Then
+                task.clickPoint = rctmp.maxDist
+                task.rcD = rctmp
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Return task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m"
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
+            Return ""
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then
                 Static color8U As New Color8U_Basics
@@ -87,17 +100,7 @@ Namespace VBClasses
 
             dst2 = ApplyPalette(rcMap, 0)
 
-            If standalone Then
-                Dim rctmp = RedC_Basics.rcFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-                If rctmp IsNot Nothing Then
-                    task.rcD = rctmp
-                    Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    SetTrueText(task.rcD.displayCell, 3)
-                Else
-                    If rcList.Count > 1 Then task.rcD = rcList(1)
-                End If
-            End If
+            If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
 
             labels(2) = CStr(classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             If rcList.Count > 255 Then
@@ -146,7 +149,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedCC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For i = 0 To rcList.Count - 1
                 Dim rc = rcList(i)
@@ -487,6 +490,7 @@ Namespace VBClasses
             redColor.initialMask = task.depthmask
             redColor.Run(color8U.dst2)
             rcList = New List(Of rcData)(redColor.rcList)
+            rcMap = redColor.rcMap
             dst2 = redColor.dst2
             labels(2) = CStr(rcList.Count) + " cells were found where there was no depth."
         End Sub

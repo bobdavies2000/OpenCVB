@@ -325,10 +325,14 @@ Namespace VBClasses
                 If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
-                depthAvg = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
-                Dim mm = GetMinMax(task.pcSplit(2)(rect), task.depthmask(rect))
-                depthMax = mm.maxVal
-                depthMin = mm.minVal
+
+                Dim tmp = mask And task.depthmask(rect)
+                If CountNonZero(tmp) / pixels > 0.5 Then
+                    depthAvg = Mean(task.pcSplit(2)(rect), task.depthmask(rect))
+                    Dim mm = GetMinMax(task.pcSplit(2)(rect), task.depthmask(rect))
+                    depthMax = mm.maxVal
+                    depthMin = mm.minVal
+                End If
             End Sub
             Public Function buildMaxDist(mask As cv.Mat) As cv.Point
                 Dim tmpMask = mask.Clone

@@ -1,6 +1,60 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class RedC_Basics : Inherits TaskParent
+    Public Class RedCC_Basics : Inherits TaskParent
+        Dim redNoDepth As New RedColor_NoDepth
+        Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public Sub New()
+            desc = "Combine the RedColor_NoDepth with the RedCloud_Basics output."
+        End Sub
+        Public Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
+            For Each rc In myList
+                If rc.ID = id Then Return myList(rc.index)
+            Next
+            Return Nothing
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redNoDepth.Run(src)
+            redC.Run(src)
+
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In redNoDepth.rcList
+                sortList.Add(rc.pixels, rc)
+            Next
+            For Each rc In redC.rcList
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData)
+            rcMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+
+            For Each rc In rcList
+                If rc.ID = 0 Then Continue For
+                If rc.depthAvg > 0 Then SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
+            Next
+
+            labels(2) = CStr(rcList.Count) + " cells found from RedC/NoDepth: " + CStr(redC.rcList.Count) + "/" +
+                        CStr(redNoDepth.rcList.Count) + ".  Zero depths are not shown."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCC_Motion : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
@@ -117,7 +171,7 @@ Namespace VBClasses
     End Class
 
 
-    Public Class RedC_BasicsOld : Inherits TaskParent
+    Public Class XR_RedCC_Basics1 : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim rcListLast As New List(Of rcData)
@@ -128,13 +182,6 @@ Namespace VBClasses
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Identify each cell using color"
         End Sub
-        Private Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
-            If id = 0 Then Return Nothing
-            For Each rc In myList
-                If rc.ID = id Then Return myList(rc.index)
-            Next
-            Return Nothing
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If heartbeatLTX() Then dst1 = task.delaunayFLess.dst2
 
@@ -157,7 +204,7 @@ Namespace VBClasses
             Next
 
             For Each rc In rcList
-                Dim rcLast = rcFinder(rcListLast, rc.ID)
+                Dim rcLast = RedCC_Basics.rcFinder(rcListLast, rc.ID)
                 rc.maxDStable = rc.maxDist
                 If rcLast IsNot Nothing Then
                     If rcLast.motionPixels = 0 Then
@@ -173,7 +220,7 @@ Namespace VBClasses
             labels(2) = CStr(task.redColor.rcList.Count) + " were mapped to " + CStr(task.delaunayFLess.ptList.Count) + " cells"
             labels(3) = CStr(task.redColor.rcList.Count) + " cells were found"
 
-            Dim rctmp = rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            Dim rctmp = RedCC_Basics.rcFinder(rcList, rcMapLast.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             If rctmp IsNot Nothing Then
                 task.rcD = rctmp
                 Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
@@ -190,7 +237,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_CoreOld : Inherits TaskParent
+    Public Class XR_RedCC_CoreOld : Inherits TaskParent
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
@@ -266,8 +313,8 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_MergeCells : Inherits TaskParent
-        Dim nabe As New RedC_NeighborHist
+    Public Class XR_RedCC_MergeCells : Inherits TaskParent
+        Dim nabe As New RedCC_NeighborHist
         Public merged As New rcData
         Public mergeList As New List(Of rcData)
         Public Sub New()
@@ -340,7 +387,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Depth : Inherits TaskParent
+    Public Class RedCC_Depth : Inherits TaskParent
         Dim redColor As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -364,7 +411,7 @@ Namespace VBClasses
             dst3.SetTo(0, task.noDepthMask)
 
             If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(RedC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedCC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m", 1)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
@@ -379,8 +426,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_CellLines : Inherits TaskParent
-        Dim redC As New RedC_Core
+    Public Class RedCC_CellLines : Inherits TaskParent
+        Dim redC As New RedCC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics
             desc = "Find any lines connected to a cell contour."
@@ -420,8 +467,8 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_DepthMerge : Inherits TaskParent
-        Public redC As New RedC_Core
+    Public Class XR_RedCC_DepthMerge : Inherits TaskParent
+        Public redC As New RedCC_Core
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             labels(3) = "rcMap version of cells"
@@ -529,7 +576,7 @@ Namespace VBClasses
             Next
 
             Dim mm = cellDepthRange(task.rcD)
-            strOut = RedC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            strOut = RedCC_Core.displayCell(redC.rcList, redC.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
             SetTrueText(strOut + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m" + vbCrLf +
                         "Depth range = " + mm.minVal.ToString(fmt2) + " to " +
                         mm.maxVal.ToString(fmt2) + "m", 1)
@@ -545,9 +592,9 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Features : Inherits TaskParent
+    Public Class RedCC_Features : Inherits TaskParent
         Dim feat As New Feature_Basics
-        Dim redC As New RedC_Core
+        Dim redC As New RedCC_Core
         Public Sub New()
             If task.lines Is Nothing Then task.lines = New Line_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -576,8 +623,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_NeighborHist : Inherits TaskParent
-        Public redC As New RedC_Basics
+    Public Class RedCC_NeighborHist : Inherits TaskParent
+        Public redC As New RedCC_Basics
         Public neighbors As New List(Of rcData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -617,7 +664,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_FloodToRC : Inherits TaskParent
+    Public Class RedCC_FloodToRC : Inherits TaskParent
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcList As New List(Of rcData) ' includes cloud data.
         Dim flood As New Flood_Basics
@@ -652,7 +699,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            SetTrueText(RedC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            SetTrueText(RedCC_Core.displayCell(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -677,7 +724,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Core : Inherits TaskParent
+    Public Class RedCC_Core : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -764,9 +811,9 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedC_FeatureLessTestSingle : Inherits TaskParent
-        Dim flood As New RedC_FloodToRC
-        Dim redC As New RedC_Basics
+    Public Class XR_RedCC_FeatureLessTestSingle : Inherits TaskParent
+        Dim flood As New RedCC_FloodToRC
+        Dim redC As New RedCC_Basics
         Public merged As New rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -825,8 +872,8 @@ Namespace VBClasses
 
 
 
-    Public Class RedC_Neighbors : Inherits TaskParent
-        Dim redC As New RedC_Basics
+    Public Class RedCC_Neighbors : Inherits TaskParent
+        Dim redC As New RedCC_Basics
         Dim rcTarget As rcData
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True

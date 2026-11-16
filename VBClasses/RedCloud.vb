@@ -64,7 +64,7 @@ Namespace VBClasses
             If standalone Then
                 Dim clickID = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
                 If clickID > 0 Then
-                    Dim rctmp = RedC_Basics.rcFinder(rcList, clickID)
+                    Dim rctmp = RedCC_Basics.rcFinder(rcList, clickID)
                     If rctmp IsNot Nothing Then
                         Rectangle(dst2, rctmp.rect, task.highlight, task.lineWidth)
                         SetTrueText(rctmp.displayCell(), 3)
@@ -80,7 +80,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_BasicsTest : Inherits TaskParent
+    Public Class XR_RedCloud_BasicsTest : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_Delaunay : Inherits TaskParent
+    Public Class XR_RedCloud_Delaunay : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -557,7 +557,7 @@ Namespace VBClasses
 
     Public Class XR_RedCloud_CellHistogram2 : Inherits TaskParent
         Dim plot As New PlotBar_Basics
-        Dim redC As New RedC_Core
+        Dim redC As New RedCC_Core
         Public Sub New()
             task.gOptions.setHistogramBins(100)
             plot.createHistogram = True
@@ -777,73 +777,73 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_TierRanges : Inherits TaskParent
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim redC As New RedCloud_Basics
-        Dim redColor As New RedColor_Basics
-        Public Sub New()
-            task.gOptions.HistBinBar.Value = 32
-            desc = "Identify the ranges of the different layers of depth data."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redC.Run(src)
-            labels(2) = redC.labels(2)
+    'Public Class XR_RedCloud_TierRanges : Inherits TaskParent
+    '    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    '    Dim redC As New RedCloud_Basics
+    '    Dim redColor As New RedColor_Basics
+    '    Public Sub New()
+    '        task.gOptions.HistBinBar.Value = 32
+    '        desc = "Identify the ranges of the different layers of depth data."
+    '    End Sub
+    '    Public Overrides Sub RunAlg(src As cv.Mat)
+    '        redC.Run(src)
+    '        labels(2) = redC.labels(2)
 
-            Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-            Dim maxDepth As Single
-            For Each rc In redC.rcList
-                depthSorted.Add(rc.depthMin, rc.index)
-                If maxDepth < rc.depthMax Then maxDepth = rc.depthMax
-            Next
+    '        Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+    '        Dim maxDepth As Single
+    '        For Each rc In redC.rcList
+    '            depthSorted.Add(rc.depthMin, rc.index)
+    '            If maxDepth < rc.depthMax Then maxDepth = rc.depthMax
+    '        Next
 
-            Const desiredCount As Integer = 5
-            Dim incr As Single = maxDepth / desiredCount
-            Dim boundaryMin As New List(Of Single)
-            Dim boundaryMax As New List(Of Single)
-            Dim maxDesired = CInt(depthSorted.Keys.Count / 3)
-            While boundaryMin.Count < desiredCount Or boundaryMin.Count > maxDesired
-                boundaryMin.Clear()
-                boundaryMax.Clear()
-                Dim val1 = depthSorted.Keys(1) ' first value is always zero.
-                For i = 0 To depthSorted.Keys.Count - 2
-                    Dim val2 = depthSorted.Keys(i + 1)
-                    If (val2 - val1) > incr Then
-                        boundaryMin.Add(val1)
-                        boundaryMax.Add(val2)
-                        val1 = val2
-                    End If
-                Next
-                If boundaryMin.Count < desiredCount Then
-                    incr -= 0.05
-                End If
-                If boundaryMin.Count > maxDesired Then
-                    incr += 0.05
-                End If
-            End While
+    '        Const desiredCount As Integer = 5
+    '        Dim incr As Single = maxDepth / desiredCount
+    '        Dim boundaryMin As New List(Of Single)
+    '        Dim boundaryMax As New List(Of Single)
+    '        Dim maxDesired = CInt(depthSorted.Keys.Count / 3)
+    '        While boundaryMin.Count < desiredCount Or boundaryMin.Count > maxDesired
+    '            boundaryMin.Clear()
+    '            boundaryMax.Clear()
+    '            Dim val1 = depthSorted.Keys(1) ' first value is always zero.
+    '            For i = 0 To depthSorted.Keys.Count - 2
+    '                Dim val2 = depthSorted.Keys(i + 1)
+    '                If (val2 - val1) > incr Then
+    '                    boundaryMin.Add(val1)
+    '                    boundaryMax.Add(val2)
+    '                    val1 = val2
+    '                End If
+    '            Next
+    '            If boundaryMin.Count < desiredCount Then
+    '                incr -= 0.05
+    '            End If
+    '            If boundaryMin.Count > maxDesired Then
+    '                incr += 0.05
+    '            End If
+    '        End While
 
-            strOut = "Ranges for tiers" + vbCrLf
-            Dim minVal As Single, maxVal As Single
+    '        strOut = "Ranges for tiers" + vbCrLf
+    '        Dim minVal As Single, maxVal As Single
 
-            rcMap.SetTo(0)
-            Dim tmp As New cv.Mat
-            For i = 0 To boundaryMin.Count - 2
-                minVal = boundaryMin(i)
-                maxVal = boundaryMax(i)
-                Dim bestBound = maxVal + (boundaryMin(i + 1) - maxVal) / 2
-                InRange(task.pcSplit(2), minVal, bestBound, tmp)
-                rcMap.SetTo(i + 1, tmp)
-            Next
-            InRange(task.pcSplit(2), boundaryMax.Last, task.MaxZmeters, tmp)
-            rcMap.SetTo(boundaryMin.Count, tmp)
+    '        rcMap.SetTo(0)
+    '        Dim tmp As New cv.Mat
+    '        For i = 0 To boundaryMin.Count - 2
+    '            minVal = boundaryMin(i)
+    '            maxVal = boundaryMax(i)
+    '            Dim bestBound = maxVal + (boundaryMin(i + 1) - maxVal) / 2
+    '            InRange(task.pcSplit(2), minVal, bestBound, tmp)
+    '            rcMap.SetTo(i + 1, tmp)
+    '        Next
+    '        InRange(task.pcSplit(2), boundaryMax.Last, task.MaxZmeters, tmp)
+    '        rcMap.SetTo(boundaryMin.Count, tmp)
 
-            dst2 = ApplyPalette(rcMap, 0)
+    '        dst2 = ApplyPalette(rcMap, 0)
 
-            For Each rc In redC.rcList
-                If rc.ID = 0 Then Continue For
-                SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
-            Next
+    '        For Each rc In redC.rcList
+    '            If rc.ID = 0 Then Continue For
+    '            SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
+    '        Next
 
-            labels(3) = CStr(boundaryMin.Count) + " depth tiers"
-        End Sub
-    End Class
+    '        labels(3) = CStr(boundaryMin.Count) + " depth tiers"
+    '    End Sub
+    'End Class
 End Namespace

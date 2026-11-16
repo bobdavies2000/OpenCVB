@@ -108,7 +108,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                Static redC As New RedC_Basics
+                Static redC As New RedCC_Basics
                 redC.Run(task.gray)
                 If redC.rcList.Count <= 1 Then Exit Sub
                 dst2 = redC.dst2
