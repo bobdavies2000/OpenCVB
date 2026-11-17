@@ -848,24 +848,46 @@ Namespace VBClasses
 
 
     Public Class RedCloud_FeatureLess : Inherits TaskParent
-        Dim redColor = New RedColor_Basics
-        Dim minPixels As Integer = dst2.Total * 0.025
+        Dim redColor As New RedColor_Basics
         Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public prepEdges As New RedPrep_Basics
+        Dim minSize As Integer = dst2.Total * 0.025
         Public Sub New()
+            task.gOptions.stableDepthRGB.Checked = True
             desc = "Restrict the floodfill for depth data to the featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            prepEdges.Run(src)
+            dst0 = prepEdges.dst2.Clone
             dst1 = task.depthmask.Clone
-            dst1.SetTo(0, task.delaunayFLess.dst3)
-            InRange(dst1, 0, 254, dst1)
+            dst1.SetTo(0, dst0)
+            redColor.floodMask = task.noDepthMask.Clone
             redColor.run(dst1)
-            dst2 = redColor.dst2
-            dst2.SetTo(0, task.noDepthMask)
 
-            For Each rc In redColor.rclist
-                If rc.pixels >= minPixels Then
-                    rcList.Add(rc)
-                End If
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In redColor.rcList
+                If rc.ID = 0 Then Continue For
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData)
+            rcMap.SetTo(0)
+            For Each rc In sortList.Values
+                If rc.pixels < minSize Then Exit For
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                If rcList.Count >= task.fless.rcList.Count Then Exit For
+            Next
+            labels(2) = CStr(rcList.Count) + " cells were found."
+            rcMap.SetTo(0, task.noDepthMask)
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            For Each rc In rcList
+                SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
             Next
         End Sub
     End Class
