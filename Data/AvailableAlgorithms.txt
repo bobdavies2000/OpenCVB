@@ -612,6 +612,7 @@ Rectangle_Fit
 Rectangle_Quadrants
 Rectangle_Rotated
 RedCC_Basics
+RedCC_BasicsOld
 RedCC_CellLines
 RedCC_Core
 RedCC_Depth
@@ -624,6 +625,7 @@ RedCC_Simple
 RedCloud_Basics
 RedCloud_Core
 RedCloud_DepthTiers
+RedCloud_FeatureLess
 RedCloud_Features
 RedColor_Basics
 RedColor_CellHistogram

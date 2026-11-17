@@ -75,6 +75,7 @@ Namespace VBClasses
 
 
 
+
     Public Class XR_RedCloud_BasicsTest : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
@@ -801,8 +802,8 @@ Namespace VBClasses
             Dim flags As FloodFillFlags = FloodFillFlags.Link4
             Dim rc As rcData
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y As Integer = 0 To input.Height - 1 Step task.gridWH
-                For x As Integer = 0 To input.Width - 1 Step task.gridWH
+            For y = 0 To input.Height - 1 Step task.gridWH
+                For x = 0 To input.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
                     ' skip the regions with no depth or those that were already floodfilled.
                     If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
@@ -842,4 +843,31 @@ Namespace VBClasses
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class
+
+
+
+
+    Public Class RedCloud_FeatureLess : Inherits TaskParent
+        Dim redColor = New RedColor_Basics
+        Dim minPixels As Integer = dst2.Total * 0.025
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            desc = "Restrict the floodfill for depth data to the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = task.depthmask.Clone
+            dst1.SetTo(0, task.delaunayFLess.dst3)
+            InRange(dst1, 0, 254, dst1)
+            redColor.run(dst1)
+            dst2 = redColor.dst2
+            dst2.SetTo(0, task.noDepthMask)
+
+            For Each rc In redColor.rclist
+                If rc.pixels >= minPixels Then
+                    rcList.Add(rc)
+                End If
+            Next
+        End Sub
+    End Class
+
 End Namespace

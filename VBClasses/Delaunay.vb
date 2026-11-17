@@ -522,6 +522,7 @@ Namespace VBClasses
         Public ptLatest As New List(Of cv.Point2f)
         Public facetList As New List(Of List(Of cv.Point))
         Public snapshotList As New List(Of rcData)
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Use the featureless cells to build a map covering the entire image."
         End Sub
@@ -550,13 +551,11 @@ Namespace VBClasses
 
                 dst2 = ApplyPalette(rcMap, 0)
 
-                ' run after ApplyPalette
-                For Each rc In task.fless.rcList
-                    If rc.ID = 0 Then Continue For
-                    Circle(dst2, rc.maxDist, task.DotSize, task.highlight, -1)
-                    DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth, task.lineType)
-                Next
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
+
+                Dim mm = GetMinMax(rcMap)
+                edges.Run(rcMap * 255 / mm.maxVal)
+                dst3 = edges.dst2
             End If
 
             ptLatest.Clear()

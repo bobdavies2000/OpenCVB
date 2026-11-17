@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public classCount As Integer
-        Public initialMask As cv.Mat
+        Public floodMask As cv.Mat
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -36,7 +36,7 @@ Namespace VBClasses
             Dim rc As rcData, rcNext As rcData
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            If initialMask IsNot Nothing Then initialMask.CopyTo(mask(task.maskRect))
+            If floodMask IsNot Nothing Then floodMask.CopyTo(mask(task.maskRect))
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim index As Integer = 1
@@ -44,8 +44,10 @@ Namespace VBClasses
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
                     If mask.Get(Of Byte)(y, x) = 0 Then
+
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
+
                         If count >= task.minCellSize Then
                             rc = New rcData(mask(rect), rect, index) With {.index = index}
                             sortList.Add(rc.pixels, rc)
@@ -487,7 +489,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
-            redColor.initialMask = task.depthmask
+            redColor.floodMask = task.depthmask
             redColor.Run(color8U.dst2)
             rcList = New List(Of rcData)(redColor.rcList)
             rcMap = redColor.rcMap

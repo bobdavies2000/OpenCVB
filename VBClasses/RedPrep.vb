@@ -111,6 +111,8 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Core : Inherits TaskParent
+        Public options As New Options_RedPrep
+        Public optionsPrep As New Options_PrepData
         Public reduced32f As New Mat
         Public presetReductionName As String = ""
         Public Const wcMinVal As Single = -1000
@@ -119,6 +121,9 @@ Namespace VBClasses
             desc = "Reduction transform for the cv.Point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            optionsPrep.Run()
+
             Dim reduction = task.fOptions.ReductionDepth.Value
             Dim split() = {New Mat, New Mat, New Mat}
             task.pcSplit(0).ConvertTo(split(0), MatType.CV_32S, 1000 / reduction)
