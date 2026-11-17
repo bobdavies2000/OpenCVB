@@ -21,9 +21,44 @@ Namespace VBClasses
 
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             For Each rc In redNoDepth.rcList
+                If rc.ID = 0 Then Continue For
                 sortList.Add(rc.pixels, rc)
             Next
             For Each rc In redC.rcList
+                If rc.ID = 0 Then Continue For
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            Dim rcSorted As New List(Of rcData)(sortList.Values)
+            For Each rc In sortList.Values
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.index = rcSorted.Count
+                rcSorted.Add(rc)
+            Next
+
+            Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            Dim tmpList As New List(Of rcData)
+            For Each rc In rcSorted
+                If rc.index < 0 Then Continue For
+                For i = rc.index + 1 To rcSorted.Count - 1
+                    Dim rcNext = rcSorted(i)
+                    If rcNext.index < 0 Then Continue For
+                    If rc.ID = rcNext.ID Then
+                        Dim ID = rc.ID
+                        Dim rect = rc.rect.Union(rcNext.rect)
+                        ' tmp(rect).SetTo(0)
+                        rc.mask.CopyTo(tmp(rc.rect))
+                        rcNext.mask.CopyTo(tmp(rcNext.rect))
+                        rc = New rcData(tmp(rect), rect, 255) With {.ID = ID}
+                        rcSorted(i).index = -1
+                    End If
+                Next
+                tmpList.Add(rc)
+            Next
+
+            ' sort the merged cells by size
+            sortList.Clear()
+            For Each rc In tmpList
                 sortList.Add(rc.pixels, rc)
             Next
 
@@ -31,6 +66,74 @@ Namespace VBClasses
             rcList.Add(New rcData)
             rcMap.SetTo(0)
             For Each rc In sortList.Values
+                If rc.index < 0 Then Continue For
+                rc.index = rcList.Count
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+
+            For Each rc In rcList
+                If rc.ID = 0 Then Continue For
+                If rc.depthAvg > 0 Then
+                    SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
+                    If rc.index = 1 Then Rectangle(dst2, rc.rect, black, task.lineWidth)
+                    ' Debug.WriteLine(CStr(rc.index) + ": " + rc.depthMin.ToString(fmt3))
+                End If
+            Next
+
+            labels(2) = CStr(rcList.Count) + " cells found from RedC/NoDepth: " + CStr(redC.rcList.Count) + "/" +
+                        CStr(redNoDepth.rcList.Count) + ".  Zero depths are not shown."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCC_Simple : Inherits TaskParent
+        Dim redNoDepth As New RedColor_NoDepth
+        Dim redC As New RedCloud_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public Sub New()
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Combine the RedColor_NoDepth with the RedCloud_Basics output."
+        End Sub
+        Public Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
+            If id = 0 Then Return Nothing
+            For Each rc In myList
+                If rc.ID = id Then Return myList(rc.index)
+            Next
+            Return Nothing
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst1.SetTo(0)
+            For Each rc In redC.rcList
+                DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.All(255), -1)
+            Next
+
+
+            redNoDepth.Run(src)
+
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In redNoDepth.rcList
+                If rc.ID = 0 Then Continue For
+                sortList.Add(rc.pixels, rc)
+            Next
+            For Each rc In redC.rcList
+                If rc.ID = 0 Then Continue For
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            For Each rc In sortList.Values
+                rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rc.index = rcList.Count
                 rcList.Add(rc)
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)

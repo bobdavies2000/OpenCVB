@@ -620,6 +620,7 @@ RedCC_FloodToRC
 RedCC_Motion
 RedCC_NeighborHist
 RedCC_Neighbors
+RedCC_Simple
 RedCloud_Basics
 RedCloud_Core
 RedCloud_DepthTiers

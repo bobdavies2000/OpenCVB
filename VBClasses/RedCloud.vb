@@ -14,35 +14,30 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.quarterBeat Then
-                reduction.Run(task.gray)
-                dst1 = reduction.dst2
-            End If
-
             redCore.Run(src)
             labels(3) = redCore.labels(3)
 
             rcList.Clear()
-            rcList.Add(New rcData)
             For Each rc In redCore.rcList
                 rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rc.index = rcList.Count
-                If rc.pixels < task.minCellSize Then Continue For
                 rcList.Add(rc)
             Next
 
             Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
             Dim tmpList As New List(Of rcData)
             For Each rc In rcList
-                If rc.ID = 0 Then Continue For
+                If rc.ID < 0 Then Continue For
                 For i = rc.index + 1 To rcList.Count - 1
-                    If rcList(i).index < 0 Then Continue For
-                    If rc.ID = rcList(i).ID Then
-                        Dim rect = rc.rect.Union(rcList(i).rect)
+                    Dim rcNext = rcList(i)
+                    If rcNext.index < 0 Then Continue For
+                    If rc.ID = rcNext.ID Or rc.rect.Contains(rcNext.rect) Then
+                        Dim ID = rc.ID
+                        Dim rect = rc.rect.Union(rcNext.rect)
                         tmp(rect).SetTo(0)
                         rc.mask.CopyTo(tmp(rc.rect))
-                        rcList(i).mask.CopyTo(tmp(rcList(i).rect))
-                        rc = New rcData(tmp(rect), rect, 255) With {.ID = rcList(i).ID}
+                        rcNext.mask.CopyTo(tmp(rcNext.rect))
+                        rc = New rcData(tmp(rect), rect, 255) With {.ID = ID}
                         rcList(i).index = -1
                     End If
                 Next
@@ -146,66 +141,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class RedCloud_Core : Inherits TaskParent
-        Public prepEdges As New RedPrep_Basics
-        Public rcList As New List(Of rcData)
-        Public Sub New()
-            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
-            desc = "Find the biggest chunks of consistent depth data "
-        End Sub
-        Public Shared Function sweepImage(input As Mat) As List(Of rcData)
-            Dim index As Integer = 1
-            Dim rect As New cv.Rect
-            Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
-            Dim flags As FloodFillFlags = FloodFillFlags.Link4
-            Dim rc As rcData
-            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For y As Integer = 0 To input.Height - 1 Step task.gridWH
-                For x As Integer = 0 To input.Width - 1 Step task.gridWH
-                    Dim pt = New cv.Point(x, y)
-                    ' skip the regions with no depth or those that were already floodfilled.
-                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                        Dim count = FloodFill(input, mask, pt, index, rect, 0, 0, flags)
-                        If rect.Width > 0 And rect.Height > 0 Then
-                            If count >= task.minCellSize Then
-                                rc = New rcData(input(rect), rect, index)
-                                newList.Add(rc.pixels, rc)
-                                index += 1
-                                rc.ID = newList.Count
-                            End If
-                        End If
-                    End If
-                Next
-            Next
-
-            Return New List(Of rcData)(newList.Values)
-        End Function
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                prepEdges.Run(src)
-                src = prepEdges.dst2.Clone
-            End If
-
-            rcList = sweepImage(src)
-            If rcList.Count = 0 Then
-                rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
-                task.rcD = rcList(0)
-            End If
-            dst2.SetTo(0)
-            For Each rc In rcList
-                If rc.pixels < task.minCellSize Then Continue For
-                dst2(rc.rect).SetTo(rc.ID, rc.mask)
-            Next
-            If rcList.Count >= 255 Then MsgBox("RedCloud_Core has exceeded the 8-bit max.  Increase task.minCellSize?")
-            dst3 = ApplyPalette(dst2, 0)
-            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
-        End Sub
-    End Class
 
 
 
@@ -846,4 +781,65 @@ Namespace VBClasses
     '        labels(3) = CStr(boundaryMin.Count) + " depth tiers"
     '    End Sub
     'End Class
+
+
+
+
+
+
+    Public Class RedCloud_Core : Inherits TaskParent
+        Public prepEdges As New RedPrep_Basics
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            dst2 = New Mat(dst2.Size, MatType.CV_8U, 0)
+            desc = "Find the biggest chunks of consistent depth data "
+        End Sub
+        Public Shared Function sweepImage(input As Mat) As List(Of rcData)
+            Dim index As Integer = 1
+            Dim rect As New cv.Rect
+            Dim mask = New Mat(New Size(input.Width + 2, input.Height + 2), MatType.CV_8U, 0)
+            Dim flags As FloodFillFlags = FloodFillFlags.Link4
+            Dim rc As rcData
+            Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For y As Integer = 0 To input.Height - 1 Step task.gridWH
+                For x As Integer = 0 To input.Width - 1 Step task.gridWH
+                    Dim pt = New cv.Point(x, y)
+                    ' skip the regions with no depth or those that were already floodfilled.
+                    If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                        Dim count = FloodFill(input, mask, pt, index, rect, 0, 0, flags)
+                        If rect.Width > 0 And rect.Height > 0 Then
+                            If count >= task.minCellSize Then
+                                rc = New rcData(input(rect), rect, index)
+                                newList.Add(rc.pixels, rc)
+                                index += 1
+                                rc.ID = newList.Count
+                            End If
+                        End If
+                    End If
+                Next
+            Next
+
+            Return New List(Of rcData)(newList.Values)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then
+                prepEdges.Run(src)
+                src = prepEdges.dst2.Clone
+            End If
+
+            rcList = sweepImage(src)
+            If rcList.Count = 0 Then
+                rcList.Add(New rcData(src, New cv.Rect(0, 0, src.Width, src.Height), 1))
+                task.rcD = rcList(0)
+            End If
+            dst2.SetTo(0)
+            For Each rc In rcList
+                If rc.pixels < task.minCellSize Then Continue For
+                dst2(rc.rect).SetTo(rc.ID, rc.mask)
+            Next
+            If rcList.Count >= 255 Then MsgBox("RedCloud_Core has exceeded the 8-bit max.  Increase task.minCellSize?")
+            dst3 = ApplyPalette(dst2, 0)
+            labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
+        End Sub
+    End Class
 End Namespace

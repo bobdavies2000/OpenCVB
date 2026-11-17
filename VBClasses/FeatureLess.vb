@@ -33,9 +33,11 @@ Namespace VBClasses
             Dim rc As rcData
             Dim index As Integer = 1
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
+            Dim singleBrick = task.gridWH * task.gridWH
             For Each r In fLessBricks
                 If rcMap.Get(Of Byte)(r.Y, r.X) = 255 Then
                     Dim count = FloodFill(rcMap, mask, r.TopLeft, index, rect, 0, 0, flags)
+                    If count = singleBrick Then Continue For
                     rc = New rcData(rcMap(rect), rect, index)
                     sortList.Add(rc.pixels, rc)
                     index += 1
@@ -65,7 +67,6 @@ Namespace VBClasses
                         rc.maxDStable = rclast.maxDStable
                     End If
                 End If
-                ' SetTrueText(CStr(rc.age), rc.maxDStable)
             Next
 
             dst2 = ApplyPalette(rcMap, 0)
