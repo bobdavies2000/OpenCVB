@@ -30,6 +30,13 @@
     <Import Include="VBClasses" />
   </ItemGroup>
 
+  <!-- SDK adds this import after the project file is read. The Task type would hide the vbc.task module member. -->
+  <Target Name="RemoveThreadingTasksImport" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Import Remove="System.Threading.Tasks" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.31.0" />
     <PackageReference Include="Newtonsoft.Json" Version="14.0.1-beta2" />

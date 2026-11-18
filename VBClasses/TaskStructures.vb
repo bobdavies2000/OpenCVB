@@ -304,6 +304,7 @@ Namespace VBClasses
         Public Class rcData
             Public age As Integer = 1
             Public contour As New List(Of cv.Point)
+            Public contoursEx As cv.Point()() = Nothing
             Public depthAvg As Single
             Public depthMax As Single
             Public depthMin As Single
@@ -321,8 +322,12 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
+
+                FindContours(mask, contoursEx, Nothing, cv.RetrievalModes.External,
+                                                        cv.ContourApproximationModes.ApproxSimple)
+
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
-                If contour.Count > 0 Then DrawContours(mask, {contour}, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+                DrawContours(mask, contoursEx, -1, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
                 pixels = CountNonZero(mask)
                 maxDist = buildMaxDist(mask)
 

@@ -2,6 +2,7 @@ Imports System.IO
 Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.GdipExtensions
+Imports VBClasses
 Namespace MainApp
     Partial Public Class MainUI : Inherits Form
         Dim isPlaying As Boolean
