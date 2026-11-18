@@ -623,9 +623,9 @@ RedCC_NeighborHist
 RedCC_Neighbors
 RedCC_Simple
 RedCloud_Basics
+RedCloud_Contours
 RedCloud_Core
 RedCloud_DepthTiers
-RedCloud_FeatureLess
 RedCloud_Features
 RedColor_Basics
 RedColor_CellHistogram
@@ -1624,7 +1624,6 @@ XR_RedCloud_CellHistogram1
 XR_RedCloud_CellHistogram2
 XR_RedCloud_Delaunay
 XR_RedCloud_KNN
-XR_RedCloud_LeftRight
 XR_RedCloud_Matches
 XR_RedCloud_Motion
 XR_RedCloud_MotionFilter

@@ -9,7 +9,6 @@ Namespace VBClasses
         Public floodMask As cv.Mat
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -95,16 +94,11 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            Dim usedList As New SortedList(Of Integer, Byte)(New compareAllowIdenticalInteger)
-            For Each rc In colorList
-                If usedList.ContainsKey(rc.ID) = False Then usedList.Add(rc.ID, rc.index)
-            Next
-
             dst2 = ApplyPalette(rcMap, 0)
 
             If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
 
-            labels(2) = CStr(classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
+            labels(2) = CStr(rcList.Count) + " cells found"
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If

@@ -1,6 +1,54 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
+        Dim redColor As New RedColor_Basics
+        Public rcList As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public prepEdges As New RedPrep_Basics
+        Public Sub New()
+            task.gOptions.stableDepthRGB.Checked = True
+            desc = "Restrict the floodfill for depth data to the featureless regions."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prepEdges.Run(src)
+            dst0 = prepEdges.dst2.Clone
+            dst1 = task.depthmask.Clone
+            dst1.SetTo(0, dst0)
+            redColor.floodMask = task.noDepthMask.Clone
+            redColor.Run(dst1)
+
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            For Each rc In redColor.rcList
+                If rc.ID = 0 Then Continue For
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            rcList.Clear()
+            rcList.Add(New rcData)
+            rcMap.SetTo(0)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                If rcList.Count >= task.fless.rcList.Count Then Exit For
+            Next
+            labels(2) = CStr(rcList.Count) + " cells shown with average depth."
+            rcMap.SetTo(0, task.noDepthMask)
+
+            dst2 = ApplyPalette(rcMap, 0)
+
+            For Each rc In rcList
+                ' If rc.ID > 0 Then SetTrueText(rc.depthAvg.ToString(fmt3) + "m", rc.maxDStable, 2)
+                If rc.ID > 0 Then SetTrueText(CStr(rc.index), rc.maxDStable, 2)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedCloud_Contours : Inherits TaskParent
         Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
@@ -47,7 +95,7 @@ Namespace VBClasses
             rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData)
-            For Each rc In tmplist
+            For Each rc In tmpList
                 If rc.index < 0 Then Continue For
                 rc.index = rcList.Count
                 rcList.Add(rc)
@@ -146,37 +194,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class XR_RedCloud_LeftRight : Inherits TaskParent
-        Dim bricks As New Brick_Basics
-        Dim redC As New RedCloud_Basics
-        Public Sub New()
-            desc = "Map the RedCloud output into the right view."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
-
-            Dim count As Integer
-            dst1.SetTo(0)
-            For Each brick As brickData In bricks.brickList
-                If CountNonZero(redC.rcMap(brick.lRect)) And brick.rRect.Width > 0 Then
-                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
-                    count += 1
-                End If
-            Next
-
-            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
-            labels(3) += " " + CStr(count) + " bricks mapped into the right image."
-        End Sub
-    End Class
-
-
-
-
-
     Public Class XR_RedCloud_KNN : Inherits TaskParent
         Dim redC As New RedCloud_Basics
         Dim knn As New KNN_Basics
@@ -218,7 +235,7 @@ Namespace VBClasses
 
 
     Public Class XR_RedCloud_Matches : Inherits TaskParent
-        Dim redC As New RedCloud_Basics
+        Dim redC As New RedCloud_Contours
         Public rcList As New List(Of rcData)
         Public Sub New()
             task.fOptions.ReductionColor.Value = 120
@@ -665,7 +682,7 @@ Namespace VBClasses
             task.gOptions.HistBinBar.Value = 32
             desc = "Identify the ranges of the different layers of depth data."
         End Sub
-        Private Function adjustTiers(depths As List(Of Single), maxVal As Single) As List(Of Integer)
+        Private Function adjustTiers(depths As List(Of Integer), maxVal As Single) As List(Of Integer)
             Dim usedTiers As New List(Of Integer)
             For Each index In depths
                 Dim rc = redC.rcList(index)
@@ -688,7 +705,7 @@ Namespace VBClasses
                     If maxDepth < rc.depthMax Then maxDepth = rc.depthMax
                 Next
 
-                Dim depthValues = New List(Of Single)(depths.Values)
+                Dim depthValues = New List(Of Integer)(depths.Values)
                 maxDepth = Math.Ceiling(maxDepth)
                 While 1
                     tiers = adjustTiers(depthValues, maxDepth)
@@ -843,53 +860,4 @@ Namespace VBClasses
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class
-
-
-
-
-    Public Class RedCloud_FeatureLess : Inherits TaskParent
-        Dim redColor As New RedColor_Basics
-        Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public prepEdges As New RedPrep_Basics
-        Dim minSize As Integer = dst2.Total * 0.025
-        Public Sub New()
-            task.gOptions.stableDepthRGB.Checked = True
-            desc = "Restrict the floodfill for depth data to the featureless regions."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            prepEdges.Run(src)
-            dst0 = prepEdges.dst2.Clone
-            dst1 = task.depthmask.Clone
-            dst1.SetTo(0, dst0)
-            redColor.floodMask = task.noDepthMask.Clone
-            redColor.run(dst1)
-
-            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            For Each rc In redColor.rcList
-                If rc.ID = 0 Then Continue For
-                sortList.Add(rc.pixels, rc)
-            Next
-
-            rcList.Clear()
-            rcList.Add(New rcData)
-            rcMap.SetTo(0)
-            For Each rc In sortList.Values
-                If rc.pixels < minSize Then Exit For
-                rc.index = rcList.Count
-                rcList.Add(rc)
-                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                If rcList.Count >= task.fless.rcList.Count Then Exit For
-            Next
-            labels(2) = CStr(rcList.Count) + " cells were found."
-            rcMap.SetTo(0, task.noDepthMask)
-
-            dst2 = ApplyPalette(rcMap, 0)
-
-            For Each rc In rcList
-                SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
-            Next
-        End Sub
-    End Class
-
 End Namespace
