@@ -144,6 +144,12 @@ Namespace VBClasses
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
             DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
         End Sub
+        Public Shared Sub DrawTour(dst As Mat, contoursEx As cv.Point()(), color As Scalar,
+                                   Optional lineWidth As Integer = -1,
+                                   Optional lineType As LineTypes = LineTypes.Link8)
+            If contoursEx Is Nothing Then Exit Sub
+            DrawContours(dst, contoursEx, -1, color, lineWidth, lineType)
+        End Sub
         Public Sub Run(src As cv.Mat)
             task.cpu.measureStartRun(traceName)
 

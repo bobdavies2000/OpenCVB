@@ -1052,7 +1052,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For i = 0 To rcLpList.Count - 1
                 Line(dst3, rcLpList(i).lp.p1, rcLpList(i).lp.p2, task.highlight, task.lineWidth)
-                DrawTour(dst3, rcLpList(i).rc.contour, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst3, rcLpList(i).rc.contoursEx, task.highlight, task.lineWidth, task.lineType)
             Next
             labels(3) = CStr(rcLpList.Count) + " contour/line connections"
 
@@ -1062,7 +1062,6 @@ Namespace VBClasses
                 If index < rcLpList.Count Then
                     Dim rc = rcLpList(index).rc
                     Dim lp = rcLpList(index).lp
-                    DrawTour(dst1, rc.contour, white, task.lineWidth, task.lineType)
                     Line(dst1, lp.p1, lp.p2, red, task.lineWidth + 1, task.lineType)
                     strOut = rc.displayCell
                 Else

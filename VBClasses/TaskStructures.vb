@@ -364,7 +364,11 @@ Namespace VBClasses
                 strout += "index = " + CStr(index) + vbCrLf
                 strout += "age = " + CStr(age) + vbCrLf
 
-                strout += "contour point count = " + CStr(contour.Count) + vbCrLf
+                If contoursEx Is Nothing Then
+                    strout += "Number of contours = 0 "
+                Else
+                    strout += "Number of contours = " + CStr(contoursEx.Length) + vbCrLf
+                End If
 
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
                 strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
