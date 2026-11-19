@@ -1555,7 +1555,7 @@ Namespace VBClasses
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
-                DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst3(rc.rect), rc.contoursEx, task.highlight, task.lineWidth, task.lineType)
                 Circle(dst3, rc.maxDist, task.DotSize, task.highlight, -1)
             Next
         End Sub

@@ -411,7 +411,7 @@ Namespace VBClasses
                 redColor.rcMap.SetTo(0)
                 For Each rc In redColor.rcList
                     If rc.contour.Count = 0 Then Continue For
-                    DrawTour(redColor.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
+                    DrawTour(redColor.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
                     SetTrueText(CStr(rc.index), rc.maxDist)
                 Next
 

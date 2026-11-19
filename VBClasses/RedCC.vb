@@ -20,7 +20,7 @@ Namespace VBClasses
             redC.Run(src)
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.All(255), -1)
+                DrawTour(dst1(rc.rect), rc.contoursEx, cv.Scalar.All(255), -1)
             Next
 
             redNoDepth.Run(src)
@@ -90,8 +90,8 @@ Namespace VBClasses
                 If rc.depthAvg > 0 Then SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
             Next
 
-            labels(2) = CStr(rcList.Count) + " cells found from RedC/NoDepth: " + CStr(redC.rcList.Count) + "/" +
-                        CStr(redNoDepth.rcList.Count) + ".  Zero depths are not shown."
+            labels(2) = CStr(rcList.Count) + " cells found from RedC.rcList/NoDepth.rcList: " + CStr(redC.rcList.Count) + "/" +
+                        CStr(redNoDepth.rcList.Count)
         End Sub
     End Class
 
@@ -214,7 +214,7 @@ Namespace VBClasses
             redC.Run(src)
             dst1.SetTo(0)
             For Each rc In redC.rcList
-                DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.All(255), -1)
+                DrawTour(dst1(rc.rect), rc.contoursEx, cv.Scalar.All(255), -1)
             Next
 
 
@@ -951,11 +951,10 @@ Namespace VBClasses
 
             Dim rc As rcData
             If standaloneTest() Then
-                labels(3) = task.redColor.labels(3)
                 dst3 = task.redColor.dst2.Clone
                 For Each rc In task.fless.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
+                    DrawTour(dst3(rc.rect), rc.contoursEx, task.highlight, task.lineWidth)
                 Next
             End If
 

@@ -480,10 +480,10 @@ Namespace VBClasses
 
                     For Each rc In redC.rcList
                         If rc.contour.Count = 0 Then Continue For
-                        DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.ID), -1)
+                        DrawTour(dst2(rc.rect), rc.contoursEx, task.scalarColors(rc.ID), -1)
                         rc.ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                        DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
-                        DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth)
+                        DrawTour(rcMap(rc.rect), rc.contoursEx, rc.ID, -1)
+                        DrawTour(dst2(rc.rect), rc.contoursEx, black, task.lineWidth)
                     Next
                     rcMap.SetTo(0, task.edges.dst2)
 
@@ -615,7 +615,7 @@ Namespace VBClasses
                 redC.rcMap.SetTo(0)
                 For Each rc In redC.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawTour(redC.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
+                    DrawTour(redC.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
                 Next
 
                 dst2 = ApplyPalette(redC.rcMap, 0)
@@ -660,8 +660,8 @@ Namespace VBClasses
             task.redColor.rcMap.SetTo(0)
             For Each rc In task.redColor.rcList
                 If rc.ID = 0 Then Continue For
-                DrawTour(task.redColor.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
-                SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
+                DrawTour(task.redColor.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
+                If rc.depthMin > 0 Then SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
             Next
 
             dst2 = ApplyPalette(task.redColor.rcMap, 0)
@@ -717,7 +717,7 @@ Namespace VBClasses
                 redC.rcMap.SetTo(0)
                 For Each rc In redC.rcList
                     If rc.ID = 0 Then Continue For
-                    DrawTour(redC.rcMap(rc.rect), rc.contour, New cv.Scalar(rc.ID), -1)
+                    DrawTour(redC.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
                 Next
                 dst2 = ApplyPalette(redC.rcMap, 0)
                 labels(3) = CStr(tiers.Count) + " depth tiers"

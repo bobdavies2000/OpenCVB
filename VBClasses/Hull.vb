@@ -45,7 +45,7 @@ Namespace VBClasses
 
             CvtColor(task.edges.dst2, dst3, cv.ColorConversionCodes.GRAY2BGR)
             For Each rc In task.redColor.rcList
-                DrawTour(dst3(rc.rect), rc.contour, task.highlight, task.lineWidth)
+                DrawTour(dst3(rc.rect), rc.contoursEx, task.highlight, task.lineWidth)
             Next
         End Sub
     End Class

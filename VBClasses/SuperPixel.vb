@@ -12,7 +12,7 @@ Namespace VBClasses
 
             dst3 = src
             For Each rc In task.redColor.rcList
-                DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
+                DrawTour(dst3(rc.rect), rc.contoursEx, white, task.lineWidth)
             Next
         End Sub
     End Class

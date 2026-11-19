@@ -1,25 +1,22 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Boundary_Basics : Inherits TaskParent
-        Public redColor As New RedColor_Basics
-        Dim color8U As New Color8U_Basics
         Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             task.fOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
             dst3 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Create a mask of the RedCloud cell boundaries"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            redColor.Run(color8U.dst2)
-            dst2 = redColor.dst2
-            labels(2) = redColor.labels(2)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
 
             dst3.SetTo(0)
-            For Each rc In redColor.rcList
-                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            For Each rc In task.redColor.rcList
+                DrawTour(dst3(rc.rect), rc.contoursEx, 255, task.lineWidth)
             Next
 
-            labels(3) = $"{redColor.rcList.Count} cells were found."
+            labels(3) = $"{task.redColor.rcList.Count} cells were found."
         End Sub
     End Class
 
@@ -42,23 +39,23 @@ Namespace VBClasses
             bounds.Run(src)
 
             dst2.SetTo(0)
-            For Each rc In bounds.redColor.rcList
+            For Each rc In task.redColor.rcList
                 Rectangle(dst2, rc.rect, task.highlight, task.lineWidth)
             Next
-            labels(2) = $"{bounds.redColor.rcList.Count} rectangles before contain test"
+            labels(2) = $"{task.redColor.rcList.Count} rectangles before contain test"
 
             rects.Clear()
-            For i = 0 To CInt(bounds.redColor.rcList.Count * options.percentRect) - 1
-                rects.Add(bounds.redColor.rcList(i).rect)
+            For i = 0 To CInt(task.redColor.rcList.Count * options.percentRect) - 1
+                rects.Add(task.redColor.rcList(i).rect)
             Next
 
             smallRects.Clear()
             smallContours.Clear()
-            For i = bounds.redColor.rcList.Count - 1 To CInt(bounds.redColor.rcList.Count * options.percentRect) Step -1
-                task.rcD = bounds.redColor.rcList(i)
+            For i = task.redColor.rcList.Count - 1 To CInt(task.redColor.rcList.Count * options.percentRect) Step -1
+                task.rcD = task.redColor.rcList(i)
                 Dim r = task.rcD.rect
                 Dim contained As Boolean = False
-                For Each rc In bounds.redColor.rcList
+                For Each rc In task.redColor.rcList
                     If r = rc.rect Then Continue For
                     If rc.rect.Contains(r) Then
                         contained = True
@@ -98,13 +95,13 @@ Namespace VBClasses
             dst2 = bRects.bounds.dst2.Clone
             dst3 = bRects.dst2
             dst1 = bRects.dst3
-            labels(3) = $"{bRects.bounds.redColor.rcList.Count} cells before contain test"
+            labels(3) = $"{task.redColor.rcList.Count} cells before contain test"
 
             For i = 0 To bRects.smallRects.Count - 1
                 DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), Scalar.Black, task.lineWidth)
             Next
             labels(1) = labels(2)
-            labels(2) = $"{bRects.bounds.redColor.rcList.Count - bRects.smallRects.Count} cells after contain test"
+            labels(2) = $"{task.redColor.rcList.Count - bRects.smallRects.Count} cells after contain test"
         End Sub
     End Class
 End Namespace

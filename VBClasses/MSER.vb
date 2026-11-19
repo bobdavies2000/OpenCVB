@@ -55,7 +55,7 @@ Namespace VBClasses
                 rc.pixels = detect.maskCounts(index)
 
                 rc.contour = ContourBuild(rc.mask)
-                DrawTour(rc.mask, rc.contour, 255, -1)
+                DrawTour(rc.mask, rc.contoursEx, 255, -1)
 
                 Dim indexLast = task.redColor.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If indexLast <> 0 And indexLast < task.redColor.rcList.Count Then

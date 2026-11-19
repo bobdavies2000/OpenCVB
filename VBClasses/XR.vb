@@ -754,7 +754,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst3 = dst2.Clone
                 For Each rc In rcList
-                    DrawTour(dst3(rc.rect), rc.contour, 0, white, task.lineWidth)
+                    DrawTour(dst3(rc.rect), rc.contoursEx, 0, white, task.lineWidth)
                 Next
             End If
 
@@ -1373,9 +1373,9 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each rc In task.redColor.rcList
-                DrawTour(dst2(rc.rect), rc.contour, task.scalarColors(rc.ID Mod 255), -1)
+                DrawTour(dst2(rc.rect), rc.contoursEx, task.scalarColors(rc.ID Mod 255), -1)
                 If task.rcD IsNot Nothing Then
-                    If rc.ID = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+                    If rc.ID = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contoursEx, white, -1)
                 End If
             Next
         End Sub
@@ -1472,7 +1472,7 @@ Namespace VBClasses
                     Dim simplified() As Point = Cv2.ApproxPolyDP(rc.contour.ToArray, epsilon, True)
                     rc.contour = simplified.ToList
                 End If
-                DrawTour(dst2(rc.rect), rc.contour, task.highlight, task.lineWidth, task.lineType)
+                DrawTour(dst2(rc.rect), rc.contoursEx, task.highlight, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
