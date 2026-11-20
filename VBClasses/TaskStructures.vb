@@ -370,6 +370,9 @@ Namespace VBClasses
                     strout += "Number of contours = " + CStr(contoursEx.Length) + vbCrLf
                 End If
 
+                strout += "depthAvg = " + task.rcD.depthAvg.ToString(fmt2) + "m" + vbCrLf
+                strout += "depthMax = " + task.rcD.depthMax.ToString(fmt2) + "m" + vbCrLf
+                strout += "depthMin = " + task.rcD.depthMin.ToString(fmt2) + "m" + vbCrLf
                 strout += "MaxDist = " + CStr(maxDist.X) + ", " + CStr(maxDist.Y) + vbCrLf
                 strout += "MaxDStable = " + CStr(maxDStable.X) + ", " + CStr(maxDStable.Y) + vbCrLf
                 strout += "Pixel count = " + CStr(pixels) + vbCrLf

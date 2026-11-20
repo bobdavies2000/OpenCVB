@@ -17,7 +17,7 @@ Namespace VBClasses
                 task.rcD = rctmp
                 Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                Return task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m"
+                Return task.rcD.displayCell()
             Else
                 If rcList.Count > 1 Then task.rcD = rcList(1)
             End If
