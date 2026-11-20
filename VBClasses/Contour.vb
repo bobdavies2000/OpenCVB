@@ -2,7 +2,6 @@ Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Contour_Basics : Inherits TaskParent
         Dim contours As New Contour_Core
-        Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public Sub New()
@@ -27,10 +26,9 @@ Namespace VBClasses
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            dst2 = color8U.dst3
+            dst2 = task.color8U.dst3
 
-            contours.Run(color8U.dst2.Clone)
+            contours.Run(task.color8U.dst2.Clone)
 
             Dim rcListLast As New List(Of rcData)(rcList)
             rcMap.SetTo(0)
@@ -41,7 +39,7 @@ Namespace VBClasses
 
             rcList = New List(Of rcData)(contours.rcList)
 
-            task.color = clickContour(rcMap, rcList, color8U.dst2)
+            task.color = clickContour(rcMap, rcList, task.color8U.dst2)
 
             SetTrueText(strOut, 1)
 

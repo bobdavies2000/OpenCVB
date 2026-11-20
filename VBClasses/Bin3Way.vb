@@ -131,7 +131,6 @@ Namespace VBClasses
     Public Class XR_Bin3Way_RedColorOther : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_OriginalMask
-        Dim color8U As New Color8U_Basics
         Public Sub New()
             flood.inputRemoved = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
             desc = "Use RedColor with the regions that are neither lightest or darkest"
@@ -141,8 +140,7 @@ Namespace VBClasses
 
             flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
 
-            color8U.Run(src)
-            flood.Run(color8U.dst2)
+            flood.Run(task.color8U.dst2)
             dst2 = flood.dst2
         End Sub
     End Class

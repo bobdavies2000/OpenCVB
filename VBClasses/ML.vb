@@ -393,15 +393,13 @@ Namespace VBClasses
 
     Public Class XR_ML_Color2Depth : Inherits TaskParent
         Implements IDisposable
-        Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            dst2 = color8U.dst3
+            dst2 = task.color8U.dst3
             labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = ML.RTrees.Create()
@@ -412,7 +410,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim mls As mlColor
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(r.Y, r.X)
+                mls.colorIndex = task.color8U.dst2.Get(Of Byte)(r.Y, r.X)
                 mls.x = r.X
                 mls.y = r.Y
 
@@ -468,15 +466,13 @@ Namespace VBClasses
 
     Public Class XR_ML_ColorInTier2Depth : Inherits TaskParent
         Implements IDisposable
-        Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            dst2 = color8U.dst3
+            dst2 = task.color8U.dst3
             labels(2) = "Output of Color8U_Basics running " + task.fOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = ML.RTrees.Create()
@@ -487,7 +483,7 @@ Namespace VBClasses
             For i = 0 To task.gridRects.Count - 1
                 Dim r = task.gridRects(i)
                 Dim mls As mlColorInTier
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(r.Y, r.X)
+                mls.colorIndex = task.color8U.dst2.Get(Of Byte)(r.Y, r.X)
                 mls.x = r.X
                 mls.y = r.Y
 

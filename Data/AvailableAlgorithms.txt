@@ -165,7 +165,6 @@ Edge_DiffZ_CPP
 Edge_EndPoints
 Edge_Laplacian
 Edge_LeftRight
-Edge_RedEdges
 Edge_ResizeAdd
 Edge_RGB
 Edge_Sobel
@@ -1387,7 +1386,6 @@ XR_LaneFinder_Edges
 XR_LaneFinder_ROI
 XR_Laplacian_Blur
 XR_LeftRight_BRISK
-XR_LeftRight_ContourLeft
 XR_LeftRight_Edges
 XR_LeftRight_EdgesColor
 XR_LeftRight_Features

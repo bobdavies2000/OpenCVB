@@ -687,15 +687,12 @@ Namespace VBClasses
 
 
     Public Class XR_RedColor_BasicsUnMerged : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public Sub New()
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(task.gray)
-
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             Dim rect As cv.Rect
             rcMap.SetTo(0)
@@ -705,12 +702,12 @@ Namespace VBClasses
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     If mask.Get(Of Byte)(y, x) = 0 Then
                         Dim index = sortList.Count
-                        Dim count = FloodFill(color8U.dst2, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
+                        Dim count = FloodFill(task.color8U.dst2, mask, New cv.Point(x, y), index, rect, 0, 0, flags)
                         If count >= task.minCellSize Then
-                            Dim rc = New rcData(color8U.dst2(rect), rect, index) With {.index = index}
+                            Dim rc = New rcData(task.color8U.dst2(rect), rect, index) With {.index = index}
                             sortList.Add(rc.pixels, rc)
                         Else
-                            If count > 0 Then mask(rect).SetTo(0, color8U.dst2(rect)) ' add the small fragments back to the pool.
+                            If count > 0 Then mask(rect).SetTo(0, task.color8U.dst2(rect)) ' add the small fragments back to the pool.
                         End If
                     End If
                 Next
@@ -758,7 +755,7 @@ Namespace VBClasses
                 Next
             End If
 
-            labels(2) = CStr(color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
+            labels(2) = CStr(task.color8U.classCount) + " color8U classes created " + CStr(rcList.Count) + " cells"
             labels(3) = CStr(sortList.Count - rcList.Count) + " cells were completely contained in a larger cell."
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
@@ -822,7 +819,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = Mat_Basics.srcMustBe8U(src)
+            dst1 = If(src.Type = cv.MatType.CV_8U, src.Clone, task.color8U.dst2.Clone)
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
@@ -1433,18 +1430,16 @@ Namespace VBClasses
 
     Public Class XR_RedCC_SteadyCam : Inherits TaskParent
         Dim redC As New RedCC_Core
-        Dim color8U As New Color8U_Basics
         Public Sub New()
-            desc = "Build the RedC cells using the GravityRGB_SteadyXY output."
+            desc = "Build the RedC cells using the task.steadyCam output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.steadyCam.dst3
+            dst3 = task.steadyCam.dst2
 
             Threshold(dst3, dst1, 0, 255, cv.ThresholdTypes.BinaryInv)
 
-            color8U.Run(dst3)
-            color8U.dst2.SetTo(0, dst1)
-            redC.Run(color8U.dst2)
+            task.color8U.dst2.SetTo(0, dst1)
+            redC.Run(task.color8U.dst2)
             dst2 = redC.dst2
             dst2.SetTo(0, dst1)
             labels = redC.labels

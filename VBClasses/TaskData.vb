@@ -75,6 +75,7 @@ Namespace VBClasses
         Public steadyLineWidth As Integer
 
         Public filterBasics As Filter_Basics
+        Public color8U As Color8U_Basics
         Public fless As FeatureLess_Basics
         Public delaunayFLess As Delaunay_FeatureLess
         Public redColor As RedColor_Basics

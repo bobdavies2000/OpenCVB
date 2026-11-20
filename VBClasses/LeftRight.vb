@@ -106,24 +106,6 @@ Namespace VBClasses
 
 
 
-    Public Class XR_LeftRight_ContourLeft : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
-        Dim contours As New Contour_Finder
-        Public Sub New()
-            desc = "Segment the left view with contour_basics_List"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(task.leftView)
-            contours.Run(color8U.dst2)
-            dst2 = contours.dst2
-        End Sub
-    End Class
-
-
-
-
-
-
 
     Public Class XR_LeftRight_Edges : Inherits TaskParent
         Dim edges As New Edge_Basics

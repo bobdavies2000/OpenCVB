@@ -139,14 +139,12 @@ Namespace VBClasses
 
 
     Public Class XR_Threshold_ColorSource : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
         Dim byChan As New Threshold_ByChannels
         Public Sub New()
             desc = "Use all the alternative color sources as input to Threshold_ByChannels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            byChan.Run(color8U.dst3)
+            byChan.Run(task.color8U.dst3)
             dst2 = byChan.dst2
             dst3 = byChan.dst3
             labels = byChan.labels

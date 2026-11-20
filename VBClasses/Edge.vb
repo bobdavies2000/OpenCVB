@@ -1690,46 +1690,17 @@ Namespace VBClasses
 
 
     Public Class XR_Edge_Color8U : Inherits TaskParent
-        Public color8u As New Color8U_Basics
         Dim edges As New Edge_Basics
         Public Sub New()
             labels(2) = "Input to edges algorithm"
             desc = "Find edges in a variety of Color8U algorithms then find the edges common to all."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(src)
-            CvtColor(color8u.dst3, dst2, ColorConversionCodes.BGR2GRAY)
-
-            edges.Run(dst2)
-            dst3 = edges.dst2
-            labels(3) = edges.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Edge_RedEdges : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Dim edges As New Edge_Basics
-        Public Sub New()
-            desc = "Find the edges in the RedColor output."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.gray)
-
-            Dim _edges_cvt As New Mat
-            CvtColor(color8u.dst3, _edges_cvt, ColorConversionCodes.BGR2GRAY)
-            edges.Run(_edges_cvt)
+            edges.Run(task.color8U.dst2 * 255 / task.color8U.classCount)
             dst2 = edges.dst2
-
-            dst3 = dst2.Clone
-            dst3.SetTo(0, task.edges.dst2)
+            labels(2) = edges.labels(2)
         End Sub
     End Class
-
-
 
 
 

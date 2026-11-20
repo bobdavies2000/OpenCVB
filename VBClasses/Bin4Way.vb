@@ -542,14 +542,12 @@ Namespace VBClasses
 
     Public Class XR_Bin4Way_BasicsColors : Inherits TaskParent
         Dim bin4 As New Bin4Way_Basics
-        Dim color8U As New Color8U_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMyDst1.Checked = True
             desc = "Test Bin4Way_Basics with different src inputs."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            bin4.Run(color8U.dst3)
+            bin4.Run(task.color8U.dst3)
             dst1 = bin4.dst1
             dst2 = bin4.dst2
             dst3 = bin4.dst3

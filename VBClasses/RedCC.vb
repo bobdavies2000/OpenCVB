@@ -472,11 +472,7 @@ Namespace VBClasses
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcidMapLast = rcMap.Clone
 
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(task.gray)
-                src = color8u.dst2
-            End If
+            If src.Channels <> 1 Then src = task.color8U.dst2.Clone
 
             flood.Run(src)
             dst2 = flood.dst2
@@ -877,11 +873,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap = rcMap.Clone
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(task.gray)
-                src = color8u.dst2
-            End If
+            If src.Channels <> 1 Then src = task.color8U.dst2.Clone
 
             flood.Run(src)
             dst2 = flood.dst2

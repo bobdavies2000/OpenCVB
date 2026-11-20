@@ -409,14 +409,12 @@ Namespace VBClasses
 
     Public Class XR_MSER_ReducedRGB : Inherits TaskParent
         Dim mser As New MSER_Basics
-        Dim color8u As New Color8U_Basics
         Public Sub New()
             OptionParent.FindCheckBox("Use grayscale input").Checked = False
             desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(src)
-            dst3 = color8u.dst3
+            dst3 = task.color8U.dst3
 
             mser.Run(dst3)
             dst2 = mser.dst2

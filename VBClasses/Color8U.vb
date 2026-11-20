@@ -399,7 +399,6 @@ Namespace VBClasses
 
     Public Class Color8U_Bricks : Inherits TaskParent
         Dim bricks As New Brick_Basics
-        Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
         Public Sub New()
             If standalone Then task.gOptions.showMyDst0.Checked = True
@@ -408,15 +407,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bricks.Run(src)
             dst0 = task.leftView
-            color8u.Run(task.leftView)
-            dst2 = color8u.dst3
+            dst2 = task.color8U.dst3
 
             Dim count As Integer
             dst1.SetTo(0)
             For Each brick As brickData In bricks.brickList
                 If brick.rRect.Width > 0 Then
                     dst2(brick.lRect).CopyTo(dst1(brick.rRect))
-                    brick.colorClass = color8u.dst2.Get(Of Byte)
+                    brick.colorClass = task.color8U.dst2.Get(Of Byte)
                     count += 1
                 End If
             Next
@@ -431,16 +429,14 @@ Namespace VBClasses
 
 
     Public Class Color8U_Edges : Inherits TaskParent
-        Dim color8U As New Color8U_Basics
         Dim edges As New Edge_Basics
         Dim diff As New Diff_Basics
         Public Sub New()
             desc = "find fake edges between shades of the same color."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
-            dst2 = color8U.dst3
-            labels(2) = color8U.labels(2)
+            dst2 = task.color8U.dst3
+            labels(2) = task.color8U.labels(2)
 
             Dim tmp As New cv.Mat
             CvtColor(dst2, tmp, cv.ColorConversionCodes.BGR2GRAY)

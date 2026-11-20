@@ -9,14 +9,7 @@ Namespace VBClasses
             desc = "FloodFill the input and create a list of rect's sorted by pixel count."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(src)
-                dst1 = color8u.dst2.Clone
-            Else
-                dst1 = src.Clone
-            End If
-
+            dst1 = If(src.Channels = 1, src.Clone, task.color8U.dst2.Clone)
             dst2 = ApplyPalette(dst1, 0)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
@@ -153,7 +146,6 @@ Namespace VBClasses
 
     Public Class XR_Flood_Tiers : Inherits TaskParent
         Dim flood As New Flood_OriginalMask
-        Dim color8U As New Color8U_Basics
         Dim tiers As New Depth_Tiers
         Public Sub New()
             task.gOptions.showMyDst1.Checked = True
@@ -175,10 +167,8 @@ Namespace VBClasses
 
             labels(2) = tiers.labels(2) + " in tier " + CStr(tier) + ".  Use the global options 'DebugSlider' to select different tiers."
 
-            color8U.Run(src)
-
             flood.inputRemoved = dst0
-            flood.Run(color8U.dst2)
+            flood.Run(task.color8U.dst2)
 
             dst2 = flood.dst2
             dst3 = flood.dst3
@@ -259,17 +249,15 @@ Namespace VBClasses
     Public Class Flood_OriginalMask : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Dim color8U As New Color8U_Basics
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
             desc = "Floodfill by color as usual."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
             InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
             ConvertScaleAbs(inputRemoved, inputRemoved)
-            src = color8U.dst2
+            src = task.color8U.dst2
 
             src.SetTo(0, inputRemoved)
 
@@ -318,8 +306,8 @@ Namespace VBClasses
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("lo Diff", 0, 100, 5)
-                sliders.setupTrackBar("up Diff", 0, 100, 5)
+                sliders.setupTrackBar("lo Diff", 0, 100, 2)
+                sliders.setupTrackBar("up Diff", 0, 100, 2)
             End If
             desc = "FloodFill the input with an upDiff and loDiff to create a list of rect's sorted by pixel count."
         End Sub
@@ -330,13 +318,7 @@ Namespace VBClasses
             Dim upDiff = cv.Scalar.All(upSlider.value)
             Dim loDiff = cv.Scalar.All(loSlider.value)
 
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(src)
-                dst1 = color8u.dst2.Clone
-            Else
-                dst1 = src.Clone
-            End If
+            dst1 = If(src.Channels = 1, src.Clone, task.color8U.dst2.Clone)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -426,13 +408,7 @@ Namespace VBClasses
             desc = "FloodFill the input and create a list of rect's sorted by pixel count."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(src)
-                dst1 = color8u.dst2.Clone
-            Else
-                dst1 = src.Clone
-            End If
+            dst1 = If(src.Channels = 1, src.Clone, task.color8U.dst2.Clone)
 
             Dim rectList As New List(Of cv.Rect)
             Dim floodPoints As New List(Of cv.Point)
@@ -585,11 +561,11 @@ Namespace VBClasses
 
     Public Class Flood_Color8U : Inherits TaskParent
         Public rcList As New List(Of rcData)
-        Public color8u As New Color8U_Basics
         Public Sub New()
             desc = "FloodFill the color8u input and keep the color about the same as the flooded cell."
         End Sub
-        Public Shared Function floodAll(ByRef input As cv.Mat, mask As cv.Mat) As List(Of rcData)
+        Public Shared Function floodAll(ByRef input As cv.Mat) As List(Of rcData)
+            Dim mask As New Mat(New cv.Size(CInt(input.Width + 2), CInt(input.Height + 2)), MatType.CV_8U, 0)
             Dim rcList As New List(Of rcData)
             Dim rect As cv.Rect
             Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
@@ -612,12 +588,9 @@ Namespace VBClasses
             Return rcList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim mask As New Mat(New cv.Size(CInt(dst2.Width + 2), CInt(dst2.Height + 2)), MatType.CV_8U, 0)
-            color8u.Run(src)
-
-            dst2 = color8u.dst2.Clone
+            dst2 = task.color8U.dst2.Clone
             rcList.Clear()
-            rcList = New List(Of rcData)(floodAll(dst2, mask))
+            rcList = New List(Of rcData)(floodAll(dst2))
 
             labels(2) = CStr(rcList.Count) + " regions found "
         End Sub
@@ -629,7 +602,6 @@ Namespace VBClasses
     Public Class Flood_MaxDist : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Dim flood As New Flood_Color8U
-        Public color8u As New Color8U_Basics
         Public Sub New()
             desc = "Flood_Color8U on the heartbeat and flood maxdist otherwise."
         End Sub
@@ -638,22 +610,20 @@ Namespace VBClasses
                 flood.Run(src)
                 labels(2) = flood.labels(2)
             Else
-                color8u.Run(src)
-
                 Dim rect As cv.Rect
                 Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
                 Dim flags = FloodFillFlags.FixedRange Or (255 << 8)
                 rcList.Clear()
                 For Each rc In flood.rcList
-                    Dim count = FloodFill(color8u.dst2, mask, rc.maxDist, rc.grayByte, rect, 0, 0, flags)
+                    Dim count = FloodFill(task.color8U.dst2, mask, rc.maxDist, rc.grayByte, rect, 0, 0, flags)
                     If count >= task.minCellSize Then
                         rect = ValidateRect(rect)
-                        Dim rcNew = New rcData(color8u.dst2(rect), rect, rc.grayByte)
+                        Dim rcNew = New rcData(task.color8U.dst2(rect), rect, rc.grayByte)
                         rcList.Add(rcNew)
                     End If
                 Next
 
-                Dim newList = Flood_Color8U.floodAll(color8u.dst2, mask)
+                Dim newList = Flood_Color8U.floodAll(task.color8U.dst2)
 
                 For Each rc In newList
                     rcList.Add(rc)

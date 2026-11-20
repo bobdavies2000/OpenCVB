@@ -4,14 +4,6 @@ Namespace VBClasses
         Public Sub New()
             desc = "Use the repeat method to replicate data."
         End Sub
-        Public Shared Function srcMustBe8U(src As Mat) As Mat
-            If src.Type <> MatType.CV_8U Then
-                Static color8U As New Color8U_Basics
-                color8U.Run(src)
-                Return color8U.dst2
-            End If
-            Return src
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Resize(src, dst2, New cv.Size(src.Cols / 10, src.Rows / 10))
 

@@ -25,6 +25,7 @@ Namespace VBClasses
             task.edges = New Edge_Basics
             task.delaunayFLess = New Delaunay_FeatureLess
             task.fless = New FeatureLess_Basics
+            task.color8U = New Color8U_Basics
 
             If task.gOptions.stableDepthRGB.Checked Then
                 task.stableDepth = New StableDepth_Basics
@@ -59,6 +60,7 @@ Namespace VBClasses
 
             task.filterBasics.Run(task.color.Clone)
             task.gray = task.filterBasics.dst3.Clone
+            task.color8U.Run(task.gray)
             task.grayOriginal = task.gray.Clone
             task.originalPointCloud = task.pointCloud.Clone
             task.leftRightBrightness.Run(New cv.Mat)

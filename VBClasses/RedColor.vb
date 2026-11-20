@@ -5,7 +5,6 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public classCount As Integer
         Public floodMask As cv.Mat
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
@@ -25,12 +24,7 @@ Namespace VBClasses
             Return ""
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8U As New Color8U_Basics
-                color8U.Run(src)
-                src = color8U.dst2
-                classCount = color8U.classCount
-            End If
+            If src.Channels <> 1 Then src = task.color8U.dst2
 
             Dim rc As rcData, rcNext As rcData
 
@@ -120,11 +114,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lastMap = rcMap.Clone
-            If src.Channels <> 1 Then
-                Static color8u As New Color8U_Basics
-                color8u.Run(task.gray)
-                src = color8u.dst2
-            End If
+            If src.Channels <> 1 Then src = task.color8U.dst2.Clone
 
             flood.Run(src)
             dst2 = flood.dst2
@@ -203,17 +193,15 @@ Namespace VBClasses
     Public Class XR_RedColor_InRange : Inherits TaskParent
         Public inputRemoved As New Mat
         Public showSelected As Boolean = True
-        Dim color8U As New Color8U_Basics
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
             desc = "Use InRange to prepare an 8U input image for RedColor_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
             InRange(task.pcSplit(2), task.MaxZmeters, 1000, inputRemoved)
             ConvertScaleAbs(inputRemoved, inputRemoved)
-            src = color8U.dst2
+            src = task.color8U.dst2
 
             src.SetTo(0, inputRemoved)
 
@@ -308,11 +296,7 @@ Namespace VBClasses
             desc = "Use the FeatureLess regions to improve the RedColor output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then
-                Static color8U As New Color8U_Basics
-                color8U.Run(task.gray)
-                src = color8U.dst2
-            End If
+            If src.Channels <> 1 Then src = task.color8U.dst2.Clone
 
             Dim rect As cv.Rect
             Dim mask = New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
@@ -475,16 +459,14 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim redColor As New RedColor_Basics
-        Dim color8U As New Color8U_Basics
         Public Sub New()
             task.gOptions.stableDepthRGB.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Limit the floodfill of colors to areas with no depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(src)
             redColor.floodMask = task.depthmask
-            redColor.Run(color8U.dst2)
+            redColor.Run(task.color8U.dst2)
             rcList = New List(Of rcData)(redColor.rcList)
             rcMap = redColor.rcMap
             dst2 = redColor.dst2
