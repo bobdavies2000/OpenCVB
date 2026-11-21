@@ -48,7 +48,7 @@ Namespace VBClasses
                     dst3(r).SetTo(asciiChar)
                 Next
             Next
-            dst2 = ApplyPalette(dst3, 0)
+            dst2 = ApplyPal(dst3, 0)
         End Sub
     End Class
 

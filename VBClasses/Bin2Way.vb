@@ -91,7 +91,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
             SetTrueText(redC.strOut, 3)
         End Sub
     End Class
@@ -138,7 +138,7 @@ Namespace VBClasses
                 dst3.SetTo(index, mats(i))
             Next
 
-            dst2 = ApplyPalette(dst3)
+            dst2 = ApplyPal(dst3)
         End Sub
     End Class
 

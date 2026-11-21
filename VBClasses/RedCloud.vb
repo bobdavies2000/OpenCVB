@@ -42,7 +42,7 @@ Namespace VBClasses
             labels(2) = CStr(rcList.Count) + " cells shown with average depth."
             rcMap.SetTo(0, task.noDepthMask)
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             For Each rc In rcList
                 ' If rc.ID > 0 Then SetTrueText(rc.depthAvg.ToString(fmt3) + "m", rc.maxDStable, 2)
@@ -111,7 +111,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             If standalone Then
                 Dim clickID = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
@@ -188,7 +188,7 @@ Namespace VBClasses
                 If usedTiers.Contains(rc.ID) = False Then usedTiers.Add(rc.ID)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             If rcList.Count >= 255 Then
                 MsgBox("RedCloud_Basics has exceeded the 8-bit max.  Increase task.minCellSize?")
@@ -429,7 +429,7 @@ Namespace VBClasses
                 ' SetTrueText(CStr(rc.age), rc.maxDStable)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             For Each rc In rcList
                 If rc.index = 0 Then Continue For
@@ -496,7 +496,7 @@ Namespace VBClasses
                     Next
                     rcMap.SetTo(0, task.edges.dst2)
 
-                    dst2 = ApplyPalette(rcMap, 0)
+                    dst2 = ApplyPal(rcMap, 0)
 
                     'For Each rc In redC.rcList
                     '    DrawTour(dst2(rc.rect), rc.contour, black, task.lineWidth)
@@ -627,7 +627,7 @@ Namespace VBClasses
                     DrawTour(redC.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
                 Next
 
-                dst2 = ApplyPalette(redC.rcMap, 0)
+                dst2 = ApplyPal(redC.rcMap, 0)
             End If
         End Sub
     End Class
@@ -673,7 +673,7 @@ Namespace VBClasses
                 If rc.depthMin > 0 Then SetTrueText(rc.depthMin.ToString(fmt3) + "m", rc.maxDStable, 2)
             Next
 
-            dst2 = ApplyPalette(task.redColor.rcMap, 0)
+            dst2 = ApplyPal(task.redColor.rcMap, 0)
             labels(3) = CStr(usedTiers.Count) + " depth tiers"
         End Sub
     End Class
@@ -728,7 +728,7 @@ Namespace VBClasses
                     If rc.ID = 0 Then Continue For
                     DrawTour(redC.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
                 Next
-                dst2 = ApplyPalette(redC.rcMap, 0)
+                dst2 = ApplyPal(redC.rcMap, 0)
                 labels(3) = CStr(tiers.Count) + " depth tiers"
             End If
         End Sub
@@ -798,7 +798,7 @@ Namespace VBClasses
     '        InRange(task.pcSplit(2), boundaryMax.Last, task.MaxZmeters, tmp)
     '        rcMap.SetTo(boundaryMin.Count, tmp)
 
-    '        dst2 = ApplyPalette(rcMap, 0)
+    '        dst2 = ApplyPal(rcMap, 0)
 
     '        For Each rc In redC.rcList
     '            If rc.ID = 0 Then Continue For
@@ -865,7 +865,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.ID, rc.mask)
             Next
             If rcList.Count >= 255 Then MsgBox("RedCloud_Core has exceeded the 8-bit max.  Increase task.minCellSize?")
-            dst3 = ApplyPalette(dst2, 0)
+            dst3 = ApplyPal(dst2, 0)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class

@@ -29,7 +29,7 @@ Namespace VBClasses
                 dst2.SetTo(i + 1, tmp)
             Next
 
-            dst3 = ApplyPalette(dst2)
+            dst3 = ApplyPal(dst2)
 
             If standalone Then
                 task.redColor.Run(dst2)

@@ -116,7 +116,7 @@ Namespace VBClasses
                 task.optionsChanged Then Return True
             Return False
         End Function
-        Public Shared Function ApplyPalette(input As Mat, Optional firstEntry As Byte = 1) As Mat
+        Public Shared Function ApplyPal(input As Mat, Optional firstEntry As Byte = 1) As Mat
             Dim output As New Mat
             'ApplyColorMap(input, output, Palette_Basics.palettes(task.paletteIndex))
 
@@ -146,7 +146,7 @@ Namespace VBClasses
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
             DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
         End Sub
-        Public Shared Sub DrawTour(dst As Mat, contoursEx As cv.Point()(), color As Scalar,
+        Public Shared Sub DrawTour(dst As Mat, contoursEx As List(Of List(Of cv.Point)), color As Scalar,
                                    Optional lineWidth As Integer = -1,
                                    Optional lineType As LineTypes = LineTypes.Link8)
             If contoursEx Is Nothing Then Exit Sub

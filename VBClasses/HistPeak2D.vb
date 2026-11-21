@@ -36,7 +36,7 @@ Namespace VBClasses
 
             Dim backProjection As New Mat
             CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
-            dst2 = ApplyPalette(backProjection)
+            dst2 = ApplyPal(backProjection)
         End Sub
     End Class
 
@@ -69,7 +69,7 @@ Namespace VBClasses
             End If
             peak.Run(task.pointCloud)
             dst1 = peak.dst2
-            dst2 = ApplyPalette(dst1)
+            dst2 = ApplyPal(dst1)
         End Sub
     End Class
 

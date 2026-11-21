@@ -212,10 +212,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             reduction.Run(task.leftView)
-            dst2 = ApplyPalette(reduction.dst2.Clone)
+            dst2 = ApplyPal(reduction.dst2.Clone)
 
             reduction.Run(task.rightView)
-            dst3 = ApplyPalette(reduction.dst2.Clone)
+            dst3 = ApplyPal(reduction.dst2.Clone)
         End Sub
     End Class
 

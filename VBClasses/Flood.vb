@@ -10,7 +10,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = If(src.Channels = 1, src.Clone, task.color8U.dst2.Clone)
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
 
             Dim sortList As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
             Dim sortIndexList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -340,7 +340,7 @@ Namespace VBClasses
             Next
 
             Dim tmp = mask(task.maskRect)
-            dst2 = ApplyPalette(tmp, 0)
+            dst2 = ApplyPal(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)
             indexList = New List(Of Integer)(sortIndexList.Values)
@@ -390,7 +390,7 @@ Namespace VBClasses
             Next
 
             Dim tmp = mask(task.maskRect)
-            dst2 = ApplyPalette(tmp, 0)
+            dst2 = ApplyPal(tmp, 0)
 
             rectList = New List(Of cv.Rect)(sortList.Values)
             indexList = New List(Of Integer)(sortIndexList.Values)
@@ -471,7 +471,7 @@ Namespace VBClasses
             Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
 
             Cv2.LUT(dst1, lut, dst2)
-            dst3 = ApplyPalette(dst1, 0)
+            dst3 = ApplyPal(dst1, 0)
 
             labels(2) = CStr(rectList.Count) + " regions found "
         End Sub
@@ -525,7 +525,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
 
             Dim lutTable(255) As Byte
             For i = 0 To sortList.Count - 1
@@ -538,7 +538,7 @@ Namespace VBClasses
             Marshal.Copy(lutTable, 0, lut.Data, lutTable.Length)
 
             Cv2.LUT(dst2, lut, dst0)
-            dst3 = ApplyPalette(dst0, 0)
+            dst3 = ApplyPal(dst0, 0)
 
             Dim overlaps As New List(Of cv.Rect)
             For i = 0 To rectList.Count - 1

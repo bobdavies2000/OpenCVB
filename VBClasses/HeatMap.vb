@@ -27,9 +27,9 @@ Namespace VBClasses
             dst1 = sideframes.dst2
 
             ConvertScaleAbs(dst0, dst0)
-            dst2 = ApplyPalette(dst0, 0)
+            dst2 = ApplyPal(dst0, 0)
             ConvertScaleAbs(dst1, dst1)
-            dst3 = ApplyPalette(dst1, 0)
+            dst3 = ApplyPal(dst1, 0)
             labels(2) = "Top view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
             labels(3) = "Side view of heat map with the last " + CStr(task.fOptions.FrameHistoryCount.Value) + " frames"
         End Sub

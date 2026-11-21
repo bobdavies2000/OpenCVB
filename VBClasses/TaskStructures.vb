@@ -304,7 +304,7 @@ Namespace VBClasses
         Public Class rcData
             Public age As Integer = 1
             Public contour As New List(Of cv.Point)
-            Public contoursEx As cv.Point()() = Nothing
+            Public contoursEx As New List(Of List(Of cv.Point))
             Public depthAvg As Single
             Public depthMax As Single
             Public depthMin As Single
@@ -323,8 +323,12 @@ Namespace VBClasses
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
 
-                FindContours(mask, contoursEx, Nothing, cv.RetrievalModes.External,
+                Dim contoursTmp As cv.Point()() = Nothing
+                FindContours(mask, contoursTmp, Nothing, cv.RetrievalModes.External,
                                                         cv.ContourApproximationModes.ApproxSimple)
+                For i = 0 To contoursTmp.Length - 1
+                    If contoursTmp(i).Length > 1 Then contoursEx.Add(contoursTmp(i).ToList)
+                Next
 
                 contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxSimple)
                 DrawContours(mask, contoursEx, -1, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
@@ -367,7 +371,7 @@ Namespace VBClasses
                 If contoursEx Is Nothing Then
                     strout += "Number of contours = 0 "
                 Else
-                    strout += "Number of contours = " + CStr(contoursEx.Length) + vbCrLf
+                    strout += "Number of contours = " + CStr(contoursEx.Count) + vbCrLf
                 End If
 
                 strout += "depthAvg = " + task.rcD.depthAvg.ToString(fmt2) + "m" + vbCrLf

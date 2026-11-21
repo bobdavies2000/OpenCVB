@@ -45,6 +45,7 @@ Namespace VBClasses
 
                         If count > task.minCellSize Then
                             rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
+
                             Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                             If ID > 0 Then
                                 mask(rect).SetTo(ID, rc.mask)
@@ -118,7 +119,7 @@ Namespace VBClasses
                 rcList.Add(rc)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
 
@@ -181,7 +182,7 @@ Namespace VBClasses
                 ' Rectangle(dst2, task.rcD.rect, task.highlight, task.lineWidth)
             End If
 
-            dst3 = ApplyPalette(rcMap, 0)
+            dst3 = ApplyPal(rcMap, 0)
             labels(3) = CStr(rcList.Count - 1) + " cells found reordered and assigned index."
         End Sub
     End Class
@@ -275,7 +276,7 @@ Namespace VBClasses
                     dst1(rc.rect).SetTo(rc.ID, rc.mask)
                 End If
             Next
-            dst3 = ApplyPalette(dst1, 0)
+            dst3 = ApplyPal(dst1, 0)
         End Sub
     End Class
 
@@ -311,7 +312,7 @@ Namespace VBClasses
                 lastIndex = usedList.Keys(i)
             Next
 
-            dst1 = ApplyPalette(dst0, 0)
+            dst1 = ApplyPal(dst0, 0)
         End Sub
     End Class
 
@@ -374,7 +375,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
             dst3 = task.fless.dst2
 
             labels(2) = CStr(rcList.Count) + " cells were identified."
@@ -430,7 +431,7 @@ Namespace VBClasses
                     SetTrueText(CStr(rc.index), rc.maxDist)
                 Next
 
-                dst2 = ApplyPalette(redColor.rcMap, 0)
+                dst2 = ApplyPal(redColor.rcMap, 0)
             End If
         End Sub
     End Class
@@ -475,7 +476,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
 
             labels(2) = CStr(rcList.Count) + " cells found from " + CStr(redNoDepth.rcList.Count) + " and " +
                         CStr(task.redColor.rcList.Count) + " cells."

@@ -46,7 +46,7 @@ Namespace VBClasses
                 FillConvexPoly(dst1, facetList(i), i + 1, LineTypes.Link4)
             Next
 
-            dst2 = ApplyPalette(dst1)
+            dst2 = ApplyPal(dst1)
             WarpAffine(dst2, dst3, task.steadyCam.M, src.Size, InterpolationFlags.Linear, BorderTypes.Constant, black)
 
             labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
@@ -506,7 +506,7 @@ Namespace VBClasses
 
             ' Convert to 8U and colorize
             dst3.ConvertTo(dst1, MatType.CV_8U)
-            dst2 = ApplyPalette(dst1)
+            dst2 = ApplyPal(dst1)
 
             labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
         End Sub
@@ -547,7 +547,7 @@ Namespace VBClasses
                     DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
                 Next
 
-                dst2 = ApplyPalette(rcMap, 0)
+                dst2 = ApplyPal(rcMap, 0)
 
                 labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
 
@@ -600,7 +600,7 @@ Namespace VBClasses
                 facetList.Add(nextFacet)
             Next
 
-            dst2 = ApplyPalette(dst3)
+            dst2 = ApplyPal(dst3)
 
             labels(2) = traceName + ": " + inputPoints.Count.ToString("000") + " cells were present."
         End Sub

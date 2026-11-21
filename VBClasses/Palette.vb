@@ -99,7 +99,7 @@ Namespace VBClasses
             reduction.Run(src)
             dst3 = reduction.dst2
 
-            dst2 = ApplyPalette(dst3)
+            dst2 = ApplyPal(dst3)
         End Sub
     End Class
 
@@ -113,7 +113,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             draw.Run(src)
-            dst2 = ApplyPalette(draw.dst2)
+            dst2 = ApplyPal(draw.dst2)
         End Sub
     End Class
 
@@ -129,7 +129,7 @@ Namespace VBClasses
             desc = "Create gradient image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            if heartbeatx() then 
+            If heartbeatX() Then
                 If standaloneTest() Then
                     ' every 30 frames try a different pair of random colors.
                     color1 = New Scalar(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
@@ -165,7 +165,7 @@ Namespace VBClasses
             Static cvtScaleSlider = OptionParent.FindSlider("Convert And Scale")
             If task.optionsChanged Then
                 gColor.color1 = Scalar.Yellow
-                gColor.color2 = Scalar.red
+                gColor.color2 = Scalar.Red
                 Dim gradMat As New Mat
 
                 gColor.gradientWidth = dst1.Width
@@ -212,7 +212,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
                 gColor.color1 = Scalar.Yellow
-                gColor.color2 = Scalar.red
+                gColor.color2 = Scalar.Red
                 Dim gradMat As New Mat
 
                 gColor.gradientWidth = dst1.Width
@@ -270,8 +270,8 @@ Namespace VBClasses
             Dim leftView As New Mat, rightView As New Mat
             ConvertScaleAbs(task.leftView, leftView)
             ConvertScaleAbs(task.rightView, rightView)
-            dst2 = ApplyPalette(leftView)
-            dst3 = ApplyPalette(rightView)
+            dst2 = ApplyPal(leftView)
+            dst3 = ApplyPal(rightView)
         End Sub
     End Class
     Public Class XR_Palette_TaskColors : Inherits TaskParent
@@ -537,7 +537,7 @@ Namespace VBClasses
             dst2 += tiers.dst2
             classCount = tiers.classCount + 4
 
-            dst3 = ApplyPalette(dst2)
+            dst3 = ApplyPal(dst2)
         End Sub
     End Class
 

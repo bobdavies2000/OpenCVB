@@ -160,7 +160,7 @@ Namespace VBClasses
             labels(2) = "Using reduction amount = " + CStr(reduction)
 
             dst2.ConvertTo(dst1, cv.MatType.CV_8U)
-            dst3 = ApplyPalette(dst2, 0)
+            dst3 = ApplyPal(dst2, 0)
         End Sub
     End Class
 
@@ -195,7 +195,7 @@ Namespace VBClasses
 
             labels(2) = "Using reduction amount = " + CStr(reduction)
 
-            dst2 = ApplyPalette(rcMap, 0)
+            dst2 = ApplyPal(rcMap, 0)
         End Sub
     End Class
 

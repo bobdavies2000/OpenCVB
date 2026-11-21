@@ -36,8 +36,8 @@ Namespace VBClasses
 
             classCount = classifier.classCount
 
-            dst3 = ApplyPalette(dst2)
-            labels(3) = "dst3 = ApplyPalette(dst2) - " + task.fOptions.Color8USource.Text
+            dst3 = ApplyPal(dst2)
+            labels(3) = "dst3 = ApplyPal(dst2) - " + task.fOptions.Color8USource.Text
             labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) + " pixel classifications"
         End Sub
     End Class

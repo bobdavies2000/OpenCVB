@@ -154,7 +154,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
 
             If heartbeatX() Then labels(2) = CStr(rcList.Count) + " contours were found"
         End Sub
@@ -208,7 +208,7 @@ Namespace VBClasses
                 areaList.Add(ele.Key)
                 DrawTour(dst0, allContours(ele.Value).ToList, tourList.Count, -1, LineTypes.Link8)
             Next
-            dst2 = ApplyPalette(dst0)
+            dst2 = ApplyPal(dst0)
             labels(2) = $"Top {tourList.Count} contours in tourList from the " + CStr(sortedList.Count) + " found."
         End Sub
     End Class
@@ -530,7 +530,7 @@ Namespace VBClasses
                 If heartbeatX() Then
                     rotatedRect.Run(src)
                     dst0 = rotatedRect.dst2
-                    dst2 = ApplyPalette(dst0, 0)
+                    dst2 = ApplyPal(dst0, 0)
                 End If
             Else
                 dst0 = src
@@ -931,7 +931,7 @@ Namespace VBClasses
                 DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, LineTypes.Link4)
             Next
 
-            dst3 = ApplyPalette(dst1, 0)
+            dst3 = ApplyPal(dst1, 0)
             labels(2) = "There were " + CStr(sortedTours.Count) + " contours found with width and height greater than " + CStr(options.minSize)
         End Sub
     End Class
@@ -1317,7 +1317,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.ID Mod 255, rc.mask)
             Next
 
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
             Dim matched As Integer
             For Each tour In rcList
                 If tour.age > 1 Then matched += 1
@@ -1379,7 +1379,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(index, rc.mask)
             Next
 
-            dst2 = ApplyPalette(dst1, 0)
+            dst2 = ApplyPal(dst1, 0)
 
             If heartbeatX() Then labels(2) = CStr(rcList.Count) + " cells found"
         End Sub
