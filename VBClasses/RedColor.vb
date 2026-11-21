@@ -8,7 +8,7 @@ Namespace VBClasses
         Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public floodMask As cv.Mat
         Public Sub New()
-            labels(3) = "Select any cell in dst2 to see details below."
+            labels(3) = "Highlighted fragments are too small to be a cell."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -53,7 +53,7 @@ Namespace VBClasses
                             sortList.Add(rc.pixels, rc)
                             index += 1
                         Else
-                            ' If count > 0 Then mask(rect).SetTo(255, mask(rect))
+                            If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
@@ -67,10 +67,12 @@ Namespace VBClasses
             Dim histogram As New Mat
             Dim histArray() As Single = Nothing
             Dim colorList As New List(Of rcData)
+            Dim matches As Integer
             With task.delaunayFLess
                 For Each rc In sortList.Values
+                    Dim motionFlag = task.motion.motionMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    If ID = 0 Then
+                    If ID = 0 Or motionFlag <> 0 Then
                         CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
                         histogram.GetArray(Of Single)(histArray)
                         Dim hList = histArray.ToList
@@ -78,8 +80,13 @@ Namespace VBClasses
                     Else
                         Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                         Dim rcLast = rcLastList(lastIndex)
-                        rc.age = rcLast.age + 1
-                        rc.ID = ID
+                        Dim lastID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        If rcLast.ID = lastID Then
+                            rc.age = rcLast.age + 1
+                            rc.maxDStable = rcLast.maxDStable
+                            rc.ID = ID
+                            matches += 1
+                        End If
                     End If
                     If rc.ID >= 0 Then colorList.Add(rc)
                 Next
@@ -107,6 +114,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count
                 rcIndex(rc.rect).SetTo(rc.index, rc.mask)
+                SetTrueText(CStr(rc.ID), rc.maxDStable, 2)
                 rcList.Add(rc)
             Next
 
@@ -114,7 +122,8 @@ Namespace VBClasses
 
             If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
 
-            labels(2) = CStr(rcList.Count) + " cells found"
+            labels(2) = CStr(sortList.Count) + " cells merged into " + CStr(rcList.Count) + ". " + CStr(matches) +
+                        " were matched to previous frame.  Click any cell to see details in dst3."
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
