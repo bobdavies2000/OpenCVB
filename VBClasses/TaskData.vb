@@ -69,7 +69,8 @@ Namespace VBClasses
         Public scalarColors(255) As Scalar
         Public vecColors(255) As Vec3b
         Public colorMapDepth As Mat
-        Public colorMap As Mat
+        Public colorMap As New Mat
+        Public colorMapArray
         Public colorMapBricks As Mat
         Public lineMaxCount As Integer  ' this will isolate the top X longest lines in the image.
         Public steadyLineWidth As Integer
@@ -165,6 +166,7 @@ Namespace VBClasses
         Public afterHeartBeat As Boolean
 
         Public toggleOn As Boolean ' toggles on the heartbeat.
+        Public pauseOn As Boolean ' pauses the algorithm.
 
         Public pcFloor As Single ' y-value for floor...
         Public pcCeiling As Single ' y-value for ceiling...

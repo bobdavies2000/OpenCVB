@@ -1,7 +1,7 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
 Public Class OptionsGlobal
     Public pixelDiffThreshold As Integer
-    Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
+    Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "HSV", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -11,7 +11,7 @@ Public Class OptionsGlobal
         For Each mapName In mapNames
             Palettes.Items.Add(mapName)
         Next
-        Palettes.SelectedIndex = mapNames.IndexOf("Jet")
+        Palettes.SelectedIndex = mapNames.IndexOf("HSV")
 
         LineType.Items.Add("AntiAlias")
         LineType.Items.Add("Link4")

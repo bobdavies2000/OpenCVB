@@ -43,6 +43,7 @@ Namespace VBClasses
 
                         If count >= task.minCellSize Then
                             rc = New rcData(mask(rect), rect, index) With {.index = index}
+                            mask(rect).SetTo(index, rc.mask)
                             sortList.Add(rc.pixels, rc)
                             index += 1
                         End If
@@ -50,16 +51,25 @@ Namespace VBClasses
                 Next
             Next
 
+            mask = mask(task.maskRect)
+            If floodMask IsNot Nothing Then mask.SetTo(0, floodMask)
+            cv.Cv2.ImShow("mask", ApplyPalette(mask, 0))
+
             Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
             Dim histogram As New Mat
             Dim histArray() As Single = Nothing
             Dim colorList As New List(Of rcData)
             With task.delaunayFLess
                 For Each rc In sortList.Values
-                    CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
-                    histogram.GetArray(Of Single)(histArray)
-                    Dim hList = histArray.ToList
-                    rc.ID = hList.IndexOf(hList.Max)
+                    Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If ID = 0 Then
+                        CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
+                        histogram.GetArray(Of Single)(histArray)
+                        Dim hList = histArray.ToList
+                        rc.ID = hList.IndexOf(hList.Max)
+                    Else
+                        rc.ID = ID
+                    End If
                     If rc.ID >= 0 Then colorList.Add(rc)
                 Next
             End With
@@ -67,7 +77,6 @@ Namespace VBClasses
             rcMap.SetTo(0)
             rcList.Clear()
             rcList.Add(New rcData) ' placeholder for zero...
-            mask = mask(task.maskRect)
             For i = 0 To colorList.Count - 1
                 rc = colorList(i)
                 If rc.ID < 0 Then Continue For

@@ -26,6 +26,7 @@ Namespace MainApp
             components = New ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainUI))
             MainToolStrip = New ToolStrip()
+            PauseRunButton = New ToolStripButton()
             OptionsButton = New ToolStripButton()
             TestAllButton = New ToolStripButton()
             Magnifier = New ToolStripButton()
@@ -55,13 +56,22 @@ Namespace MainApp
             ' MainToolStrip
             ' 
             MainToolStrip.ImageScalingSize = New Size(24, 24)
-            MainToolStrip.Items.AddRange(New ToolStripItem() {OptionsButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
+            MainToolStrip.Items.AddRange(New ToolStripItem() {PauseRunButton, OptionsButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
             MainToolStrip.Size = New Size(1275, 39)
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
+            ' 
+            ' PauseRunButton
+            ' 
+            PauseRunButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+            PauseRunButton.Image = CType(resources.GetObject("PauseRunButton.Image"), Image)
+            PauseRunButton.ImageTransparentColor = Color.Magenta
+            PauseRunButton.Name = "PauseRunButton"
+            PauseRunButton.Size = New Size(34, 34)
+            PauseRunButton.Text = "ToolStripButton1"
             ' 
             ' OptionsButton
             ' 
@@ -273,6 +283,7 @@ Namespace MainApp
         Friend WithEvents Magnify5X As ToolStripMenuItem
         Friend WithEvents Magnify10X As ToolStripMenuItem
         Friend WithEvents Magnify15X As ToolStripMenuItem
+        Friend WithEvents PauseRunButton As ToolStripButton
 
     End Class
 End Namespace

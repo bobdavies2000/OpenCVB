@@ -550,5 +550,12 @@ Namespace MainApp
 
             AvailableAlgorithms.SelectedIndex = index
         End Sub
+
+        Private Sub PauseRunButton_Click(sender As Object, e As EventArgs) Handles PauseRunButton.Click
+            task.pauseOn = Not task.pauseOn
+            Static pauseImage As New Bitmap(homeDir + "MainUI/Data/pause.png")
+            Static runImage As New Bitmap(homeDir + "MainUI/Data/run.png")
+            PauseRunButton.Image = If(task.pauseOn, runImage, pauseImage)
+        End Sub
     End Class
 End Namespace

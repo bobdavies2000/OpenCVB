@@ -2,7 +2,14 @@ Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCVSharp
 Imports System.IO
 Namespace VBClasses
     Public Class Palette_Basics : Inherits TaskParent
-        Public whitebackground As Boolean
+        Public Shared ReadOnly palettes() As ColormapTypes = {
+                                    ColormapTypes.Autumn, ColormapTypes.Bone,
+                                    ColormapTypes.Cividis, ColormapTypes.Cool, ColormapTypes.Hot,
+                                    ColormapTypes.Hsv, ColormapTypes.Inferno, ColormapTypes.Jet,
+                                    ColormapTypes.Magma, ColormapTypes.Ocean, ColormapTypes.Parula,
+                                    ColormapTypes.Pink, ColormapTypes.Plasma, ColormapTypes.Rainbow,
+                                    ColormapTypes.Spring, ColormapTypes.Summer, ColormapTypes.Twilight,
+                                    ColormapTypes.TwilightShifted, ColormapTypes.Viridis, ColormapTypes.Winter}
         Public Sub New()
             desc = "Apply the different color maps in OpenCV"
         End Sub
@@ -17,14 +24,7 @@ Namespace VBClasses
 
             If src.Type = MatType.CV_32F Then src.ConvertTo(src, MatType.CV_8U)
 
-            Dim mapIndex = Choose(task.paletteIndex + 1, ColormapTypes.Autumn, ColormapTypes.Bone,
-                                          ColormapTypes.Cividis, ColormapTypes.Cool, ColormapTypes.Hot,
-                                          ColormapTypes.Hsv, ColormapTypes.Inferno, ColormapTypes.Jet,
-                                          ColormapTypes.Magma, ColormapTypes.Ocean, ColormapTypes.Parula,
-                                          ColormapTypes.Pink, ColormapTypes.Plasma, ColormapTypes.Rainbow,
-                                          ColormapTypes.Spring, ColormapTypes.Summer, ColormapTypes.Twilight,
-                                          ColormapTypes.TwilightShifted, ColormapTypes.Viridis, ColormapTypes.Winter)
-            ApplyColorMap(src, dst2, ColormapTypes.Jet)
+            ApplyColorMap(src, dst2, palettes(task.paletteIndex))
         End Sub
     End Class
 

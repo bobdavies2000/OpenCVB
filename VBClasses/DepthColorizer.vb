@@ -1,59 +1,49 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
+Imports OpenCvSharp
+Imports OpenCvSharp.Cv2
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class DepthColorizer_Basics : Inherits TaskParent
         Implements IDisposable
-        Public saveDepthColorMap As Mat
-        Public saveVecColors(0) As Vec3b
-        Public saveScalarColors(0) As Scalar
-        Public Sub New()
+        Private Shared Function RandomWithoutReplacement() As Byte()
+            Dim values(255) As Byte
+            For i = 0 To 255
+                values(i) = CByte(i)
+            Next
+
+            'Fisher-Yates shuffle
+            Dim rng As New Random()
+            For i = values.Length - 1 To 1 Step -1
+                Dim j = rng.Next(i + 1)
+
+                Dim temp = values(i)
+                values(i) = values(j)
+                values(j) = temp
+            Next
+            Return values
+        End Function
+        Private Sub initializeTaskStructures()
             cPtr = Depth_Colorizer_Open()
             Dim gradientWidth = Math.Min(dst2.Width, 256)
             Dim f As Double = 1.0
-            If saveVecColors.Length = 1 Then
-                ' some solid colors that should be easier to see.
-                task.vecColors(0) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
-                task.vecColors(1) = VividAmber
-                task.vecColors(2) = ElectricAmberYellow
-                task.vecColors(3) = KellyGreen
-                task.vecColors(4) = ElectricLime
-                task.vecColors(5) = DeepCyan
-                task.vecColors(6) = CobaltBlue
-                task.vecColors(7) = DeepViolet
-                task.vecColors(8) = HotCoral
-                task.vecColors(9) = RichGold
-                task.vecColors(10) = CrimsonRed
-                For i = 11 To task.vecColors.Length - 1
-                    task.vecColors(i) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
-                Next
-                For i = 0 To task.vecColors.Length - 1
-                    task.scalarColors(i) = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-                Next
+            Dim color1 = Scalar.Blue, color2 = Scalar.Yellow
+            Dim colorList As New List(Of Vec3b)
+            For i = 0 To gradientWidth - 1
+                Dim v1 = f * color2(0) + (1 - f) * color1(0)
+                Dim v2 = f * color2(1) + (1 - f) * color1(1)
+                Dim v3 = f * color2(2) + (1 - f) * color1(2)
+                colorList.Add(New Vec3b(v1, v2, v3))
+                f -= 1 / gradientWidth
+            Next
+            colorList(0) = New Vec3b ' black for the first color...
+            task.colorMapDepth = Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorList.ToArray)
 
-                Dim color1 = Scalar.Blue, color2 = Scalar.Yellow
-                Dim colorList As New List(Of Vec3b)
-                For i = 0 To gradientWidth - 1
-                    Dim v1 = f * color2(0) + (1 - f) * color1(0)
-                    Dim v2 = f * color2(1) + (1 - f) * color1(1)
-                    Dim v3 = f * color2(2) + (1 - f) * color1(2)
-                    colorList.Add(New Vec3b(v1, v2, v3))
-                    f -= 1 / gradientWidth
-                Next
-                colorList(0) = New Vec3b ' black for the first color...
-                task.colorMapDepth = Mat.FromPixelData(256, 1, MatType.CV_8UC3, colorList.ToArray)
+            Dim graybytes = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC1, RandomWithoutReplacement())
+            Cv2.ApplyColorMap(graybytes, task.colorMap, Palette_Basics.palettes(task.paletteIndex))
 
-                saveVecColors = task.vecColors
-                saveScalarColors = task.scalarColors
-                saveDepthColorMap = task.colorMapDepth
-            Else
-                ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
-                ' Colors will be different when OpenCVB is restarted.  
-                task.vecColors = saveVecColors
-                task.scalarColors = saveScalarColors
-                task.colorMapDepth = saveDepthColorMap
-            End If
-
-            task.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, task.vecColors.ToArray)
+            For i = 0 To task.vecColors.Length - 1
+                task.scalarColors(i) = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+            Next
 
             Dim color3 = Scalar.Black, color4 = Scalar.Red
             Dim corrColors = New List(Of Vec3b)
@@ -70,7 +60,11 @@ Namespace VBClasses
             dst1 = New Mat(dst1.Size, MatType.CV_8U, 0)
             desc = "Create a traditional depth color scheme."
         End Sub
+        Public Sub New()
+            initializeTaskStructures()
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.optionsChanged Then initializeTaskStructures()
             If task.gOptions.showMyDst1.Checked = False Or standaloneTest() Then
                 If task.gOptions.stableDepthRGB.Checked = False Then
                     Dim depthData(task.pcSplit(2).Total - 1) As Single

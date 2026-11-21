@@ -99,17 +99,17 @@ Namespace VBClasses
 
 
 
-
-            If task.needtoRunAlgorithm or task.cpu.displayObjectIndex < 0 Then
-                task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-            Else
-                If task.cpu.displayObjectName = task.Settings.algorithm Then
-                    Dim compoundName = task.Settings.algorithm + "\TaskAlgorithms\" + task.Settings.algorithm + "\"
-                    task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(compoundName)
-                    task.cpu.displayObjectName = compoundName
+            If task.pauseOn = False Then
+                If task.needtoRunAlgorithm Or task.cpu.displayObjectIndex < 0 Then
+                    task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+                Else
+                    If task.cpu.displayObjectName = task.Settings.algorithm Then
+                        Dim compoundName = task.Settings.algorithm + "\TaskAlgorithms\" + task.Settings.algorithm + "\"
+                        task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(compoundName)
+                        task.cpu.displayObjectName = compoundName
+                    End If
                 End If
             End If
-
 
 
 
