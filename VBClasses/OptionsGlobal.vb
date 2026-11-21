@@ -1,5 +1,6 @@
 Imports OpenCvSharp.Cv2 : Imports OpenCvSharp : Imports cv = OpenCvSharp
-Public Class OptionsGlobal
+Namespace VBClasses
+    Public Class OptionsGlobal
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "HSV", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
@@ -166,9 +167,9 @@ Public Class OptionsGlobal
             Case "Black"
                 task.highlight = Scalar.Black
             Case "white"
-                task.highlight = Scalar.white
+                task.highlight = Scalar.White
             Case "red"
-                task.highlight = Scalar.red
+                task.highlight = Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)
@@ -220,4 +221,5 @@ Public Class OptionsGlobal
     Private Sub ShowGrid_CheckedChanged(sender As Object, e As EventArgs) Handles ShowGrid.CheckedChanged
         task.optionsChanged = True
     End Sub
-End Class
+    End Class
+End Namespace

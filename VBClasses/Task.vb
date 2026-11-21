@@ -126,11 +126,12 @@ Namespace VBClasses
 
             pixelViewerOrGIFProcessing(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            task.dstList(0) = If(task.gOptions.showMyDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), task.color.Clone)
-            task.dstList(1) = If(task.gOptions.showMyDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), task.depthRGB.Clone)
-            task.dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
-            task.dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
-
+            If task.pauseOn = False Then
+                task.dstList(0) = If(task.gOptions.showMyDst0.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst0), task.color.Clone)
+                task.dstList(1) = If(task.gOptions.showMyDst1.Checked, Mat_Convert.Mat_Check8UC3(displayObject.dst1), task.depthRGB.Clone)
+                task.dstList(2) = Mat_Convert.Mat_Check8UC3(displayObject.dst2)
+                task.dstList(3) = Mat_Convert.Mat_Check8UC3(displayObject.dst3)
+            End If
             For Each m In task.dstList
                 If m.Size <> task.workRes Then Resize(m, m, task.workRes, 0, 0, InterpolationFlags.Nearest)
             Next

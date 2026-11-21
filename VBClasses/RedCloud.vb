@@ -10,13 +10,13 @@ Namespace VBClasses
             desc = "Restrict the floodfill for depth data to the featureless regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static saveLastFrame As Integer
-            If task.heartBeat Then
-                saveLastFrame = task.frameCount + 5
-                Exit Sub ' wait some frames for the depth to stabilize
-            End If
+            'Static saveLastFrame As Integer
+            'If task.heartBeat Then
+            '    saveLastFrame = task.frameCount + 5
+            '    Exit Sub ' wait some frames for the depth to stabilize
+            'End If
+            'If task.frameCount < saveLastFrame Then Exit Sub
 
-            If task.frameCount < saveLastFrame Then Exit Sub
             prepEdges.Run(src)
             dst0 = prepEdges.dst2.Clone
             dst1 = task.depthmask.Clone

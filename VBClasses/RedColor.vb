@@ -5,6 +5,7 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public floodMask As cv.Mat
         Public Sub New()
             labels(3) = "Select any cell in dst2 to see details below."
@@ -27,6 +28,7 @@ Namespace VBClasses
             If src.Channels <> 1 Then src = task.color8U.dst2
 
             Dim rc As rcData, rcNext As rcData
+            Dim rcLastList = New List(Of rcData)(rcList)
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             If floodMask IsNot Nothing Then floodMask.CopyTo(mask(task.maskRect))
@@ -41,11 +43,17 @@ Namespace VBClasses
                         Dim flags = FloodFillFlags.FixedRange Or (index << 8)
                         Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
 
-                        If count >= task.minCellSize Then
-                            rc = New rcData(mask(rect), rect, index) With {.index = index}
-                            mask(rect).SetTo(index, rc.mask)
+                        If count > task.minCellSize Then
+                            rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
+                            Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                            If ID > 0 Then
+                                mask(rect).SetTo(ID, rc.mask)
+                                rc.ID = ID
+                            End If
                             sortList.Add(rc.pixels, rc)
                             index += 1
+                        Else
+                            ' If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
@@ -53,7 +61,7 @@ Namespace VBClasses
 
             mask = mask(task.maskRect)
             If floodMask IsNot Nothing Then mask.SetTo(0, floodMask)
-            cv.Cv2.ImShow("mask", ApplyPalette(mask, 0))
+            dst3 = mask.Clone
 
             Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
             Dim histogram As New Mat
@@ -68,6 +76,9 @@ Namespace VBClasses
                         Dim hList = histArray.ToList
                         rc.ID = hList.IndexOf(hList.Max)
                     Else
+                        Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        Dim rcLast = rcLastList(lastIndex)
+                        rc.age = rcLast.age + 1
                         rc.ID = ID
                     End If
                     If rc.ID >= 0 Then colorList.Add(rc)
@@ -89,11 +100,13 @@ Namespace VBClasses
                         mask(rcNext.rect).SetTo(255, rcNext.mask)
                         rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
                         rcNext.ID = -1
+                        rc.age = colorList(i).age
                         colorList(j) = rcNext
                     End If
                 Next
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
                 rc.index = rcList.Count
+                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
                 rcList.Add(rc)
             Next
 

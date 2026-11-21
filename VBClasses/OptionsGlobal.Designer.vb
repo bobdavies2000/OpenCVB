@@ -1,5 +1,6 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class OptionsGlobal
+Namespace VBClasses
+    <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+    Partial Class OptionsGlobal
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -609,4 +610,5 @@ Partial Class OptionsGlobal
     Friend WithEvents Label9 As Label
     Friend WithEvents ShowSplash As CheckBox
     Friend WithEvents stableDepthRGB As CheckBox
-End Class
+    End Class
+End Namespace
