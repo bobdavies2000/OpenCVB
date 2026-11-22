@@ -63,6 +63,7 @@ Contour_Basics
 Contour_Core
 Contour_Finder
 Contour_Largest
+Contour_LargestSimple
 Contour_Regions
 Contour_RemoveLines
 Contour_Sort
@@ -627,6 +628,7 @@ RedCloud_Core
 RedCloud_DepthTiers
 RedCloud_Features
 RedColor_Basics
+RedColor_BasicsTest
 RedColor_CellHistogram
 RedColor_DepthBoundaries
 RedColor_MapHoles

@@ -16,7 +16,7 @@ Namespace VBClasses
             If rctmp IsNot Nothing Then
                 task.clickPoint = rctmp.maxDist
                 task.rcD = rctmp
-                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                ' Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
                 task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                 Return task.rcD.displayCell()
             Else
@@ -44,8 +44,7 @@ Namespace VBClasses
                         Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
 
                         If count > task.minCellSize Then
-                            rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
-
+                            rc = New rcData(src(rect), rect, index) With {.index = index}
                             Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                             If ID > 0 Then
                                 mask(rect).SetTo(ID, rc.mask)
@@ -54,7 +53,7 @@ Namespace VBClasses
                             sortList.Add(rc.pixels, rc)
                             index += 1
                         Else
-                            If count > 0 Then mask(rect).SetTo(255, mask(rect))
+                            ' If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
@@ -106,7 +105,7 @@ Namespace VBClasses
                         mask(r).SetTo(0)
                         mask(rc.rect).SetTo(255, rc.mask)
                         mask(rcNext.rect).SetTo(255, rcNext.mask)
-                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+                        rc = New rcData(mask(r), r, rcNext.ID) With {.ID = rcNext.ID}
                         rcNext.ID = -1
                         rc.age = colorList(i).age
                         colorList(j) = rcNext
@@ -503,6 +502,113 @@ Namespace VBClasses
             rcMap = redColor.rcMap
             dst2 = redColor.dst2
             labels(2) = CStr(rcList.Count) + " cells were found where there was no depth."
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_BasicsTest : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Dim contour As New Contour_Basics
+        Public Sub New()
+            labels(3) = "Highlighted fragments are too small to be a cell."
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
+        End Sub
+        Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
+            Dim rctmp = RedCC_Basics.rcFinder(rcList, rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
+            If rctmp IsNot Nothing Then
+                task.clickPoint = rctmp.maxDist
+                task.rcD = rctmp
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Return task.rcD.displayCell()
+            Else
+                If rcList.Count > 1 Then task.rcD = rcList(1)
+            End If
+            Return ""
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.color8U.dst2
+
+            Dim rc As rcData, rcNext As rcData
+            Dim rcLastList = New List(Of rcData)(rcList)
+
+            contour.Run(emptyMat)
+
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim index As Integer = 1
+            For Each rc In contour.rcList
+                sortList.Add(rc.pixels, rc)
+            Next
+
+            Dim colorList As New List(Of rcData)
+            Dim matches As Integer
+            With task.delaunayFLess
+                Dim ranges() As Rangef = {New Rangef(0, .ptList.Count)}
+                Dim histogram As New Mat
+                Dim histArray() As Single = Nothing
+                For Each rc In sortList.Values
+                    Dim motionFlag = task.motion.motionMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If ID = 0 Or motionFlag <> 0 Then
+                        CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
+                        histogram.GetArray(Of Single)(histArray)
+                        Dim hList = histArray.ToList
+                        rc.ID = hList.IndexOf(hList.Max)
+                    Else
+                        Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        Dim rcLast = rcLastList(lastIndex)
+                        Dim lastID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        If rcLast.ID = lastID Then
+                            rc.age = rcLast.age + 1
+                            rc.maxDStable = rcLast.maxDStable
+                            rc.ID = ID
+                            matches += 1
+                        End If
+                    End If
+                    If rc.ID >= 0 Then colorList.Add(rc)
+                Next
+            End With
+
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            For i = 0 To colorList.Count - 1
+                rc = colorList(i)
+                If rc.ID < 0 Then Continue For
+                For j = i + 1 To colorList.Count - 1
+                    rcNext = colorList(j)
+                    If rc.ID = rcNext.ID Then
+                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
+                        mask(r).SetTo(0)
+                        mask(rc.rect).SetTo(255, rc.mask)
+                        mask(rcNext.rect).SetTo(255, rcNext.mask)
+                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+                        rcNext.ID = -1
+                        rc.age = colorList(i).age
+                        colorList(j) = rcNext
+                    End If
+                Next
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.index = rcList.Count
+                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
+                SetTrueText(CStr(rc.ID), rc.maxDStable, 2)
+                rcList.Add(rc)
+            Next
+
+            dst2 = ApplyPal(rcMap, 0)
+
+            If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
+
+            labels(2) = CStr(sortList.Count) + " cells merged into " + CStr(rcList.Count) + ". " + CStr(matches) +
+                        " were matched to previous frame.  Click any cell to see details in dst3."
+            If rcList.Count > 255 Then
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
+            End If
         End Sub
     End Class
 End Namespace

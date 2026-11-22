@@ -322,7 +322,6 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, floodVal As Integer)
                 rect = _rect
                 InRange(_mask, floodVal, floodVal, mask)
-
                 Dim contoursTmp As cv.Point()() = Nothing
                 FindContours(mask, contoursTmp, Nothing, cv.RetrievalModes.External,
                                                         cv.ContourApproximationModes.ApproxSimple)

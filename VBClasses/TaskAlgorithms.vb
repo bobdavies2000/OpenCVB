@@ -130,7 +130,8 @@ Namespace VBClasses
             task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
             ' task.foreground.Run(New cv.Mat)
             If task.firstPass Then task.delaunayFLess.Run(task.gray)
-            task.edges.Run(task.gray)
+
+            task.edges.Run(task.gray.Clone)
             task.fless.Run(task.gray)
             task.delaunayFLess.Run(task.gray)
             If task.redColor IsNot Nothing Then task.redColor.Run(task.color.Clone)

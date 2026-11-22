@@ -80,7 +80,7 @@ Namespace VBClasses
 
             Dim contours As cv.Point()()
             If shadow.dst3.Channels() = 3 Then CvtColor(shadow.dst3, shadow.dst3, ColorConversionCodes.BGR2GRAY)
-            contours = FindContoursAsArray(shadow.dst3, RetrievalModes.Tree, contourApproximationModes.ApproxSimple)
+            contours = FindContoursAsArray(shadow.dst3, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple)
 
             Dim sortlist As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
             For Each c In contours
@@ -162,12 +162,12 @@ Namespace VBClasses
                 maxPoint(i) = mm.maxLoc + r.TopLeft
 
                 Circle(dst2(r), mm.minLoc, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst2(r), mm.maxLoc, task.DotSize, Scalar.red, -1, task.lineType)
+                Circle(dst2(r), mm.maxLoc, task.DotSize, Scalar.Red, -1, task.lineType)
 
                 Dim p1 = mm.minLoc + r.TopLeft
                 Dim p2 = mm.maxLoc + r.TopLeft
                 Circle(dst3, p1, task.DotSize, task.highlight, -1, task.lineType)
-                Circle(dst3, p2, task.DotSize, Scalar.red, -1, task.lineType)
+                Circle(dst3, p2, task.DotSize, Scalar.Red, -1, task.lineType)
             Next
         End Sub
     End Class
@@ -427,7 +427,7 @@ Namespace VBClasses
                 kalman.Run(emptyMat)
                 Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
                 Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
-                Rectangle(dst2, kRect, Scalar.red, 2)
+                Rectangle(dst2, kRect, Scalar.Red, 2)
                 Rectangle(dst2, nextRect, Scalar.Blue, 2)
                 If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
                     trustedRect = ValidateRect(kRect)
@@ -513,7 +513,7 @@ Namespace VBClasses
     Public Class XR_Depth_ForegroundOverTime : Inherits TaskParent
         Dim options As New Options_ForeGround
         Dim fore As New XR_Depth_Foreground
-        Dim contours As New Contour_Largest
+        Dim contours As New Contour_LargestSimple
         Dim lastFrames As New List(Of Mat)
         Public Sub New()
             labels = {"", "", "Foreground objects", "Edges for the Foreground Objects"}
@@ -607,7 +607,7 @@ Namespace VBClasses
 
     Public Class XR_Depth_Foreground : Inherits TaskParent
         Dim options As New Options_ForeGround
-        Dim contours As New Contour_Largest
+        Dim contours As New Contour_LargestSimple
         Public Sub New()
             labels(2) = "Foreground objects"
             dst2 = New Mat(dst2.Size(), MatType.CV_8U, Scalar.All(0))
@@ -636,15 +636,9 @@ Namespace VBClasses
 
 
 
-
-
-
-
-
-
     Public Class Depth_InRange : Inherits TaskParent
         Dim options As New Options_ForeGround
-        Dim contours As New Contour_Largest
+        Dim contours As New Contour_LargestSimple
         Public classCount As Integer = 1
         Public Sub New()
             labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
@@ -686,21 +680,6 @@ Namespace VBClasses
             labels(2) = classCount.ToString("000") + " regions were found"
         End Sub
     End Class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -998,7 +977,7 @@ Namespace VBClasses
             Static plane As Integer = 0
             Static warnings As New List(Of String)
             Static infWarnings As Integer
-            if heartbeatltx() then 
+            If heartbeatLTX() Then
                 plane += 1
                 If plane > 2 Then plane = 0
             End If
@@ -1161,7 +1140,7 @@ Namespace VBClasses
             For Each brick In bricks.brickList
                 Dim pt = brick.mm.minLoc
                 subdiv.Insert(pt + brick.rect.TopLeft)
-                Circle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, Scalar.red, -1, task.lineType)
+                Circle(dst1(brick.rect), brick.mm.minLoc, task.DotSize, Scalar.Red, -1, task.lineType)
                 Circle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, Scalar.Blue, -1, task.lineType)
             Next
 

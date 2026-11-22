@@ -1,4 +1,5 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
+Imports System.Linq
 Namespace VBClasses
     Public Class Contour_Basics : Inherits TaskParent
         Dim contours As New Contour_Core
@@ -6,7 +7,6 @@ Namespace VBClasses
         Public rcMap As New Mat(task.workRes, MatType.CV_8U, 0)
         Public Sub New()
             task.fOptions.Color8USource.SelectedItem = "KMeans_Basics"
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Create an rcMap of the contours using the colors indicated by KMeans"
         End Sub
         Public Shared Function clickContour(rcMap As cv.Mat, rcList As List(Of rcData), color8U As cv.Mat) As cv.Mat
@@ -30,18 +30,22 @@ Namespace VBClasses
 
             contours.Run(task.color8U.dst2.Clone)
 
-            Dim rcListLast As New List(Of rcData)(rcList)
             rcMap.SetTo(0)
-            Dim pixelThreshold = dst2.Total / 50
             For Each rc In contours.rcList
                 rcMap(rc.rect).SetTo(rc.ID, rc.mask)
             Next
 
             rcList = New List(Of rcData)(contours.rcList)
+            For Each rc In rcList
+                DrawTour(dst2, rc.contour, black, task.lineWidth)
+            Next
 
             task.color = clickContour(rcMap, rcList, task.color8U.dst2)
 
             SetTrueText(strOut, 1)
+
+            CvtColor(dst2, dst1, cv.ColorConversionCodes.BGR2GRAY)
+            Threshold(dst1, dst3, 0, 255, cv.ThresholdTypes.BinaryInv)
 
             labels(2) = CStr(rcList.Count) + " contour cells were found"
         End Sub
@@ -515,7 +519,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Largest : Inherits TaskParent
+    Public Class Contour_LargestSimple : Inherits TaskParent
         Public bestContour As New List(Of cv.Point)
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -1441,4 +1445,36 @@ Namespace VBClasses
             dst2 = contourSort.dst2
         End Sub
     End Class
+
+
+
+
+
+    Public Class Contour_Largest : Inherits TaskParent
+        Dim options As New Options_Contours
+        Public Sub New()
+            desc = "Use Linq to find the largest contour."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim contours()() As Point = Nothing
+            Dim hierarchy() As HierarchyIndex = Nothing
+
+            dst1 = task.color8U.dst2.Clone
+            dst1 *= 255 / task.color8U.classCount
+            dst1.SetTo(0, task.noDepthMask)
+            Rectangle(dst1, New cv.Rect(0, 0, dst1.Width, dst1.Height), black, task.lineWidth)
+
+            cv.Cv2.FindContours(dst1, contours, hierarchy, RetrievalModes.External,
+                                ContourApproximationModes.ApproxSimple)
+
+            Dim largestContour As Point() = contours.OrderByDescending(Function(c) Cv2.ContourArea(c)).
+                                                     FirstOrDefault()
+
+            dst2 = src.Clone
+            DrawTour(dst2, largestContour.ToList, task.highlight, task.lineWidth)
+        End Sub
+    End Class
+
 End Namespace

@@ -101,6 +101,7 @@ Namespace VBClasses
 
             If task.pauseOn = False Then
                 If task.needtoRunAlgorithm Or task.cpu.displayObjectIndex < 0 Then
+                    displayObject.trueData.Clear()
                     task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
                 Else
                     If task.cpu.displayObjectName = task.Settings.algorithm Then
@@ -152,14 +153,15 @@ Namespace VBClasses
 
             If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.dstList(0))
 
-            task.trueData.Clear()
-            task.trueData.Add(New TrueText(task.depthAndDepthRange,
-                              New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
-            For Each tt In displayObject.trueData
-                task.trueData.Add(tt)
-            Next
+            If task.pauseOn = False Then
+                task.trueData.Clear()
+                task.trueData.Add(New TrueText(task.depthAndDepthRange,
+                                  New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+                For Each tt In displayObject.trueData
+                    task.trueData.Add(tt)
+                Next
+            End If
 
-            displayObject.trueData.Clear()
             task.labels = displayObject.labels
             If task.gOptions.showMyDst0.Checked = False Then task.labels(0) = task.resolutionDetails
             If task.gOptions.showMyDst1.Checked = False Then task.labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")

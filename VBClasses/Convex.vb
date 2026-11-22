@@ -85,7 +85,7 @@ Namespace VBClasses
 
 
     Public Class Convex_RedCDefects : Inherits TaskParent
-        Dim contours As New Contour_Largest
+        Dim contours As New Contour_LargestSimple
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             If standalone Then task.gOptions.showMyDst1.Checked = True
@@ -188,7 +188,7 @@ Namespace VBClasses
 
     ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
     Public Class Convex_Defects : Inherits TaskParent
-        Dim contours As New Contour_Largest
+        Dim contours As New Contour_LargestSimple
         Public Sub New()
             Threshold(ImRead(task.homeDir + "Data/star2.png"), dst2, 200, 255, ThresholdTypes.Binary)
             Resize(dst2, dst2, New Size(task.workRes.Width, task.workRes.Height))

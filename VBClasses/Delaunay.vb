@@ -516,56 +516,6 @@ Namespace VBClasses
 
 
 
-    Public Class Delaunay_FeatureLess : Inherits TaskParent
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public ptList As New List(Of cv.Point2f)
-        Public ptLatest As New List(Of cv.Point2f)
-        Public facetList As New List(Of List(Of cv.Point))
-        Public snapshotList As New List(Of rcData)
-        Dim edges As New Edge_Basics
-        Public Sub New()
-            desc = "Use the featureless cells to build a map covering the entire image."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Or ptList.Count <= 2 Then
-                snapshotList = New List(Of rcData)(task.fless.rcList)
-
-                ptList.Clear()
-                For Each rc In task.fless.rcList
-                    ptList.Add(rc.maxDist)
-                Next
-
-                rcMap.SetTo(0)
-                facetList = Delaunay_Basics.buildFacets(ptList)
-                For i = 0 To facetList.Count - 1
-                    FillConvexPoly(rcMap, facetList(i), i + 1, LineTypes.Link4)
-                Next
-
-                For Each rc In task.fless.rcList
-                    If rc.contour.Count = 0 Then Continue For
-                    rc.ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
-                Next
-
-                dst2 = ApplyPal(rcMap, 0)
-
-                labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
-
-                Dim mm = GetMinMax(rcMap)
-                edges.Run(rcMap * 255 / mm.maxVal)
-                dst3 = edges.dst2
-            End If
-
-            ptLatest.Clear()
-            For i = 0 To ptList.Count - 1
-                ptLatest.Add(WarpAffine_Basics.WarpPoint(ptList(i), task.steadyCam.M))
-            Next
-        End Sub
-    End Class
-
-
-
-
     Public Class Delaunay_Color : Inherits TaskParent
         Public inputPoints As New List(Of Point2f)
         Public facetList As New List(Of List(Of cv.Point))
@@ -642,6 +592,57 @@ Namespace VBClasses
                 DrawTour(dst2, ptList, 255, 1)
             Next
             labels(2) = traceName + ": " + ptList.Count.ToString("000") + " cells were present."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Delaunay_FeatureLess : Inherits TaskParent
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public ptList As New List(Of cv.Point2f)
+        Public ptLatest As New List(Of cv.Point2f)
+        Public facetList As New List(Of List(Of cv.Point))
+        Public snapshotList As New List(Of rcData)
+        Dim edges As New Edge_Basics
+        Public Sub New()
+            desc = "Use the featureless cells to build a map covering the entire image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If heartbeatLTX() Or ptList.Count <= 2 Then
+                snapshotList = New List(Of rcData)(task.fless.rcList)
+
+                ptList.Clear()
+                For Each rc In task.fless.rcList
+                    ptList.Add(rc.maxDist)
+                Next
+
+                rcMap.SetTo(0)
+                facetList = Delaunay_Basics.buildFacets(ptList)
+                For i = 0 To facetList.Count - 1
+                    FillConvexPoly(rcMap, facetList(i), i + 1, LineTypes.Link4)
+                Next
+
+                For Each rc In task.fless.rcList
+                    If rc.contour.Count = 0 Then Continue For
+                    rc.ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    DrawTour(rcMap(rc.rect), rc.contour, rc.ID, -1)
+                Next
+
+                dst2 = ApplyPal(rcMap, 0)
+
+                labels(2) = CStr(task.fless.rcList.Count) + " cells in the rcMap"
+
+                Dim mm = GetMinMax(rcMap)
+                edges.Run(rcMap * 255 / mm.maxVal)
+                dst3 = edges.dst2
+            End If
+
+            ptLatest.Clear()
+            For i = 0 To ptList.Count - 1
+                ptLatest.Add(WarpAffine_Basics.WarpPoint(ptList(i), task.steadyCam.M))
+            Next
         End Sub
     End Class
 End Namespace
