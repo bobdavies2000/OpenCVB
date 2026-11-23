@@ -8,6 +8,7 @@ Namespace VBClasses
         Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public floodMask As cv.Mat
         Public Sub New()
+            labels(3) = "The highlights are regions too small to be cells (< " + CStr(task.minCellSize) + " pixels."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -28,6 +29,7 @@ Namespace VBClasses
 
             Dim rc As rcData, rcNext As rcData
             Dim rcLastList = New List(Of rcData)(rcList)
+            Dim rcMapLast = rcMap.Clone
 
             Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
             If floodMask IsNot Nothing Then floodMask.CopyTo(mask(task.maskRect))
@@ -80,13 +82,19 @@ Namespace VBClasses
                     Else
                         Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                         Dim rcLast = rcLastList(lastIndex)
-                        Dim lastID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        'If rc.motionPixels = 0 Then
+                        '    rc = rcLast
+                        '    rc.age += 1
+                        '    matches += 1
+                        'Else
+                        Dim lastID = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                         If rcLast.ID = lastID Then
                             rc.age = rcLast.age + 1
                             rc.maxDStable = rcLast.maxDStable
                             rc.ID = ID
                             matches += 1
                         End If
+                        ' End If
                     End If
                     If rc.ID >= 0 Then colorList.Add(rc)
                 Next
@@ -507,6 +515,30 @@ Namespace VBClasses
 
 
 
+    Public Class RedColor_LeftRight : Inherits TaskParent
+        Dim redLeft As New RedColor_Basics
+        Dim redRight As New RedColor_Basics
+        Dim reduction As New Reduction_Basics
+        Public Sub New()
+            desc = "Display the RedColor_Basics output For both the left And right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(task.leftView)
+
+            redLeft.Run(reduction.dst2)
+            dst2 = ApplyPal(redLeft.dst2, 0)
+            labels(2) = redLeft.labels(2) + " In the left image"
+
+            reduction.Run(task.rightView)
+
+            redRight.Run(reduction.dst2)
+            dst3 = ApplyPal(redRight.dst2, 0)
+            labels(3) = redRight.labels(2) + " In the right image"
+        End Sub
+    End Class
+
+
+
 
 
     Public Class RedColor_Phase1 : Inherits TaskParent
@@ -539,6 +571,8 @@ Namespace VBClasses
                             rc.ID = ID
                             sortList.Add(rc.pixels, rc)
                             index += 1
+                            'Else
+                            '    If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
@@ -596,7 +630,7 @@ Namespace VBClasses
             With task.delaunayFLess
                 For Each rc In inputList
                     Dim motionFlag = task.motion.motionMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) > 0
-                    Dim ID = .rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                     If ID = 0 Or motionFlag Then
                         CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
                         histogram.GetArray(Of Single)(histArray)
@@ -699,31 +733,6 @@ Namespace VBClasses
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
-        End Sub
-    End Class
-
-
-
-
-    Public Class RedColor_LeftRight : Inherits TaskParent
-        Dim redLeft As New RedColor_Basics
-        Dim redRight As New RedColor_Basics
-        Dim reduction As New Reduction_Basics
-        Public Sub New()
-            desc = "Display the RedColor_Basics output For both the left And right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.leftView)
-
-            redLeft.Run(reduction.dst2)
-            dst2 = ApplyPal(redLeft.dst2, 0)
-            labels(2) = redLeft.labels(2) + " In the left image"
-
-            reduction.Run(task.rightView)
-
-            redRight.Run(reduction.dst2)
-            dst3 = ApplyPal(redRight.dst2, 0)
-            labels(3) = redRight.labels(2) + " In the right image"
         End Sub
     End Class
 End Namespace
