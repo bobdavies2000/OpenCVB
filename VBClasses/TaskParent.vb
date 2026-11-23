@@ -118,8 +118,6 @@ Namespace VBClasses
         End Function
         Public Shared Function ApplyPal(input As Mat, Optional firstEntry As Byte = 1) As Mat
             Dim output As New Mat
-            'ApplyColorMap(input, output, Palette_Basics.palettes(task.paletteIndex))
-
             task.colorMap.Set(Of Vec3b)(0, 0, If(firstEntry = 0, New Vec3b(0, 0, 0), task.vecColors(0)))
 
             If input.Type <> MatType.CV_8U Then

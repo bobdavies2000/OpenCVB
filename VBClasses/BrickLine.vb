@@ -10,8 +10,8 @@ Namespace VBClasses
             desc = "Given lines or edges, build a grid of cells that cover them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bricks.Run(src)
             options.Run()
+            bricks.Run(src)
 
             If standalone Or edgeRequest Then
                 Static contour As New XR_Contour_RotateRect
@@ -24,10 +24,11 @@ Namespace VBClasses
 
             Dim mm = GetMinMax(src)
             Dim featList As New List(Of List(Of Integer))
-            For i = 0 To mm.maxVal ' the 0th entry is a placeholder for the background and will have 0 entries.
+            For i = 0 To mm.maxVal ' the 0th entry is a placeholder for the background and will have no entries.
                 featList.Add(New List(Of Integer))
             Next
 
+            ReDim hist.histarray(featList.Count - 1)
             For Each brick In bricks.brickList
                 hist.Run(src(brick.rect))
                 For i = 1 To hist.histarray.Length - 1

@@ -1,7 +1,7 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
-        Dim redColor As New RedColor_BasicsOriginal
+        Dim redColor As New RedColor_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public prepEdges As New RedPrep_Basics

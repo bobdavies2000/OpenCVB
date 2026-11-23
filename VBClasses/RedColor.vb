@@ -6,10 +6,8 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Dim redC1 As New RedColor_Phase1
-        Dim redC2 As New RedColor_Phase2
+        Public floodMask As cv.Mat
         Public Sub New()
-            labels(3) = "Highlighted fragments are too small to be a cell."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -28,71 +26,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.color8U.dst2
 
-            redC1.Run(src)
-            Dim mask = redC1.mask(task.maskRect).Clone
-
-            redC2.inputList = New List(Of rcData)(redC1.rcList)
-            redC2.Run(src)
-
             Dim rc As rcData, rcNext As rcData
+            Dim rcLastList = New List(Of rcData)(rcList)
 
-            rcMap.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
-            Dim rcListC2 As New List(Of rcData)(redC2.rcList)
-            For i = 0 To rcListC2.Count - 1
-                rc = rcListC2(i)
-                If rc.ID < 0 Then Continue For
-                For j = i + 1 To rcListC2.Count - 1
-                    rcNext = rcListC2(j)
-                    If rc.ID = rcNext.ID Then
-                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
-                        mask(r).SetTo(0)
-                        mask(rc.rect).SetTo(255, rc.mask)
-                        mask(rcNext.rect).SetTo(255, rcNext.mask)
-                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
-                        rcNext.ID = -1
-                        rc.age = rcListC2(i).age
-                        rcListC2(j) = rcNext
-                    End If
-                Next
-                rc.index = rcList.Count
-                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
-                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                SetTrueText(CStr(rc.index), rc.maxDStable, 2)
-                rcList.Add(rc)
-            Next
-
-            dst2 = ApplyPal(rcMap, 0)
-
-            If standalone Then SetTrueText(displayClick(rcList, rcMap), 3)
-
-            labels(2) = CStr(rcListC2.Count) + " cells merged into " + CStr(rcList.Count) + ". "
-            If rcList.Count > 255 Then
-                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class RedColor_Phase1 : Inherits TaskParent
-        Public rcList As New List(Of rcData)
-        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-        Public Sub New()
-            labels(3) = "CV_8U version of dst2."
-            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.color8U.dst2
-
+            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+            If floodMask IsNot Nothing Then floodMask.CopyTo(mask(task.maskRect))
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim index As Integer = 1
-            mask.SetTo(0)
             For y = 0 To dst2.Height - 1 Step task.gridWH
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
@@ -102,36 +43,92 @@ Namespace VBClasses
                         Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
 
                         If count > task.minCellSize Then
-                            Dim rc = New rcData(src(rect), rect, index) With {.ID = index, .index = index}
-                            Dim ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                            mask(rect).SetTo(ID, rc.mask)
-                            rc.ID = ID
+                            rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
+
+                            Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                            If ID > 0 Then
+                                mask(rect).SetTo(ID, rc.mask)
+                                rc.ID = ID
+                            End If
                             sortList.Add(rc.pixels, rc)
                             index += 1
+                        Else
+                            If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
             Next
 
-            dst3 = mask(task.maskRect).Clone
-            rcList = New List(Of rcData)(sortList.Values)
-            rcMap = src.Clone
+            mask = mask(task.maskRect)
+            If floodMask IsNot Nothing Then mask.SetTo(0, floodMask)
+            dst3 = mask.Clone
 
-            If standaloneTest() Then
-                dst2 = ApplyPal(dst3, 0)
-                For Each rc In rcList
-                    SetTrueText(CStr(rc.ID), rc.maxDist, 2)
-                    SetTrueText(CStr(rc.id), rc.maxDist, 3)
+            Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
+            Dim histogram As New Mat
+            Dim histArray() As Single = Nothing
+            Dim colorList As New List(Of rcData)
+            Dim matches As Integer
+            With task.delaunayFLess
+                For Each rc In sortList.Values
+                    Dim motionFlag = task.motion.motionMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                    If ID = 0 Or motionFlag <> 0 Then
+                        CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
+                        histogram.GetArray(Of Single)(histArray)
+                        Dim hList = histArray.ToList
+                        rc.ID = hList.IndexOf(hList.Max) - 1
+                    Else
+                        Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        Dim rcLast = rcLastList(lastIndex)
+                        Dim lastID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                        If rcLast.ID = lastID Then
+                            rc.age = rcLast.age + 1
+                            rc.maxDStable = rcLast.maxDStable
+                            rc.ID = ID
+                            matches += 1
+                        End If
+                    End If
+                    If rc.ID >= 0 Then colorList.Add(rc)
                 Next
-            End If
+            End With
 
-            labels(2) = CStr(sortList.Count) + " cells found in phase 1 of isolating RedColor cells."
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            For i = 0 To colorList.Count - 1
+                rc = colorList(i)
+                If rc.ID < 0 Then Continue For
+                For j = i + 1 To colorList.Count - 1
+                    rcNext = colorList(j)
+                    If rc.ID = rcNext.ID Then
+                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
+                        mask(r).SetTo(0)
+                        mask(rc.rect).SetTo(255, rc.mask)
+                        mask(rcNext.rect).SetTo(255, rcNext.mask)
+                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+                        rcNext.ID = -1
+                        rc.age = colorList(i).age
+                        colorList(j) = rcNext
+                    End If
+                Next
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                rc.index = rcList.Count
+                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
+                SetTrueText(CStr(rc.ID), rc.maxDStable, 2)
+                rcList.Add(rc)
+            Next
+
+            dst2 = ApplyPal(rcMap, 0)
+
+            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+
+            labels(2) = CStr(sortList.Count) + " cells merged into " + CStr(rcList.Count) + ". " + CStr(matches) +
+                        " were matched to previous frame.  Click any cell to see details in dst3."
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
         End Sub
     End Class
-
 
 
 
@@ -491,7 +488,7 @@ Namespace VBClasses
     Public Class RedColor_NoDepth : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Dim redColor As New RedColor_BasicsOriginal
+        Dim redColor As New RedColor_Basics
         Public Sub New()
             task.gOptions.stableDepthRGB.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -510,26 +507,23 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_BasicsOriginal : Inherits TaskParent
+
+
+    Public Class RedColor_Phase1 : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public floodMask As cv.Mat
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
-            labels(3) = "Highlighted fragments are too small to be a cell."
+            labels(3) = "CV_8U version of dst2."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.color8U.dst2
 
-            Dim rc As rcData, rcNext As rcData
-            Dim rcLastList = New List(Of rcData)(rcList)
-
-            Dim mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
-            If floodMask IsNot Nothing Then floodMask.CopyTo(mask(task.maskRect))
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim index As Integer = 1
+            mask.SetTo(0)
             For y = 0 To dst2.Height - 1 Step task.gridWH
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
@@ -539,92 +533,37 @@ Namespace VBClasses
                         Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
 
                         If count > task.minCellSize Then
-                            rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
-
-                            Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                            If ID > 0 Then
-                                mask(rect).SetTo(ID, rc.mask)
-                                rc.ID = ID
-                            End If
+                            Dim rc = New rcData(src(rect), rect, index) With {.ID = index, .index = index}
+                            Dim ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                            mask(rect).SetTo(ID, rc.mask)
+                            rc.ID = ID
                             sortList.Add(rc.pixels, rc)
                             index += 1
-                        Else
-                            If count > 0 Then mask(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 Next
             Next
 
-            mask = mask(task.maskRect)
-            If floodMask IsNot Nothing Then mask.SetTo(0, floodMask)
-            dst3 = mask.Clone
+            dst3 = mask(task.maskRect).Clone
+            rcList = New List(Of rcData)(sortList.Values)
+            rcMap = src.Clone
 
-            Dim ranges() As Rangef = {New Rangef(0, task.delaunayFLess.ptList.Count)}
-            Dim histogram As New Mat
-            Dim histArray() As Single = Nothing
-            Dim colorList As New List(Of rcData)
-            Dim matches As Integer
-            With task.delaunayFLess
-                For Each rc In sortList.Values
-                    Dim motionFlag = task.motion.motionMask.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                    If ID = 0 Or motionFlag <> 0 Then
-                        CalcHist({ .rcMap(rc.rect)}, {0}, rc.mask, histogram, 1, { .ptList.Count}, ranges)
-                        histogram.GetArray(Of Single)(histArray)
-                        Dim hList = histArray.ToList
-                        rc.ID = hList.IndexOf(hList.Max) - 1
-                    Else
-                        Dim lastIndex = rcIndex.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                        Dim rcLast = rcLastList(lastIndex)
-                        Dim lastID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                        If rcLast.ID = lastID Then
-                            rc.age = rcLast.age + 1
-                            rc.maxDStable = rcLast.maxDStable
-                            rc.ID = ID
-                            matches += 1
-                        End If
-                    End If
-                    If rc.ID >= 0 Then colorList.Add(rc)
+            If standaloneTest() Then
+                dst2 = ApplyPal(dst3, 0)
+                For Each rc In rcList
+                    SetTrueText(CStr(rc.ID), rc.maxDist, 2)
+                    SetTrueText(CStr(rc.ID), rc.maxDist, 3)
                 Next
-            End With
+            End If
 
-            rcMap.SetTo(0)
-            rcList.Clear()
-            rcList.Add(New rcData) ' placeholder for zero...
-            For i = 0 To colorList.Count - 1
-                rc = colorList(i)
-                If rc.ID < 0 Then Continue For
-                For j = i + 1 To colorList.Count - 1
-                    rcNext = colorList(j)
-                    If rc.ID = rcNext.ID Then
-                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
-                        mask(r).SetTo(0)
-                        mask(rc.rect).SetTo(255, rc.mask)
-                        mask(rcNext.rect).SetTo(255, rcNext.mask)
-                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
-                        rcNext.ID = -1
-                        rc.age = colorList(i).age
-                        colorList(j) = rcNext
-                    End If
-                Next
-                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
-                rc.index = rcList.Count
-                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
-                SetTrueText(CStr(rc.ID), rc.maxDStable, 2)
-                rcList.Add(rc)
-            Next
-
-            dst2 = ApplyPal(rcMap, 0)
-
-            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
-
-            labels(2) = CStr(sortList.Count) + " cells merged into " + CStr(rcList.Count) + ". " + CStr(matches) +
-                        " were matched to previous frame.  Click any cell to see details in dst3."
+            labels(2) = CStr(sortList.Count) + " cells found in phase 1 of isolating RedColor cells."
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
         End Sub
     End Class
+
+
 
 
 
@@ -695,6 +634,69 @@ Namespace VBClasses
 
             labels(2) = CStr(inputList.Count) + " cells merged into " + CStr(rcList.Count) + " cells. Click any cell to see details."
             If rcList.Count >= 255 Then
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedColor_Phase3 : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Dim redC1 As New RedColor_Phase1
+        Dim redC2 As New RedColor_Phase2
+        Public Sub New()
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.color8U.dst2
+
+            redC1.Run(src)
+            Dim mask = redC1.mask(task.maskRect).Clone
+
+            redC2.inputList = New List(Of rcData)(redC1.rcList)
+            redC2.Run(src)
+
+            Dim rc As rcData, rcNext As rcData
+
+            rcMap.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData) ' placeholder for zero...
+            Dim rcListC2 As New List(Of rcData)(redC2.rcList)
+            For i = 0 To rcListC2.Count - 1
+                rc = rcListC2(i)
+                If rc.ID < 0 Then Continue For
+                For j = i + 1 To rcListC2.Count - 1
+                    rcNext = rcListC2(j)
+                    If rc.ID = rcNext.ID Then
+                        Dim r = ValidateRect(rc.rect.Union(rcNext.rect))
+                        mask(r).SetTo(0)
+                        mask(rc.rect).SetTo(255, rc.mask)
+                        mask(rcNext.rect).SetTo(255, rcNext.mask)
+                        rc = New rcData(mask(r), r, 255) With {.ID = rcNext.ID}
+                        rcNext.ID = -1
+                        rc.age = rcListC2(i).age
+                        rcListC2(j) = rcNext
+                    End If
+                Next
+                rc.index = rcList.Count
+                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
+                rcMap(rc.rect).SetTo(rc.ID, rc.mask)
+                SetTrueText(CStr(rc.index), rc.maxDStable, 2)
+                rcList.Add(rc)
+            Next
+
+            dst2 = ApplyPal(rcMap, 0)
+
+            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+
+            labels(2) = CStr(rcListC2.Count) + " cells merged into " + CStr(rcList.Count) + ". "
+            If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
             End If
         End Sub

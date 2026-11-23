@@ -1,3 +1,4 @@
+Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports OpenCvSharp.Cv2
@@ -24,7 +25,7 @@ Namespace VBClasses
         End Function
         Private Sub initializeTaskStructures()
             cPtr = Depth_Colorizer_Open()
-            Dim gradientWidth = Math.Min(dst2.Width, 256)
+            Dim gradientWidth = Math.Min(task.workRes.Width, 256)
             Dim f As Double = 1.0
             Dim color1 = Scalar.Blue, color2 = Scalar.Yellow
             Dim colorList As New List(Of Vec3b)
@@ -41,11 +42,30 @@ Namespace VBClasses
             Dim graybytes = cv.Mat.FromPixelData(256, 1, MatType.CV_8UC1, RandomWithoutReplacement())
             Cv2.ApplyColorMap(graybytes, task.colorMap, Palette_Basics.palettes(task.paletteIndex))
 
+            ' some solid colors that should be easier to see.
+            task.vecColors(0) = New Vec3b(task.msRNG.Next(0, 255), task.msRNG.Next(0, 255), task.msRNG.Next(0, 255))
+            task.vecColors(1) = VividAmber
+            task.vecColors(2) = ElectricAmberYellow
+            task.vecColors(3) = KellyGreen
+            task.vecColors(4) = ElectricLime
+            task.vecColors(5) = DeepCyan
+            task.vecColors(6) = CobaltBlue
+            task.vecColors(7) = DeepViolet
+            task.vecColors(8) = HotCoral
+            task.vecColors(9) = RichGold
+            task.vecColors(10) = CrimsonRed
+
+            Dim rng As New Random(12345)
+            For i = 11 To task.vecColors.Length - 1
+                task.vecColors(i) = New Vec3b(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
+            Next
+            task.colorMap = Mat.FromPixelData(256, 1, MatType.CV_8UC3, task.vecColors)
+
             For i = 0 To task.vecColors.Length - 1
                 task.scalarColors(i) = New Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
             Next
 
-            Dim color3 = Scalar.Black, color4 = Scalar.Red
+            Dim color3 = black, color4 = red
             Dim corrColors = New List(Of Vec3b)
             f = 1.0
             For i = 0 To gradientWidth - 1

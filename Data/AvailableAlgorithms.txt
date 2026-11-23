@@ -628,13 +628,13 @@ RedCloud_Core
 RedCloud_DepthTiers
 RedCloud_Features
 RedColor_Basics
-RedColor_BasicsOriginal
 RedColor_CellHistogram
 RedColor_DepthBoundaries
 RedColor_MapHoles
 RedColor_NoDepth
 RedColor_Phase1
 RedColor_Phase2
+RedColor_Phase3
 RedPrep_Basics
 RedPrep_Core
 RedPrep_Edges_CPP
