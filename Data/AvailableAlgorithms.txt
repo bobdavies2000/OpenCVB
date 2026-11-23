@@ -630,6 +630,7 @@ RedCloud_Features
 RedColor_Basics
 RedColor_CellHistogram
 RedColor_DepthBoundaries
+RedColor_LeftRight
 RedColor_MapHoles
 RedColor_NoDepth
 RedColor_Phase1
@@ -1645,7 +1646,6 @@ XR_RedColor_GridRects
 XR_RedColor_Hulls
 XR_RedColor_InRange
 XR_RedColor_Isolate
-XR_RedColor_LeftRight
 XR_RedColor_Lines
 XR_RedColor_LineSingle
 XR_RedColor_Missing

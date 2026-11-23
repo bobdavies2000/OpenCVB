@@ -701,4 +701,29 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+    Public Class RedColor_LeftRight : Inherits TaskParent
+        Dim redLeft As New RedColor_Basics
+        Dim redRight As New RedColor_Basics
+        Dim reduction As New Reduction_Basics
+        Public Sub New()
+            desc = "Display the RedColor_Basics output For both the left And right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(task.leftView)
+
+            redLeft.Run(reduction.dst2)
+            dst2 = ApplyPal(redLeft.dst2, 0)
+            labels(2) = redLeft.labels(2) + " In the left image"
+
+            reduction.Run(task.rightView)
+
+            redRight.Run(reduction.dst2)
+            dst3 = ApplyPal(redRight.dst2, 0)
+            labels(3) = redRight.labels(2) + " In the right image"
+        End Sub
+    End Class
 End Namespace
