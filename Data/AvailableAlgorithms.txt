@@ -628,6 +628,7 @@ RedCloud_Core
 RedCloud_DepthTiers
 RedCloud_Features
 RedColor_Basics
+RedColor_BasicsMerge
 RedColor_CellHistogram
 RedColor_DepthBoundaries
 RedColor_LeftRight
@@ -1631,7 +1632,7 @@ XR_RedCloud_Matches
 XR_RedCloud_Motion
 XR_RedCloud_MotionFilter
 XR_RedCloud_TierRanges
-XR_RedColor_Basics
+XR_RedColor_BasicsSimple
 XR_RedColor_BasicsUnMerged
 XR_RedColor_Bricks
 XR_RedColor_Contour

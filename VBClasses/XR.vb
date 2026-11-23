@@ -766,7 +766,7 @@ Namespace VBClasses
 
 
 
-    Public Class XR_RedColor_Basics : Inherits TaskParent
+    Public Class XR_RedColor_BasicsSimple : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat

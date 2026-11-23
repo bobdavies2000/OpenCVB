@@ -5,10 +5,9 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Public floodMask As cv.Mat
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
         Public Sub New()
-            labels(3) = "The highlights are regions too small to be cells (< " + CStr(task.minCellSize) + " pixels."
+            labels(3) = "CV_8U version of dst2.  Each cell's ID is displayed."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -24,6 +23,63 @@ Namespace VBClasses
             End If
             Return ""
         End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.color8U.dst2
+
+            Dim rect As cv.Rect
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            Dim index As Integer = 1
+            mask.SetTo(0)
+            For y = 0 To dst2.Height - 1 Step task.gridWH
+                For x = 0 To dst2.Width - 1 Step task.gridWH
+                    Dim pt = New cv.Point(x, y)
+                    If mask.Get(Of Byte)(y, x) = 0 Then
+
+                        Dim flags = FloodFillFlags.FixedRange Or (index << 8)
+                        Dim count = FloodFill(src, mask, pt, index, rect, 0, 0, flags)
+
+                        If count > task.minCellSize Then
+                            Dim rc = New rcData(src(rect), rect, index) With {.ID = index, .index = index}
+                            Dim ID = task.delaunayFLess.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                            mask(rect).SetTo(ID, rc.mask)
+                            rc.ID = ID
+                            sortList.Add(rc.pixels, rc)
+                            index += 1
+                        End If
+                    End If
+                Next
+            Next
+
+            dst3 = mask(task.maskRect).Clone
+            rcList = New List(Of rcData)(sortList.Values)
+            rcMap = src.Clone
+
+            If standaloneTest() Then
+                dst2 = ApplyPal(dst3, 0)
+                For Each rc In rcList
+                    SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                Next
+            End If
+
+            labels(2) = CStr(sortList.Count) + " cells found in phase 1 of isolating RedColor cells."
+            If rcList.Count > 255 Then
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
+            End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_BasicsMerge : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public floodMask As cv.Mat
+        Public Sub New()
+            labels(3) = "The highlights are regions too small to be cells (< " + CStr(task.minCellSize) + " pixels."
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then src = task.color8U.dst2
 
@@ -496,7 +552,7 @@ Namespace VBClasses
     Public Class RedColor_NoDepth : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
-        Dim redColor As New RedColor_Basics
+        Dim redColor As New RedColor_BasicsMerge
         Public Sub New()
             task.gOptions.stableDepthRGB.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
