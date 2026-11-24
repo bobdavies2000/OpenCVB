@@ -83,7 +83,7 @@ Namespace VBClasses
 
             dst2 = ApplyPal(rcMap, 0)
 
-            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+            If standalone Then SetTrueText(RedColor_Basics.idClick(rcList, rcMap), 3)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -174,7 +174,7 @@ Namespace VBClasses
 
             dst2 = ApplyPal(rcMap, 0)
 
-            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+            If standalone Then SetTrueText(RedColor_Basics.idClick(rcList, rcMap), 3)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -241,7 +241,7 @@ Namespace VBClasses
 
             dst2 = ApplyPal(rcMap, 0)
 
-            If standalone Then SetTrueText(RedColor_Basics.displayClick(rcList, rcMap), 3)
+            If standalone Then SetTrueText(RedColor_Basics.idClick(rcList, rcMap), 3)
 
             For Each rc In rcList
                 If rc.ID = 0 Then Continue For
@@ -596,7 +596,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             redColor.Run(src)
             dst2 = redColor.dst2
-            labels(2) = redColor.labels(2)
 
             dst0.SetTo(0)
             Dim depthCount As Integer
@@ -606,18 +605,21 @@ Namespace VBClasses
                 depthCount += 1
             Next
 
-            ApplyColorMap(dst0, dst3, task.colorMapDepth)
-            dst3.SetTo(0, task.noDepthMask)
+            ApplyColorMap(dst0, dst2, task.colorMapDepth)
+            dst2.SetTo(0, task.noDepthMask)
 
-            If task.firstPass Then task.rcD = redColor.rcList(1)
-            SetTrueText(RedCC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
+            If redColor.rcList.Count > 1 Then task.rcD = redColor.rcList(1)
+            If task.rcD Is Nothing Then
+                SetTrueText(RedCC_Core.displayCell(redColor.rcList, redColor.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)), 1)
 
-            SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m", 1)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-            dst2(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
-            Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
+                SetTrueText(task.rcD.displayCell() + vbCrLf + "Mean depth = " + task.rcD.depthAvg.ToString(fmt2) + "m", 1)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                dst2(task.rcD.rect).SetTo(task.highlight, task.rcD.mask)
+                Rectangle(dst3, task.rcD.rect, task.highlight, task.lineWidth)
+            End If
 
-            labels(3) = CStr(depthCount) + " cells colored by mean depth (0-" + task.MaxZmeters.ToString(fmt0) + "m DepthColorizer palette)"
+            labels(2) = CStr(depthCount) + " cells colored by mean depth (0-" + task.MaxZmeters.ToString(fmt0) +
+                                           "m DepthColorizer palette)"
         End Sub
     End Class
 

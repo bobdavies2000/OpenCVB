@@ -16,6 +16,7 @@ Public Class TreeviewForm
     Public Sub BuildTreeView(tree As TreeView, paths As IEnumerable(Of String))
         tree.BeginUpdate()
         tree.Nodes.Clear()
+        Dim index As Integer = 0
         For Each path In paths
             Dim parts = path.Split("\"c)
             Dim currentNodes = tree.Nodes
@@ -38,6 +39,8 @@ Public Class TreeviewForm
                 ' Create if missing, or always create at leaf to allow duplicate names
                 If found Is Nothing Then
                     found = currentNodes.Add(part)
+                    found.Tag = index
+                    index += 1
                     found.ToolTipText = path + "\"
                     nodeList.Add(found.Text)
                 End If
@@ -79,9 +82,9 @@ Public Class TreeviewForm
 
         PercentTime.Left = 250
     End Sub
-    Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
+    Private Sub TreeView1_AfterSelect(sender As Object, e As TreeNodeMouseClickEventArgs) Handles TreeView1.NodeMouseClick
         task.cpu.displayObjectName = e.Node.Text
-        task.cpu.displayObjectIndex = task.cpu.callTrace.IndexOf(e.Node.ToolTipText)
+        task.cpu.displayObjectIndex = CInt(e.Node.Tag - 1)
         Timer2_Tick(sender, e)
     End Sub
 End Class
