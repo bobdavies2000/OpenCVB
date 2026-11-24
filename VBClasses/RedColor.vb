@@ -5,9 +5,11 @@ Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public rcIndex As New Mat(dst2.Size, MatType.CV_8U, 0)
         Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Dim floodAll As New RedColor_FloodMask
+        Dim floodPart As New RedColor_FloodMask
         Public Sub New()
-            labels(3) = "CV_8U version of dst2.  Each cell's ID is displayed."
             desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
         End Sub
         Public Shared Function displayClick(rcList As List(Of rcData), rcMap As cv.Mat) As String
@@ -23,13 +25,101 @@ Namespace VBClasses
             End If
             Return ""
         End Function
+        Public Shared Function displayClickIndex(rclist As List(Of rcData), rcIndex As cv.Mat) As String
+            Dim index = rcIndex.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index > 0 Then
+                task.rcD = rclist(index)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Rectangle(task.color, task.rcD.rect, task.highlight, task.lineWidth)
+                Return task.rcD.displayCell()
+            End If
+            Return ""
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.color8U.dst2
+            If src.Channels <> 1 Then src = task.color8U.dst2.Clone
+
+            Dim rect As cv.Rect
+            Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+            If heartbeatX() Then
+                floodAll.mask.SetTo(0)
+                floodAll.Run(src)
+                rcList = New List(Of rcData)(floodAll.rcList)
+                mask = floodAll.mask.Clone
+            Else
+                mask.SetTo(0)
+                For Each rc In floodAll.rcList
+                    If rc.ID = 0 Then Continue For
+                    Dim flags = FloodFillFlags.FixedRange Or (rc.ID << 8)
+                    Dim count = FloodFill(src, mask, rc.maxDist, 255, rect, 0, 0, flags)
+
+                    If count > task.minCellSize Then
+                        Dim rcNew = New rcData(src(rect), rect, 255) With {.ID = rc.ID}
+                        sortList.Add(rcNew.pixels, rcNew)
+                    End If
+                Next
+
+                Threshold(mask(task.maskRect), dst1, 1, 255, cv.ThresholdTypes.Binary)
+                floodPart.mask.SetTo(0)
+                floodPart.mask(task.maskRect).SetTo(255, dst1)
+                floodPart.Run(src)
+
+                For Each rc In floodPart.rcList
+                    sortList.Add(rc.pixels, rc)
+                    mask(task.maskRect)(rc.rect).SetTo(rc.ID, rc.mask)
+                Next
+            End If
+
+            rcIndex.SetTo(0)
+            rcList.Clear()
+            rcList.Add(New rcData)
+            For Each rc In sortList.Values
+                rc.index = rcList.Count
+                rcList.Add(rc)
+                rcIndex(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            dst3 = mask(task.maskRect).Clone
+            rcMap = dst3.Clone
+
+            If standaloneTest() Then
+                dst2 = ApplyPal(dst3, 0)
+                For Each rc In rcList
+                    If rc.ID = 0 Then Continue For
+                    SetTrueText(CStr(rc.ID), rc.maxDist, 3)
+                Next
+            End If
+
+            If standalone Then SetTrueText(RedColor_Basics.displayClickIndex(rcList, rcIndex), 3)
+
+            labels(2) = CStr(sortList.Count) + " cells found."
+            labels(3) = CStr(task.fless.rcList.Count) + " cell classes.  CV_8U version of dst2 with cell ID's."
+            If rcList.Count > 255 Then
+                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_FloodMask : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
+        Public mask As New Mat(New Size(dst2.Width + 2, dst2.Height + 2), MatType.CV_8U, 0)
+        Public Sub New()
+            labels(3) = "CV_8U version of dst2.  Each cell's ID is displayed."
+            desc = "FloodFill cells in the Color8U input and track them if above a minimum size."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Or src.Channels <> 1 Then
+                src = task.color8U.dst2
+                mask.SetTo(0)
+            End If
 
             Dim rect As cv.Rect
             Dim sortList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim index As Integer = 1
-            mask.SetTo(0)
             For y = 0 To dst2.Height - 1 Step task.gridWH
                 For x = 0 To dst2.Width - 1 Step task.gridWH
                     Dim pt = New cv.Point(x, y)
@@ -50,8 +140,9 @@ Namespace VBClasses
                 Next
             Next
 
-            dst3 = mask(task.maskRect).Clone
             rcList = New List(Of rcData)(sortList.Values)
+
+            dst3 = mask(task.maskRect).Clone
             rcMap = src.Clone
 
             If standaloneTest() Then
@@ -61,13 +152,9 @@ Namespace VBClasses
                 Next
             End If
 
-            labels(2) = CStr(sortList.Count) + " cells found in phase 1 of isolating RedColor cells."
-            If rcList.Count > 255 Then
-                SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
-            End If
+            labels(2) = CStr(sortList.Count) + " cells found."
         End Sub
     End Class
-
 
 
 
@@ -104,10 +191,7 @@ Namespace VBClasses
                             rc = New rcData(mask(rect).Clone, rect, index) With {.index = index}
 
                             Dim ID = rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                            If ID > 0 Then
-                                mask(rect).SetTo(ID, rc.mask)
-                                rc.ID = ID
-                            End If
+                            If ID > 0 Then rc.ID = ID
                             sortList.Add(rc.pixels, rc)
                             index += 1
                         Else
@@ -641,7 +725,6 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = ApplyPal(dst3, 0)
                 For Each rc In rcList
-                    SetTrueText(CStr(rc.ID), rc.maxDist, 2)
                     SetTrueText(CStr(rc.ID), rc.maxDist, 3)
                 Next
             End If

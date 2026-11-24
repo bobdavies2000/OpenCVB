@@ -631,6 +631,7 @@ RedColor_Basics
 RedColor_BasicsMerge
 RedColor_CellHistogram
 RedColor_DepthBoundaries
+RedColor_FloodMask
 RedColor_LeftRight
 RedColor_MapHoles
 RedColor_NoDepth
