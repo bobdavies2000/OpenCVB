@@ -105,12 +105,6 @@ if not exist OakD\depthai-core\Build (
 	cmake --build . --config Debug --target depthai-core depthai-resources XLink
 	echo Oak-D camera support built successfully.
 	cd ..\..\..\
-) else if not exist OakD\depthai-core\Build\Release\depthai-core.lib (
-	echo Building Oak-D camera support ^(depthai-core not yet built^)...
-	cmake OakD\depthai-core\Build -DOpenCV_DIR="%CD%\opencv\Build" -DDEPTHAI_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DDEPTHAI_SANITIZE=OFF
-	cmake --build OakD\depthai-core\Build --config Release --target depthai-core depthai-resources XLink
-	cmake --build OakD\depthai-core\Build --config Debug --target depthai-core depthai-resources XLink
-	echo Oak-D camera support built successfully.
 )
 
 echo.
