@@ -34,7 +34,6 @@ Namespace MainApp
         End Sub
 
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            ensureOakPaths()
             Application.DoEvents()
             settings = settingsIO.Load()
             pathFixup()
@@ -51,14 +50,6 @@ Namespace MainApp
             Me.Show()
             Application.DoEvents()
             StartStopTask()
-        End Sub
-        Private Sub ensureOakPaths()
-            updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-3D/Oak-4D camera support.")
-            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV native DLLs for Cam_Oak-D.dll")
-            updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV native DLLs for Cam_Oak-D.dll")
         End Sub
         Private Sub pathFixup()
             updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
