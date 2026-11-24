@@ -127,7 +127,6 @@ Neighbor
 Octree
 OEX
 OpAuto
-Open3D
 ORB
 Palette
 PCA

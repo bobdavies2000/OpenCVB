@@ -38,11 +38,6 @@ Namespace MainApp
             Application.DoEvents()
             settings = settingsIO.Load()
             pathFixup()
-            Try
-                Debug.WriteLine(Open3D_PrintVersion())
-            Catch ex As Exception
-                Debug.WriteLine("Open3D_PrintVersion failed: " + ex.Message)
-            End Try
 
             addPics()
 
