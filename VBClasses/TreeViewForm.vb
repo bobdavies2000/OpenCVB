@@ -66,6 +66,7 @@ Public Class TreeviewForm
 
         PercentTime.Text = CPUTime.PrepareReport(treeData)
 
+        If PercentTime.Lines.Length = 0 Then Exit Sub
         Dim length As Integer = PercentTime.Lines(PercentTime.Lines.Length - 1).Length
         Dim start As Integer = PercentTime.GetFirstCharIndexFromLine(PercentTime.Lines.Length - 1)
         PercentTime.Select(start, length)
