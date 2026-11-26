@@ -84,6 +84,9 @@ public:
         static ob::PointCloudFilter pointCloud;
         static OBCameraParam cameraParam = pipe.getCameraParam();
         pointCloud.setCameraParam(cameraParam);
+        // align.process below registers depth to color, so the cloud must use
+        // the color intrinsics rather than the depth camera's.
+        pointCloud.setFrameAlignState(true);
 
         static std::vector<std::shared_ptr<ob::Frame>> gyroFrames;
         static std::mutex gyroMutex;
@@ -128,19 +131,26 @@ public:
 
             if (lFrame != nullptr) leftData = (int*)lFrame->data();
             if (rFrame != nullptr) rightData = (int*)rFrame->data();
-            if (cFrame != nullptr) colorData = (int*)frameSet->colorFrame()->data();
-            if (dFrame != nullptr)
+            if (dFrame != nullptr && cFrame != nullptr)
             {
                 auto newFrame = align.process(frameSet);
-                auto newFrameSet = newFrame->as<ob::FrameSet>();
-                cFrame = newFrameSet->colorFrame();
-                dFrame = newFrameSet->depthFrame();
-
-                static float depthValueScale = dFrame->getValueScale();
-                pointCloud.setPositionDataScaled(depthValueScale);
-                pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
-                pcData = (int*)pointCloud.process(newFrameSet)->data();
+                if (newFrame != nullptr)
+                {
+                    auto newFrameSet = newFrame->as<ob::FrameSet>();
+                    if (newFrameSet != nullptr)
+                    {
+                        cFrame = newFrameSet->colorFrame();
+                        dFrame = newFrameSet->depthFrame();
+                        if (dFrame != nullptr)
+                        {
+                            pointCloud.setPositionDataScaled(dFrame->getValueScale());
+                            pointCloud.setCreatePointFormat(OB_FORMAT_POINT);
+                            pcData = (int*)pointCloud.process(newFrameSet)->data();
+                        }
+                    }
+                }
             }
+            if (cFrame != nullptr) colorData = (int*)cFrame->data();
             {
                 std::unique_lock<std::mutex> lock(gyroMutex);
                 auto val = gyroFrames.back()->as<ob::GyroFrame>()->value();
