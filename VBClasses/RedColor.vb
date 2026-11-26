@@ -696,7 +696,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim redPrep As New RedPrep_Basics
-        Dim redNoDepth As New RedColor_NoDepth
+        Dim redNoDepth As New RedColor_NoDepth1
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
             desc = "Limit the floodfill of colors with the depth boundaries."
@@ -761,7 +761,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_NoDepth : Inherits TaskParent
+    Public Class RedColor_NoDepth1 : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public Sub New()
             If task.redColor Is Nothing Then task.redColor = New RedColor_Basics

@@ -1,13 +1,13 @@
 Imports OpenCvSharp : Imports OpenCvSharp.Cv2 : Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCC_Basics : Inherits TaskParent
-        Dim redNoDepth As New RedColor_NoDepth
+        Dim redNoDepth As New RedColor_NoDepth1
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Combine the RedColor_NoDepth with the RedCloud_Basics output."
+            desc = "Combine the RedColor_NoDepth1 with the RedCloud_Basics output."
         End Sub
         Public Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
@@ -100,12 +100,12 @@ Namespace VBClasses
 
 
     Public Class RedCC_BasicsOld : Inherits TaskParent
-        Dim redNoDepth As New RedColor_NoDepth
+        Dim redNoDepth As New RedColor_NoDepth1
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            desc = "Combine the RedColor_NoDepth with the RedCloud_Basics output."
+            desc = "Combine the RedColor_NoDepth1 with the RedCloud_Basics output."
         End Sub
         Public Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
@@ -195,13 +195,13 @@ Namespace VBClasses
 
 
     Public Class RedCC_Simple : Inherits TaskParent
-        Dim redNoDepth As New RedColor_NoDepth
+        Dim redNoDepth As New RedColor_NoDepth1
         Dim redC As New RedCloud_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Combine the RedColor_NoDepth with the RedCloud_Basics output."
+            desc = "Combine the RedColor_NoDepth1 with the RedCloud_Basics output."
         End Sub
         Public Shared Function rcFinder(myList As List(Of rcData), id As Integer) As rcData
             If id = 0 Then Return Nothing
