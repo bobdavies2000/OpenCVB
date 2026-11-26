@@ -40,10 +40,11 @@ Namespace MainApp
 
             Dim device As Device = profiles.Device
             For Each s In device.Sensors
-                ' The default queue holds seconds of frames, so the picture lags the scene.
-                ' Two slots is the depth-plus-color size. Global time asks the device clock
-                ' on every frame, and that query is the long hardware delay.
-                TrySetOption(s, Intel.RealSense.Option.FramesQueueSize, 2)
+                ' Color, depth, and both infrared images have to sit in the queue together
+                ' or the frameset never completes and the app waits. 32 slots is about a
+                ' second at 30 FPS; the camera clamps that to the option maximum.
+                ' Global time asks the device clock on every frame.
+                TrySetOption(s, Intel.RealSense.Option.FramesQueueSize, 32)
                 TrySetOption(s, Intel.RealSense.Option.GlobalTimeEnabled, 0)
                 If s.Info.Item(0).Contains("Stereo Module") Then
                     s.Options(Intel.RealSense.Option.EmitterEnabled).Value = emitterOn
@@ -144,7 +145,10 @@ Namespace MainApp
         End Sub
         Private Sub TrySetOption(sensor As Sensor, opt As Intel.RealSense.Option, value As Single)
             Try
-                sensor.Options(opt).Value = value
+                Dim setting = sensor.Options(opt)
+                If value > setting.Max Then value = setting.Max
+                If value < setting.Min Then value = setting.Min
+                setting.Value = value
             Catch
                 ' This sensor does not have the option.
             End Try
@@ -169,19 +173,13 @@ Namespace MainApp
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            ' WaitForFrames blocks for the whole timeout when color and stereo are
-            ' a frame apart. Poll, then wait only one frame time, and keep the newest set.
+            ' Take one queued frameset. Leave the rest buffered so the next call
+            ' does not wait out another camera interval.
             Dim frames As FrameSet = Nothing
             Try
                 If Not pipe.PollForFrames(frames) Then
                     If Not pipe.TryWaitForFrames(frames, 33) Then Return
                 End If
-                Dim newer As FrameSet = Nothing
-                While pipe IsNot Nothing AndAlso pipe.PollForFrames(newer)
-                    frames.Dispose()
-                    frames = newer
-                    newer = Nothing
-                End While
             Catch ex As Exception
                 Debug.WriteLine("RealSense frame wait: " + ex.Message)
                 If frames IsNot Nothing Then frames.Dispose()
