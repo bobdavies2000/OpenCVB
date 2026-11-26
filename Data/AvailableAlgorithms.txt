@@ -99,6 +99,7 @@ Depth_Basics
 Depth_GuidedFilter
 Depth_Holes
 Depth_InRange
+Depth_InRange1
 Depth_NotMissing
 Depth_Outline
 Depth_ReliableLines
@@ -622,13 +623,13 @@ RedCC_NeighborHist
 RedCC_Neighbors
 RedCC_Simple
 RedCloud_Basics
+RedCloud_CellHistogram
 RedCloud_Contours
 RedCloud_Core
 RedCloud_DepthTiers
 RedCloud_Features
 RedColor_Basics
 RedColor_BasicsMerge
-RedColor_CellHistogram
 RedColor_Consolidate
 RedColor_DepthBoundaries
 RedColor_FloodMask
@@ -1652,6 +1653,7 @@ XR_RedColor_Isolate
 XR_RedColor_Lines
 XR_RedColor_LineSingle
 XR_RedColor_Missing
+XR_RedColor_NoDepth
 XR_RedColor_Points
 XR_Reduction_BGR
 XR_Reduction_Edges

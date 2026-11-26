@@ -869,4 +869,46 @@ Namespace VBClasses
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class RedCloud_CellHistogram : Inherits TaskParent
+        Dim plot As New PlotBar_Basics
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            task.gOptions.setHistogramBins(100)
+            plot.createHistogram = True
+            plot.removeZeroEntry = True
+            desc = "Display the histogram of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.redColor.dst2
+            labels(2) = task.redColor.labels(2)
+
+            If task.rcD Is Nothing Then Exit Sub
+
+            Dim clickText = RedColor_Basics.indexClick(task.redColor.rcList, task.redColor.rcIndex)
+            SetTrueText(clickText, 1)
+
+            labels(3) = "Select a cell to see the histogram of the depth values for that cell."
+
+            Dim depth As Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            plot.minRange = 0
+            plot.maxRange = task.MaxZmeters
+            plot.Run(depth)
+            labels(3) = "0 meters to " + task.MaxZmeters.ToString(fmt0) + " meters - vertical lines every meter"
+
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
+                Dim x = incr * i
+                Line(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), Scalar.White, task.lineWidth, task.lineType)
+            Next
+            dst3 = plot.dst2
+        End Sub
+    End Class
 End Namespace

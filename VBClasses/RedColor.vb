@@ -153,7 +153,6 @@ Namespace VBClasses
             Next
 
             dst2 = ApplyPal(rcMap, 0)
-            dst3 = redColor.dst2
 
             If standalone Then SetTrueText(RedColor_Basics.indexClick(rcList, rcIndex), 3)
 
@@ -740,7 +739,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_NoDepth : Inherits TaskParent
+    Public Class XR_RedColor_NoDepth : Inherits TaskParent
         Public rcList As New List(Of rcData)
         Public rcMap As New Mat(dst2.Size, MatType.CV_8U, 0)
         Dim redColor As New RedColor_BasicsMerge
@@ -756,6 +755,46 @@ Namespace VBClasses
             rcMap = redColor.rcMap
             dst2 = redColor.dst2
             labels(2) = CStr(rcList.Count) + " cells were found where there was no depth."
+        End Sub
+    End Class
+
+
+
+
+    Public Class RedColor_NoDepth : Inherits TaskParent
+        Public rcList As New List(Of rcData)
+        Public Sub New()
+            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+            task.gOptions.stableDepthRGB.Checked = True
+            dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Limit the floodfill of colors to areas with no depth data."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            rcList = New List(Of rcData)(task.redColor.rcList)
+            dst0.SetTo(0)
+            dst1.SetTo(0)
+            Dim count As Integer
+            For Each rc In rcList
+                If rc.ID = 0 Then Continue For
+                If rc.depthAvg = 0 Then
+                    dst0(rc.rect).SetTo(rc.ID, rc.mask)
+                    count += 1
+                Else
+                    dst1(rc.rect).SetTo(rc.ID, rc.mask)
+                End If
+            Next
+
+            dst2 = ApplyPal(dst0, 0)
+            dst3 = ApplyPal(dst1, 0)
+
+            If standaloneTest() Then
+                Dim clickText = RedColor_Basics.indexClick(rcList, task.redColor.rcIndex)
+                SetTrueText(clickText, 2)
+            End If
+
+            labels(2) = CStr(count) + " cells were found where there was no depth."
+            labels(3) = CStr(rcList.Count - count) + " cells were found with depth."
         End Sub
     End Class
 
@@ -978,46 +1017,6 @@ Namespace VBClasses
             labels(2) = CStr(rcListC2.Count) + " cells merged into " + CStr(rcList.Count) + ". "
             If rcList.Count > 255 Then
                 SetTrueText("Flood_RectMats needs to increase the minimum cell size - too many to fit in CV_8U!", 3)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class RedColor_CellHistogram : Inherits TaskParent
-        Public depths As New List(Of Single)
-        Public Sub New()
-            If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-            desc = "Isolate the depthAvg values for each of the detected cells."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If heartbeatLTX() Then
-                dst2 = task.redColor.dst2.Clone
-
-                depths.Clear()
-                For Each rc In task.redColor.rcList
-                    depths.Add(rc.depthAvg)
-                Next
-
-                Dim maxval = depths.Max
-                If maxval > 0 Then
-                    Static maxDepth = Math.Ceiling(maxval)
-                    maxDepth = Math.Ceiling(maxval)
-                    For Each rc In task.redColor.rcList
-                        rc.ID = Math.Floor(task.histogramBins * rc.depthAvg / maxDepth) + 1
-                    Next
-                End If
-                task.redColor.rcMap.SetTo(0)
-                For Each rc In task.redColor.rcList
-                    If rc.contour.Count = 0 Then Continue For
-                    DrawTour(task.redColor.rcMap(rc.rect), rc.contoursEx, New cv.Scalar(rc.ID), -1)
-                    SetTrueText(CStr(rc.index), rc.maxDist)
-                Next
-
-                dst3 = ApplyPal(task.redColor.rcMap, 0)
             End If
         End Sub
     End Class
