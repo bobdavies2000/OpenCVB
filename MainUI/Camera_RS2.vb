@@ -21,6 +21,19 @@ Namespace MainApp
                 If dev.Info.Item(0).Contains(searchName) Then serialNumber = dev.Info.Item(1)
             Next
 
+            If isD455 Then
+                ' 1280x720 color, depth, and both infrared streams are about 190 MB/s.
+                ' The D455 accepts that mode, then only a few complete framesets arrive
+                ' each second and the app waits. These smaller modes are 30 FPS profiles
+                ' for all four streams.
+                If workRes.Width <= 640 AndAlso workRes.Height <= 360 Then
+                    captureRes = New cv.Size(640, 360)
+                Else
+                    captureRes = New cv.Size(848, 480)
+                End If
+                fps = 30
+            End If
+
             Dim cfg As New Config()
             cfg.EnableDevice(serialNumber)
 
@@ -40,12 +53,9 @@ Namespace MainApp
 
             Dim device As Device = profiles.Device
             For Each s In device.Sensors
-                ' Color, depth, and both infrared images have to sit in the queue together
-                ' or the frameset never completes and the app waits. 32 slots is about a
-                ' second at 30 FPS; the camera clamps that to the option maximum.
-                ' Global time asks the device clock on every frame.
+                ' Enough slots for color, depth, and both infrared images to sync at 30 FPS.
+                ' Global time stays on: without one clock the four streams rarely form a frameset.
                 TrySetOption(s, Intel.RealSense.Option.FramesQueueSize, 32)
-                TrySetOption(s, Intel.RealSense.Option.GlobalTimeEnabled, 0)
                 If s.Info.Item(0).Contains("Stereo Module") Then
                     s.Options(Intel.RealSense.Option.EmitterEnabled).Value = emitterOn
                     ' s.Options(Intel.RealSense.Option.LaserPower).Value = 13
@@ -62,16 +72,9 @@ Namespace MainApp
             Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
             Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
-            Dim ratio = captureRes.Width \ workRes.Width
-            calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
-            calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
-            calibData.rgbIntrinsics.fx = rgb.fx / ratio
-            calibData.rgbIntrinsics.fy = rgb.fy / ratio
-
-            calibData.leftIntrinsics.fx = leftIntrin.fx / ratio
-            calibData.leftIntrinsics.fy = leftIntrin.fy / ratio
-            calibData.leftIntrinsics.ppx = leftIntrin.ppx / ratio
-            calibData.leftIntrinsics.ppy = leftIntrin.ppy / ratio
+            captureRes = New cv.Size(rgb.width, rgb.height)
+            ScaleToWork(rgb, calibData.rgbIntrinsics)
+            ScaleToWork(leftIntrin, calibData.leftIntrinsics)
 
             ReDim calibData.LtoR_translation(3 - 1)
             ReDim calibData.LtoR_rotation(9 - 1)
@@ -164,6 +167,16 @@ Namespace MainApp
                 IMU_FrameTime = mFrame.Timestamp - imuStartTime
             End If
         End Sub
+        Private Sub ScaleToWork(src As Intrinsics, ByRef dst As GenericCamera.intrinsicData)
+            Dim scaleX As Single = 1.0F
+            Dim scaleY As Single = 1.0F
+            If src.width > 0 AndAlso workRes.Width > 0 Then scaleX = CSng(src.width) / workRes.Width
+            If src.height > 0 AndAlso workRes.Height > 0 Then scaleY = CSng(src.height) / workRes.Height
+            dst.ppx = src.ppx / scaleX
+            dst.ppy = src.ppy / scaleY
+            dst.fx = src.fx / scaleX
+            dst.fy = src.fy / scaleY
+        End Sub
         Private Sub CopyToWorkRes(data As IntPtr, srcRows As Integer, srcCols As Integer, matType As cv.MatType, dst As cv.Mat)
             If data = IntPtr.Zero OrElse dst Is Nothing OrElse srcRows <= 0 OrElse srcCols <= 0 Then Return
             Dim src = cv.Mat.FromPixelData(srcRows, srcCols, matType, data)
@@ -173,13 +186,11 @@ Namespace MainApp
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            ' Take one queued frameset. Leave the rest buffered so the next call
-            ' does not wait out another camera interval.
+            ' One queued frameset, or the next one within a single frame time.
+            ' A 33 ms give-up was returning before the four streams had synced.
             Dim frames As FrameSet = Nothing
             Try
-                If Not pipe.PollForFrames(frames) Then
-                    If Not pipe.TryWaitForFrames(frames, 33) Then Return
-                End If
+                If Not pipe.PollForFrames(frames) Then frames = pipe.WaitForFrames(100)
             Catch ex As Exception
                 Debug.WriteLine("RealSense frame wait: " + ex.Message)
                 If frames IsNot Nothing Then frames.Dispose()
@@ -187,7 +198,6 @@ Namespace MainApp
             End Try
             If frames Is Nothing Then Return
 
-            Dim cols = captureRes.Width, rows = captureRes.Height
             Dim sawDepth As Boolean = False
             Using frames
                 ' Copy out of the SDK buffers before they are released. Holding the
@@ -195,18 +205,19 @@ Namespace MainApp
                 ' the next wait times out.
                 SyncLock cameraMutex
                     For Each frame As Intel.RealSense.Frame In frames
-                        If frame.Profile.Stream = Stream.Color And frame.Profile.Index = 0 Then
-                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC3, color)
-                        End If
-                        If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 1 Then
-                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC1, leftView)
-                        End If
-                        If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 2 Then
-                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC1, rightView)
-                        End If
-                        If frame.Profile.Stream = Stream.Depth Then
-                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_16UC1, depth16u)
-                            sawDepth = True
+                        Dim streamKind = frame.Profile.Stream
+                        If streamKind = Stream.Color OrElse streamKind = Stream.Infrared OrElse streamKind = Stream.Depth Then
+                            Dim video = frame.As(Of VideoFrame)()
+                            If streamKind = Stream.Color And frame.Profile.Index = 0 Then
+                                CopyToWorkRes(frame.Data, video.Height, video.Width, cv.MatType.CV_8UC3, color)
+                            ElseIf streamKind = Stream.Infrared And frame.Profile.Index = 1 Then
+                                CopyToWorkRes(frame.Data, video.Height, video.Width, cv.MatType.CV_8UC1, leftView)
+                            ElseIf streamKind = Stream.Infrared And frame.Profile.Index = 2 Then
+                                CopyToWorkRes(frame.Data, video.Height, video.Width, cv.MatType.CV_8UC1, rightView)
+                            ElseIf streamKind = Stream.Depth Then
+                                CopyToWorkRes(frame.Data, video.Height, video.Width, cv.MatType.CV_16UC1, depth16u)
+                                sawDepth = True
+                            End If
                         End If
                         If frame.Profile.Stream = Stream.Accel Then
                             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
