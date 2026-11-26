@@ -117,25 +117,43 @@ Public Class GenericCamera
         End If
     End Sub
 
+    Private cloudRows As Integer
+    Private cloudCols As Integer
+    Private cloudFx As Single
+    Private cloudFy As Single
+    Private cloudPpx As Single
+    Private cloudPpy As Single
+    Private cloudX As cv.Mat
+    Private cloudY As cv.Mat
     Public Function ComputePointCloud(rawDepth As cv.Mat, intrinsics As intrinsicData) As cv.Mat
-        ' Same unprojection as the per-pixel loop (X, Y, Z meters, zero where depth is zero).
-        ' The loop held the RealSense capture thread long enough for WaitForFrames to time out.
+        ' X, Y, Z in meters. Zero depth stays zero. The axis grids are built once per
+        ' resolution so a D455 frame is not spent reallocating them.
         Dim depth As New cv.Mat
         rawDepth.ConvertTo(depth, cv.MatType.CV_32F, 0.001)
+        EnsureCloudAxes(rawDepth.Rows, rawDepth.Cols, intrinsics)
 
-        Dim x = UnprojectAxis(rawDepth.Cols, intrinsics.ppx, intrinsics.fx, rawDepth.Rows, rawDepth.Cols, True)
-        Dim y = UnprojectAxis(rawDepth.Rows, intrinsics.ppy, intrinsics.fy, rawDepth.Rows, rawDepth.Cols, False)
-        cv.Cv2.Multiply(x, depth, x)
-        cv.Cv2.Multiply(y, depth, y)
+        Dim x As New cv.Mat
+        Dim y As New cv.Mat
+        cv.Cv2.Multiply(cloudX, depth, x)
+        cv.Cv2.Multiply(cloudY, depth, y)
 
         Dim pc As New cv.Mat
         cv.Cv2.Merge(New cv.Mat() {x, y, depth}, pc)
-
-        Dim pcSplit() As cv.Mat = cv.Cv2.Split(pc)
-        Dim minVal As Double, maxVal As Double
-        cv.Cv2.MinMaxLoc(pcSplit(2), minVal, maxVal)
         Return pc
     End Function
+    Private Sub EnsureCloudAxes(rows As Integer, cols As Integer, intrinsics As intrinsicData)
+        If cloudX IsNot Nothing AndAlso cloudRows = rows AndAlso cloudCols = cols AndAlso
+           cloudFx = intrinsics.fx AndAlso cloudFy = intrinsics.fy AndAlso
+           cloudPpx = intrinsics.ppx AndAlso cloudPpy = intrinsics.ppy Then Return
+        cloudX = UnprojectAxis(cols, intrinsics.ppx, intrinsics.fx, rows, cols, True)
+        cloudY = UnprojectAxis(rows, intrinsics.ppy, intrinsics.fy, rows, cols, False)
+        cloudRows = rows
+        cloudCols = cols
+        cloudFx = intrinsics.fx
+        cloudFy = intrinsics.fy
+        cloudPpx = intrinsics.ppx
+        cloudPpy = intrinsics.ppy
+    End Sub
     Private Function UnprojectAxis(count As Integer, principal As Single, focal As Single,
                                    rows As Integer, cols As Integer, horizontal As Boolean) As cv.Mat
         Dim line As cv.Mat

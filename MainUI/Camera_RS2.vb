@@ -8,7 +8,6 @@ Namespace MainApp
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim pipe As New Pipeline()
         Dim motionSensor As Sensor
-        Dim waitPrimed As Boolean
         Dim imuStartTime As Double
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, emitterOn As Integer,
                        Optional fps As Integer = 30)
@@ -22,19 +21,13 @@ Namespace MainApp
                 If dev.Info.Item(0).Contains(searchName) Then serialNumber = dev.Info.Item(1)
             Next
 
-            ' Four 1280-wide streams at 30 fps overrun the D455 USB link, and the
-            ' frameset never completes. 15 fps is a rate the color, depth, and both
-            ' infrared profiles all support.
-            Dim videoFps = fps
-            If isD455 AndAlso captureRes.Width >= 1280 AndAlso videoFps > 15 Then videoFps = 15
-
             Dim cfg As New Config()
             cfg.EnableDevice(serialNumber)
 
-            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, videoFps)
-            cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, videoFps)
-            cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, videoFps)
-            cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, videoFps)
+            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
+            cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
+            cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
+            cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
             ' D435i accel is 63 Hz. A D455 made after mid-2022 has no 63 Hz profile
             ' (minimum is 100). Leaving motion in this frameset makes WaitForFrames
             ' wait for a sample that never arrives and time out at 5 seconds.
@@ -47,6 +40,11 @@ Namespace MainApp
 
             Dim device As Device = profiles.Device
             For Each s In device.Sensors
+                ' The default queue holds seconds of frames, so the picture lags the scene.
+                ' Two slots is the depth-plus-color size. Global time asks the device clock
+                ' on every frame, and that query is the long hardware delay.
+                TrySetOption(s, Intel.RealSense.Option.FramesQueueSize, 2)
+                TrySetOption(s, Intel.RealSense.Option.GlobalTimeEnabled, 0)
                 If s.Info.Item(0).Contains("Stereo Module") Then
                     s.Options(Intel.RealSense.Option.EmitterEnabled).Value = emitterOn
                     ' s.Options(Intel.RealSense.Option.LaserPower).Value = 13
@@ -144,6 +142,13 @@ Namespace MainApp
                 Debug.WriteLine("D455 motion start: " + ex.Message)
             End Try
         End Sub
+        Private Sub TrySetOption(sensor As Sensor, opt As Intel.RealSense.Option, value As Single)
+            Try
+                sensor.Options(opt).Value = value
+            Catch
+                ' This sensor does not have the option.
+            End Try
+        End Sub
         Private Sub OnMotion(frame As Frame)
             If frame Is Nothing OrElse frame.Profile Is Nothing Then Return
             If frame.Profile.Stream = Stream.Accel Then
@@ -164,16 +169,22 @@ Namespace MainApp
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            ' The first frameset can take longer than 5 seconds while exposure settles.
-            Dim timeout As UInteger = If(waitPrimed, 5000UI, 10000UI)
-            waitPrimed = True
-
+            ' WaitForFrames blocks for the whole timeout when color and stereo are
+            ' a frame apart. Poll, then wait only one frame time, and keep the newest set.
             Dim frames As FrameSet = Nothing
             Try
-                frames = pipe.WaitForFrames(timeout)
+                If Not pipe.PollForFrames(frames) Then
+                    If Not pipe.TryWaitForFrames(frames, 33) Then Return
+                End If
+                Dim newer As FrameSet = Nothing
+                While pipe IsNot Nothing AndAlso pipe.PollForFrames(newer)
+                    frames.Dispose()
+                    frames = newer
+                    newer = Nothing
+                End While
             Catch ex As Exception
-                ' A missed frameset used to kill this thread. Keep waiting.
                 Debug.WriteLine("RealSense frame wait: " + ex.Message)
+                If frames IsNot Nothing Then frames.Dispose()
                 Return
             End Try
             If frames Is Nothing Then Return
