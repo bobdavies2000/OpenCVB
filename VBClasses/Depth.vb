@@ -636,53 +636,6 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_InRange : Inherits TaskParent
-        Dim options As New Options_ForeGround
-        Dim contours As New Contour_LargestSimple
-        Public classCount As Integer = 1
-        Public Sub New()
-            labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
-            If standalone Then task.gOptions.showMyDst1.Checked = True
-            dst3 = New Mat(dst0.Size(), MatType.CV_8U)
-            desc = "Create the selected number of depth ranges "
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Dim regMats As New List(Of Mat)
-            For i = 0 To options.numberOfRegions - 1
-                Dim upperBound = (i + 1) * options.depthPerRegion
-                If i = options.numberOfRegions - 1 Then upperBound = 1000
-                Dim regMat As New Mat
-                InRange(task.pcSplit(2), i * options.depthPerRegion, upperBound, regMat)
-                regMats.Add(regMat)
-                If i = 0 Then regMats(0).SetTo(0, task.noDepthMask)
-            Next
-
-            dst2 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
-            dst3.SetTo(0)
-            classCount = 1
-            For i = 0 To regMats.Count - 1
-                contours.Run(regMats(i))
-                For Each ctr In contours.allContours
-                    If ctr.Length >= options.minSizeContour Then
-                        DrawTour(dst2, ctr.ToList, classCount, -1)
-                        classCount += 1
-                        DrawTour(dst3, ctr.ToList, white)
-                    End If
-                Next
-            Next
-
-            dst0 = src.Clone
-            dst0.SetTo(white, dst3)
-
-            If standaloneTest() Then dst2 = ApplyPal(dst2)
-            labels(2) = classCount.ToString("000") + " regions were found"
-        End Sub
-    End Class
-
-
-
     Public Class XR_Depth_Regions : Inherits TaskParent
         Public classCount As Integer = 5
         Public Sub New()
@@ -1627,6 +1580,54 @@ Namespace VBClasses
             colorizer.Run(filtered)
             dst3 = colorizer.dst2
             labels(2) = "Prepared 32F depth  radius=" + CStr(radius) + "  eps=" + eps.ToString(fmt3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Depth_InRange : Inherits TaskParent
+        Dim options As New Options_ForeGround
+        Dim contours As New Contour_LargestSimple
+        Public classCount As Integer = 1
+        Public Sub New()
+            labels = {"", "", "Looks empty! But the values are there - 0 to classcount.  Run standaloneTest() to see the palette output for this", "Edges between the depth regions."}
+            If standalone Then task.gOptions.showMyDst1.Checked = True
+            dst3 = New Mat(dst0.Size(), MatType.CV_8U)
+            desc = "Create the selected number of depth ranges "
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim regMats As New List(Of Mat)
+            For i = 0 To options.numberOfRegions - 1
+                Dim upperBound = (i + 1) * options.depthPerRegion
+                If i = options.numberOfRegions - 1 Then upperBound = 1000
+                Dim regMat As New Mat
+                InRange(task.pcSplit(2), i * options.depthPerRegion, upperBound, regMat)
+                regMats.Add(regMat)
+                If i = 0 Then regMats(0).SetTo(0, task.noDepthMask)
+            Next
+
+            dst2 = New Mat(dst0.Size(), MatType.CV_8U, Scalar.All(0))
+            dst3.SetTo(0)
+            classCount = 1
+            For i = 0 To regMats.Count - 1
+                contours.Run(regMats(i))
+                For Each ctr In contours.allContours
+                    If ctr.Length >= options.minSizeContour Then
+                        DrawTour(dst2, ctr.ToList, classCount, -1)
+                        classCount += 1
+                        DrawTour(dst3, ctr.ToList, white)
+                    End If
+                Next
+            Next
+
+            dst0 = src.Clone
+            dst0.SetTo(white, dst3)
+
+            If standaloneTest() Then dst2 = ApplyPal(dst2)
+            labels(2) = classCount.ToString("000") + " regions were found"
         End Sub
     End Class
 End Namespace

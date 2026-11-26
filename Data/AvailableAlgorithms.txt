@@ -99,7 +99,6 @@ Depth_Basics
 Depth_GuidedFilter
 Depth_Holes
 Depth_InRange
-Depth_InRange1
 Depth_NotMissing
 Depth_Outline
 Depth_ReliableLines
