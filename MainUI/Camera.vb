@@ -118,28 +118,55 @@ Public Class GenericCamera
     End Sub
 
     Public Function ComputePointCloud(rawDepth As cv.Mat, intrinsics As intrinsicData) As cv.Mat
-        ' Compute point cloud from depth image and camera intrinsics
-        Dim pc = New cv.Mat(rawDepth.Size(), cv.MatType.CV_32FC3, 0)
-
+        ' Same unprojection as the per-pixel loop (X, Y, Z meters, zero where depth is zero).
+        ' The loop held the RealSense capture thread long enough for WaitForFrames to time out.
         Dim depth As New cv.Mat
-        rawDepth.ConvertTo(depth, cv.MatType.CV_32F)
-        depth *= 0.001
+        rawDepth.ConvertTo(depth, cv.MatType.CV_32F, 0.001)
 
-        For y = 0 To pc.Rows - 1
-            For x = 0 To pc.Cols - 1
-                Dim z = depth.At(Of Single)(y, x)
-                If z > 0 Then
-                    Dim px = (x - intrinsics.ppx) * z / intrinsics.fx
-                    Dim py = (y - intrinsics.ppy) * z / intrinsics.fy
-                    pc.At(Of cv.Vec3f)(y, x) = New cv.Vec3f(px, py, z)
-                End If
-            Next
-        Next
+        Dim x = UnprojectAxis(rawDepth.Cols, intrinsics.ppx, intrinsics.fx, rawDepth.Rows, rawDepth.Cols, True)
+        Dim y = UnprojectAxis(rawDepth.Rows, intrinsics.ppy, intrinsics.fy, rawDepth.Rows, rawDepth.Cols, False)
+        cv.Cv2.Multiply(x, depth, x)
+        cv.Cv2.Multiply(y, depth, y)
+
+        Dim pc As New cv.Mat
+        cv.Cv2.Merge(New cv.Mat() {x, y, depth}, pc)
 
         Dim pcSplit() As cv.Mat = cv.Cv2.Split(pc)
         Dim minVal As Double, maxVal As Double
         cv.Cv2.MinMaxLoc(pcSplit(2), minVal, maxVal)
         Return pc
+    End Function
+    Private Function UnprojectAxis(count As Integer, principal As Single, focal As Single,
+                                   rows As Integer, cols As Integer, horizontal As Boolean) As cv.Mat
+        Dim line As cv.Mat
+        If horizontal Then
+            line = New cv.Mat(1, count, cv.MatType.CV_32F)
+            For i = 0 To count - 1
+                line.Set(Of Single)(0, i, CSng(i))
+            Next
+        Else
+            line = New cv.Mat(count, 1, cv.MatType.CV_32F)
+            For i = 0 To count - 1
+                line.Set(Of Single)(i, 0, CSng(i))
+            Next
+        End If
+
+        Dim grid As New cv.Mat
+        If horizontal Then
+            cv.Cv2.Repeat(line, rows, 1, grid)
+        Else
+            cv.Cv2.Repeat(line, 1, cols, grid)
+        End If
+
+        Using principalMat As New cv.Mat(grid.Size(), grid.Type(), New cv.Scalar(principal))
+            cv.Cv2.Subtract(grid, principalMat, grid)
+        End Using
+        If focal <> 0 Then
+            Using scale As New cv.Mat(grid.Size(), grid.Type(), New cv.Scalar(1.0 / focal))
+                cv.Cv2.Multiply(grid, scale, grid)
+            End Using
+        End If
+        Return grid
     End Function
     Public Overridable Sub StopCamera()
     End Sub

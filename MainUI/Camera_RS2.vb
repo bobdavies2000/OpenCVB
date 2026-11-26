@@ -7,26 +7,41 @@ Imports cv = OpenCvSharp
 Namespace MainApp
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim pipe As New Pipeline()
+        Dim motionSensor As Sensor
+        Dim waitPrimed As Boolean
+        Dim imuStartTime As Double
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, emitterOn As Integer,
                        Optional fps As Integer = 30)
             captureRes = _captureRes
             workRes = _workRes
+            Dim isD455 = devName.EndsWith("455")
             Dim serialNumber As String = ""
             Dim ctx As New Context()
-            Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")
+            Dim searchName As String = If(isD455, "D455", "D435i")
             For Each dev In ctx.QueryDevices()
                 If dev.Info.Item(0).Contains(searchName) Then serialNumber = dev.Info.Item(1)
             Next
 
+            ' Four 1280-wide streams at 30 fps overrun the D455 USB link, and the
+            ' frameset never completes. 15 fps is a rate the color, depth, and both
+            ' infrared profiles all support.
+            Dim videoFps = fps
+            If isD455 AndAlso captureRes.Width >= 1280 AndAlso videoFps > 15 Then videoFps = 15
+
             Dim cfg As New Config()
             cfg.EnableDevice(serialNumber)
 
-            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
-            cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
-            cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
-            cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
-            cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
-            cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
+            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, videoFps)
+            cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, videoFps)
+            cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, videoFps)
+            cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, videoFps)
+            ' D435i accel is 63 Hz. A D455 made after mid-2022 has no 63 Hz profile
+            ' (minimum is 100). Leaving motion in this frameset makes WaitForFrames
+            ' wait for a sample that never arrives and time out at 5 seconds.
+            If Not isD455 Then
+                cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
+                cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
+            End If
 
             Dim profiles = pipe.Start(cfg)
 
@@ -83,6 +98,7 @@ Namespace MainApp
                                                   System.Math.Pow(calibData.LtoR_translation(1), 2) +
                                                   System.Math.Pow(calibData.LtoR_translation(2), 2))
             MyBase.prepImages()
+            If isD455 Then StartD455Motion(profiles.Device)
 
             ' Start background thread to capture frames
             captureThread = New Thread(AddressOf CaptureFrames)
@@ -95,33 +111,93 @@ Namespace MainApp
                 GetNextFrame()
             End While
         End Sub
+        ''' <summary>
+        ''' D455 motion stays on its own sensor. The video pipeline then waits only
+        ''' for color, depth, and infrared, which do arrive.
+        ''' </summary>
+        Private Sub StartD455Motion(device As Device)
+            Try
+                For Each s In device.Sensors
+                    If Not s.Info.Item(0).Contains("Motion") Then Continue For
+                    Dim profileList = s.StreamProfiles
+                    Dim accelProfile As StreamProfile = Nothing
+                    Dim gyroProfile As StreamProfile = Nothing
+                    For i = 0 To profileList.Count - 1
+                        Dim p = profileList(i)
+                        If p.Stream = Stream.Accel AndAlso p.Framerate = 100 Then accelProfile = p
+                        If p.Stream = Stream.Gyro AndAlso p.Framerate = 200 Then gyroProfile = p
+                    Next
+                    If accelProfile Is Nothing OrElse gyroProfile Is Nothing Then
+                        For i = 0 To profileList.Count - 1
+                            Dim p = profileList(i)
+                            If accelProfile Is Nothing AndAlso p.Stream = Stream.Accel Then accelProfile = p
+                            If gyroProfile Is Nothing AndAlso p.Stream = Stream.Gyro Then gyroProfile = p
+                        Next
+                    End If
+                    If accelProfile Is Nothing OrElse gyroProfile Is Nothing Then Exit Sub
+                    s.Open(New StreamProfile() {accelProfile, gyroProfile})
+                    s.Start(AddressOf OnMotion)
+                    motionSensor = s
+                    Exit Sub
+                Next
+            Catch ex As Exception
+                Debug.WriteLine("D455 motion start: " + ex.Message)
+            End Try
+        End Sub
+        Private Sub OnMotion(frame As Frame)
+            If frame Is Nothing OrElse frame.Profile Is Nothing Then Return
+            If frame.Profile.Stream = Stream.Accel Then
+                IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+            ElseIf frame.Profile.Stream = Stream.Gyro Then
+                IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+                Dim mFrame = frame.As(Of MotionFrame)()
+                If imuStartTime = 0 Then imuStartTime = mFrame.Timestamp
+                IMU_FrameTime = mFrame.Timestamp - imuStartTime
+            End If
+        End Sub
+        Private Sub CopyToWorkRes(data As IntPtr, srcRows As Integer, srcCols As Integer, matType As cv.MatType, dst As cv.Mat)
+            If data = IntPtr.Zero OrElse dst Is Nothing OrElse srcRows <= 0 OrElse srcCols <= 0 Then Return
+            Dim src = cv.Mat.FromPixelData(srcRows, srcCols, matType, data)
+            cv.Cv2.Resize(src, dst, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        End Sub
         Public Sub GetNextFrame()
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            Static ptcloud As PointCloud = New PointCloud()
-            Dim cols = captureRes.Width, rows = captureRes.Height
+            ' The first frameset can take longer than 5 seconds while exposure settles.
+            Dim timeout As UInteger = If(waitPrimed, 5000UI, 10000UI)
+            waitPrimed = True
 
-            Dim depth16u As cv.Mat = Nothing
-            Using frames As FrameSet = pipe.WaitForFrames(5000)
+            Dim frames As FrameSet = Nothing
+            Try
+                frames = pipe.WaitForFrames(timeout)
+            Catch ex As Exception
+                ' A missed frameset used to kill this thread. Keep waiting.
+                Debug.WriteLine("RealSense frame wait: " + ex.Message)
+                Return
+            End Try
+            If frames Is Nothing Then Return
+
+            Dim cols = captureRes.Width, rows = captureRes.Height
+            Dim sawDepth As Boolean = False
+            Using frames
+                ' Copy out of the SDK buffers before they are released. Holding the
+                ' frameset through the point-cloud build fills the camera queue and
+                ' the next wait times out.
                 SyncLock cameraMutex
                     For Each frame As Intel.RealSense.Frame In frames
                         If frame.Profile.Stream = Stream.Color And frame.Profile.Index = 0 Then
-                            color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, frame.Data)
-                            cv.Cv2.Resize(color, color, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC3, color)
                         End If
                         If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 1 Then
-                            leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                            cv.Cv2.Resize(leftView, leftView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC1, leftView)
                         End If
                         If frame.Profile.Stream = Stream.Infrared And frame.Profile.Index = 2 Then
-                            rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                            cv.Cv2.Resize(rightView, rightView, workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_8UC1, rightView)
                         End If
                         If frame.Profile.Stream = Stream.Depth Then
-                            depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data)
-                            cv.Cv2.Resize(depth16u, depth16u, workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                            pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
+                            CopyToWorkRes(frame.Data, rows, cols, cv.MatType.CV_16UC1, depth16u)
+                            sawDepth = True
                         End If
                         If frame.Profile.Stream = Stream.Accel Then
                             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
@@ -129,23 +205,36 @@ Namespace MainApp
                         If frame.Profile.Stream = Stream.Gyro Then
                             IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
                             Dim mFrame = frame.As(Of MotionFrame)
-                            Static IMU_StartTime As Int64 = mFrame.Timestamp
-                            IMU_FrameTime = mFrame.Timestamp - IMU_StartTime
+                            If imuStartTime = 0 Then imuStartTime = mFrame.Timestamp
+                            IMU_FrameTime = mFrame.Timestamp - imuStartTime
                         End If
                     Next
                 End SyncLock
-
-                MyBase.GetNextFrameCounts()
             End Using
+
+            If sawDepth Then
+                Dim cloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
+                SyncLock cameraMutex
+                    pointCloud = cloud
+                End SyncLock
+            End If
+
+            MyBase.GetNextFrameCounts()
         End Sub
         Public Overrides Sub StopCamera()
             ' Stop the pipeline asynchronously so it doesn't block the UI
             Dim pipeToStop = pipe
+            Dim motionToStop = motionSensor
             pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
+            motionSensor = Nothing
 
             ' Run pipe.Stop() on a background thread so it doesn't block
             ThreadPool.QueueUserWorkItem(Sub(state)
                                              Try
+                                                 If motionToStop IsNot Nothing Then
+                                                     motionToStop.Stop()
+                                                     motionToStop.Close()
+                                                 End If
                                                  pipeToStop.Stop()
                                                  pipeToStop.Dispose()
                                              Catch ex As Exception
